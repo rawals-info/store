@@ -17,12 +17,12 @@ const FilterTag = ({
   return (
     <Button
       variant="secondary"
-      className="flex items-center gap-x-1 px-3 py-1.5 border border-luxury-gold/30 bg-luxury-cream/10 text-luxury-charcoal hover:border-luxury-gold/60 transition-colors"
+      className="flex items-center gap-x-1.5 px-3 py-1.5 border border-luxury-gold/40 bg-luxury-ivory shadow-sm text-luxury-charcoal hover:border-luxury-gold hover:bg-luxury-cream/10 transition-colors rounded-sm group"
       onClick={onClick}
       data-testid={dataTestId}
     >
-      <span className="text-xs">{label}</span>
-      <XMarkMini className="w-3 h-3" />
+      <span className="text-xs font-serif group-hover:text-luxury-gold/90 transition-colors">{label}</span>
+      <XMarkMini className="w-3 h-3 text-luxury-gold" />
     </Button>
   )
 }

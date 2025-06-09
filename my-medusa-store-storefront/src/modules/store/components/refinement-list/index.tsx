@@ -1,9 +1,9 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useState, useMemo } from "react"
+import { useCallback, useState, useMemo, useEffect } from "react"
 import { Button, Heading, Text } from "@medusajs/ui"
-import { XMarkMini } from "@medusajs/icons"
+import { XMarkMini, Adjustments } from "@medusajs/icons"
 
 import SortProducts, { SortOptions } from "./sort-products"
 import FilterDropdown from "@modules/common/components/filter-dropdown"
@@ -62,7 +62,8 @@ const RefinementList = ({
     return params ? params.split(",") : []
   }, [searchParams])
   
-  const priceRange = useMemo(() => {
+  // Get initial price range from URL or props
+  const initialPriceRange = useMemo(() => {
     const minParam = searchParams.get("price_min")
     const maxParam = searchParams.get("price_max")
     return [
@@ -71,57 +72,73 @@ const RefinementList = ({
     ] as [number, number]
   }, [searchParams, minPrice, maxPrice])
   
+  // Store current price range in component state 
+  const [currentPriceRange, setCurrentPriceRange] = useState<[number, number]>(initialPriceRange)
+  
+  // Update currentPriceRange when URL params change
+  useEffect(() => {
+    setCurrentPriceRange(initialPriceRange)
+  }, [initialPriceRange])
+  
+  // For display and filtering logic
+  const hasActivePriceFilter = useMemo(() => {
+    return currentPriceRange[0] > minPrice || currentPriceRange[1] < maxPrice
+  }, [currentPriceRange, minPrice, maxPrice])
+  
   // Check if any filters are active
-  const hasActiveFilters = categoryIds.length > 0 || tagIds.length > 0 || 
-    priceRange[0] > minPrice || priceRange[1] < maxPrice
+  const hasActiveFilters = useMemo(() => {
+    return categoryIds.length > 0 || tagIds.length > 0 || hasActivePriceFilter
+  }, [categoryIds, tagIds, hasActivePriceFilter])
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams(searchParams.toString())
       params.set(name, value)
       return params.toString()
     },
     [searchParams]
   )
 
-  const setQueryParams = (name: string, value: string) => {
+  const setQueryParams = useCallback((name: string, value: string) => {
     const query = createQueryString(name, value)
-    router.push(`${pathname}?${query}`)
-  }
+    router.push(`${pathname}?${query}`, { scroll: false })
+  }, [createQueryString, pathname, router])
   
   // Handle category filter change
-  const handleCategoryChange = (id: string) => {
+  const handleCategoryChange = useCallback((id: string) => {
     const updatedCategories = categoryIds.includes(id)
       ? categoryIds.filter((catId) => catId !== id)
       : [...categoryIds, id]
     
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams.toString())
     if (updatedCategories.length) {
       params.set("categories", updatedCategories.join(","))
     } else {
       params.delete("categories")
     }
-    router.push(`${pathname}?${params.toString()}`)
-  }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [categoryIds, searchParams, pathname, router])
   
   // Handle tag filter change
-  const handleTagChange = (id: string) => {
+  const handleTagChange = useCallback((id: string) => {
     const updatedTags = tagIds.includes(id)
       ? tagIds.filter((tagId) => tagId !== id)
       : [...tagIds, id]
     
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams.toString())
     if (updatedTags.length) {
       params.set("tags", updatedTags.join(","))
     } else {
       params.delete("tags")
     }
-    router.push(`${pathname}?${params.toString()}`)
-  }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [tagIds, searchParams, pathname, router])
   
   // Handle price range change
-  const handlePriceChange = (value: [number, number]) => {
-    const params = new URLSearchParams(searchParams)
+  const handlePriceChange = useCallback((value: [number, number]) => {
+    setCurrentPriceRange(value)
+    
+    const params = new URLSearchParams(searchParams.toString())
     
     if (value[0] !== minPrice) {
       params.set("price_min", value[0].toString())
@@ -135,12 +152,25 @@ const RefinementList = ({
       params.delete("price_max")
     }
     
-    router.push(`${pathname}?${params.toString()}`)
-  }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [searchParams, minPrice, maxPrice, pathname, router])
+  
+  // Reset price range
+  const resetPriceRange = useCallback(() => {
+    setCurrentPriceRange([minPrice, maxPrice])
+    
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("price_min")
+    params.delete("price_max")
+    
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [searchParams, minPrice, maxPrice, pathname, router])
   
   // Clear all filters
-  const clearAllFilters = () => {
-    const params = new URLSearchParams(searchParams)
+  const clearAllFilters = useCallback(() => {
+    setCurrentPriceRange([minPrice, maxPrice])
+    
+    const params = new URLSearchParams(searchParams.toString())
     params.delete("categories")
     params.delete("tags")
     params.delete("price_min")
@@ -149,8 +179,8 @@ const RefinementList = ({
     // Keep the sort parameter
     const sort = params.get("sortBy")
     
-    router.push(`${pathname}${sort ? `?sortBy=${sort}` : ""}`)
-  }
+    router.push(`${pathname}${sort ? `?sortBy=${sort}` : ""}`, { scroll: false })
+  }, [searchParams, minPrice, maxPrice, pathname, router])
   
   // Determine active category names for tags
   const activeCategoryNames = useMemo(() => {
@@ -167,42 +197,54 @@ const RefinementList = ({
   }, [tags, tagIds])
   
   // Remove a specific category
-  const removeCategory = (id: string) => {
+  const removeCategory = useCallback((id: string) => {
     handleCategoryChange(id)
-  }
+  }, [handleCategoryChange])
   
   // Remove a specific tag
-  const removeTag = (id: string) => {
+  const removeTag = useCallback((id: string) => {
     handleTagChange(id)
-  }
+  }, [handleTagChange])
   
   return (
-    <div className="py-4 mb-8">
+    <div className="w-full max-w-full">
       {/* Mobile filter toggle */}
-      <div className="flex items-center justify-between mb-6 small:hidden">
-        <div className="flex items-center">
-          <Button 
-            variant="secondary"
-            className="flex items-center gap-x-2 px-3 py-1.5 border border-luxury-gold/30 bg-transparent text-luxury-charcoal hover:border-luxury-gold/60 transition-colors"
-            onClick={() => setShowMobileFilters(!showMobileFilters)}
+      <div className="flex items-center justify-between mb-4 lg:hidden">
+        <button 
+          className="flex items-center gap-x-2 px-4 py-2 bg-luxury-ivory border border-luxury-gold/40 shadow-sm hover:border-luxury-gold transition-colors rounded-sm group"
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+        >
+          <Adjustments className="w-4 h-4 text-luxury-gold" />
+          <span className="text-xs font-serif text-luxury-charcoal group-hover:text-luxury-gold/90 transition-colors">
+            {showMobileFilters ? "Hide Filters" : "Refine"}
+          </span>
+          {hasActiveFilters && (
+            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-luxury-gold text-luxury-ivory text-[10px] font-serif">
+              {categoryIds.length + tagIds.length + (hasActivePriceFilter ? 1 : 0)}
+            </div>
+          )}
+        </button>
+        {hasActiveFilters && (
+          <button
+            className="text-xs text-luxury-gold/80 hover:text-luxury-gold border-b border-luxury-gold/20 hover:border-luxury-gold/60 font-serif pb-0.5 transition-colors"
+            onClick={clearAllFilters}
           >
-            <span className="text-xs font-medium">Filter</span>
-            {hasActiveFilters && (
-              <div className="w-2 h-2 rounded-full bg-luxury-gold"></div>
-            )}
-          </Button>
-        </div>
-        <div className="flex items-center">
-          <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
-        </div>
+            Clear All
+          </button>
+        )}
       </div>
       
       {/* Product count & active filters */}
-      <div className="flex flex-col gap-y-4 mb-6">
+      <div className="flex flex-col gap-y-3 mb-4">
         {productCount !== undefined && (
-          <Text className="text-luxury-charcoal font-medium text-base">
-            {productCount} {productCount === 1 ? "Product" : "Products"}
-          </Text>
+          <div className="flex justify-between items-center">
+            <Text className="text-luxury-charcoal font-serif text-sm uppercase tracking-wider">
+              {productCount} {productCount === 1 ? "Piece" : "Pieces"}
+            </Text>
+            <div className="hidden lg:block">
+              <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
+            </div>
+          </div>
         )}
         
         {hasActiveFilters && (
@@ -214,7 +256,7 @@ const RefinementList = ({
                 return (
                   <FilterTag 
                     key={`cat-${category.id}`}
-                    label={`Category: ${name}`}
+                    label={`${name}`}
                     onClick={() => removeCategory(category.id)}
                   />
                 )
@@ -226,28 +268,30 @@ const RefinementList = ({
                 return (
                   <FilterTag 
                     key={`tag-${tag.id}`}
-                    label={`Tag: ${value}`}
+                    label={`${value}`}
                     onClick={() => removeTag(tag.id)}
                   />
                 )
               })}
               
-              {(priceRange[0] > minPrice || priceRange[1] < maxPrice) && (
+              {hasActivePriceFilter && (
                 <FilterTag 
-                  label={`Price: ${new Intl.NumberFormat("en-US", { 
+                  label={`${new Intl.NumberFormat("en-US", { 
                     style: "currency", 
-                    currency: currencyCode 
-                  }).format(priceRange[0])} - ${new Intl.NumberFormat("en-US", { 
+                    currency: currencyCode,
+                    minimumFractionDigits: 0
+                  }).format(currentPriceRange[0])} - ${new Intl.NumberFormat("en-US", { 
                     style: "currency", 
-                    currency: currencyCode 
-                  }).format(priceRange[1])}`}
-                  onClick={() => handlePriceChange([minPrice, maxPrice])}
+                    currency: currencyCode,
+                    minimumFractionDigits: 0
+                  }).format(currentPriceRange[1])}`}
+                  onClick={resetPriceRange}
                 />
               )}
             </div>
             <Button
               variant="secondary"
-              className="text-luxury-charcoal/80 text-xs flex items-center gap-x-1"
+              className="text-luxury-gold/80 text-xs flex items-center gap-x-1 font-serif hover:text-luxury-gold"
               onClick={clearAllFilters}
             >
               <XMarkMini className="w-3.5 h-3.5" />
@@ -258,9 +302,17 @@ const RefinementList = ({
       </div>
       
       {/* Filters & sort */}
-      <div className={`grid small:grid-cols-[250px_1fr] gap-x-8 ${!showMobileFilters && 'max-small:hidden'}`}>
-        {/* Left sidebar filters */}
-        <div className="flex flex-col gap-6">
+      <div className={`grid gap-y-4 w-full ${!showMobileFilters && 'max-lg:hidden'}`}>
+        {/* Sort (mobile) */}
+        <div className="lg:hidden w-full">
+          <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
+        </div>
+        
+        {/* Divider */}
+        <div className="h-px w-full bg-luxury-gold/20"></div>
+        
+        {/* Filters */}
+        <div className="flex flex-col gap-4 w-full">
           {categories.length > 0 && (
             <FilterDropdown
               title="Categories"
@@ -275,33 +327,38 @@ const RefinementList = ({
             />
           )}
           
+          <div className="h-px w-full bg-luxury-gold/20"></div>
+          
           {tags.length > 0 && (
-            <FilterDropdown
-              title="Tags"
-              items={tags.map(t => ({
-                id: t.id,
-                name: t.value,
-                count: t.products_count
-              }))}
-              selectedItems={tagIds}
-              handleChange={handleTagChange}
-              data-testid="tag-filter"
-            />
+            <>
+              <FilterDropdown
+                title="Materials"
+                items={tags.map(t => ({
+                  id: t.id,
+                  name: t.value,
+                  count: t.products_count
+                }))}
+                selectedItems={tagIds}
+                handleChange={handleTagChange}
+                data-testid="tag-filter"
+              />
+              
+              <div className="h-px w-full bg-luxury-gold/20"></div>
+            </>
           )}
           
-          <PriceRange
-            min={minPrice}
-            max={maxPrice}
-            value={priceRange}
-            handleChange={handlePriceChange}
-            currencyCode={currencyCode}
-            data-testid="price-filter"
-          />
-        </div>
-        
-        {/* Right side sort (desktop) */}
-        <div className="hidden small:flex justify-end">
-          <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
+          <div className="w-full">
+            {minPrice !== maxPrice && (
+              <PriceRange
+                min={minPrice}
+                max={maxPrice}
+                value={currentPriceRange}
+                handleChange={handlePriceChange}
+                currencyCode={currencyCode}
+                data-testid="price-filter"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

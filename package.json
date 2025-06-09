@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@headlessui/react": "2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@hookform/error-message": "2.0.0",
     "@ianvs/prettier-plugin-sort-imports": "4.3.1",
     "@mdx-js/loader": "3.0.1",

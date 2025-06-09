@@ -84,14 +84,11 @@ export const listProducts = async ({
 
   // Process price filter
   if (queryParams.price) {
-    if (queryParams.price.gte !== undefined) {
-      processedQueryParams.price_from = queryParams.price.gte
-    }
-    if (queryParams.price.lte !== undefined) {
-      processedQueryParams.price_to = queryParams.price.lte
-    }
-    // Remove the original price object as it's not compatible with the API
+    // Store the price filter but remove from API params as we'll handle filtering client-side
     delete processedQueryParams.price
+    
+    // Request more products to ensure we have enough after filtering
+    processedQueryParams.limit = 100
   }
 
   // Use request deduplication
@@ -109,14 +106,57 @@ export const listProducts = async ({
         }
       )
       .then(({ products, count }) => {
-        const nextPage = count > offset + limit ? pageParam + 1 : null
+        // Apply price filtering on client-side since the API doesn't support it directly
+        let filteredProducts = products;
+        
+        if (queryParams.price) {
+          filteredProducts = products.filter(product => {
+            // Get the price from the first variant's calculated price
+            const productPrice = product.variants?.[0]?.calculated_price?.calculated_amount || 0;
+            
+            // Skip products with no price
+            if (productPrice === 0) return false;
+            
+            // Apply minimum price filter if specified
+            if (queryParams.price?.gte !== undefined && productPrice < queryParams.price.gte) {
+              return false;
+            }
+            
+            // Apply maximum price filter if specified
+            if (queryParams.price?.lte !== undefined && productPrice > queryParams.price.lte) {
+              return false;
+            }
+            
+            return true;
+          });
+          
+          // Apply pagination after filtering
+          const startIndex = offset;
+          const endIndex = startIndex + limit;
+          const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+          
+          const filteredCount = filteredProducts.length;
+          const nextPage = filteredCount > offset + limit ? pageParam + 1 : null;
+          
+          return {
+            response: {
+              products: paginatedProducts,
+              count: filteredCount,
+            },
+            nextPage,
+            queryParams,
+          }
+        }
 
+        // If no price filter, return original result with pagination
+        const nextPage = count > offset + limit ? pageParam + 1 : null;
+        
         return {
           response: {
             products,
             count,
           },
-          nextPage: nextPage,
+          nextPage,
           queryParams,
         }
       }),
