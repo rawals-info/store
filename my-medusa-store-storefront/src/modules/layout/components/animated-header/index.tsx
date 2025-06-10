@@ -8,6 +8,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
+import CountrySwitcher from "@modules/layout/components/country-switcher"
+import CurrencySwitcher from "@modules/layout/components/currency-switcher"
 
 const AnimatedHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -100,7 +102,7 @@ const AnimatedHeader = () => {
     <>
       <motion.header
         className={clx(
-          "sticky top-0 inset-x-0 z-50 group transition-all duration-500 backdrop-blur-sm",
+          "sticky top-0 inset-x-0 z-[40] group transition-all duration-500 backdrop-blur-sm",
           {
             "border-b border-luxury-gold/10": isScrolled,
           }
@@ -258,8 +260,8 @@ const AnimatedHeader = () => {
                   </motion.div>
                 ))}
               </div>
-              <div className="hidden small:block">
-                <RegionSelector regions={regions} variant="header" />
+              <div className="hidden small:flex items-center gap-x-4">
+                <CurrencySwitcher />
               </div>
               <div className="h-full flex items-center">
                 <CartButton />
@@ -332,9 +334,9 @@ const AnimatedHeader = () => {
               ))}
             </div>
 
-            {/* Region selector in mobile menu */}
-            <div className="p-6 border-t border-luxury-gold/10 flex justify-center">
-              <RegionSelector regions={regions} variant="mobile" />
+            {/* Region and country selectors in mobile menu */}
+            <div className="p-6 border-t border-luxury-gold/10 flex justify-center gap-6">
+              <CurrencySwitcher />
             </div>
           </motion.div>
         )}

@@ -64,18 +64,52 @@ export async function getOrSetCart(countryCode: string) {
     ...(await getAuthHeaders()),
   }
 
+  // Get default sales channel
+  let salesChannelId = "sc_01JX7RWQ7RATZ6B95GFKPK262E"; // Default fallback ID
+  try {
+    // Try to use the "Default Sales Channel" which is typically created during setup
+    const response = await sdk.client.fetch<{ sales_channels: Array<{ id: string, name: string }> }>("/store/sales-channels", {
+      method: "GET",
+      headers,
+    });
+    
+    if (response.sales_channels && response.sales_channels.length > 0) {
+      // Try to find the default sales channel
+      const defaultChannel = response.sales_channels.find(
+        (channel) => channel.name === "Default Sales Channel"
+      );
+      
+      if (defaultChannel) {
+        salesChannelId = defaultChannel.id;
+      } else if (response.sales_channels[0]?.id) {
+        // Fallback to the first available sales channel
+        salesChannelId = response.sales_channels[0].id;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching sales channels, using default sales channel ID:", error);
+  }
+
   if (!cart) {
-    const cartResp = await sdk.store.cart.create(
-      { region_id: region.id },
-      {},
-      headers
-    )
-    cart = cartResp.cart
+    try {
+      const cartResp = await sdk.store.cart.create(
+        { 
+          region_id: region.id,
+          sales_channel_id: salesChannelId 
+        },
+        {},
+        headers
+      )
+      cart = cartResp.cart
 
-    await setCartId(cart.id)
+      await setCartId(cart.id)
 
-    const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+      const cartCacheTag = await getCacheTag("carts")
+      revalidateTag(cartCacheTag)
+    } catch (error) {
+      console.error("Error creating cart:", error)
+      throw error
+    }
   }
 
   if (cart && cart?.region_id !== region.id) {
@@ -459,22 +493,34 @@ export async function updateRegion(countryCode: string, currentPath: string) {
     throw new Error(`Region not found for country code: ${countryCode}`)
   }
 
-  if (cartId) {
-    await updateCart({ region_id: region.id })
-    const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+  try {
+    if (cartId) {
+      // Try to update existing cart
+      try {
+        await updateCart({ region_id: region.id })
+        const cartCacheTag = await getCacheTag("carts")
+        revalidateTag(cartCacheTag)
+      } catch (error) {
+        console.error("Error updating cart region, will create new cart:", error)
+        // If updating fails, remove the cart ID so we create a new one on next visit
+        await removeCartId()
+      }
+    }
+
+    const regionCacheTag = await getCacheTag("regions")
+    revalidateTag(regionCacheTag)
+
+    const productsCacheTag = await getCacheTag("products")
+    revalidateTag(productsCacheTag)
+
+    // Ensure currentPath doesn't start with a slash to avoid double slashes
+    const cleanPath = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath
+    
+    redirect(`/${countryCode}/${cleanPath}`)
+  } catch (error) {
+    console.error("Error in updateRegion:", error)
+    throw error
   }
-
-  const regionCacheTag = await getCacheTag("regions")
-  revalidateTag(regionCacheTag)
-
-  const productsCacheTag = await getCacheTag("products")
-  revalidateTag(productsCacheTag)
-
-  // Ensure currentPath doesn't start with a slash to avoid double slashes
-  const cleanPath = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath
-  
-  redirect(`/${countryCode}/${cleanPath}`)
 }
 
 export async function listCartOptions() {

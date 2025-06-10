@@ -9,6 +9,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
+import CurrencySwitcher from "@modules/layout/components/currency-switcher"
 
 export default function Footer() {
   const [collections, setCollections] = useState<any[]>([])
@@ -198,7 +199,7 @@ export default function Footer() {
                     }
 
                     const children =
-                      c.category_children?.map((child) => ({
+                      c.category_children?.map((child: any) => ({
                         name: child.name,
                         handle: child.handle,
                         id: child.id,
@@ -223,7 +224,7 @@ export default function Footer() {
                         {children && (
                           <ul className="grid grid-cols-1 ml-3 gap-2">
                             {children &&
-                              children.map((child) => (
+                              children.map((child: { id: string; name: string; handle: string }) => (
                                 <li key={child.id}>
                                   <LocalizedClientLink
                                     className="hover:text-luxury-gold transition-colors duration-300 relative group"
@@ -294,9 +295,14 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Region selector */}
+            {/* Currency Switcher */}
             <div className="flex flex-col gap-y-3">
-              <RegionSelector regions={regions} variant="footer" />
+              <span className="font-display text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
+                Currency
+              </span>
+              <div className="text-luxury-charcoal/80 text-serif-regular">
+                <CurrencySwitcher variant="footer" />
+              </div>
             </div>
           </div>
         </div>

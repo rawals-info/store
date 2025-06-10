@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getDefaultCountry } from "./lib/util/get-default-country"
+import { getValidCountries } from "./lib/util/get-valid-countries"
 
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us"
-
-// List of valid country codes that we support
-const VALID_COUNTRY_CODES = ["us", "gb", "dk", "de", "se", "fr", "es", "it", "ca", "au", "jp"] // Add all supported country codes
+// Cache for valid countries and default country
+let cachedValidCountries: string[] | null = null
+let cachedDefaultCountry: string | null = null
+let cacheTimestamp = 0
+const CACHE_TTL = 60 * 1000 // 1 minute
 
 // Paths that should have longer cache times (static content)
 const STATIC_PATHS = [
@@ -23,11 +26,75 @@ const DYNAMIC_PATHS = [
 ]
 
 /**
+ * Get the default country and valid countries with caching
+ */
+async function getCountryData() {
+  const now = Date.now()
+  
+  // Use cached data if available and not expired
+  if (cachedValidCountries && cachedDefaultCountry && (now - cacheTimestamp < CACHE_TTL)) {
+    return {
+      validCountries: cachedValidCountries,
+      defaultCountry: cachedDefaultCountry
+    }
+  }
+  
+  // Otherwise fetch fresh data
+  try {
+    const [validCountries, defaultCountry] = await Promise.all([
+      getValidCountries(),
+      getDefaultCountry()
+    ])
+    
+    // Update cache
+    cachedValidCountries = validCountries
+    cachedDefaultCountry = defaultCountry
+    cacheTimestamp = now
+    
+    return {
+      validCountries,
+      defaultCountry
+    }
+  } catch (error) {
+    console.error("Error fetching country data:", error)
+    
+    // Fallback to whatever we have in cache, or empty arrays if nothing
+    return {
+      validCountries: cachedValidCountries || [],
+      defaultCountry: cachedDefaultCountry || "us"
+    }
+  }
+}
+
+/**
  * Middleware to handle region selection, caching, and performance optimization.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl
+    
+    // Get country data from backend (cached)
+    const { validCountries, defaultCountry } = await getCountryData()
+    
+    // First, check for nested country codes like /us/in or /us/ae
+    const nestedCountryMatch = pathname.match(/^\/([a-z]{2})\/([a-z]{2})($|\/)/)
+    
+    if (nestedCountryMatch) {
+      // Get the second country code
+      const secondCountryCode = nestedCountryMatch[2]
+      
+      // Only redirect if the second code is a valid country code
+      if (validCountries.includes(secondCountryCode)) {
+        // Get the rest of the path after the second country code
+        const restOfPath = pathname.substring(pathname.indexOf(secondCountryCode) + 2)
+        
+        // Create a new URL with just the second country code
+        const newUrl = new URL(`/${secondCountryCode}${restOfPath}`, request.url)
+        
+        // Redirect to the normalized URL
+        return NextResponse.redirect(newUrl)
+      }
+    }
     
     // Get country code from URL
     const urlCountryCode = pathname.split("/")[1]?.toLowerCase()
@@ -64,7 +131,7 @@ export function middleware(request: NextRequest) {
     }
 
     // If URL already has a valid country code, just proceed with cache headers
-    if (VALID_COUNTRY_CODES.includes(urlCountryCode)) {
+    if (validCountries.includes(urlCountryCode)) {
       // Set cache ID cookie if not already set
       let cacheIdCookie = request.cookies.get("_medusa_cache_id")
       if (!cacheIdCookie) {
@@ -85,7 +152,7 @@ export function middleware(request: NextRequest) {
       pathname === "/" ? "" : pathname
     const queryString = request.nextUrl.search ? request.nextUrl.search : ""
     
-    const redirectUrl = `${request.nextUrl.origin}/${DEFAULT_REGION}${redirectPath}${queryString}`
+    const redirectUrl = `${request.nextUrl.origin}/${defaultCountry}${redirectPath}${queryString}`
     response = NextResponse.redirect(redirectUrl, 307)
     
     // Set cache ID cookie

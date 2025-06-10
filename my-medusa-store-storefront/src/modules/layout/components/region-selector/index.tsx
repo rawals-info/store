@@ -6,6 +6,7 @@ import { useParams, usePathname } from "next/navigation"
 import { updateRegion } from "@lib/data/cart"
 import ReactCountryFlag from "react-country-flag"
 import { motion, AnimatePresence } from "framer-motion"
+import { listRegions } from "@lib/data/regions"
 
 interface RegionSelectorProps {
   regions: StoreRegion[]
@@ -19,15 +20,32 @@ interface CountryOption {
 }
 
 const RegionSelector: React.FC<RegionSelectorProps> = ({ 
-  regions, 
+  regions: initialRegions, 
   variant = "header" 
 }) => {
   const [currentCountry, setCurrentCountry] = useState<CountryOption | null>(null)
+  const [regions, setRegions] = useState<StoreRegion[]>(initialRegions || [])
   
   const [isOpen, setIsOpen] = useState(false)
   const { countryCode } = useParams()
   const fullPath = usePathname()
   const currentPath = fullPath.replace(new RegExp(`^/${countryCode}`), '')
+  
+  // Force refresh regions data from backend
+  useEffect(() => {
+    const refreshRegions = async () => {
+      try {
+        const freshRegions = await listRegions()
+        if (freshRegions && freshRegions.length > 0) {
+          setRegions(freshRegions)
+        }
+      } catch (error) {
+        console.error("Error refreshing regions:", error)
+      }
+    }
+    
+    refreshRegions()
+  }, [])
   
   // Create an array of country options from the regions
   const countryOptions = React.useMemo(() => {

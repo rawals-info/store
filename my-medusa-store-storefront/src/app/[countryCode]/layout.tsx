@@ -1,27 +1,43 @@
-import React from "react"
+import React, { Suspense } from "react"
 import Footer from "@modules/layout/templates/footer"
 import AnimatedHeader from "@modules/layout/components/animated-header"
 import PrefetchProvider from "@modules/layout/components/prefetch-provider"
+import { getRegions } from "@lib/regions"
+import { dataFetchingConfig } from "@lib/config"
 
-export default function StoreLayout({
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = dataFetchingConfig.regions.revalidate
+
+export async function generateStaticParams() {
+  const regions = await getRegions()
+  const countryCodes = Object.keys(regions).map((countryCode) => ({
+    countryCode: countryCode.toLowerCase(),
+  }))
+
+  return countryCodes
+}
+
+// This will return 404 for non-existent countries
+export const dynamicParams = true
+
+export default async function StoreLayout({
   children,
   params,
 }: {
   children: React.ReactNode
   params: { countryCode: string }
 }) {
-  // The (checkout) group has its own header and footer
-  // We'll render just the children for that group
   return (
     <PrefetchProvider>
-      <div className="flex flex-col min-h-screen">
-        <div id="store-nav">
-          <AnimatedHeader />
+      <div className="relative flex flex-col min-h-screen">
+        <AnimatedHeader />
+        <div className="flex-1 bg-luxury-ivory">
+          <div className="max-w-screen-2xl mx-auto py-6 px-6 sm:px-8 lg:px-12">
+            {children}
+          </div>
         </div>
-        <main className="flex-1 relative">{children}</main>
-        <div id="store-footer">
-          <Footer />
-        </div>
+        <Footer />
       </div>
     </PrefetchProvider>
   )

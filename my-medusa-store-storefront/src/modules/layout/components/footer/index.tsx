@@ -5,6 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { motion } from "framer-motion"
 import { useScrollAnimation } from "@lib/hooks/use-scroll-animation"
 import Image from "next/image"
+import CurrencySwitcher from "@modules/layout/components/currency-switcher"
 
 const Footer = () => {
   const { ref, isInView } = useScrollAnimation({
@@ -193,6 +194,11 @@ const Footer = () => {
                 </motion.li>
               ))}
             </ul>
+            
+            <div className="mt-6 pt-4 border-t border-luxury-gold/10">
+              <Heading level="h4" className="text-sm mb-3 font-display text-luxury-gold">Currency</Heading>
+              <CurrencySwitcher variant="footer" />
+            </div>
           </motion.div>
 
           {/* Newsletter with enhanced luxury styling */}

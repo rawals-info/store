@@ -7,6 +7,7 @@ checkEnvVariables()
  */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   logging: {
     fetches: {
       fullUrl: true,
@@ -66,9 +67,23 @@ const nextConfig = {
   },
   // Enable experimental features for better image optimization
   experimental: {
-    optimizeCss: true,
     scrollRestoration: true,
   },
+  // Configure dynamic routes
+  serverRuntimeConfig: {
+    dynamicRoutes: true,
+  },
+  // Configure runtime settings for dynamic data fetching
+  runtime: 'nodejs',
+  // Increase the timeout for builds
+  staticPageGenerationTimeout: 180,
+  // Configure the build to handle dynamic routes
+  onDemandEntries: {
+    // period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 60 * 1000,
+    // number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 5,
+  }
 }
 
 module.exports = nextConfig

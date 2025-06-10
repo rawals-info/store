@@ -1,13 +1,18 @@
 "use server"
 
-import { sdk } from "@lib/config"
+import { sdk, dataFetchingConfig } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { deduplicateRequest } from "@lib/util/request-cache"
 import { HttpTypes } from "@medusajs/types"
 import { getStaticDataCacheOptions } from "./optimize-fetching"
 
 export const listRegions = async () => {
-  const cacheOptions = getStaticDataCacheOptions()
+  const cacheOptions = {
+    next: {
+      revalidate: dataFetchingConfig.regions.revalidate,
+      tags: ["regions"]
+    }
+  }
 
   return deduplicateRequest(
     "/store/regions",
@@ -19,12 +24,17 @@ export const listRegions = async () => {
       .then(({ regions }) => regions)
       .catch(medusaError),
     undefined,
-    60 * 1000 // 1 minute TTL
+    dataFetchingConfig.regions.revalidate * 1000 // Convert to milliseconds
   )
 }
 
 export const retrieveRegion = async (id: string) => {
-  const cacheOptions = getStaticDataCacheOptions()
+  const cacheOptions = {
+    next: {
+      revalidate: dataFetchingConfig.regions.revalidate,
+      tags: ["regions", `region-${id}`]
+    }
+  }
 
   return deduplicateRequest(
     `/store/regions/${id}`,
@@ -36,7 +46,7 @@ export const retrieveRegion = async (id: string) => {
       .then(({ region }) => region)
       .catch(medusaError),
     undefined,
-    60 * 1000 // 1 minute TTL
+    dataFetchingConfig.regions.revalidate * 1000 // Convert to milliseconds
   )
 }
 
@@ -44,7 +54,7 @@ export const retrieveRegion = async (id: string) => {
 const regionMap = new Map<string, HttpTypes.StoreRegion>()
 // Timestamp to track when the in-memory cache was last refreshed
 let regionCacheTimestamp = 0;
-const CACHE_TTL = 1000 * 60 * 60; // 1 hour in milliseconds
+const CACHE_TTL = dataFetchingConfig.regions.revalidate * 1000; // Convert to milliseconds
 
 // Store a promise for the ongoing fetch to avoid duplicate requests
 let ongoingFetch: Promise<void> | null = null;
