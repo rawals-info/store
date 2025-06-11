@@ -23,7 +23,7 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 3600,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
@@ -65,25 +65,90 @@ const nextConfig = {
       },
     ],
   },
-  // Enable experimental features for better image optimization
   experimental: {
     scrollRestoration: true,
+    optimizeCss: true,
+    optimizeServerReact: true,
+    serverMinification: true,
+    webpackBuildWorker: true,
   },
-  // Configure dynamic routes
-  serverRuntimeConfig: {
-    dynamicRoutes: true,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'Surrogate-Control',
+            value: 'public, max-age=3600'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=60, stale-while-revalidate=300'
+          }
+        ]
+      },
+      {
+        source: '/(.*).(jpg|jpeg|png|webp|avif|ico|svg)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        source: '/(.*).(js|css)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=60, stale-while-revalidate=300'
+          }
+        ]
+      },
+      {
+        source: '/categories/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=60, stale-while-revalidate=300'
+          }
+        ]
+      }
+    ]
   },
-  // Configure runtime settings for dynamic data fetching
-  runtime: 'nodejs',
-  // Increase the timeout for builds
-  staticPageGenerationTimeout: 180,
-  // Configure the build to handle dynamic routes
+  staticPageGenerationTimeout: 300,
   onDemandEntries: {
-    // period (in ms) where the server will keep pages in the buffer
     maxInactiveAge: 60 * 1000,
-    // number of pages that should be kept simultaneously without being disposed
-    pagesBufferLength: 5,
-  }
+    pagesBufferLength: 10,
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+  generateEtags: true,
+  poweredByHeader: false,
 }
 
 module.exports = nextConfig

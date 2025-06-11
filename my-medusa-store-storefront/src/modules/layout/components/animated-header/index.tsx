@@ -35,7 +35,7 @@ const AnimatedHeader = () => {
   // Navigation links data with refined labeling
   const navLinks = [
     { href: "/", label: "Home", testId: "nav-home-link" },
-    { href: "/collections", label: "Collections", testId: "nav-collections-link" },
+    { href: "/categories", label: "Categories", testId: "nav-categories-link" },
     { href: "/products", label: "Products", testId: "nav-products-link" },
     { href: "/about", label: "About Us", testId: "nav-about-link" },
   ]

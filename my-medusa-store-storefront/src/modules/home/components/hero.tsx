@@ -6,6 +6,7 @@ import { useRef } from "react"
 import Image from "next/image"
 import AnimatedButton from "@modules/common/components/animated-button"
 import { staggerContainer, fadeIn } from "@lib/util/animations"
+import Link from "next/link"
 
 export default function Hero() {
   const heroRef = useRef(null)
@@ -18,7 +19,7 @@ export default function Hero() {
       animate="animate"
       variants={staggerContainer}
     >
-      {/* Background with marble texture */}
+      {/* Background with marble texture and overlay */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/marble-bg-light.jpg"
@@ -31,7 +32,27 @@ export default function Hero() {
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
         />
+        <div className="absolute inset-0 bg-gradient-to-b from-luxury-gold/5 to-transparent"></div>
       </div>
+
+      {/* Decorative elements */}
+      <motion.div
+        className="absolute top-24 left-10 w-32 h-32 rounded-full border border-luxury-gold/20"
+        animate={{ 
+          scale: [1, 1.05, 1],
+          opacity: [0.2, 0.3, 0.2]
+        }}
+        transition={{ repeat: Infinity, duration: 4 }}
+      />
+
+      <motion.div
+        className="absolute bottom-24 right-10 w-48 h-48 rounded-full border border-luxury-gold/20"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.2, 0.4, 0.2]
+        }}
+        transition={{ repeat: Infinity, duration: 6, delay: 1 }}
+      />
       
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
@@ -42,22 +63,26 @@ export default function Hero() {
         </motion.div>
         
         <motion.div variants={fadeIn} className="mb-8">
-          <Text className="text-lg md:text-xl max-w-2xl mx-auto">
+          <Text className="text-lg md:text-xl max-w-2xl mx-auto text-luxury-charcoal/90">
             Discover our collection of handcrafted marble pieces, meticulously created by master artisans for your luxury home.
           </Text>
         </motion.div>
         
-        <motion.div variants={fadeIn}>
-          <AnimatedButton variant="gold" size="large" className="mr-4">
-            Browse Products
-          </AnimatedButton>
-          <AnimatedButton variant="outline" size="large">
-            About Us
-          </AnimatedButton>
+        <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-4">
+          <Link href="/products">
+            <AnimatedButton variant="gold" size="large">
+              Browse Collection
+            </AnimatedButton>
+          </Link>
+          <Link href="/about">
+            <AnimatedButton variant="outline" size="large">
+              Our Heritage
+            </AnimatedButton>
+          </Link>
         </motion.div>
       </div>
       
-      {/* Decorative elements */}
+      {/* Scroll indicator */}
       <motion.div 
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
         animate={{ y: [0, 10, 0] }}

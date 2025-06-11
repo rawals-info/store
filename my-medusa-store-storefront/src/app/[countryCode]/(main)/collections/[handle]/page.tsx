@@ -19,8 +19,9 @@ type Props = {
 }
 
 // Set dynamic rendering options for this page
-export const dynamic = "force-static" // Force static generation
-export const revalidate = 600 // Revalidate every 10 minutes
+export const dynamic = "force-static"
+// Fix the config field issue by using a number directly
+export const revalidate = 600
 
 export async function generateStaticParams() {
   // Fetch collections and regions using batch fetch
@@ -69,6 +70,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
+  // Properly await params in Next.js 15
   const params = await props.params
   const handle = params.handle
 
@@ -108,11 +110,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function CollectionPage(props: Props) {
-  const searchParams = props.searchParams
-  const params = await props.params
-  const { sortBy, page } = searchParams
-  const handle = params.handle
-  const countryCode = params.countryCode
+  // Properly await params and searchParams in Next.js 15
+  const searchParamsData = await props.searchParams
+  const paramsData = await props.params
+  
+  const { sortBy, page } = searchParamsData
+  const handle = paramsData.handle
+  const countryCode = paramsData.countryCode
 
   const response = await batchFetch([
     {

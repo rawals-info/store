@@ -29,7 +29,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   return (
     <Container
       className={clx(
-        "relative w-full overflow-hidden p-4 bg-ui-bg-subtle shadow-elevation-card-rest rounded-large group-hover:shadow-elevation-card-hover transition-shadow ease-in-out duration-150",
+        "relative w-full overflow-hidden bg-ui-bg-subtle shadow-elevation-card-rest rounded-large group-hover:shadow-elevation-card-hover transition-shadow ease-in-out duration-150",
         className,
         {
           "aspect-[11/14]": isFeatured,
@@ -55,21 +55,21 @@ const ImageOrPlaceholder = ({
 }: Pick<ThumbnailProps, "size" | "isFeatured"> & { image?: string }) => {
   const [isLoading, setIsLoading] = useState(true)
 
-  // Define appropriate sizes based on component size
+  // Define appropriate sizes for different screens and component sizes
   const imageSizes = 
     size === "small" ? "180px" :
     size === "medium" ? "290px" :
     size === "large" ? "440px" :
-    size === "full" ? "(max-width: 576px) 100vw, (max-width: 768px) 50vw, 33vw" :
-    "(max-width: 768px) 100vw, 33vw"
+    size === "full" ? "(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" :
+    "(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
 
   return image ? (
     <Image
       src={image}
-      alt="Thumbnail"
-      className={`absolute inset-0 object-cover object-center ${isLoading ? 'scale-110 blur-sm' : 'scale-100 blur-0'} transition-all duration-300`}
+      alt="Product thumbnail"
+      className={`absolute inset-0 object-cover object-center ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
       draggable={false}
-      quality={isFeatured ? 85 : 75}
+      quality={isFeatured ? 80 : 65} // Lower quality for non-featured images
       sizes={imageSizes}
       fill
       priority={isFeatured ? true : false}
@@ -77,9 +77,15 @@ const ImageOrPlaceholder = ({
       onLoadingComplete={() => setIsLoading(false)}
       placeholder="blur"
       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+      fetchPriority={isFeatured ? "high" : "auto"}
+      style={{
+        // Minimize Cumulative Layout Shift
+        objectFit: "cover",
+        objectPosition: "center",
+      }}
     />
   ) : (
-    <div className="w-full h-full absolute inset-0 flex items-center justify-center">
+    <div className="w-full h-full absolute inset-0 flex items-center justify-center bg-luxury-ivory/50">
       <PlaceholderImage size={size === "small" ? 16 : 24} />
     </div>
   )

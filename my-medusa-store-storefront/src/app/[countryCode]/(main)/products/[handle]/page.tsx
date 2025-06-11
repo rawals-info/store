@@ -12,8 +12,8 @@ type Props = {
 }
 
 // Set dynamic rendering options for this page
-export const dynamic = "force-static" // Force static generation
-export const revalidate = 300 // Revalidate every 5 minutes
+export const dynamic = "force-static"
+export const revalidate = 300
 
 export async function generateStaticParams() {
   try {
@@ -59,7 +59,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const { countryCode, handle } = props.params
+  const paramsData = await props.params
+  const { countryCode, handle } = paramsData
 
   // Use batch fetch for metadata generation
   const responses = await batchFetch([
@@ -72,7 +73,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       path: `/store/products`,
       query: { 
         limit: 1,
-        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories",
         handle: handle 
       },
       cacheTags: ["products"],
@@ -107,7 +108,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage(props: Props) {
-  const { countryCode, handle } = props.params
+  const paramsData = await props.params
+  const { countryCode, handle } = paramsData
   
   // Use batch fetch instead of parallelFetch to reduce API calls
   const responses = await batchFetch([
@@ -120,7 +122,7 @@ export default async function ProductPage(props: Props) {
       path: `/store/products`,
       query: { 
         limit: 1,
-        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories",
         handle: handle
       },
       cacheTags: ["products"],

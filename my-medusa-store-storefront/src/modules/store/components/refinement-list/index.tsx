@@ -51,6 +51,39 @@ const RefinementList = ({
   // Mobile filter toggle
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   
+  // Use local state for categories to allow frontend fetching
+  const [localCategories, setLocalCategories] = useState<typeof categories>(categories)
+  
+  // Fetch categories from API if needed
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (categories.length === 0) {
+        try {
+          const response = await fetch('/store/product-categories?limit=100', {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data.product_categories) {
+              setLocalCategories(data.product_categories.map((cat: any) => ({
+                id: cat.id,
+                name: cat.name,
+                handle: cat.handle,
+                products_count: cat.products?.length
+              })));
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch categories:', error);
+        }
+      }
+    };
+    
+    fetchCategories();
+  }, [categories])
+  
   // Parse existing filters from URL
   const categoryIds = useMemo(() => {
     const params = searchParams.get("categories")
@@ -184,10 +217,10 @@ const RefinementList = ({
   
   // Determine active category names for tags
   const activeCategoryNames = useMemo(() => {
-    return categories
+    return localCategories
       .filter(cat => categoryIds.includes(cat.id))
       .map(cat => cat.name)
-  }, [categories, categoryIds])
+  }, [localCategories, categoryIds])
   
   // Determine active tag names for tags
   const activeTagNames = useMemo(() => {
@@ -251,7 +284,7 @@ const RefinementList = ({
           <div>
             <div className="flex flex-wrap gap-2 mb-2">
               {activeCategoryNames.map((name, i) => {
-                const category = categories.find(c => c.name === name)
+                const category = localCategories.find(c => c.name === name)
                 if (!category) return null
                 return (
                   <FilterTag 
@@ -313,10 +346,10 @@ const RefinementList = ({
         
         {/* Filters */}
         <div className="flex flex-col gap-4 w-full">
-          {categories.length > 0 && (
+          {localCategories.length > 0 && (
             <FilterDropdown
               title="Categories"
-              items={categories.map(c => ({
+              items={localCategories.map(c => ({
                 id: c.id,
                 name: c.name,
                 count: c.products_count

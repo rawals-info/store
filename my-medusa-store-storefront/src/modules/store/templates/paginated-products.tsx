@@ -2,12 +2,12 @@
 
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
-import { batchFetch } from "@lib/util/batch-fetch"
 import ProductPreview from "@modules/products/components/product-preview/server"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
 import { Suspense } from "react"
+import { cache } from "react"
 
 const PRODUCT_LIMIT = 12
 
@@ -19,44 +19,12 @@ type PaginatedProductsParams = {
   order?: string
 }
 
-// Pre-fetch data outside of the component
-async function fetchProductData(
-  countryCode: string,
-  page: number,
-  queryParams: PaginatedProductsParams,
-  sortBy?: SortOptions
-) {
-  // Fetch region using batchFetch
-  const responses = await batchFetch([
-    {
-      path: `/store/regions`,
-      cacheTags: ["regions"],
-      cacheRevalidate: 60
-    }
-  ])
+// Cached region fetch to prevent redundant requests
+const getCachedRegion = cache(async (countryCode: string) => {
+  return await getRegion(countryCode)
+})
 
-  const regionResponse = (responses[0].data as any)
-  const regions = regionResponse?.regions || []
-  const region = regions.find((r: any) => r.countries.some((c: any) => c.iso_2 === countryCode))
-  
-  if (!region) {
-    return { region: null, productsData: { response: { products: [], count: 0 }, nextPage: null } }
-  }
-  
-  // Now use the region to fetch products
-  const productsData = await listProductsWithSort({
-    page,
-    queryParams: {
-      ...queryParams,
-      region_id: region.id
-    },
-    sortBy,
-    countryCode,
-  })
-  
-  return { region, productsData }
-}
-
+// Pre-fetch data outside of the component with streaming support
 export default async function PaginatedProducts({
   sortBy,
   page,
@@ -73,7 +41,7 @@ export default async function PaginatedProducts({
   countryCode: string
 }) {
   const queryParams: PaginatedProductsParams = {
-    limit: 12,
+    limit: PRODUCT_LIMIT,
   }
 
   if (collectionId) {
@@ -92,45 +60,72 @@ export default async function PaginatedProducts({
     queryParams["order"] = "created_at"
   }
 
-  // Fetch data using optimized function
-  const { region, productsData } = await fetchProductData(
-    countryCode, 
-    page, 
-    queryParams, 
-    sortBy
-  )
-
+  // Get region using cached function
+  const region = await getCachedRegion(countryCode)
+  
   if (!region) {
     return null
   }
+  
+  try {
+    // Fetch products with optimized parameters
+    const { response, nextPage } = await listProductsWithSort({
+      page,
+      queryParams,
+      sortBy,
+      countryCode,
+    })
+    
+    const { products, count } = response
+    const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
-  const { response: { products, count } } = productsData
-  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+    // If no products found, show a message
+    if (products.length === 0) {
+      return (
+        <div className="flex flex-col items-center text-center py-12">
+          <h3 className="text-base-regular font-semibold mb-4">No products found</h3>
+          <p className="text-small-regular text-gray-700">
+            Try adjusting your filters or search term
+          </p>
+        </div>
+      )
+    }
 
-  return (
-    <>
-      <Suspense fallback={<ProductListSkeleton count={PRODUCT_LIMIT} />}>
-        <ul
-          className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
-          data-testid="products-list"
-        >
-          {products.map((p) => {
-            return (
+    return (
+      <>
+        <Suspense fallback={<ProductListSkeleton count={PRODUCT_LIMIT} />}>
+          <ul
+            className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-4 gap-y-8"
+            data-testid="products-list"
+          >
+            {products.map((p) => (
               <li key={p.id}>
-                <ProductPreview product={p} region={region} />
+                <Suspense fallback={<div className="aspect-[9/16] bg-luxury-ivory/50 rounded-sm animate-pulse"></div>}>
+                  <ProductPreview product={p} region={region} />
+                </Suspense>
               </li>
-            )
-          })}
-        </ul>
-      </Suspense>
-      
-      {totalPages > 1 && (
-        <Pagination
-          data-testid="product-pagination"
-          page={page}
-          totalPages={totalPages}
-        />
-      )}
-    </>
-  )
+            ))}
+          </ul>
+        </Suspense>
+        
+        {totalPages > 1 && (
+          <Pagination
+            data-testid="product-pagination"
+            page={page}
+            totalPages={totalPages}
+          />
+        )}
+      </>
+    )
+  } catch (error) {
+    console.error("Error fetching products:", error)
+    return (
+      <div className="flex flex-col items-center text-center py-12">
+        <h3 className="text-base-regular font-semibold mb-4">Error loading products</h3>
+        <p className="text-small-regular text-gray-700">
+          Please try again later
+        </p>
+      </div>
+    )
+  }
 }

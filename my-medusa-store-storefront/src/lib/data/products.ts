@@ -5,23 +5,44 @@ import { sortProducts } from "@lib/util/sort-products"
 import { deduplicateRequest } from "@lib/util/request-cache"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
+import { cache } from "react"
 
+// Minimize fields for performance when listing many products
+const DEFAULT_FIELDS = "id,title,handle,thumbnail,variants.calculated_price,variants.inventory_quantity" 
+// More fields when detailed info is needed
+const DETAILED_FIELDS = DEFAULT_FIELDS + ",metadata,tags,categories,description,variants.title"
+
+// Cache key generator for product requests
+const getProductCacheKey = (params: any) => {
+  return `products_${JSON.stringify(params)}`
+}
+
+// Cache TTL in seconds
+const CACHE_TTL = {
+  SHORT: 30, // 30 seconds
+  MEDIUM: 300, // 5 minutes
+  LONG: 3600, // 1 hour
+}
+
+// Cached product listing function
 export const listProducts = async ({
   pageParam = 1,
   queryParams = {},
   countryCode,
   regionId,
+  isDetailed = false, // Flag to determine level of detail needed
 }: {
   pageParam?: number
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams & {
     category_id?: string | string[]
     tags?: string | string[]
-    price?: { gte?: number; lte?: number }
+    price_range?: { min?: number; max?: number } // Changed to use Medusa's native price filtering
   }
   countryCode?: string
   regionId?: string
+  isDetailed?: boolean
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
@@ -54,46 +75,84 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    revalidate: 60,
-    tags: ['products'],
-  }
-
   // Process query parameters
   const processedQueryParams: Record<string, any> = {
     limit,
     offset,
     region_id: region?.id,
-    fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+    fields: isDetailed ? DETAILED_FIELDS : DEFAULT_FIELDS,
     ...queryParams,
   }
 
-  // Process category filter
+  // IMPORTANT: Replace any problematic sort orders with safe ones
+  if (processedQueryParams.order) {
+    // Replace updated_at:desc with id:desc which should always be available
+    if (processedQueryParams.order.includes('updated_at:desc')) {
+      processedQueryParams.order = 'id:desc';
+    }
+    
+    // Also handle created_at:desc which causes errors
+    if (processedQueryParams.order.includes('created_at:desc')) {
+      processedQueryParams.order = 'id:desc';
+    }
+  }
+
+  // Handle category ID
   if (queryParams.category_id) {
     processedQueryParams.category_id = Array.isArray(queryParams.category_id) 
       ? queryParams.category_id 
       : [queryParams.category_id]
   }
 
-  // Process tag filter
+  // Handle tags
   if (queryParams.tags) {
     processedQueryParams.tags = Array.isArray(queryParams.tags) 
       ? queryParams.tags 
       : [queryParams.tags]
   }
-
-  // Process price filter
-  if (queryParams.price) {
-    // Store the price filter but remove from API params as we'll handle filtering client-side
-    delete processedQueryParams.price
+  
+  // Handle price filtering - use Medusa's built-in price filter capability
+  if (queryParams.price_range) {
+    // Only set price_list_id if it exists in the region 
+    // This avoids the TypeScript error for price_list_id
+    const regionPriceListId = (region as any).price_list_id;
     
-    // Request more products to ensure we have enough after filtering
-    processedQueryParams.limit = 100
+    if (queryParams.price_range.min !== undefined) {
+      if (regionPriceListId) {
+        processedQueryParams.price_list_id = regionPriceListId;
+      }
+      
+      processedQueryParams["variants.calculated_price"] = {
+        gte: queryParams.price_range.min
+      }
+    }
+    
+    if (queryParams.price_range.max !== undefined) {
+      if (regionPriceListId) {
+        processedQueryParams.price_list_id = regionPriceListId;
+      }
+      
+      processedQueryParams["variants.calculated_price"] = {
+        ...processedQueryParams["variants.calculated_price"] || {},
+        lte: queryParams.price_range.max
+      }
+    }
+    
+    delete processedQueryParams.price_range
   }
 
-  // Use request deduplication
+  // Caching configuration with ISR
+  const next = {
+    revalidate: 60, // ISR revalidation time of 60 seconds
+    tags: ['products'],
+  }
+
+  // Generate cache key for this specific request
+  const cacheKey = getProductCacheKey(processedQueryParams);
+
+  // Use request deduplication with improved caching
   return await deduplicateRequest(
-    `/store/products`,
+    `/store/products_${cacheKey}`,
     () => sdk.client
       .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
         `/store/products`,
@@ -106,50 +165,7 @@ export const listProducts = async ({
         }
       )
       .then(({ products, count }) => {
-        // Apply price filtering on client-side since the API doesn't support it directly
-        let filteredProducts = products;
-        
-        if (queryParams.price) {
-          filteredProducts = products.filter(product => {
-            // Get the price from the first variant's calculated price
-            const productPrice = product.variants?.[0]?.calculated_price?.calculated_amount || 0;
-            
-            // Skip products with no price
-            if (productPrice === 0) return false;
-            
-            // Apply minimum price filter if specified
-            if (queryParams.price?.gte !== undefined && productPrice < queryParams.price.gte) {
-              return false;
-            }
-            
-            // Apply maximum price filter if specified
-            if (queryParams.price?.lte !== undefined && productPrice > queryParams.price.lte) {
-              return false;
-            }
-            
-            return true;
-          });
-          
-          // Apply pagination after filtering
-          const startIndex = offset;
-          const endIndex = startIndex + limit;
-          const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-          
-          const filteredCount = filteredProducts.length;
-          const nextPage = filteredCount > offset + limit ? pageParam + 1 : null;
-          
-          return {
-            response: {
-              products: paginatedProducts,
-              count: filteredCount,
-            },
-            nextPage,
-            queryParams,
-          }
-        }
-
-        // If no price filter, return original result with pagination
-        const nextPage = count > offset + limit ? pageParam + 1 : null;
+        const nextPage = count > offset + limit ? _pageParam + 1 : null;
         
         return {
           response: {
@@ -159,17 +175,27 @@ export const listProducts = async ({
           nextPage,
           queryParams,
         }
+      })
+      .catch(error => {
+        console.error("Error fetching products:", error);
+        return {
+          response: {
+            products: [],
+            count: 0,
+          },
+          nextPage: null,
+          queryParams,
+        };
       }),
     processedQueryParams,
-    30 * 1000 // 30 seconds TTL
+    CACHE_TTL.MEDIUM // 5 minutes TTL
   )
 }
 
 /**
- * This will fetch 100 products to the Next.js cache and sort them based on the sortBy parameter.
- * It will then return the paginated products based on the page and limit parameters.
+ * This will fetch products up to the specified limit with sorting
  */
-export const listProductsWithSort = async ({
+export const listProductsWithSort = cache(async ({
   page = 0,
   queryParams,
   sortBy = "created_at",
@@ -179,7 +205,7 @@ export const listProductsWithSort = async ({
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams & {
     category_id?: string | string[]
     tags?: string | string[]
-    price?: { gte?: number; lte?: number }
+    price_range?: { min?: number; max?: number }
   }
   sortBy?: SortOptions
   countryCode: string
@@ -189,32 +215,74 @@ export const listProductsWithSort = async ({
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
 }> => {
   const limit = queryParams?.limit || 12
-
+  const offset = (page - 1) * limit
+  
+  // For most sorts, use the API's built-in ordering
+  if (sortBy === "price_asc" || sortBy === "price_desc") {
+    // For price sorting, we need to add order params
+    const orderDirection = sortBy === "price_asc" ? "asc" : "desc"
+    
+    const {
+      response,
+      nextPage
+    } = await listProducts({
+      pageParam: page,
+      queryParams: {
+        ...queryParams,
+        limit,
+        order: `variants.calculated_price:${orderDirection}`,
+      },
+      countryCode,
+      isDetailed: true,
+    })
+    
+    return { response, nextPage, queryParams }
+  } 
+  
+  // Fix for created_at sorting - use id:desc instead which is always available
+  if (sortBy === "created_at") {
+    const {
+      response,
+      nextPage
+    } = await listProducts({
+      pageParam: page,
+      queryParams: {
+        ...queryParams,
+        limit,
+        order: `id:desc`, // Changed from updated_at:desc to id:desc to fix 500 errors
+      },
+      countryCode,
+      isDetailed: true,
+    })
+    
+    return { response, nextPage, queryParams }
+  }
+  
+  // For custom sorting that can't be handled by the API
   const {
-    response: { products, count },
+    response,
+    nextPage
   } = await listProducts({
-    pageParam: 0,
+    pageParam: page,
     queryParams: {
       ...queryParams,
-      limit: 100,
+      limit,
     },
     countryCode,
+    isDetailed: true,
   })
 
-  const sortedProducts = sortProducts(products, sortBy)
-
-  const pageParam = (page - 1) * limit
-
-  const nextPage = count > pageParam + limit ? pageParam + limit : null
-
-  const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit)
+  // If we need to sort client-side, do that here
+  // This is less efficient but works as a fallback
+  const { products, count } = response;
+  const sortedProducts = sortProducts(products, sortBy);
 
   return {
     response: {
-      products: paginatedProducts,
+      products: sortedProducts,
       count,
     },
     nextPage,
     queryParams,
-  }
-}
+  };
+});

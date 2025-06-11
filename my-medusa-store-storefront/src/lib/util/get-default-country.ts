@@ -21,7 +21,8 @@ export async function getDefaultCountry(fallback = "us"): Promise<string> {
     // First, try to get the store settings to find the default region
     const { store } = await sdk.client.fetch<StoreResponse>(`/store`, {
       method: "GET",
-      cache: "no-store",
+      // Use next.revalidate instead of cache: "no-store" to allow static generation
+      next: { revalidate: 60 } // Revalidate every 60 seconds
     })
     
     // If store has a default region set

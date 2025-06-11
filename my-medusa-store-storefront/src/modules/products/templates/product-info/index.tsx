@@ -25,15 +25,32 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   return (
     <div id="product-info" className="px-1">
       <div className="flex flex-col gap-y-6 lg:max-w-[500px] mx-auto">
-        {/* Collection link with enhanced styling */}
-        {product.collection && (
-          <LocalizedClientLink
-            href={`/collections/${product.collection.handle}`}
-            className="text-luxury-gold/80 hover:text-luxury-gold transition-colors duration-300 uppercase tracking-wider text-xs"
-          >
-            {product.collection.title} Collection
-          </LocalizedClientLink>
-        )}
+        {/* Collection and Category links with enhanced styling */}
+        <div className="flex flex-wrap gap-2 items-center">
+          {product.collection && (
+            <>
+              <LocalizedClientLink
+                href={`/collections/${product.collection.handle}`}
+                className="text-luxury-gold/80 hover:text-luxury-gold transition-colors duration-300 uppercase tracking-wider text-xs"
+              >
+                {product.collection.title} Collection
+              </LocalizedClientLink>
+              
+              {product.categories?.length > 0 && (
+                <span className="text-luxury-gold/50 mx-1">·</span>
+              )}
+            </>
+          )}
+
+          {product.categories?.length > 0 && (
+            <LocalizedClientLink
+              href={`/categories/${product.categories[0].handle}`}
+              className="text-luxury-gold/80 hover:text-luxury-gold transition-colors duration-300 uppercase tracking-wider text-xs"
+            >
+              {product.categories[0].name} Category
+            </LocalizedClientLink>
+          )}
+        </div>
         
         {/* Product title with luxury styling */}
         <div className="space-y-2">

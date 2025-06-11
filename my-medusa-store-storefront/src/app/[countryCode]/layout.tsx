@@ -6,8 +6,7 @@ import { getRegions } from "@lib/regions"
 import { dataFetchingConfig } from "@lib/config"
 
 export const dynamic = 'force-dynamic'
-export const fetchCache = 'force-no-store'
-export const revalidate = dataFetchingConfig.regions.revalidate
+export const revalidate = 60
 
 export async function generateStaticParams() {
   const regions = await getRegions()
