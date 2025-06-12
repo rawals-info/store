@@ -1,7 +1,7 @@
 "use client"
 
 import Image, { ImageProps } from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
   /**
@@ -40,6 +40,16 @@ const OptimizedImage = ({
 }: OptimizedImageProps) => {
   const [isLoading, setIsLoading] = useState(true)
   
+  // Use effect to simulate image loading
+  useEffect(() => {
+    // Simulate image loading completion after a short delay
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [src]);
+  
   // Default blur data URL if not provided and withBlur is true
   const defaultBlurDataURL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
   
@@ -69,7 +79,6 @@ const OptimizedImage = ({
         loading={loadingStrategy}
         placeholder={placeholderStrategy as any}
         blurDataURL={blurPlaceholder}
-        onLoadingComplete={() => setIsLoading(false)}
         {...props}
       />
     </div>

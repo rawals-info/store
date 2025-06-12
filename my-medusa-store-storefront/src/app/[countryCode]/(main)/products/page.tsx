@@ -1,137 +1,133 @@
-"use client"
-
-import { useState, useEffect } from "react"
+import { Suspense } from "react"
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { listCategories } from "@lib/data/categories"
 import { listTags } from "@lib/data/tags"
-import ProductPreview from "@modules/products/components/product-preview"
+import ProductPreview from "@modules/products/components/product-preview/server"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import { sdk } from "@lib/config"
+import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
 
-interface ProductsPageProps {
-  params: {
-    countryCode: string
-  }
-  searchParams: {
-    sortBy?: SortOptions
-    categories?: string
-    tags?: string
-    price_min?: string
-    price_max?: string
-  }
+type SearchParams = {
+  sortBy?: string
+  categories?: string
+  tags?: string
+  price_min?: string
+  price_max?: string
 }
 
-// Helper function to safely get product price
-const getProductPrice = (product: HttpTypes.StoreProduct): number => {
-  if (!product.variants || product.variants.length === 0) {
-    return 0
-  }
+type Props = {
+  params: Promise<{ countryCode: string }>
+  searchParams: Promise<SearchParams>
+}
+
+// Helper function to get product price
+const getProductPrice = (product: any) => {
+  if (!product || !product.variants || !product.variants.length) return 0
   
-  return product.variants[0]?.calculated_price?.calculated_amount || 0
+  const prices = product.variants
+    .filter((v: any) => v.calculated_price)
+    .map((v: any) => v.calculated_price.calculated_amount || 0)
+  
+  return prices.length > 0 ? Math.min(...prices) : 0
 }
 
-export default function ProductsPage(props: ProductsPageProps) {
-  const [region, setRegion] = useState<HttpTypes.StoreRegion | null>(null)
-  const [products, setProducts] = useState<HttpTypes.StoreProduct[]>([])
-  const [productCount, setProductCount] = useState<number>(0)
-  const [categories, setCategories] = useState<HttpTypes.StoreProductCategory[]>([])
-  const [tagsList, setTagsList] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [minPrice, setMinPrice] = useState<number>(0)
-  const [maxPrice, setMaxPrice] = useState<number>(1000)
+export default async function ProductsPage({ params, searchParams }: Props) {
+  // Await params and searchParams
+  const paramsData = await params
+  const searchParamsData = await searchParams
+  
+  // Extract search params safely
+  const sortBy = searchParamsData.sortBy || "created_at"
+  const categoryFilter = searchParamsData.categories
+  const tagFilter = searchParamsData.tags
+  const price_min = searchParamsData.price_min
+  const price_max = searchParamsData.price_max
+  
+  // Get country code from params
+  const countryCode = paramsData.countryCode
 
-  // Extract search params
-  const { sortBy = "created_at", categories: categoryFilter, tags: tagFilter, price_min, price_max } = props.searchParams
-  const countryCode = props.params.countryCode
+  // Get region
+  const regionData = await getRegion(countryCode)
+  if (!regionData) {
+    notFound()
+  }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true)
+  // Build query params for product API
+  const queryParams: Record<string, any> = {}
 
-      try {
-        // Get region
-        const regionData = await getRegion(countryCode)
-        if (!regionData) {
-          notFound()
-        }
-        setRegion(regionData)
+  // Add category filter
+  if (categoryFilter) {
+    queryParams.category_id = categoryFilter.split(",")
+  }
 
-        // Build query params for product API
-        const queryParams: Record<string, any> = {}
+  // Add tag filter
+  if (tagFilter) {
+    queryParams.tags = tagFilter.split(",")
+  }
 
-        // Add category filter
-        if (categoryFilter) {
-          queryParams.category_id = categoryFilter.split(",")
-        }
+  // Add price filter
+  if (price_min || price_max) {
+    queryParams.price = {}
+    if (price_min) queryParams.price.gte = parseInt(price_min)
+    if (price_max) queryParams.price.lte = parseInt(price_max)
+  }
 
-        // Add tag filter
-        if (tagFilter) {
-          queryParams.tags = tagFilter.split(",")
-        }
+  // Fetch products
+  const { response } = await listProducts({
+    regionId: regionData.id,
+    queryParams,
+  })
 
-        // Add price filter
-        if (price_min || price_max) {
-          queryParams.price = {}
-          if (price_min) queryParams.price.gte = parseInt(price_min)
-          if (price_max) queryParams.price.lte = parseInt(price_max)
-        }
+  const products = response.products
+  const productCount = response.count
 
-        // Fetch products
-        const { response } = await listProducts({
-          regionId: regionData.id,
-          queryParams,
-        })
-
-        setProducts(response.products)
-        setProductCount(response.count)
-
-        // Fetch categories
-        const categoriesResponse = await sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
-          "/store/product-categories",
-          {
-            query: { 
-              limit: 100,
-              fields: "*category_children, *parent_category", 
-            },
-          }
-        )
-        
-        setCategories(categoriesResponse.product_categories || [])
-
-        // Fetch tags
-        const tagsResponse = await sdk.client.fetch<{ tags: any[] }>(
-          "/store/products/tag-usage",
-          {
-            next: {
-              revalidate: 60,
-              tags: ['tags'],
-            }
-          }
-        )
-        
-        setTagsList(tagsResponse.tags || [])
-
-        // Calculate price range
-        const prices = response.products.map(product => getProductPrice(product)).filter(price => price > 0)
-        if (prices.length > 0) {
-          setMinPrice(Math.floor(Math.min(...prices)))
-          setMaxPrice(Math.ceil(Math.max(...prices)))
-        }
-
-      } catch (error) {
-        console.error("Error fetching data:", error)
-      } finally {
-        setIsLoading(false)
+  // Fetch categories
+  let categories: HttpTypes.StoreProductCategory[] = []
+  try {
+    const categoriesResponse = await sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
+      "/store/product-categories",
+      {
+        query: { 
+          limit: 100,
+          fields: "*category_children, *parent_category", 
+        },
       }
-    }
+    )
+    categories = categoriesResponse.product_categories || []
+  } catch (error) {
+    console.error("Error fetching categories:", error)
+  }
 
-    fetchData()
-  }, [countryCode, categoryFilter, tagFilter, price_min, price_max])
+  // Fetch tags
+  let tagsList: any[] = []
+  try {
+    const tagsResponse = await sdk.client.fetch<{ tags: any[] }>(
+      "/store/products/tag-usage",
+      {
+        next: {
+          revalidate: 60,
+          tags: ['tags'],
+        }
+      }
+    )
+    tagsList = tagsResponse.tags || []
+  } catch (error) {
+    console.error("Error fetching tags:", error)
+  }
+
+  // Calculate price range
+  const prices = products.map(product => getProductPrice(product)).filter(price => price > 0)
+  let minPrice = 0
+  let maxPrice = 1000
+  if (prices.length > 0) {
+    minPrice = Math.floor(Math.min(...prices))
+    maxPrice = Math.ceil(Math.max(...prices))
+  }
 
   // Sort products if needed
   let sortedProducts = [...products]
@@ -153,29 +149,6 @@ export default function ProductsPage(props: ProductsPageProps) {
   
   // Get featured product (first product or null)
   const featuredProduct = sortedProducts.length > 0 ? sortedProducts[0] : null
-
-  if (isLoading || !region) {
-    return (
-      <div className="content-container py-12">
-        <div className="animate-pulse">
-          <div className="h-40 bg-gray-200 rounded-md mb-8"></div>
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="w-full lg:w-64 space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-px bg-gray-200"></div>
-              <div className="h-40 bg-gray-200 rounded"></div>
-            </div>
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-72 bg-gray-200 rounded-md"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
   
   return (
     <div className="content-container">
@@ -216,14 +189,14 @@ export default function ProductsPage(props: ProductsPageProps) {
           {/* Product count & filters */}
           <div className="sticky top-20">
             <RefinementList 
-              sortBy={sortBy}
+              sortBy={sortBy as SortOptions}
               categories={categories}
               tags={tagsList}
               minPrice={minPrice}
               maxPrice={maxPrice}
-              currencyCode={region.currency_code}
+              currencyCode={regionData.currency_code}
               productCount={productCount}
-              region={region}
+              region={regionData}
             />
             
             {/* Trustpilot-style testimonial */}
@@ -245,22 +218,24 @@ export default function ProductsPage(props: ProductsPageProps) {
 
         {/* Main product grid */}
         <main>
-          {productCount > 0 ? (
-            <ul className="grid grid-cols-1 small:grid-cols-2 gap-x-8 gap-y-10">
-              {sortedProducts.map((product) => (
-                <li key={product.id}>
-                  <ProductPreview product={product} region={region} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="py-24 flex flex-col items-center justify-center">
-              <h2 className="font-display text-xl text-luxury-gold mb-4">No products found</h2>
-              <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
-                We're currently updating our collection. Please check back soon for our latest creations.
-              </p>
-            </div>
-          )}
+          <Suspense fallback={<ProductListSkeleton count={8} />}>
+            {productCount > 0 ? (
+              <ul className="grid grid-cols-1 small:grid-cols-2 gap-x-8 gap-y-10">
+                {sortedProducts.map((product) => (
+                  <li key={product.id}>
+                    <ProductPreview product={product} region={regionData} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="py-24 flex flex-col items-center justify-center">
+                <h2 className="font-display text-xl text-luxury-gold mb-4">No products found</h2>
+                <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
+                  We're currently updating our collection. Please check back soon for our latest creations.
+                </p>
+              </div>
+            )}
+          </Suspense>
           
           {/* Value proposition section */}
           {productCount > 0 && (

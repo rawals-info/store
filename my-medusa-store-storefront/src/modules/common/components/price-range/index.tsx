@@ -187,8 +187,8 @@ const PriceRange = ({
   const maxPos = ((localValue[1] - min) / (max - min)) * 100
   
   return (
-    <div className="flex flex-col gap-y-4 w-full max-w-full" data-testid={dataTestId}>
-      <Text className="text-serif font-medium text-sm text-luxury-charcoal tracking-wide uppercase">Price Range</Text>
+    <div className="flex flex-col gap-y-2 w-full max-w-full" data-testid={dataTestId}>
+      <Text className="text-serif font-medium text-xs text-luxury-charcoal tracking-wide uppercase">Price Range</Text>
       
       {/* Price display */}
       <div className="flex items-center justify-between mb-1">
@@ -203,7 +203,7 @@ const PriceRange = ({
       {/* Custom range slider */}
       <div 
         ref={sliderRef}
-        className="relative h-1.5 bg-luxury-gold/20 rounded-full mb-6 w-full cursor-pointer"
+        className="relative h-1 bg-luxury-gold/20 rounded-full mb-3 w-full cursor-pointer"
         onClick={handleTrackClick}
       >
         {/* Track fill */}
@@ -217,7 +217,7 @@ const PriceRange = ({
         
         {/* Min handle */}
         <div 
-          className="absolute w-4 h-4 bg-luxury-gold border-2 border-luxury-ivory shadow-sm rounded-full -mt-[0.3125rem] -ml-2 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10"
+          className="absolute w-3 h-3 bg-luxury-gold border border-luxury-ivory shadow-sm rounded-full -mt-1 -ml-1.5 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10"
           style={{ left: `${minPos}%` }}
           onMouseDown={(e) => {
             e.preventDefault() // Prevent text selection during drag
@@ -253,7 +253,7 @@ const PriceRange = ({
         
         {/* Max handle */}
         <div 
-          className="absolute w-4 h-4 bg-luxury-gold border-2 border-luxury-ivory shadow-sm rounded-full -mt-[0.3125rem] -ml-2 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10"
+          className="absolute w-3 h-3 bg-luxury-gold border border-luxury-ivory shadow-sm rounded-full -mt-1 -ml-1.5 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10"
           style={{ left: `${maxPos}%` }}
           onMouseDown={(e) => {
             e.preventDefault() // Prevent text selection during drag
@@ -288,27 +288,27 @@ const PriceRange = ({
         ></div>
       </div>
       
-      <div className="flex gap-x-4 items-center w-full">
-        <div className="flex flex-col gap-y-1 flex-1">
+      <div className="flex gap-x-2 items-center w-full">
+        <div className="flex flex-col flex-1">
           <input 
             type="text" 
             value={inputValues[0]}
             onChange={handleMinChange}
             onBlur={handleMinBlur}
             onKeyPress={(e) => handleKeyPress(e, true)}
-            className="w-full bg-luxury-ivory border border-luxury-gold/30 p-2 text-luxury-charcoal text-xs rounded-sm focus:border-luxury-gold focus:outline-none shadow-sm font-serif"
+            className="w-full bg-luxury-ivory border border-luxury-gold/30 p-1 text-luxury-charcoal text-xs rounded-sm focus:border-luxury-gold focus:outline-none shadow-sm font-serif"
             aria-label="Minimum price"
           />
         </div>
-        <div className="h-px w-4 bg-luxury-gold/40"></div>
-        <div className="flex flex-col gap-y-1 flex-1">
+        <div className="h-px w-2 bg-luxury-gold/40"></div>
+        <div className="flex flex-col flex-1">
           <input 
             type="text" 
             value={inputValues[1]}
             onChange={handleMaxChange}
             onBlur={handleMaxBlur}
             onKeyPress={(e) => handleKeyPress(e, false)}
-            className="w-full bg-luxury-ivory border border-luxury-gold/30 p-2 text-luxury-charcoal text-xs rounded-sm focus:border-luxury-gold focus:outline-none shadow-sm font-serif"
+            className="w-full bg-luxury-ivory border border-luxury-gold/30 p-1 text-luxury-charcoal text-xs rounded-sm focus:border-luxury-gold focus:outline-none shadow-sm font-serif"
             aria-label="Maximum price"
           />
         </div>

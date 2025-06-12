@@ -30,6 +30,9 @@ export default function ProductPreviewClient({
   
   const isHandcrafted = true // All our products are handcrafted
 
+  // Fallback price display if calculated_price is missing
+  const displayPrice = cheapestPrice?.calculated_price || "Contact for price"
+
   return (
     <LocalizedClientLink 
       href={`/products/${product.handle}`} 
@@ -108,11 +111,9 @@ export default function ProductPreviewClient({
             </h3>
             
             <div className="flex items-center">
-              {cheapestPrice && (
-                <Text className="text-luxury-gold font-medium text-sm">
-                  {cheapestPrice.calculated_price}
-                </Text>
-              )}
+              <Text className="text-luxury-gold font-medium text-sm">
+                {displayPrice}
+              </Text>
             </div>
           </div>
           

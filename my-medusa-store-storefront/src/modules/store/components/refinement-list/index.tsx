@@ -242,17 +242,17 @@ const RefinementList = ({
   return (
     <div className="w-full max-w-full">
       {/* Mobile filter toggle */}
-      <div className="flex items-center justify-between mb-4 lg:hidden">
+      <div className="flex items-center justify-between mb-3 lg:hidden">
         <button 
-          className="flex items-center gap-x-2 px-4 py-2 bg-luxury-ivory border border-luxury-gold/40 shadow-sm hover:border-luxury-gold transition-colors rounded-sm group"
+          className="flex items-center gap-x-2 px-3 py-1.5 bg-luxury-ivory border border-luxury-gold/40 shadow-sm hover:border-luxury-gold transition-colors rounded-sm group"
           onClick={() => setShowMobileFilters(!showMobileFilters)}
         >
-          <Adjustments className="w-4 h-4 text-luxury-gold" />
+          <Adjustments className="w-3.5 h-3.5 text-luxury-gold" />
           <span className="text-xs font-serif text-luxury-charcoal group-hover:text-luxury-gold/90 transition-colors">
             {showMobileFilters ? "Hide Filters" : "Refine"}
           </span>
           {hasActiveFilters && (
-            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-luxury-gold text-luxury-ivory text-[10px] font-serif">
+            <div className="w-3.5 h-3.5 flex items-center justify-center rounded-full bg-luxury-gold text-luxury-ivory text-[10px] font-serif">
               {categoryIds.length + tagIds.length + (hasActivePriceFilter ? 1 : 0)}
             </div>
           )}
@@ -268,10 +268,10 @@ const RefinementList = ({
       </div>
       
       {/* Product count & active filters */}
-      <div className="flex flex-col gap-y-3 mb-4">
+      <div className="flex flex-col gap-y-2 mb-3">
         {productCount !== undefined && (
           <div className="flex justify-between items-center">
-            <Text className="text-luxury-charcoal font-serif text-sm uppercase tracking-wider">
+            <Text className="text-luxury-charcoal font-serif text-xs uppercase tracking-wider">
               {productCount} {productCount === 1 ? "Piece" : "Pieces"}
             </Text>
             <div className="hidden lg:block">
@@ -282,7 +282,7 @@ const RefinementList = ({
         
         {hasActiveFilters && (
           <div>
-            <div className="flex flex-wrap gap-2 mb-2">
+            <div className="flex flex-wrap gap-1.5 mb-1.5">
               {activeCategoryNames.map((name, i) => {
                 const category = localCategories.find(c => c.name === name)
                 if (!category) return null
@@ -327,7 +327,7 @@ const RefinementList = ({
               className="text-luxury-gold/80 text-xs flex items-center gap-x-1 font-serif hover:text-luxury-gold"
               onClick={clearAllFilters}
             >
-              <XMarkMini className="w-3.5 h-3.5" />
+              <XMarkMini className="w-3 h-3" />
               Clear all filters
             </Button>
           </div>
@@ -335,7 +335,7 @@ const RefinementList = ({
       </div>
       
       {/* Filters & sort */}
-      <div className={`grid gap-y-4 w-full ${!showMobileFilters && 'max-lg:hidden'}`}>
+      <div className={`grid gap-y-3 w-full ${!showMobileFilters && 'max-lg:hidden'}`}>
         {/* Sort (mobile) */}
         <div className="lg:hidden w-full">
           <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
@@ -345,7 +345,7 @@ const RefinementList = ({
         <div className="h-px w-full bg-luxury-gold/20"></div>
         
         {/* Filters */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-3 w-full">
           {localCategories.length > 0 && (
             <FilterDropdown
               title="Categories"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image, { ImageProps } from "next/image"
 import useLazyImage from "@lib/hooks/use-lazy-image"
 import { transformImageUrl } from "@lib/util/image-transformer"
@@ -60,6 +60,18 @@ const LazyImage = ({
     disabled: isPriority, // Disable lazy loading for priority images
   })
   
+  // Use effect to simulate image loading when visible
+  useEffect(() => {
+    if (isVisible || isPriority) {
+      // Simulate image load event after a short delay
+      const timer = setTimeout(() => {
+        handleImageLoad();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, isPriority, handleImageLoad]);
+  
   // Default blur data URL if not provided and withBlur is true
   const defaultBlurDataURL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
   
@@ -101,7 +113,6 @@ const LazyImage = ({
           loading={isPriority ? "eager" : "lazy"}
           placeholder={withBlur ? "blur" : placeholder || "empty"}
           blurDataURL={withBlur ? (blurDataURL || defaultBlurDataURL) : undefined}
-          onLoad={handleImageLoad}
           onError={handleError}
           {...props}
         />

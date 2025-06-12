@@ -3,8 +3,22 @@ import { getPercentageDiff } from "./get-precentage-diff"
 import { convertToLocale } from "./money"
 
 export const getPricesForVariant = (variant: any) => {
-  if (!variant?.calculated_price?.calculated_amount) {
+  // Check if variant or calculated_price is missing
+  if (!variant) {
     return null
+  }
+  
+  // If calculated_price is missing, return a default structure
+  if (!variant.calculated_price?.calculated_amount) {
+    return {
+      calculated_price_number: 0,
+      calculated_price: null, // Will be displayed as "Contact for price"
+      original_price_number: 0,
+      original_price: null,
+      currency_code: 'USD',
+      price_type: 'default',
+      percentage_diff: 0,
+    }
   }
 
   // Ensure we have valid numbers
@@ -54,8 +68,15 @@ export function getProductPrice({
       return null
     }
 
-    const cheapestVariant: any = product.variants
-      .filter((v: any) => !!v.calculated_price)
+    // Filter out variants without calculated_price to avoid errors
+    const variantsWithPrice = product.variants.filter((v: any) => !!v.calculated_price)
+    
+    // If no variants have calculated_price, return the first variant without price info
+    if (variantsWithPrice.length === 0) {
+      return getPricesForVariant(product.variants[0])
+    }
+
+    const cheapestVariant: any = variantsWithPrice
       .sort((a: any, b: any) => {
         return (
           a.calculated_price.calculated_amount -

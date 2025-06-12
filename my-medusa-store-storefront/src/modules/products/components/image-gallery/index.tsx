@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
@@ -33,6 +33,15 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
     setImageLoading(true)
     setSelectedImage(index)
   }
+  
+  // Reset loading state after a short delay when selected image changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setImageLoading(false)
+    }, 300)
+    
+    return () => clearTimeout(timer)
+  }, [selectedImage])
 
   if (!images.length) {
     return (
@@ -74,7 +83,6 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
                   : undefined
               }
               quality={90}
-              onLoadingComplete={() => setImageLoading(false)}
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
             />

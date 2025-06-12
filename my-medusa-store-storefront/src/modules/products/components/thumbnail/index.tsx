@@ -2,7 +2,7 @@
 
 import { Container, clx } from "@medusajs/ui"
 import Image from "next/image"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 
@@ -53,7 +53,19 @@ const ImageOrPlaceholder = ({
   size,
   isFeatured,
 }: Pick<ThumbnailProps, "size" | "isFeatured"> & { image?: string }) => {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoaded, setIsLoaded] = useState(false)
+  
+  // Use useEffect to set image as loaded after a short delay
+  // This is a client-side alternative to onLoad
+  useEffect(() => {
+    if (image) {
+      const timer = setTimeout(() => {
+        setIsLoaded(true)
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [image]);
 
   // Define appropriate sizes for different screens and component sizes
   const imageSizes = 
@@ -67,14 +79,13 @@ const ImageOrPlaceholder = ({
     <Image
       src={image}
       alt="Product thumbnail"
-      className={`absolute inset-0 object-cover object-center ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+      className={`absolute inset-0 object-cover object-center ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
       draggable={false}
       quality={isFeatured ? 80 : 65} // Lower quality for non-featured images
       sizes={imageSizes}
       fill
       priority={isFeatured ? true : false}
       loading={isFeatured ? "eager" : "lazy"}
-      onLoadingComplete={() => setIsLoading(false)}
       placeholder="blur"
       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
       fetchPriority={isFeatured ? "high" : "auto"}

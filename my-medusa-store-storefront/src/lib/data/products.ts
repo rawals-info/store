@@ -86,14 +86,22 @@ export const listProducts = async ({
 
   // IMPORTANT: Replace any problematic sort orders with safe ones
   if (processedQueryParams.order) {
-    // Replace updated_at:desc with id:desc which should always be available
+    // Replace updated_at:desc with created_at:desc which is safer
     if (processedQueryParams.order.includes('updated_at:desc')) {
-      processedQueryParams.order = 'id:desc';
+      // Use a safe default ordering
+      delete processedQueryParams.order;
     }
     
-    // Also handle created_at:desc which causes errors
+    // Remove id:desc which causes errors
+    if (processedQueryParams.order.includes('id:desc')) {
+      // Use a safe default ordering
+      delete processedQueryParams.order;
+    }
+
+    // Remove created_at:desc which causes errors
     if (processedQueryParams.order.includes('created_at:desc')) {
-      processedQueryParams.order = 'id:desc';
+      // Use a safe default ordering
+      delete processedQueryParams.order;
     }
   }
 
@@ -239,7 +247,7 @@ export const listProductsWithSort = cache(async ({
     return { response, nextPage, queryParams }
   } 
   
-  // Fix for created_at sorting - use id:desc instead which is always available
+  // Fix for created_at sorting - don't use created_at:desc as it's not supported
   if (sortBy === "created_at") {
     const {
       response,
@@ -249,13 +257,25 @@ export const listProductsWithSort = cache(async ({
       queryParams: {
         ...queryParams,
         limit,
-        order: `id:desc`, // Changed from updated_at:desc to id:desc to fix 500 errors
+        // Don't specify order parameter as it's not supported
       },
       countryCode,
       isDetailed: true,
     })
     
-    return { response, nextPage, queryParams }
+    // Sort products by created_at on the client side instead
+    const sortedProducts = [...response.products].sort((a, b) => {
+      return new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
+    });
+    
+    return { 
+      response: {
+        products: sortedProducts,
+        count: response.count
+      }, 
+      nextPage, 
+      queryParams 
+    }
   }
   
   // For custom sorting that can't be handled by the API
