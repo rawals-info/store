@@ -117,7 +117,7 @@ const AnimatedHeader = () => {
     <>
       <motion.header
         className={clx(
-          "fixed top-0 inset-x-0 z-[40] group transition-colors duration-500",
+          "fixed top-0 inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-x-hidden",
           {
             "border-b border-luxury-gold/10": isScrolled,
             "backdrop-blur-sm": isScrolled,
@@ -155,7 +155,7 @@ const AnimatedHeader = () => {
           />
         )}
         
-        <div className={`max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-12 ${getTextColor()} h-full transition-all duration-300 ${
+        <div className={`w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 ${getTextColor()} h-full transition-all duration-300 box-border ${
           isScrolled ? "py-0 h-16" : "py-1 h-20"
         }`}>
           <div className="w-full flex items-center justify-between h-full">
@@ -297,26 +297,26 @@ const AnimatedHeader = () => {
         </div>
       </motion.header>
       
-      {/* Mobile menu overlay */}
+      {/* Mobile menu overlay - Set max width to viewport width */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
             <motion.div
-              className="fixed inset-0 bg-luxury-charcoal/50 backdrop-blur-sm z-[50]"
+              className="fixed inset-0 bg-luxury-charcoal/50 backdrop-blur-sm z-[50] w-screen"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeMobileMenu}
             />
             <motion.div
-              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-luxury-ivory z-[60] shadow-xl"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-luxury-ivory z-[60] shadow-xl overflow-hidden"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 20, stiffness: 100 }}
             >
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20">
+              <div className="flex flex-col h-full w-full">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20 w-full">
                   <h2 className="font-serif text-xl text-luxury-charcoal">Menu</h2>
                   <button
                     onClick={closeMobileMenu}
@@ -328,8 +328,8 @@ const AnimatedHeader = () => {
                     </svg>
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto py-6 px-6">
-                  <nav className="flex flex-col gap-y-6">
+                <div className="flex-1 overflow-y-auto py-6 px-6 w-full">
+                  <nav className="flex flex-col gap-y-6 w-full">
                     {navLinks.map((link, i) => (
                       <motion.div
                         key={link.href}
@@ -337,6 +337,7 @@ const AnimatedHeader = () => {
                         initial="closed"
                         animate="open"
                         variants={menuVariants}
+                        className="w-full"
                       >
                         <LocalizedClientLink
                           href={link.href}
@@ -355,6 +356,7 @@ const AnimatedHeader = () => {
                         initial="closed"
                         animate="open"
                         variants={menuVariants}
+                        className="w-full"
                       >
                         <LocalizedClientLink
                           href={link.href}
@@ -367,12 +369,13 @@ const AnimatedHeader = () => {
                     ))}
                   </nav>
                   <div className="h-px w-full bg-luxury-lightgold/20 my-6" />
-                  <div className="flex flex-col gap-y-6">
+                  <div className="flex flex-col gap-y-6 w-full">
                     <motion.div
                       custom={navLinks.length + rightLinks.length}
                       initial="closed"
                       animate="open"
                       variants={menuVariants}
+                      className="w-full"
                     >
                       <div className="flex items-center gap-x-2 text-luxury-charcoal">
                         <span className="text-sm font-medium">Region:</span>
@@ -384,6 +387,7 @@ const AnimatedHeader = () => {
                       initial="closed"
                       animate="open"
                       variants={menuVariants}
+                      className="w-full"
                     >
                       <div className="flex items-center gap-x-2 text-luxury-charcoal">
                         <span className="text-sm font-medium">Currency:</span>

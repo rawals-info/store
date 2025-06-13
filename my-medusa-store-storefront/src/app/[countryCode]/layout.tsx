@@ -29,7 +29,7 @@ export default async function StoreLayout({
 }) {
   return (
     <PrefetchProvider>
-      <div className="relative flex flex-col min-h-screen">
+      <div className="relative flex flex-col min-h-screen overflow-x-hidden">
         <AnimatedHeader />
         <div className="flex-1">
           {children}

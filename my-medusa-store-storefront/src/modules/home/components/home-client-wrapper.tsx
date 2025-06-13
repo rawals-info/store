@@ -98,10 +98,10 @@ export default function HomeClientWrapper({
   }
 
   return (
-    <div>
+    <div className="w-full overflow-hidden">
       {/* Hero Section */}
       <motion.section
-        className="relative h-screen flex items-center justify-center overflow-hidden pt-20"
+        className="relative h-screen flex items-center justify-center overflow-hidden pt-20 w-full"
         initial="initial"
         animate="animate"
         variants={staggerContainer}
@@ -123,7 +123,7 @@ export default function HomeClientWrapper({
         </div>
         
         {/* Content */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 w-full">
           <motion.div variants={fadeIn} className="mb-6">
             <Heading level="h1" className="text-4xl md:text-6xl lg:text-7xl mb-4 font-serif text-white">
               Bespoke Marble Handicrafts<br />for Timeless Luxury
@@ -158,8 +158,8 @@ export default function HomeClientWrapper({
       </motion.section>
       
       {/* Featured Products Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
+      <section className="py-16 bg-white w-full">
+        <div className="max-w-7xl mx-auto px-4 w-full box-border">
           <ScrollReveal>
             <div className="text-center mb-12">
               <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif">
@@ -170,18 +170,18 @@ export default function HomeClientWrapper({
           </ScrollReveal>
           
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-8 sm:gap-y-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full box-border">
             {featuredProducts.map((product, index) => (
-              <ScrollReveal key={product.id} delay={0.1 * index} className="group">
-                <div className="h-full transition-all duration-500 hover:-translate-y-1">
-                  <div className="relative h-[300px] overflow-hidden rounded-lg mb-4">
+              <ScrollReveal key={product.id} delay={0.1 * index} className="group w-full">
+                <div className="h-full transition-all duration-500 hover:-translate-y-1 w-full">
+                  <div className="relative h-[300px] overflow-hidden rounded-lg mb-4 w-full">
                     {product.thumbnail ? (
                       <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
                         <Image
                           src={product.thumbnail}
                           alt={product.title}
                           fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                           className="object-cover"
                           onError={(e) => {
                             // @ts-ignore - TypeScript doesn't know about currentTarget
@@ -204,7 +204,7 @@ export default function HomeClientWrapper({
                     </div>
                   </div>
                   <Link href={`/products/${product.handle}`} className="block">
-                    <Text className="font-medium text-lg mb-1 group-hover:text-luxury-gold transition-colors duration-300">
+                    <Text className="font-medium text-lg mb-1 group-hover:text-luxury-gold transition-colors duration-300 truncate">
                       {product.title}
                     </Text>
                     {product.variants?.[0] && (
@@ -226,12 +226,12 @@ export default function HomeClientWrapper({
       </section>
       
       {/* Category Carousel Section */}
-      <section className="py-16 bg-white relative overflow-hidden">
+      <section className="py-16 bg-white relative overflow-hidden w-full">
         {/* Decorative background elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-luxury-gold opacity-5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-luxury-gold opacity-5 rounded-full blur-3xl"></div>
         
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 relative z-10 w-full box-border">
           <ScrollReveal>
             <div className="text-center mb-12">
               <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif">
@@ -252,9 +252,9 @@ export default function HomeClientWrapper({
               </Text>
             </div>
           ) : (
-            <div className="relative">
+            <div className="relative w-full">
               {/* Category cards */}
-              <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-lg">
+              <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-lg w-full">
                 {parentCategories.map((category, index) => {
                   const bgGradient = bgGradients[index % bgGradients.length]
                   const categoryImage = getCategoryImage(category.handle)

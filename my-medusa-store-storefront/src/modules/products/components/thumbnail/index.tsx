@@ -24,7 +24,46 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   className,
   "data-testid": dataTestid,
 }) => {
-  const initialImage = thumbnail || images?.[0]?.url
+  // Properly handle image URLs from Medusa backend
+  // Medusa can provide URLs in different formats depending on the storage provider
+  const getImageUrl = () => {
+    // First try the thumbnail directly
+    if (thumbnail) {
+      return thumbnail;
+    }
+    
+    // If no thumbnail, try to get the first image from images array
+    if (images && images.length > 0) {
+      // Handle different image object structures
+      const firstImage = images[0];
+      
+      // If the image has a URL property
+      if (firstImage.url) {
+        return firstImage.url;
+      }
+      
+      // If the image itself is a string URL
+      if (typeof firstImage === 'string') {
+        return firstImage;
+      }
+      
+      // If the image has a file property with a URL
+      if (firstImage.file?.url) {
+        return firstImage.file.url;
+      }
+    }
+    
+    // Return null if no valid image found
+    return null;
+  }
+
+  const imageUrl = getImageUrl();
+  
+  console.log("Thumbnail: Image data", { 
+    thumbnail, 
+    hasImages: !!images && images.length > 0,
+    imageUrl
+  });
 
   return (
     <Container
@@ -43,7 +82,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       )}
       data-testid={dataTestid}
     >
-      <ImageOrPlaceholder image={initialImage} size={size} isFeatured={isFeatured} />
+      <ImageOrPlaceholder image={imageUrl} size={size} isFeatured={isFeatured} />
     </Container>
   )
 }
@@ -52,8 +91,9 @@ const ImageOrPlaceholder = ({
   image,
   size,
   isFeatured,
-}: Pick<ThumbnailProps, "size" | "isFeatured"> & { image?: string }) => {
+}: Pick<ThumbnailProps, "size" | "isFeatured"> & { image?: string | null }) => {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [hasError, setHasError] = useState(false)
   
   // Use useEffect to set image as loaded after a short delay
   // This is a client-side alternative to onLoad
@@ -75,10 +115,10 @@ const ImageOrPlaceholder = ({
     size === "full" ? "(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" :
     "(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
 
-  return image ? (
+  return image && !hasError ? (
     <Image
       src={image}
-      alt="Product thumbnail"
+      alt="Product image"
       className={`absolute inset-0 object-cover object-center ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
       draggable={false}
       quality={isFeatured ? 80 : 65} // Lower quality for non-featured images
@@ -93,6 +133,10 @@ const ImageOrPlaceholder = ({
         // Minimize Cumulative Layout Shift
         objectFit: "cover",
         objectPosition: "center",
+      }}
+      onError={() => {
+        console.error("Image failed to load:", image)
+        setHasError(true)
       }}
     />
   ) : (

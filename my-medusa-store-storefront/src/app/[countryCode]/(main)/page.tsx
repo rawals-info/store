@@ -11,8 +11,6 @@ import Newsletter from "@modules/home/components/newsletter"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import FeaturedProductsSkeleton from "@modules/skeletons/components/featured-products-skeleton"
 import Features from "@modules/home/components/features"
-import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
-import { listProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
 
 export const metadata: Metadata = {
@@ -38,25 +36,18 @@ export default async function Home(props: {
     return notFound()
   }
   
-  // Fetch products and categories for HomeClientWrapper
-  const { response } = await listProducts({
-    countryCode,
-    queryParams: { limit: 4 },
-  }).catch(() => {
-    return { response: { products: [] } }
-  })
-  
+  // Fetch categories for other components
   const categories = await listCategories()
 
   return (
-    <div>
-      {/* Use HomeClientWrapper which includes both hero and products */}
-      <HomeClientWrapper 
-        featuredProducts={response.products} 
-        categories={categories} 
-        region={region}
-        countryCode={countryCode}
-      />
+    <div className="overflow-x-hidden w-full">
+      {/* Hero Section */}
+      <Hero />
+      
+      {/* Featured Products Section with Suspense */}
+      <Suspense fallback={<FeaturedProductsSkeleton />}>
+        <FeaturedProducts countryCode={countryCode} />
+      </Suspense>
       
       {/* Features Section */}
       <Features />

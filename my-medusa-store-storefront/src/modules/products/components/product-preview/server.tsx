@@ -13,10 +13,27 @@ export default function ProductPreview({
   isFeatured?: boolean
   region: HttpTypes.StoreRegion
 }) {
+  console.log("ProductPreview: Rendering product", {
+    id: product.id,
+    title: product.title,
+    thumbnail: product.thumbnail,
+    hasVariants: product.variants && product.variants.length > 0,
+    variantsCount: product.variants?.length || 0
+  })
+
   // The product should already have price data from the server component
   // Get the cheapest price from all variants
   const { cheapestPrice } = getProductPrice({
     product,
+  })
+  
+  console.log("ProductPreview: Price calculation", {
+    productId: product.id,
+    cheapestPrice: cheapestPrice ? {
+      calculated_price: cheapestPrice.calculated_price,
+      original_price: cheapestPrice.original_price,
+      price_type: cheapestPrice.price_type
+    } : "No price found"
   })
   
   // Check for product tags to display appropriate badges
@@ -30,9 +47,12 @@ export default function ProductPreview({
   // Fallback price display if calculated_price is missing
   const displayPrice = cheapestPrice?.calculated_price || "Contact for price"
 
+  // Make sure product handle is available
+  const productHandle = product.handle || `product-${product.id}`
+
   return (
     <Link 
-      href={`/products/${product.handle}`} 
+      href={`/products/${productHandle}`} 
       className="group block relative luxury-image-hover"
       aria-label={`View ${product.title}`}
     >

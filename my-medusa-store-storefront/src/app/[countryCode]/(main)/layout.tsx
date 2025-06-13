@@ -10,7 +10,7 @@ export default function MainLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="content-container py-6 sm:py-10">
+    <div className="content-container py-6 sm:py-10 overflow-x-hidden">
       <Suspense fallback={
         <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
           <LoadingSpinner size="large" />

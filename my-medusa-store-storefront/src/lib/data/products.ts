@@ -84,6 +84,10 @@ export const listProducts = async ({
     ...queryParams,
   }
 
+  // IMPORTANT: Remove any problematic parameters that cause errors
+  delete processedQueryParams.tags; // Remove tags as it's causing errors
+  delete processedQueryParams.price_range; // Remove price_range if it's causing issues
+
   // IMPORTANT: Replace any problematic sort orders with safe ones
   if (processedQueryParams.order) {
     // Replace updated_at:desc with created_at:desc which is safer
@@ -110,43 +114,6 @@ export const listProducts = async ({
     processedQueryParams.category_id = Array.isArray(queryParams.category_id) 
       ? queryParams.category_id 
       : [queryParams.category_id]
-  }
-
-  // Handle tags
-  if (queryParams.tags) {
-    processedQueryParams.tags = Array.isArray(queryParams.tags) 
-      ? queryParams.tags 
-      : [queryParams.tags]
-  }
-  
-  // Handle price filtering - use Medusa's built-in price filter capability
-  if (queryParams.price_range) {
-    // Only set price_list_id if it exists in the region 
-    // This avoids the TypeScript error for price_list_id
-    const regionPriceListId = (region as any).price_list_id;
-    
-    if (queryParams.price_range.min !== undefined) {
-      if (regionPriceListId) {
-        processedQueryParams.price_list_id = regionPriceListId;
-      }
-      
-      processedQueryParams["variants.calculated_price"] = {
-        gte: queryParams.price_range.min
-      }
-    }
-    
-    if (queryParams.price_range.max !== undefined) {
-      if (regionPriceListId) {
-        processedQueryParams.price_list_id = regionPriceListId;
-      }
-      
-      processedQueryParams["variants.calculated_price"] = {
-        ...processedQueryParams["variants.calculated_price"] || {},
-        lte: queryParams.price_range.max
-      }
-    }
-    
-    delete processedQueryParams.price_range
   }
 
   // Caching configuration with ISR

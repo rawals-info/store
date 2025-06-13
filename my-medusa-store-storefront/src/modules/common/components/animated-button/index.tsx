@@ -5,7 +5,9 @@ import { ButtonHTMLAttributes, ReactNode } from "react"
 import { clx } from "@medusajs/ui"
 import { luxuryHover } from "@lib/util/animations"
 
-interface AnimatedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onDrag">
+
+interface AnimatedButtonProps extends ButtonProps {
   children: ReactNode
   variant?: "primary" | "secondary" | "gold" | "outline" | "transparent"
   size?: "small" | "medium" | "large"
@@ -24,21 +26,24 @@ const AnimatedButton = ({
   const variantClasses = {
     primary: "bg-ui-bg-base text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-subtle",
     secondary: "bg-ui-bg-subtle text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-base",
-    gold: "bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-50",
-    outline: "bg-transparent text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-subtle",
-    transparent: "bg-transparent text-ui-fg-base hover:bg-ui-bg-subtle",
+    gold: "bg-luxury-gold text-luxury-ivory border border-luxury-gold/80 hover:bg-luxury-gold/90 shadow-luxury-sm",
+    outline: "bg-transparent text-luxury-charcoal border border-luxury-gold/40 hover:border-luxury-gold hover:bg-luxury-ivory",
+    transparent: "bg-transparent text-luxury-charcoal hover:text-luxury-gold",
   }
 
   const sizeClasses = {
-    small: "px-3 py-1 text-sm",
-    medium: "px-4 py-2",
-    large: "px-6 py-3 text-lg",
+    small: "px-3 py-1.5 text-xs tracking-wider uppercase",
+    medium: "px-5 py-2 text-sm tracking-wide",
+    large: "px-7 py-3 text-base tracking-wide",
   }
+
+  // Omit onDrag to avoid conflicts with framer-motion
+  const { onDrag, ...buttonProps } = props
 
   return (
     <motion.button
       className={clx(
-        "rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:ring-opacity-50",
+        "rounded-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-luxury-gold/50 focus:ring-opacity-50",
         variantClasses[variant],
         sizeClasses[size],
         isLoading && "opacity-70 cursor-not-allowed",
@@ -49,15 +54,24 @@ const AnimatedButton = ({
       whileHover="whileHover"
       whileTap="whileTap"
       disabled={isLoading || props.disabled}
-      {...props}
+      {...buttonProps}
     >
       {isLoading ? (
         <div className="flex items-center justify-center">
-          <div className="w-4 h-4 rounded-full border-2 border-ui-fg-base border-t-transparent animate-spin mr-2" />
+          <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin mr-2" />
           <span>Loading...</span>
         </div>
       ) : (
-        children
+        <span className="flex items-center justify-center">
+          {children}
+          {variant === "gold" && (
+            <span className="ml-2 opacity-70">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          )}
+        </span>
       )}
     </motion.button>
   )
