@@ -11,8 +11,8 @@ type ConvertToLocaleParams = {
 export const convertToLocale = ({
   amount,
   currency_code,
-  minimumFractionDigits,
-  maximumFractionDigits,
+  minimumFractionDigits = 2,
+  maximumFractionDigits = 2,
   locale = "en-US",
 }: ConvertToLocaleParams) => {
   // Handle invalid inputs
@@ -20,9 +20,21 @@ export const convertToLocale = ({
     return "Price unavailable"
   }
   
-  if (!currency_code || isEmpty(currency_code)) {
-    return amount.toString()
+  // Handle zero amount
+  if (amount === 0) {
+    return "Contact for price"
   }
+  
+  if (!currency_code || isEmpty(currency_code)) {
+    currency_code = 'USD' // Default to USD if no currency code is provided
+  }
+  
+  // Normalize currency code to uppercase to avoid formatting errors
+  currency_code = currency_code.toUpperCase()
+  
+  // We're now handling prices that are 100x larger, so no need to warn about high values
+  // Instead, ensure the amount is a proper number without floating point issues
+  amount = Math.round(amount * 100) / 100
   
   try {
     return new Intl.NumberFormat(locale, {
@@ -33,6 +45,6 @@ export const convertToLocale = ({
     }).format(amount)
   } catch (error) {
     console.error("Error formatting currency:", error)
-    return `${amount} ${currency_code}`
+    return `${amount.toFixed(2)} ${currency_code}`
   }
 }

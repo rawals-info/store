@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import { convertToLocale } from "@lib/util/money"
 
 export default function ProductPreviewClient({
   product,
@@ -16,8 +17,7 @@ export default function ProductPreviewClient({
   isFeatured?: boolean
   region: HttpTypes.StoreRegion
 }) {
-  // The product should already have price data from the server component
-  // Get the cheapest price from all variants
+  // Get the cheapest price from all variants - this will use our fixed getPricesForVariant function
   const { cheapestPrice } = getProductPrice({
     product,
   })
@@ -30,16 +30,30 @@ export default function ProductPreviewClient({
   
   const isHandcrafted = true // All our products are handcrafted
 
-  // Fallback price display if calculated_price is missing
-  const displayPrice = cheapestPrice?.calculated_price || "Contact for price"
+  // Get price to display - use our fixed calculation function
+  let displayPrice = null
+  
+  // Debug price calculation
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`ProductPreview (${product.title}):`, {
+      cheapestPrice,
+      hasVariants: product.variants && product.variants.length > 0,
+      firstVariant: product.variants && product.variants[0] ? {
+        id: product.variants[0].id,
+        prices: (product.variants[0] as any).prices,
+        calculated_price: (product.variants[0] as any).calculated_price
+      } : 'No variants'
+    })
+  }
 
+  // Use the product-price component approach - cheapestPrice already handles all edge cases
   return (
-    <LocalizedClientLink 
-      href={`/products/${product.handle}`} 
-      className="group block relative luxury-image-hover"
-      aria-label={`View ${product.title}`}
+    <LocalizedClientLink
+      href={`/products/${product.handle}`}
+      className="group"
     >
-      <div data-testid="product-wrapper" className="overflow-hidden rounded-sm border border-luxury-gold/10 bg-luxury-ivory/10 transition-all duration-300 group-hover:shadow-md group-hover:border-luxury-gold/30 group-hover:-translate-y-1">
+      <div
+        data-testid="product-wrapper" className="overflow-hidden rounded-sm border border-luxury-gold/10 bg-luxury-ivory/10 transition-all duration-300 group-hover:shadow-md group-hover:border-luxury-gold/30 group-hover:-translate-y-1">
         <div className="relative">
           {/* Product thumbnail - reduced in height */}
           <div className="w-full overflow-hidden relative" style={{ height: '260px' }}>
@@ -90,46 +104,31 @@ export default function ProductPreviewClient({
               </div>
             )}
           </div>
-          
-          {/* Sale badge */}
-          {cheapestPrice?.price_type === "sale" && (
-            <div className="absolute top-3 right-3 z-10">
-              <span className="bg-luxury-gold/90 px-2 py-1 text-luxury-ivory text-[9px] uppercase tracking-wider font-medium flex items-center">
-                <svg className="w-2.5 h-2.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Sale
-              </span>
-            </div>
-          )}
         </div>
         
-        <div className="pt-3 pb-3 px-4">
-          <div className="flex justify-between items-start mb-1">
-            <h3 className="font-display text-sm text-luxury-charcoal group-hover:text-luxury-gold transition-colors duration-300 pr-4" data-testid="product-title">
+        <div className="p-4">
+          <div className="flex flex-row items-center justify-between mb-1.5">
+            <Text className="text-base font-serif font-medium text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300 flex-grow pr-3 truncate">
               {product.title}
-            </h3>
+            </Text>
             
-            <div className="flex items-center">
-              <Text className="text-luxury-gold font-medium text-sm">
-                {displayPrice}
-              </Text>
-            </div>
+            {/* Use PreviewPrice component to display price with our fixes */}
+            {cheapestPrice ? (
+              <PreviewPrice price={cheapestPrice} />
+            ) : (
+              <div className="text-luxury-gold font-medium text-base-regular font-serif">
+                Contact for price
+              </div>
+            )}
           </div>
           
-          <div className="h-px bg-luxury-gold/20 w-full my-2"></div>
-          
-          <div className="flex justify-between items-center">
-            <p className="text-serif-italic text-xs text-luxury-charcoal/70 max-w-[80%] line-clamp-1">
-              {product.description?.substring(0, 40)}
-              {product.description && product.description.length > 40 ? '...' : ''}
-            </p>
-            
-            <div className="w-6 h-6 rounded-full border border-luxury-gold/30 flex items-center justify-center transform transition-transform duration-300 group-hover:scale-110 group-hover:border-luxury-gold group-hover:bg-luxury-cream/20">
-              <svg className="w-3 h-3 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-              </svg>
-            </div>
+          {/* Category tags */}
+          <div className="flex flex-wrap gap-1 mt-2">
+            {product.categories?.slice(0, 2).map((category) => (
+              <div key={category.id} className="text-luxury-charcoal/60 text-[10px] uppercase tracking-wide">
+                {category.name}
+              </div>
+            ))}
           </div>
         </div>
       </div>

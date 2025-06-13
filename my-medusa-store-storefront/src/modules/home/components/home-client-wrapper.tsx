@@ -35,6 +35,11 @@ export default function HomeClientWrapper({
   const [autoRotate, setAutoRotate] = useState(true)
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null)
   
+  // State for products carousel
+  const [currentProductIndex, setCurrentProductIndex] = useState(0)
+  const [productsPerView, setProductsPerView] = useState(4)
+  const [totalProductPages, setTotalProductPages] = useState(1)
+  
   // Background colors for categories
   const bgGradients = [
     'from-amber-50 to-amber-200',
@@ -71,6 +76,37 @@ export default function HomeClientWrapper({
     }
   }, [autoRotate, parentCategories.length])
   
+  // Calculate products per view based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setProductsPerView(1)
+      } else if (window.innerWidth < 768) {
+        setProductsPerView(2)
+      } else if (window.innerWidth < 1024) {
+        setProductsPerView(3)
+      } else {
+        setProductsPerView(4)
+      }
+    }
+    
+    // Set initial value
+    handleResize()
+    
+    // Update on window resize
+    window.addEventListener('resize', handleResize)
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+  
+  // Calculate total product pages
+  useEffect(() => {
+    if (featuredProducts.length > 0) {
+      setTotalProductPages(Math.ceil(featuredProducts.length / productsPerView))
+    }
+  }, [featuredProducts.length, productsPerView])
+  
   // Pause auto-rotation when user interacts
   const handleNavigation = (index: number) => {
     setCurrentIndex(index)
@@ -95,6 +131,15 @@ export default function HomeClientWrapper({
   const handleNext = () => {
     const newIndex = (currentIndex + 1) % parentCategories.length
     handleNavigation(newIndex)
+  }
+  
+  // Handle product carousel navigation
+  const handlePrevProduct = () => {
+    setCurrentProductIndex((prev) => (prev === 0 ? totalProductPages - 1 : prev - 1))
+  }
+  
+  const handleNextProduct = () => {
+    setCurrentProductIndex((prev) => (prev + 1) % totalProductPages)
   }
 
   return (
@@ -137,7 +182,7 @@ export default function HomeClientWrapper({
           </motion.div>
           
           <motion.div variants={fadeIn}>
-            <Link href="/categories">
+            <Link href={`/${countryCode}/categories`}>
               <AnimatedButton variant="gold" size="large">
                 Shop Signature Collection
               </AnimatedButton>
@@ -157,7 +202,7 @@ export default function HomeClientWrapper({
         </motion.div>
       </motion.section>
       
-      {/* Featured Products Section */}
+      {/* Featured Products Section - CAROUSEL */}
       <section className="py-16 bg-white w-full">
         <div className="max-w-7xl mx-auto px-4 w-full box-border">
           <ScrollReveal>
@@ -169,58 +214,130 @@ export default function HomeClientWrapper({
             </div>
           </ScrollReveal>
           
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full box-border">
-            {featuredProducts.map((product, index) => (
-              <ScrollReveal key={product.id} delay={0.1 * index} className="group w-full">
-                <div className="h-full transition-all duration-500 hover:-translate-y-1 w-full">
-                  <div className="relative h-[300px] overflow-hidden rounded-lg mb-4 w-full">
-                    {product.thumbnail ? (
-                      <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
-                        <Image
-                          src={product.thumbnail}
-                          alt={product.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                          className="object-cover"
-                          onError={(e) => {
-                            // @ts-ignore - TypeScript doesn't know about currentTarget
-                            e.currentTarget.src = fallbackImage;
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <span className="text-gray-400">No image available</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Link href={`/products/${product.handle}`}>
-                        <AnimatedButton variant="gold" size="small" className="w-full">
-                          View Details
-                        </AnimatedButton>
-                      </Link>
-                    </div>
+          {/* Products Carousel */}
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentProductIndex * 100}%)` }}
+              >
+                {Array(totalProductPages).fill(0).map((_, pageIndex) => (
+                  <div 
+                    key={`product-page-${pageIndex}`} 
+                    className="min-w-full flex gap-4 sm:gap-6"
+                  >
+                    {featuredProducts
+                      .slice(
+                        pageIndex * productsPerView, 
+                        (pageIndex + 1) * productsPerView
+                      )
+                      .map((product, idx) => (
+                        <div 
+                          key={product.id} 
+                          className="group flex-1 min-w-0 transition-all duration-500 hover:-translate-y-1"
+                          style={{ minWidth: `calc(${100 / productsPerView}% - ${(productsPerView - 1) * 24 / productsPerView}px)` }}
+                        >
+                          <div className="relative h-[300px] overflow-hidden rounded-lg mb-4 w-full">
+                            {product.thumbnail ? (
+                              <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
+                                <Image
+                                  src={product.thumbnail}
+                                  alt={product.title}
+                                  fill
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                  className="object-cover"
+                                  onError={(e) => {
+                                    // @ts-ignore - TypeScript doesn't know about currentTarget
+                                    e.currentTarget.src = fallbackImage;
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                <span className="text-gray-400">No image available</span>
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
+                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <Link href={`/${countryCode}/products/${product.handle}`}>
+                                <AnimatedButton variant="gold" size="small" className="w-full">
+                                  View Details
+                                </AnimatedButton>
+                              </Link>
+                            </div>
+                          </div>
+                          <Link href={`/${countryCode}/products/${product.handle}`} className="block">
+                            <Text className="font-medium text-lg mb-1 group-hover:text-luxury-gold transition-colors duration-300 truncate">
+                              {product.title}
+                            </Text>
+                            {product.variants?.[0] && (
+                              <Text className="text-luxury-charcoal/80">
+                                {region?.currency_code && region.currency_code ? 
+                                  new Intl.NumberFormat(undefined, {
+                                    style: 'currency',
+                                    currency: region.currency_code
+                                  }).format((product.variants[0] as any)?.prices?.[0]?.amount / 100 || 0) 
+                                  : 'Price unavailable'}
+                              </Text>
+                            )}
+                          </Link>
+                        </div>
+                      ))
+                    }
                   </div>
-                  <Link href={`/products/${product.handle}`} className="block">
-                    <Text className="font-medium text-lg mb-1 group-hover:text-luxury-gold transition-colors duration-300 truncate">
-                      {product.title}
-                    </Text>
-                    {product.variants?.[0] && (
-                      <Text className="text-luxury-charcoal/80">
-                        {region?.currency_code && region.currency_code ? 
-                          new Intl.NumberFormat(undefined, {
-                            style: 'currency',
-                            currency: region.currency_code
-                          }).format((product.variants[0] as any)?.prices?.[0]?.amount / 100 || 0) 
-                          : 'Price unavailable'}
-                      </Text>
-                    )}
-                  </Link>
-                </div>
-              </ScrollReveal>
-            ))}
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation arrows */}
+            {totalProductPages > 1 && (
+              <>
+                <button 
+                  onClick={handlePrevProduct}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 lg:-translate-x-6 w-10 h-10 bg-white/90 shadow-md rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
+                  aria-label="Previous products"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <button 
+                  onClick={handleNextProduct}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 lg:translate-x-6 w-10 h-10 bg-white/90 shadow-md rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
+                  aria-label="Next products"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+          
+          {/* Pagination dots */}
+          {totalProductPages > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              {Array(totalProductPages).fill(0).map((_, i) => (
+                <button
+                  key={`dot-${i}`}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    currentProductIndex === i ? 'bg-luxury-gold w-4' : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  onClick={() => setCurrentProductIndex(i)}
+                  aria-label={`Go to product page ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+          
+          {/* View all button */}
+          <div className="text-center mt-10">
+            <Link href={`/${countryCode}/store`}>
+              <AnimatedButton variant="outline" size="medium">
+                View All Products
+              </AnimatedButton>
+            </Link>
           </div>
         </div>
       </section>
@@ -315,7 +432,7 @@ export default function HomeClientWrapper({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.6 }}
                           >
-                            <LocalizedClientLink href={`/categories/${category.handle}`}>
+                            <LocalizedClientLink href={`/${countryCode}/categories/${category.handle}`}>
                               <AnimatedButton variant="gold" size="large">
                                 View Collection
                               </AnimatedButton>

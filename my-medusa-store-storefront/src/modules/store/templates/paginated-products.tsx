@@ -40,6 +40,38 @@ export default async function PaginatedProducts({
   productsIds?: string[]
   countryCode: string
 }) {
+  // Validate input parameters
+  if (!countryCode) {
+    return (
+      <div className="flex flex-col items-center text-center py-12">
+        <h3 className="text-base-regular font-semibold mb-4">Missing country code</h3>
+        <p className="text-small-regular text-gray-700">
+          Please try refreshing the page
+        </p>
+      </div>
+    )
+  }
+
+  // Get region using cached function with error handling
+  let region;
+  try {
+    region = await getCachedRegion(countryCode);
+  } catch (error) {
+    console.error("Error fetching region:", error);
+    region = null;
+  }
+  
+  if (!region) {
+    return (
+      <div className="flex flex-col items-center text-center py-12">
+        <h3 className="text-base-regular font-semibold mb-4">Region not available</h3>
+        <p className="text-small-regular text-gray-700">
+          The selected region is currently unavailable
+        </p>
+      </div>
+    )
+  }
+  
   const queryParams: PaginatedProductsParams = {
     limit: PRODUCT_LIMIT,
   }
@@ -56,16 +88,6 @@ export default async function PaginatedProducts({
     queryParams["id"] = productsIds
   }
 
-  // Don't set order parameter as it's causing issues
-  // The sorting will be handled by the listProductsWithSort function
-
-  // Get region using cached function
-  const region = await getCachedRegion(countryCode)
-  
-  if (!region) {
-    return null
-  }
-  
   try {
     // Fetch products with optimized parameters
     const { response, nextPage } = await listProductsWithSort({

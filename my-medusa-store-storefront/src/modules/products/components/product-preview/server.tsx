@@ -21,6 +21,17 @@ export default function ProductPreview({
     variantsCount: product.variants?.length || 0
   })
 
+  // Debug log for variant prices
+  if (product.variants && product.variants.length > 0) {
+    console.log("ProductPreview: Variant prices for " + product.title, {
+      firstVariant: {
+        id: product.variants[0].id,
+        prices: (product.variants[0] as any).prices,
+        calculated_price: (product.variants[0] as any).calculated_price
+      }
+    })
+  }
+
   // The product should already have price data from the server component
   // Get the cheapest price from all variants
   const { cheapestPrice } = getProductPrice({
@@ -44,15 +55,37 @@ export default function ProductPreview({
   
   const isHandcrafted = true // All our products are handcrafted
 
-  // Fallback price display if calculated_price is missing
-  const displayPrice = cheapestPrice?.calculated_price || "Contact for price"
+  // Get direct price from variants if available
+  let displayPrice = "Contact for price"
+  
+  // First try to get price from cheapestPrice
+  if (cheapestPrice?.calculated_price) {
+    displayPrice = cheapestPrice.calculated_price
+  } 
+  // Fallback to direct variant prices if available
+  else if (product.variants && product.variants.length > 0) {
+    const variant = product.variants[0]
+    if ((variant as any).prices && (variant as any).prices.length > 0) {
+      const price = (variant as any).prices[0]
+      if (price && price.amount) {
+        const amount = price.amount / 100 // Convert from cents to dollars
+        displayPrice = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: price.currency_code || 'USD'
+        }).format(amount)
+      }
+    }
+  }
 
   // Make sure product handle is available
   const productHandle = product.handle || `product-${product.id}`
+  
+  // Get country code from region
+  const countryCode = region?.countries?.[0]?.iso_2 || "us"
 
   return (
     <Link 
-      href={`/products/${productHandle}`} 
+      href={`/${countryCode}/products/${productHandle}`} 
       className="group block relative luxury-image-hover"
       aria-label={`View ${product.title}`}
     >

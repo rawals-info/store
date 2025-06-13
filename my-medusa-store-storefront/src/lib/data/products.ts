@@ -10,7 +10,7 @@ import { getRegion, retrieveRegion } from "./regions"
 import { cache } from "react"
 
 // Minimize fields for performance when listing many products
-const DEFAULT_FIELDS = "id,title,handle,thumbnail,variants.calculated_price,variants.inventory_quantity" 
+const DEFAULT_FIELDS = "id,title,handle,thumbnail,variants.prices,variants,variants.prices.amount,variants.prices.currency_code,variants.calculated_price,variants.calculated_price.calculated_amount,variants.inventory_quantity" 
 // More fields when detailed info is needed
 const DETAILED_FIELDS = DEFAULT_FIELDS + ",metadata,tags,categories,description,variants.title"
 
