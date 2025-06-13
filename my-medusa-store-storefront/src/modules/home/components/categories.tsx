@@ -14,7 +14,7 @@ export const getCachedCategories = cache(async () => {
       "/store/product-categories",
       {
         query: {
-          limit: 4, // Limit to top 4 categories
+          // Remove the limit to fetch all categories
           fields: "*category_children",
         },
         next: {

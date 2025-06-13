@@ -42,53 +42,6 @@ const Footer = () => {
             From the initial selection of the finest marble to the final polish, our commitment to excellence and attention to detail 
             ensures that every creation is a timeless masterpiece worthy of your home.
           </Text>
-          
-          {/* Craftsmanship symbols */}
-          <motion.div 
-            className="flex justify-center mt-6 space-x-12"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.3, staggerChildren: 0.1 }}
-          >
-            <motion.div 
-              className="flex flex-col items-center" 
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="w-12 h-12 flex items-center justify-center mb-2 text-luxury-gold">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                </svg>
-              </div>
-              <span className="text-xs text-luxury-charcoal/70 uppercase tracking-wider">Handcrafted</span>
-            </motion.div>
-            
-            <motion.div 
-              className="flex flex-col items-center"
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="w-12 h-12 flex items-center justify-center mb-2 text-luxury-gold">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-                  <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-2.625 6c-.54 0-.828.419-.936.634a1.96 1.96 0 00-.189.866c0 .298.059.605.189.866.108.215.395.634.936.634.54 0 .828-.419.936-.634.13-.26.189-.568.189-.866 0-.298-.059-.605-.189-.866-.108-.215-.395-.634-.936-.634zm4.314.634c.108-.215.395-.634.936-.634.54 0 .828.419.936.634.13.26.189.568.189.866 0 .298-.059.605-.189.866-.108.215-.395.634-.936.634-.54 0-.828-.419-.936-.634a1.96 1.96 0 01-.189-.866c0-.298.059-.605.189-.866zm2.023 6.828a.75.75 0 10-1.06-1.06 3.75 3.75 0 01-5.304 0 .75.75 0 00-1.06 1.06 5.25 5.25 0 007.424 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span className="text-xs text-luxury-charcoal/70 uppercase tracking-wider">Satisfaction</span>
-            </motion.div>
-            
-            <motion.div 
-              className="flex flex-col items-center"
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="w-12 h-12 flex items-center justify-center mb-2 text-luxury-gold">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-                  <path fillRule="evenodd" d="M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm4.5 7.5a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75zm3.75-1.5a.75.75 0 00-1.5 0v4.5a.75.75 0 001.5 0V12zm2.25-3a.75.75 0 01.75.75v6.75a.75.75 0 01-1.5 0V9.75A.75.75 0 0113.5 9zm3.75-1.5a.75.75 0 00-1.5 0v9a.75.75 0 001.5 0v-9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span className="text-xs text-luxury-charcoal/70 uppercase tracking-wider">Excellence</span>
-            </motion.div>
-          </motion.div>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">

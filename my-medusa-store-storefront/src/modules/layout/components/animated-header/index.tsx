@@ -10,6 +10,7 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CountrySwitcher from "@modules/layout/components/country-switcher"
 import CurrencySwitcher from "@modules/layout/components/currency-switcher"
+import { usePathname } from "next/navigation"
 
 const AnimatedHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -17,6 +18,10 @@ const AnimatedHeader = () => {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { scrollY } = useScroll()
+  const pathname = usePathname()
+  
+  // Check if we're on the homepage (root country path)
+  const isHomePage = pathname?.split('/').length === 2
   
   // Transform values based on scroll position with more subtle luxury animations
   const headerOpacity = useTransform(scrollY, [0, 50], [1, 0.98])
@@ -26,18 +31,20 @@ const AnimatedHeader = () => {
     [0, 50],
     ["0px 0px 0px rgba(0,0,0,0)", "0px 6px 24px rgba(0,0,0,0.03), 0px 2px 8px rgba(212,175,55,0.1)"]
   )
+  
+  // Use transparent background for homepage initially, solid after scroll
+  // For other pages, always use solid background
   const headerBg = useTransform(
     scrollY,
     [0, 50],
-    ["rgba(255,255,245,0.85)", "rgba(255,255,245,0.97)"]
+    isHomePage ? ["rgba(255,255,255,0)", "rgba(255,255,255,0.97)"] : ["rgb(255,255,255)", "rgb(255,255,255)"]
   )
   
   // Navigation links data with refined labeling
   const navLinks = [
-    { href: "/", label: "Home", testId: "nav-home-link" },
+    { href: "/", label: "Shop", testId: "nav-shop-link" },
     { href: "/categories", label: "Categories", testId: "nav-categories-link" },
-    { href: "/products", label: "Products", testId: "nav-products-link" },
-    { href: "/about", label: "About Us", testId: "nav-about-link" },
+    { href: "/about", label: "About", testId: "nav-about-link" },
   ]
   
   const rightLinks = [
@@ -98,13 +105,22 @@ const AnimatedHeader = () => {
     setMobileMenuOpen(false)
   }
 
+  // Determine text color based on scroll and page
+  const getTextColor = () => {
+    if (isHomePage && !isScrolled) {
+      return "text-white" // White text on transparent background for homepage
+    }
+    return "text-luxury-charcoal" // Dark text for all other cases
+  }
+
   return (
     <>
       <motion.header
         className={clx(
-          "sticky top-0 inset-x-0 z-[40] group transition-all duration-500 backdrop-blur-sm",
+          "fixed top-0 inset-x-0 z-[40] group transition-colors duration-500",
           {
             "border-b border-luxury-gold/10": isScrolled,
+            "backdrop-blur-sm": isScrolled,
           }
         )}
         style={{
@@ -139,7 +155,7 @@ const AnimatedHeader = () => {
           />
         )}
         
-        <div className={`max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-12 text-luxury-charcoal h-full transition-all duration-300 ${
+        <div className={`max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-12 ${getTextColor()} h-full transition-all duration-300 ${
           isScrolled ? "py-0 h-16" : "py-1 h-20"
         }`}>
           <div className="w-full flex items-center justify-between h-full">
@@ -148,7 +164,9 @@ const AnimatedHeader = () => {
               <div className="small:hidden">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="flex items-center text-sm font-medium tracking-wide text-luxury-charcoal hover:text-luxury-gold group transition-colors duration-300"
+                  className={`flex items-center text-sm font-medium tracking-wide group transition-colors duration-300 ${
+                    isHomePage && !isScrolled ? "text-white hover:text-luxury-lightgold" : "text-luxury-charcoal hover:text-luxury-gold"
+                  }`}
                   aria-label="Open menu"
                 >
                   <svg className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -168,7 +186,9 @@ const AnimatedHeader = () => {
                     variants={linkVariants}
                   >
                     <LocalizedClientLink
-                      className="font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2"
+                      className={`font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
+                        isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
+                      }`}
                       href={link.href}
                       data-testid={link.testId}
                       onMouseEnter={() => setHoveredLink(link.href)}
@@ -198,39 +218,29 @@ const AnimatedHeader = () => {
                 scale: isScrolled ? 0.95 : 1,
                 y: isScrolled ? -1 : 0
               }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             >
-              <LocalizedClientLink
-                href="/"
-                className="flex flex-col items-center"
-                data-testid="nav-store-link"
-              >
-                <motion.span 
-                  className="font-display text-2xl text-luxury-gold hover:opacity-90 transition-all duration-200 relative group"
-                  whileHover={{ scale: 1.02, letterSpacing: "0.01em" }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
+              <LocalizedClientLink href="/" className="relative group">
+                <h1 className={`font-serif text-xl md:text-2xl tracking-wide ${
+                  isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
+                }`}>
                   MARBLE LUXE
-                  <motion.span 
-                    className="absolute -bottom-px left-0 h-0.5 bg-luxury-gold/80"
-                    initial={{ width: 0 }}
-                    whileHover={{ width: "100%" }}
-                    transition={{ duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
-                  />
-                </motion.span>
-                <motion.span 
-                  className={`text-luxury-charcoal/80 text-[10px] uppercase tracking-[0.15em] mt-0.5 transition-all duration-300 ${isScrolled ? 'opacity-0 translate-y-1' : 'opacity-100'}`}
-                  animate={{ opacity: isScrolled ? 0 : 1, y: isScrolled ? 5 : 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  FINE HANDICRAFTS
-                </motion.span>
+                </h1>
+                <div className={`text-[10px] tracking-widest uppercase text-center -mt-1 opacity-80 ${
+                  isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
+                }`}>
+                  Fine Hand-Crafts
+                </div>
+                <motion.div 
+                  className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full"
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                />
               </LocalizedClientLink>
             </motion.div>
-
-            {/* Right side links with refined hover effects */}
-            <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-              <div className="hidden small:flex items-center gap-x-8 h-full">
+            
+            {/* Right side links */}
+            <div className="flex-1 basis-0 flex items-center justify-end h-full">
+              <div className="hidden small:flex items-center gap-x-6 h-full">
                 {rightLinks.map((link) => (
                   <motion.div 
                     key={link.href} 
@@ -239,7 +249,9 @@ const AnimatedHeader = () => {
                     variants={linkVariants}
                   >
                     <LocalizedClientLink
-                      className="font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2"
+                      className={`font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
+                        isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
+                      }`}
                       href={link.href}
                       data-testid={link.testId}
                       onMouseEnter={() => setHoveredLink(link.href)}
@@ -250,7 +262,7 @@ const AnimatedHeader = () => {
                     {hoveredLink === link.href && (
                       <motion.div 
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-luxury-gold"
-                        layoutId="underline-right"
+                        layoutId="underline"
                         initial={{ width: 0, opacity: 0, left: "25%" }}
                         animate={{ width: "100%", opacity: 1, left: 0 }}
                         exit={{ width: 0, opacity: 0, left: "75%" }}
@@ -259,86 +271,130 @@ const AnimatedHeader = () => {
                     )}
                   </motion.div>
                 ))}
+                
+                {/* Currency Switcher */}
+                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
+                  <CurrencySwitcher />
+                </div>
+                
+                {/* Cart */}
+                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
+                  <CartButton />
+                </div>
               </div>
-              <div className="hidden small:flex items-center gap-x-4">
-                <CurrencySwitcher />
-              </div>
-              <div className="h-full flex items-center">
-                <CartButton />
+              
+              {/* Mobile only: Cart button */}
+              <div className="small:hidden flex items-center gap-x-4">
+                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
+                  <CurrencySwitcher />
+                </div>
+                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
+                  <CartButton />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </motion.header>
-
-      {/* Mobile menu */}
+      
+      {/* Mobile menu overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
-            className="fixed inset-0 bg-luxury-ivory z-50 flex flex-col"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {/* Top section with close button */}
-            <div className="flex justify-between items-center p-5 border-b border-luxury-gold/10">
-              <motion.h3 
-                className="font-display text-2xl text-luxury-gold"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
-                MARBLE LUXE
-              </motion.h3>
-              <button 
-                className="p-2 focus:outline-none text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300" 
-                onClick={closeMobileMenu}
-                aria-label="Close menu"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            </div>
-            
-            {/* Menu items with staggered animation */}
-            <div className="flex flex-col items-center justify-center flex-1 gap-6 py-8">
-              {[...navLinks, ...rightLinks].map((item, i) => (
-                <motion.div
-                  key={item.href}
-                  custom={i}
-                  variants={menuVariants}
-                  initial="closed"
-                  animate="open"
-                  exit="closed"
-                  className="w-full text-center"
-                >
-                  <LocalizedClientLink 
-                    href={item.href}
+          <>
+            <motion.div
+              className="fixed inset-0 bg-luxury-charcoal/50 backdrop-blur-sm z-[50]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMobileMenu}
+            />
+            <motion.div
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-luxury-ivory z-[60] shadow-xl"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 20, stiffness: 100 }}
+            >
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20">
+                  <h2 className="font-serif text-xl text-luxury-charcoal">Menu</h2>
+                  <button
                     onClick={closeMobileMenu}
-                    className="block py-3 text-xl relative overflow-hidden group text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                    className="p-2 text-luxury-charcoal hover:text-luxury-gold transition-colors"
+                    aria-label="Close menu"
                   >
-                    <div className="relative z-10">
-                      <span className="font-display tracking-wider">{item.label}</span>
-                    </div>
-                    {/* Animated underline effect */}
-                    <motion.div 
-                      className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-px bg-luxury-gold"
-                      initial={{ width: "0%" }}
-                      whileHover={{ width: "100%" }}
-                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                    />
-                  </LocalizedClientLink>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Region and country selectors in mobile menu */}
-            <div className="p-6 border-t border-luxury-gold/10 flex justify-center gap-6">
-              <CurrencySwitcher />
-            </div>
-          </motion.div>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto py-6 px-6">
+                  <nav className="flex flex-col gap-y-6">
+                    {navLinks.map((link, i) => (
+                      <motion.div
+                        key={link.href}
+                        custom={i}
+                        initial="closed"
+                        animate="open"
+                        variants={menuVariants}
+                      >
+                        <LocalizedClientLink
+                          href={link.href}
+                          className="text-lg font-medium text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                          onClick={closeMobileMenu}
+                        >
+                          {link.label}
+                        </LocalizedClientLink>
+                      </motion.div>
+                    ))}
+                    <div className="h-px w-full bg-luxury-lightgold/20 my-2" />
+                    {rightLinks.map((link, i) => (
+                      <motion.div
+                        key={link.href}
+                        custom={i + navLinks.length}
+                        initial="closed"
+                        animate="open"
+                        variants={menuVariants}
+                      >
+                        <LocalizedClientLink
+                          href={link.href}
+                          className="text-lg font-medium text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                          onClick={closeMobileMenu}
+                        >
+                          {link.label}
+                        </LocalizedClientLink>
+                      </motion.div>
+                    ))}
+                  </nav>
+                  <div className="h-px w-full bg-luxury-lightgold/20 my-6" />
+                  <div className="flex flex-col gap-y-6">
+                    <motion.div
+                      custom={navLinks.length + rightLinks.length}
+                      initial="closed"
+                      animate="open"
+                      variants={menuVariants}
+                    >
+                      <div className="flex items-center gap-x-2 text-luxury-charcoal">
+                        <span className="text-sm font-medium">Region:</span>
+                        <CountrySwitcher />
+                      </div>
+                    </motion.div>
+                    <motion.div
+                      custom={navLinks.length + rightLinks.length + 1}
+                      initial="closed"
+                      animate="open"
+                      variants={menuVariants}
+                    >
+                      <div className="flex items-center gap-x-2 text-luxury-charcoal">
+                        <span className="text-sm font-medium">Currency:</span>
+                        <CurrencySwitcher />
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

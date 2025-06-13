@@ -79,7 +79,7 @@ export default function Footer() {
       {/* Decorative gold pattern */}
       <div className="w-full h-px gold-gradient"></div>
       
-      {/* Craftsmanship banner */}
+      {/* Features section */}
       <div className="py-12 bg-luxury-cream/30">
         <div className="content-container">
           <motion.div 
@@ -95,24 +95,11 @@ export default function Footer() {
             >
               <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4">
                 <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path>
                 </svg>
               </div>
-              <h3 className="font-display text-lg mb-2 text-luxury-charcoal">Master Craftsmanship</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Each piece is meticulously handcrafted by our skilled artisans with decades of experience.</p>
-            </motion.div>
-            
-            <motion.div 
-              className="flex flex-col items-center text-center"
-              variants={itemVariants}
-            >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                </svg>
-              </div>
-              <h3 className="font-display text-lg mb-2 text-luxury-charcoal">Premium Materials</h3>
-              <p className="text-luxury-charcoal/70 text-sm">We source only the finest marble from renowned quarries, selected for unique veining and character.</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Hand Carved Detail</h3>
+              <p className="text-luxury-charcoal/70 text-sm">Intricate craftsmanship from master artisans</p>
             </motion.div>
             
             <motion.div 
@@ -124,8 +111,21 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                 </svg>
               </div>
-              <h3 className="font-display text-lg mb-2 text-luxury-charcoal">Lifetime Guarantee</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Every purchase is protected by our craftsmanship guarantee, ensuring heirloom quality pieces.</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Ethically Sourced</h3>
+              <p className="text-luxury-charcoal/70 text-sm">Premium marble, responsibly sourced</p>
+            </motion.div>
+            
+            <motion.div 
+              className="flex flex-col items-center text-center"
+              variants={itemVariants}
+            >
+              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">White-Glove Delivery</h3>
+              <p className="text-luxury-charcoal/70 text-sm">Careful handling for a pristine arrival</p>
             </motion.div>
           </motion.div>
         </div>
@@ -136,18 +136,18 @@ export default function Footer() {
           <div className="flex flex-col items-start">
             <LocalizedClientLink
               href="/"
-              className="font-display text-2xl text-luxury-gold mb-4 relative group"
+              className="font-serif text-2xl text-luxury-gold mb-4 relative group"
             >
               <span>MARBLE LUXE</span>
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-500 ease-in-out"></span>
             </LocalizedClientLink>
             
-            <p className="text-serif-regular text-luxury-charcoal/80 max-w-xs mb-6">
+            <p className="text-luxury-charcoal/80 max-w-xs mb-6">
               Exquisite handcrafted marble artifacts that embody timeless elegance and unparalleled artistry.
             </p>
             
             <div className="flex space-x-4 mb-8">
-              {["Instagram", "Facebook", "Pinterest"].map((platform) => (
+              {["Instagram", "Facebook"].map((platform) => (
                 <a 
                   key={platform}
                   href="#" 
@@ -162,209 +162,106 @@ export default function Footer() {
                     {platform === "Facebook" && (
                       <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
                     )}
-                    {platform === "Pinterest" && (
-                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z" />
-                    )}
                   </svg>
                   <span className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
                 </a>
               ))}
             </div>
-            
-            {/* Quality badge */}
-            <div className="flex items-center bg-luxury-cream p-4 border border-luxury-gold/20 text-luxury-charcoal/90 rounded-sm hover:border-luxury-gold/40 transition-colors duration-300">
-              <svg className="w-10 h-10 text-luxury-gold mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-              </svg>
-              <div>
-                <p className="font-display text-sm text-luxury-charcoal">Artisan Craftsmanship Guarantee</p>
-                <p className="text-xs text-luxury-charcoal/70 mt-1">Every piece is individually handcrafted and comes with a certificate of authenticity</p>
-              </div>
-            </div>
           </div>
           
           <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-1 sm:grid-cols-3">
-            {categories && categories?.length > 0 && (
-              <div className="flex flex-col gap-y-3">
-                <span className="font-display text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                  Collections
-                </span>
-                <ul
-                  className="grid grid-cols-1 gap-2"
-                  data-testid="footer-categories"
-                >
-                  {categories?.slice(0, 6).map((c) => {
-                    if (c.parent_category) {
-                      return null
-                    }
-
-                    const children =
-                      c.category_children?.map((child: any) => ({
-                        name: child.name,
-                        handle: child.handle,
-                        id: child.id,
-                      })) || null
-
-                    return (
-                      <li
-                        className="flex flex-col gap-2 text-luxury-charcoal/80 text-serif-regular"
-                        key={c.id}
-                      >
-                        <LocalizedClientLink
-                          className={clx(
-                            "hover:text-luxury-gold transition-colors duration-300 relative group",
-                            children && "font-medium"
-                          )}
-                          href={`/categories/${c.handle}`}
-                          data-testid="category-link"
-                        >
-                          <span>{c.name}</span>
-                          <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
-                        </LocalizedClientLink>
-                        {children && (
-                          <ul className="grid grid-cols-1 ml-3 gap-2">
-                            {children &&
-                              children.map((child: { id: string; name: string; handle: string }) => (
-                                <li key={child.id}>
-                                  <LocalizedClientLink
-                                    className="hover:text-luxury-gold transition-colors duration-300 relative group"
-                                    href={`/categories/${child.handle}`}
-                                    data-testid="category-link"
-                                  >
-                                    <span>{child.name}</span>
-                                    <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
-                                  </LocalizedClientLink>
-                                </li>
-                              ))}
-                          </ul>
-                        )}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
-            
             <div className="flex flex-col gap-y-3">
-              <span className="font-display text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                Information
+              <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
+                Shop
               </span>
-              <ul className="grid grid-cols-1 gap-y-2 text-luxury-charcoal/80 text-serif-regular">
-                {[
-                  { href: "/about", label: "Our Story" },
-                  { href: "/craftmanship", label: "Craftsmanship" },
-                  { href: "/sustainability", label: "Sustainability" },
-                  { href: "/care", label: "Product Care" },
-                  { href: "/faq", label: "FAQ" }
-                ].map((link) => (
-                  <li key={link.href}>
-                    <LocalizedClientLink 
-                      href={link.href} 
-                      className="hover:text-luxury-gold transition-colors duration-300 relative group"
-                    >
-                      <span>{link.label}</span>
-                      <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
-                    </LocalizedClientLink>
-                  </li>
-                ))}
+              <ul className="grid grid-cols-1 gap-2">
+                <li>
+                  <LocalizedClientLink href="/categories/table-top" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Table Top
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/categories/jewelry" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Jewelry
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/categories/home-decor" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Home Decor
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/categories/sculpture" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Sculpture
+                  </LocalizedClientLink>
+                </li>
               </ul>
             </div>
             
             <div className="flex flex-col gap-y-3">
-              <span className="font-display text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                Customer Service
+              <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
+                Company
               </span>
-              <ul className="grid grid-cols-1 gap-y-2 text-luxury-charcoal/80 text-serif-regular">
-                {[
-                  { href: "/contact", label: "Contact Us" },
-                  { href: "/shipping", label: "Shipping & Delivery" },
-                  { href: "/returns", label: "Returns & Exchanges" },
-                  { href: "/terms", label: "Terms & Conditions" },
-                  { href: "/privacy", label: "Privacy Policy" }
-                ].map((link) => (
-                  <li key={link.href}>
-                    <LocalizedClientLink 
-                      href={link.href} 
-                      className="hover:text-luxury-gold transition-colors duration-300 relative group"
-                    >
-                      <span>{link.label}</span>
-                      <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
-                    </LocalizedClientLink>
-                  </li>
-                ))}
+              <ul className="grid grid-cols-1 gap-2">
+                <li>
+                  <LocalizedClientLink href="/about" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    About
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/contact" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Contact
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/csr-policy" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    CSR Policy
+                  </LocalizedClientLink>
+                </li>
               </ul>
             </div>
-
-            {/* Currency Switcher */}
+            
             <div className="flex flex-col gap-y-3">
-              <span className="font-display text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                Currency
+              <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
+                Support
               </span>
-              <div className="text-luxury-charcoal/80 text-serif-regular">
-                <CurrencySwitcher variant="footer" />
-              </div>
+              <ul className="grid grid-cols-1 gap-2">
+                <li>
+                  <LocalizedClientLink href="/shipping" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Shipping
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/returns" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Returns
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/faqs" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    FAQs
+                  </LocalizedClientLink>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-        
-        {/* Newsletter */}
-        <div className="border-t border-luxury-lightgold py-12 mb-8">
-          <div className="grid grid-cols-1 small:grid-cols-2 gap-8">
-            <div>
-              <h3 className="font-display text-xl mb-3 text-luxury-gold">Join Our Exclusive List</h3>
-              <p className="text-serif-regular text-luxury-charcoal/80 mb-4">
-                Subscribe to receive updates on new collections, special offers, and styling inspiration.
-              </p>
-            </div>
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row">
-              <div className="flex-grow relative">
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email address" 
-                  className="w-full bg-luxury-ivory border border-luxury-lightgold px-4 py-3 focus:outline-none focus:border-luxury-gold transition-colors duration-300"
-                  required
-                />
-                {isSubmitted && (
-                  <motion.div 
-                    className="absolute -top-8 left-0 right-0 bg-green-100 text-green-800 text-xs py-1 px-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    Thank you for subscribing!
-                  </motion.div>
-                )}
-              </div>
-              <button 
-                type="submit"
-                disabled={isSubmitting || !email}
-                className={`mt-2 sm:mt-0 bg-luxury-gold text-luxury-ivory px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all duration-300 ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-luxury-gold/90'
-                }`}
-              >
-                {isSubmitting ? 'Subscribing...' : 'Subscribe'}
-              </button>
-            </form>
+      </div>
+      
+      <div className="border-t border-luxury-lightgold/20 py-6">
+        <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between">
+          <div className="text-small-regular text-luxury-charcoal/60">
+            © 2024 Marble Luxe. All rights reserved.
           </div>
-        </div>
-        
-        <div className="flex flex-col small:flex-row w-full py-6 justify-between text-luxury-charcoal/60 border-t border-luxury-lightgold">
-          <Text className="text-small-regular">
-            © {new Date().getFullYear()} Marble Luxe. All rights reserved.
-          </Text>
-          <div className="flex gap-x-6 text-small-regular">
-            {["Terms", "Privacy", "Cookies"].map((label) => (
-              <a 
-                key={label}
-                href="#" 
-                className="hover:text-luxury-gold transition-colors duration-300 relative group"
-              >
-                <span>{label}</span>
-                <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
-              </a>
-            ))}
+          <div className="flex items-center gap-x-6">
+            <div className="flex items-center gap-x-2">
+              <CurrencySwitcher variant="footer" />
+            </div>
+            <div className="h-6 w-px bg-luxury-lightgold/20"></div>
+            <div className="flex items-center gap-x-2">
+              <img src="/visa.svg" alt="Visa" className="h-6" />
+              <img src="/paypal.svg" alt="PayPal" className="h-6" />
+              <img src="/mastercard.svg" alt="Mastercard" className="h-6" />
+            </div>
           </div>
         </div>
       </div>

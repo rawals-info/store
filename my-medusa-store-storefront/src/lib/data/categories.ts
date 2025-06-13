@@ -24,7 +24,8 @@ export const listCategories = cache(async (
     fields?: string
   } = {}
 ): Promise<HttpTypes.StoreProductCategory[]> => {
-  const { limit = 100, offset = 0, fields = "*category_children, *parent_category" } = options
+  // Use a higher limit to ensure we get all categories
+  const { limit = 1000, offset = 0, fields = "id,name,handle,description,category_children,parent_category" } = options
   
   // Create a cache key based on the options
   const cacheKey = `categories-list-${limit}-${offset}-${fields}`
@@ -36,6 +37,8 @@ export const listCategories = cache(async (
   }
 
   try {
+    console.log("Fetching all categories from API with params:", { limit, offset, fields })
+    
     const { product_categories } = await sdk.client.fetch<{
       product_categories: HttpTypes.StoreProductCategory[]
     }>(
@@ -47,12 +50,14 @@ export const listCategories = cache(async (
           fields,
         },
         next: {
-          revalidate: 60, // Cache for 60 seconds
+          revalidate: 0, // Don't cache during development
           tags: ["categories"],
         },
-        cache: "force-cache", // Use force-cache to avoid duplicate requests
+        cache: "no-store", // Don't use browser cache during development
       }
     )
+    
+    console.log("API returned categories:", product_categories?.length || 0)
     
     // Cache the response
     if (product_categories) {

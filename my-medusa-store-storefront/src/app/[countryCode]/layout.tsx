@@ -31,10 +31,8 @@ export default async function StoreLayout({
     <PrefetchProvider>
       <div className="relative flex flex-col min-h-screen">
         <AnimatedHeader />
-        <div className="flex-1 bg-luxury-ivory">
-          <div className="max-w-screen-2xl mx-auto py-6 px-6 sm:px-8 lg:px-12">
-            {children}
-          </div>
+        <div className="flex-1">
+          {children}
         </div>
         <Footer />
       </div>

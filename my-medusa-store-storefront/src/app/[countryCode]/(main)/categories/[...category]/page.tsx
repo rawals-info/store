@@ -5,7 +5,7 @@ import { Suspense } from "react"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
-import CategoryTemplate from "@modules/categories/templates"
+import { CategoryTemplate } from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 

@@ -5,12 +5,15 @@ import { getRegion } from "@lib/data/regions"
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import Hero from "@modules/home/components/hero"
-import Categories from "@modules/home/components/categories"
 import Craftsmanship from "@modules/home/components/craftsmanship"
 import Testimonials from "@modules/home/components/testimonials"
 import Newsletter from "@modules/home/components/newsletter"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import FeaturedProductsSkeleton from "@modules/skeletons/components/featured-products-skeleton"
+import Features from "@modules/home/components/features"
+import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
+import { listProducts } from "@lib/data/products"
+import { listCategories } from "@lib/data/categories"
 
 export const metadata: Metadata = {
   title: "Luxury Marble Craftsmanship | Home",
@@ -34,48 +37,29 @@ export default async function Home(props: {
   if (!region) {
     return notFound()
   }
+  
+  // Fetch products and categories for HomeClientWrapper
+  const { response } = await listProducts({
+    countryCode,
+    queryParams: { limit: 4 },
+  }).catch(() => {
+    return { response: { products: [] } }
+  })
+  
+  const categories = await listCategories()
 
   return (
     <div>
-      {/* Hero Section - Priority load */}
-      <Hero />
+      {/* Use HomeClientWrapper which includes both hero and products */}
+      <HomeClientWrapper 
+        featuredProducts={response.products} 
+        categories={categories} 
+        region={region}
+        countryCode={countryCode}
+      />
       
-      {/* Categories Section - Deferred loading */}
-      <Suspense fallback={
-        <section className="py-16 bg-luxury-cream">
-          <div className="content-container">
-            <div className="flex flex-col items-center mb-12">
-              <div className="h-8 w-64 bg-gray-200 animate-pulse rounded mb-4"></div>
-              <div className="h-px w-24 bg-luxury-gold mb-6"></div>
-              <div className="h-4 w-full max-w-lg bg-gray-200 animate-pulse rounded"></div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-luxury-ivory border border-luxury-gold/20 rounded-md overflow-hidden h-64 animate-pulse">
-                  <div className="p-6 flex flex-col h-full">
-                    <div className="h-6 w-32 bg-gray-200 animate-pulse rounded mb-3"></div>
-                    <div className="h-px w-12 bg-luxury-gold/40 mb-3"></div>
-                    <div className="h-4 w-full bg-gray-200 animate-pulse rounded mb-2"></div>
-                    <div className="h-4 w-3/4 bg-gray-200 animate-pulse rounded mb-4"></div>
-                    <div className="mt-auto">
-                      <div className="h-5 w-28 bg-gray-200 animate-pulse rounded"></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      }>
-        <Categories />
-      </Suspense>
-      
-      {/* Featured Products Section - Deferred loading */}
-      <section className="py-16 bg-white">
-        <Suspense fallback={<FeaturedProductsSkeleton />}>
-          <FeaturedProducts countryCode={countryCode} />
-        </Suspense>
-      </section>
+      {/* Features Section */}
+      <Features />
       
       {/* Craftsmanship Section */}
       <Craftsmanship />

@@ -1,48 +1,76 @@
 import { Metadata } from "next"
-import { listCategories } from "@lib/data/categories"
-import { Suspense } from "react"
-import CategoriesTemplate from "@modules/categories/templates/categories-template"
-import SkeletonCategoriesPage from "@modules/skeletons/templates/skeleton-categories-page"
-import { cache } from "react"
+import { getRegion } from "@lib/data/regions"
+import { CategoriesTemplate } from "@modules/categories/templates"
+import { HttpTypes } from "@medusajs/types"
+import { sdk } from "@lib/config"
 
 export const metadata: Metadata = {
-  title: "Luxury Marble Categories | Browse our Exclusive Collections",
-  description: "Explore our curated categories of handcrafted marble pieces, each meticulously created by master artisans for your luxury home. Discover table tops, jewelry boxes, home decor, and more.",
+  title: "Categories",
+  description: "Browse all categories of our exclusive marble handicrafts collection.",
 }
 
-// Configure ISR for better performance
-export const dynamic = "force-dynamic"
-export const revalidate = 60 // Revalidate every 60 seconds
+// Function to fetch all categories without pagination limits
+async function getAllCategories() {
+  try {
+    const response = await sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
+      "/store/product-categories",
+      {
+        query: {
+          limit: 1000, // Using a high limit to get all categories
+          fields: "id,name,handle,description,category_children,parent_category",
+        },
+        next: {
+          revalidate: 3600, // Cache for 1 hour
+          tags: ["categories"]
+        }
+      }
+    )
+    
+    console.log("Fetching all categories from API with params:", {
+      limit: 1000,
+      offset: 0,
+      fields: 'id,name,handle,description,category_children,parent_category'
+    });
+    
+    console.log("API returned categories:", response.product_categories?.length || 0);
+    return response.product_categories || []
+  } catch (error) {
+    console.error("Failed to fetch categories:", error)
+    return []
+  }
+}
 
-// Cache the categories data
-const getCachedCategories = cache(async () => {
-  return await listCategories({
-    limit: 100,
-    fields: "id,name,handle,description,category_children,parent_category"
-  });
-});
-
-export default function CategoriesPage({
+export default async function CategoriesPage({
   params,
 }: {
   params: { countryCode: string }
 }) {
-  // Note: We're not destructuring params directly to avoid the error
-  // The error happens when we do: params: { countryCode }
+  // Properly await params before using them
+  const paramsData = await params
+  const countryCode = paramsData.countryCode
   
-  return (
-    <>
-      <Suspense fallback={<SkeletonCategoriesPage />}>
-        <CategoriesContent />
-      </Suspense>
-    </>
-  )
-}
+  const region = await getRegion(countryCode)
+  
+  console.log("Fetching categories for region:", region?.id || "unknown region")
+  const categories = await getAllCategories()
+  
+  console.log("Categories page received:", categories?.length || 0, "categories")
+  console.log("Parent categories:", categories?.filter(c => !c?.parent_category)?.length || 0)
+  console.log("Parent category names:", categories?.filter(c => !c?.parent_category)?.map(c => c.name))
+  
+  if (!categories || categories.length === 0) {
+    console.log("No categories found")
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="text-center">
+          <h2 className="text-2xl font-serif mb-4">Categories Coming Soon</h2>
+          <p className="text-luxury-charcoal/70">
+            Our category selection is being updated. Please check back later.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
-// Separate async component to handle data fetching
-async function CategoriesContent() {
-  // Fetch categories with proper error handling
-  const categories = await getCachedCategories();
-  
-  return <CategoriesTemplate categories={categories} />
+  return <CategoriesTemplate categories={categories} region={region} />
 } 
