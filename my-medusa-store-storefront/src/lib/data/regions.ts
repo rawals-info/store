@@ -77,7 +77,8 @@ export const getRegion = async (countryCode: string) => {
             // Populate cache with fresh data
             regions.forEach((region) => {
               region.countries?.forEach((c) => {
-                regionMap.set(c?.iso_2 ?? "", region);
+                const iso2 = c?.iso_2?.toLowerCase() ?? "";
+                regionMap.set(iso2, region);
               });
             });
             
@@ -98,10 +99,8 @@ export const getRegion = async (countryCode: string) => {
     }
 
     // Get region from cache
-    const region = countryCode
-      ? regionMap.get(countryCode)
-      : regionMap.get("us");
-
+    const key = countryCode?.toLowerCase() ?? "us";
+    const region = regionMap.get(key) ?? regionMap.get("us");
     return region;
   } catch (e: any) {
     console.error("Error fetching region:", e);

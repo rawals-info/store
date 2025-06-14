@@ -1,5 +1,3 @@
-"use server"
-
 import { Metadata } from "next"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import StoreTemplate from "@modules/store/templates"
@@ -11,10 +9,8 @@ export const metadata: Metadata = {
   description: "Explore our exclusive collection of handcrafted marble products.",
 }
 
-// Use a dynamic export function instead of a constant
-export async function dynamic() {
-  return "force-dynamic"
-}
+// Segment config should be a constant, not a function
+export const dynamic = 'force-dynamic'
 
 export default async function StorePage({
   params,

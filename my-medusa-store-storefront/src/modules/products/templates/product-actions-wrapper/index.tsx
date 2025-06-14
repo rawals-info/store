@@ -1,5 +1,4 @@
 import { listProducts } from "@lib/data/products"
-import { fetchWithTimeout } from "@lib/util/parallel-fetch"
 import { HttpTypes } from "@medusajs/types"
 import ProductActions from "@modules/products/components/product-actions"
 
@@ -14,17 +13,13 @@ export default async function ProductActionsWrapper({
   region: HttpTypes.StoreRegion
 }) {
   try {
-    const product = await fetchWithTimeout(
-      async () => {
-        const result = await listProducts({
-          queryParams: { id: [id] },
-          regionId: region.id,
-        })
-        return result.response.products[0]
-      },
-      5000, // 5 second timeout
-      null
-    )
+    // Directly fetch the product data without timeout wrapper
+    const { response } = await listProducts({
+      queryParams: { id: [id] },
+      regionId: region.id,
+      isDetailed: true,
+    })
+    const product = response.products[0]
 
     if (!product) {
       // Return a fallback UI if the product data couldn't be fetched

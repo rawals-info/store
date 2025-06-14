@@ -65,39 +65,28 @@ export async function getOrSetCart(countryCode: string) {
     ...(await getAuthHeaders()),
   }
 
-  // Get default sales channel
-  let salesChannelId = "sc_01JX7RWQ7RATZ6B95GFKPK262E"; // Default fallback ID
+  // Build parameters for cart creation: always include region, optionally sales_channel_id
+  const createParams: Record<string, any> = { region_id: region.id }
   try {
-    // Try to use the "Default Sales Channel" which is typically created during setup
-    const response = await sdk.client.fetch<{ sales_channels: Array<{ id: string, name: string }> }>("/store/sales-channels", {
+    const response = await sdk.client.fetch<{ sales_channels: Array<{ id: string; name: string }> }>("/store/sales-channels", {
       method: "GET",
       headers,
-    });
-    
-    if (response.sales_channels && response.sales_channels.length > 0) {
-      // Try to find the default sales channel
-      const defaultChannel = response.sales_channels.find(
-        (channel) => channel.name === "Default Sales Channel"
-      );
-      
+    })
+    if (response.sales_channels?.length) {
+      const defaultChannel = response.sales_channels.find((c) => c.name === "Default Sales Channel")?.id
+        ?? response.sales_channels[0].id
       if (defaultChannel) {
-        salesChannelId = defaultChannel.id;
-      } else if (response.sales_channels[0]?.id) {
-        // Fallback to the first available sales channel
-        salesChannelId = response.sales_channels[0].id;
+        createParams.sales_channel_id = defaultChannel
       }
     }
   } catch (error) {
-    console.error("Error fetching sales channels, using default sales channel ID:", error);
+    console.error("Error fetching sales channels, skipping sales_channel_id:", error)
   }
 
   if (!cart) {
     try {
       const cartResp = await sdk.store.cart.create(
-        { 
-          region_id: region.id,
-          sales_channel_id: salesChannelId 
-        },
+        createParams,
         {},
         headers
       )

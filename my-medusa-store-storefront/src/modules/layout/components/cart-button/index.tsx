@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { retrieveCart } from "@lib/data/cart"
 import CartDropdown from "../cart-dropdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,7 +14,8 @@ export default function CartButton() {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const cartData = await retrieveCart()
+        const response = await fetch('/api/cart', { credentials: 'include' })
+        const { cart: cartData } = await response.json()
         setCart(cartData)
       } catch (error) {
         console.error("Error fetching cart:", error)
@@ -30,19 +30,14 @@ export default function CartButton() {
   // Listen for cart updates from localStorage
   useEffect(() => {
     const handleStorageChange = () => {
-      const lastAddedTime = localStorage.getItem('last_cart_addition')
-      
-      if (lastAddedTime && Date.now() - parseInt(lastAddedTime) < 2000) {
-        // Show animation if item was added in the last 2 seconds
-        setIsAdded(true)
-        
-        setTimeout(() => {
-          setIsAdded(false)
-        }, 1500)
-        
-        // Refresh cart data
-        retrieveCart().then(cartData => setCart(cartData))
-      }
+      // Show animation on addition
+      setIsAdded(true)
+      setTimeout(() => setIsAdded(false), 1500)
+      // Refresh cart data
+      fetch('/api/cart', { credentials: 'include' })
+        .then((res) => res.json())
+        .then(({ cart: cartData }) => setCart(cartData))
+        .catch((error) => console.error("Error refreshing cart:", error))
     }
     
     window.addEventListener('storage', handleStorageChange)

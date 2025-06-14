@@ -1,6 +1,5 @@
 "use client"
 
-import { addToCart } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -130,34 +129,33 @@ export default function ProductActions({
     setIsAdding(true)
 
     try {
-      // Add the loading state immediately for better UX
       const startTime = Date.now()
-      
-      await addToCart({
-        variantId: selectedVariant.id,
-        quantity: quantity,
-        countryCode,
+
+      const response = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          variantId: selectedVariant.id,
+          quantity,
+          countryCode,
+        }),
       })
 
-      // Ensure we show the loading state for at least 500ms for better UX
-      const elapsedTime = Date.now() - startTime
-      if (elapsedTime < 500) {
-        await new Promise(resolve => setTimeout(resolve, 500 - elapsedTime))
+      if (!response.ok) {
+        throw new Error('Failed to add to cart')
       }
 
-      // Notify other components about cart update via localStorage
+      const elapsedTime = Date.now() - startTime
+      if (elapsedTime < 500) {
+        await new Promise((r) => setTimeout(r, 500 - elapsedTime))
+      }
+
       localStorage.setItem('last_cart_addition', Date.now().toString())
       window.dispatchEvent(new Event('storage'))
-      
       setAddedToCart(true)
-      
-      // Reset added to cart state after 3 seconds
-      setTimeout(() => {
-        setAddedToCart(false)
-      }, 3000)
+      setTimeout(() => setAddedToCart(false), 3000)
     } catch (error) {
-      console.error("Failed to add to cart:", error)
-      // Could add error state handling here
+      console.error('Failed to add to cart:', error)
     } finally {
       setIsAdding(false)
     }
