@@ -16,12 +16,10 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
+import { useCart } from "@lib/hooks/use-cart"
 
-const CartDropdown = ({
-  cart: cartState,
-}: {
-  cart?: HttpTypes.StoreCart | null
-}) => {
+const CartDropdown = () => {
+  const { cart: cartState } = useCart()
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
     undefined
   )
@@ -70,8 +68,37 @@ const CartDropdown = ({
     if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
       timedOpen()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+    // Save the current number of items for future comparison
+    itemRef.current = totalItems
+  }, [totalItems, pathname])
+
+  // Listen for cart updates via custom event
+  useEffect(() => {
+    const handleCartUpdate = (event: CustomEvent) => {
+      if (!pathname.includes("/cart")) {
+        // Force open the cart dropdown immediately
+        if (event.detail?.forceOpen) {
+          // Clear any existing timer
+          if (activeTimer) {
+            clearTimeout(activeTimer)
+          }
+          open()
+          
+          // Set a new timer to close after 5 seconds
+          const timer = setTimeout(close, 5000)
+          setActiveTimer(timer)
+        } else {
+          timedOpen()
+        }
+      }
+    }
+    
+    window.addEventListener('cartUpdated', handleCartUpdate as EventListener)
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate as EventListener)
+    }
+  }, [pathname, activeTimer, open, close, timedOpen])
 
   return (
     <div

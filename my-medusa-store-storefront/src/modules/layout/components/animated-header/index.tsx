@@ -4,11 +4,11 @@ import { useEffect, useState } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { clx } from "@medusajs/ui"
 import CartButton from "@modules/layout/components/cart-button"
+import CartDropdown from "@modules/layout/components/cart-dropdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
-import CountrySwitcher from "@modules/layout/components/country-switcher"
 import CurrencySwitcher from "@modules/layout/components/currency-switcher"
 import { usePathname } from "next/navigation"
 
@@ -238,9 +238,9 @@ const AnimatedHeader = () => {
               </LocalizedClientLink>
             </motion.div>
             
-            {/* Right side links */}
-            <div className="flex-1 basis-0 flex items-center justify-end h-full">
-              <div className="flex items-center gap-x-3 sm:gap-x-6 h-full">
+            {/* Right side items: Account, Cart, etc. */}
+            <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
+              <div className="hidden small:flex items-center gap-x-6">
                 {rightLinks.map((link) => (
                   <motion.div 
                     key={link.href} 
@@ -249,7 +249,7 @@ const AnimatedHeader = () => {
                     variants={linkVariants}
                   >
                     <LocalizedClientLink
-                      className={`hidden small:block font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
+                      className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
                         isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
                       }`}
                       href={link.href}
@@ -261,26 +261,22 @@ const AnimatedHeader = () => {
                     </LocalizedClientLink>
                     {hoveredLink === link.href && (
                       <motion.div 
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-luxury-gold"
-                        layoutId="underline"
-                        initial={{ width: 0, opacity: 0, left: "25%" }}
-                        animate={{ width: "100%", opacity: 1, left: 0 }}
-                        exit={{ width: 0, opacity: 0, left: "75%" }}
-                        transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
+                        className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
+                        layoutId="navIndicator"
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                       />
                     )}
                   </motion.div>
                 ))}
-                
-                {/* Currency Switcher */}
-                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"} z-[100] mr-1 sm:mr-0`}>
-                  <CurrencySwitcher />
-                </div>
-                
-                {/* Cart */}
-                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"} z-[100]`}>
-                  <CartButton />
-                </div>
+              </div>
+              
+              <div className="hidden small:flex items-center">
+                <CurrencySwitcher />
+              </div>
+              
+              {/* Cart */}
+              <div className="flex items-center">
+                <CartDropdown />
               </div>
             </div>
           </div>
@@ -360,18 +356,6 @@ const AnimatedHeader = () => {
                   </nav>
                   <div className="h-px w-full bg-luxury-lightgold/20 my-6" />
                   <div className="flex flex-col gap-y-6 w-full">
-                    <motion.div
-                      custom={navLinks.length + rightLinks.length}
-                      initial="closed"
-                      animate="open"
-                      variants={menuVariants}
-                      className="w-full"
-                    >
-                      <div className="flex items-center gap-x-2 text-luxury-charcoal">
-                        <span className="text-sm font-medium">Region:</span>
-                        <CountrySwitcher />
-                      </div>
-                    </motion.div>
                     <motion.div
                       custom={navLinks.length + rightLinks.length + 1}
                       initial="closed"

@@ -130,8 +130,9 @@ export default function ProductActions({
     setIsAdding(true)
 
     try {
-      const startTime = Date.now()
-
+      // Show loading state immediately but still provide visual feedback
+      setAddedToCart(true)
+      
       const response = await fetch('/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -146,20 +147,31 @@ export default function ProductActions({
         throw new Error('Failed to add to cart')
       }
 
-      const elapsedTime = Date.now() - startTime
-      if (elapsedTime < 500) {
-        await new Promise((r) => setTimeout(r, 500 - elapsedTime))
-      }
-
       // Guard localStorage usage to avoid errors during server rendering or tests
       if (typeof window !== 'undefined') {
-        localStorage.setItem('last_cart_addition', Date.now().toString())
-        window.dispatchEvent(new Event('storage'))
+        // Immediately fetch a fresh cart to update all cart components
+        fetch('/api/cart', { 
+          credentials: 'include',
+          cache: 'no-store',
+          headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' }
+        })
+        .then(res => res.json())
+        .then(() => {
+          // After successful update, dispatch events to notify components
+          localStorage.setItem('last_cart_addition', Date.now().toString())
+          window.dispatchEvent(new Event('storage'))
+          window.dispatchEvent(new CustomEvent('cartUpdated', { 
+            detail: { variantId: selectedVariant.id, quantity, forceOpen: true }
+          }))
+        })
+        .catch(err => console.error('Error refreshing cart:', err))
       }
-      setAddedToCart(true)
-      setTimeout(() => setAddedToCart(false), 3000)
+      
+      // Keep success message displayed for a moment
+      setTimeout(() => setAddedToCart(false), 2000)
     } catch (error) {
       console.error('Failed to add to cart:', error)
+      setAddedToCart(false)
     } finally {
       setIsAdding(false)
     }
@@ -249,9 +261,11 @@ export default function ProductActions({
             ? "Select all options"
             : !inStock
             ? "Out of stock"
+            : isAdding
+            ? "Adding..."
             : addedToCart
             ? "Added to cart!"
-            : "Add to cart"}
+            : `Add to cart`}
         </Button>
         
         {/* Additional info */}

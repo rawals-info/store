@@ -4,48 +4,23 @@ import { useEffect, useState } from "react"
 import CartDropdown from "../cart-dropdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { motion, AnimatePresence } from "framer-motion"
-import { HttpTypes } from "@medusajs/types"
+import { useCart } from "@lib/hooks/use-cart"
 
 export default function CartButton() {
-  const [cart, setCart] = useState<HttpTypes.StoreCart | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { cart, loading, totalItems } = useCart()
   const [isAdded, setIsAdded] = useState(false)
-
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const response = await fetch('/api/cart', { credentials: 'include' })
-        const { cart: cartData } = await response.json()
-        setCart(cartData)
-      } catch (error) {
-        console.error("Error fetching cart:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchCart()
-  }, [])
   
-  // Listen for cart updates from localStorage
+  // Listen for cart updates to show animation
   useEffect(() => {
-    const handleStorageChange = () => {
-      // Show animation on addition
+    const handleCartUpdate = () => {
       setIsAdded(true)
       setTimeout(() => setIsAdded(false), 1500)
-      // Refresh cart data
-      fetch('/api/cart', { credentials: 'include' })
-        .then((res) => res.json())
-        .then(({ cart: cartData }) => setCart(cartData))
-        .catch((error) => console.error("Error refreshing cart:", error))
     }
     
-    window.addEventListener('storage', handleStorageChange)
-    // Also check on mount
-    handleStorageChange()
+    window.addEventListener('cartUpdated', handleCartUpdate)
     
     return () => {
-      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('cartUpdated', handleCartUpdate)
     }
   }, [])
 
@@ -60,6 +35,11 @@ export default function CartButton() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
           </svg>
+          {totalItems > 0 && (
+            <span className="absolute -top-2 -right-2 w-4 h-4 bg-luxury-gold rounded-full flex items-center justify-center text-[10px] text-luxury-ivory font-medium">
+              {totalItems}
+            </span>
+          )}
         </span>
         <span className="text-xs sm:text-sm">Cart</span>
         <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
@@ -69,7 +49,7 @@ export default function CartButton() {
 
   return (
     <div className="relative z-[100]">
-      <CartDropdown cart={cart} />
+      <CartDropdown />
       
       {/* Cart item added animation */}
       <AnimatePresence>
