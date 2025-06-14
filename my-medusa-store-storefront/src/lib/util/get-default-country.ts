@@ -13,52 +13,51 @@ interface StoreResponse {
 
 /**
  * Gets the default country code from the backend
- * @param fallback Fallback country code if no default is found
  * @returns The default country code
  */
-export async function getDefaultCountry(fallback = "us"): Promise<string> {
+export async function getDefaultCountry(): Promise<string> {
+  // Attempt to fetch store settings for default_region_id
+  let defaultRegionId: string | undefined
   try {
-    // First, try to get the store settings to find the default region
     const { store } = await sdk.client.fetch<StoreResponse>(`/store`, {
       method: "GET",
-      // Use next.revalidate instead of cache: "no-store" to allow static generation
-      next: { revalidate: 60 } // Revalidate every 60 seconds
+      next: { revalidate: 60 }
     })
-    
-    // If store has a default region set
-    if (store?.default_region_id) {
-      const defaultRegionId = store.default_region_id
-      
-      // Get all regions
-      const regions = await listRegions()
-      
-      // Find the default region by ID
-      const defaultRegion = regions.find(region => region.id === defaultRegionId)
-      
-      // If we found the default region and it has countries
-      if (defaultRegion?.countries && defaultRegion.countries.length > 0) {
-        // Return the first country in the default region
-        return defaultRegion.countries[0].iso_2?.toLowerCase() || fallback
-      }
-    }
-    
-    // If no default region is set or we couldn't find it, just return the first region
-    const regions = await listRegions()
-    
-    if (regions && regions.length > 0) {
-      // Use the first region with countries
-      const firstRegionWithCountries = regions.find(region => region.countries?.some(c => c.iso_2))
-      
-      if (firstRegionWithCountries?.countries && firstRegionWithCountries.countries.length > 0) {
-        // Use the first country of the first region
-        return firstRegionWithCountries.countries[0].iso_2?.toLowerCase() || fallback
-      }
-    }
-    
-    return fallback
+    defaultRegionId = store?.default_region_id
   } catch (error) {
-    console.error("Error determining default region:", error)
-    // Fallback if there's an error
-    return fallback
+    console.error("Error fetching store settings, skipping default_region_id:", error)
   }
+  
+  // If a default region ID is configured, try to use it
+  if (defaultRegionId) {
+    try {
+      const regions = await listRegions()
+      const defaultRegion = regions.find(region => region.id === defaultRegionId)
+      if (defaultRegion?.countries?.length) {
+        const iso = defaultRegion.countries[0].iso_2?.toLowerCase()
+        if (iso) {
+          return iso
+        }
+      }
+    } catch (error) {
+      console.error("Error listing regions for default_region_id:", error)
+    }
+  }
+  
+  // Fallback: use the first available region from backend
+  try {
+    const regions = await listRegions()
+    const regionWithCountry = regions.find(region => region.countries?.length)
+    if (regionWithCountry?.countries?.length) {
+      const iso = regionWithCountry.countries[0].iso_2?.toLowerCase()
+      if (iso) {
+        return iso
+      }
+    }
+  } catch (error) {
+    console.error("Error listing regions for fallback:", error)
+  }
+  
+  // Last fallback to 'us'
+  return "us"
 } 
