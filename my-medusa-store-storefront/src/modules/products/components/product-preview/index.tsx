@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useEffect } from "react"
 import { Text } from "@medusajs/ui"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
@@ -21,6 +22,18 @@ export default function ProductPreviewClient({
   const { cheapestPrice } = getProductPrice({
     product,
   })
+  
+  // Push debug info to global array for the floating panel
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const arr = (window as any).__PRICE_DEBUG__ = (window as any).__PRICE_DEBUG__ || []
+      arr.push({
+        title: product.title,
+        variants: (product.variants || []).map(v => ({ id: v.id, prices: (v as any).prices, calculated_price: (v as any).calculated_price })),
+        cheapest: cheapestPrice,
+      })
+    }
+  }, [product.title, product.variants, cheapestPrice])
   
   // Check for product tags to display appropriate badges
   const isLimitedEdition = product.tags?.some(tag => 
@@ -130,6 +143,18 @@ export default function ProductPreviewClient({
               </div>
             ))}
           </div>
+          {/* Debug price list and calculation */}
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-2 p-2 bg-luxury-ivory/50 text-xs overflow-auto whitespace-pre-wrap">
+              <summary className="cursor-pointer font-medium">Price Debug</summary>
+              <pre className="mt-1">
+                {JSON.stringify({
+                  variants: (product.variants || []).map(v => ({ id: v.id, prices: (v as any).prices, calculated_price: (v as any).calculated_price })),
+                  cheapest: cheapestPrice
+                }, null, 2)}
+              </pre>
+            </details>
+          )}
         </div>
       </div>
     </LocalizedClientLink>

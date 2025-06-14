@@ -55,15 +55,16 @@ export default function ProductActions({
       return isEqual(variantOptions, options)
     })
     
-    // Store the selected variant ID in localStorage for other components to use
-    if (variant?.id) {
-      localStorage.setItem('selectedVariantId', variant.id)
-      // Dispatch storage event to notify other components
-      window.dispatchEvent(new Event('storage'))
-    }
-    
     return variant
   }, [product.variants, options])
+
+  // Side effect: store selected variant ID in localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && selectedVariant?.id) {
+      localStorage.setItem('selectedVariantId', selectedVariant.id)
+      window.dispatchEvent(new Event('storage'))
+    }
+  }, [selectedVariant])
 
   // update the options when a variant is selected
   const setOptionValue = (optionId: string, value: string) => {
@@ -150,8 +151,11 @@ export default function ProductActions({
         await new Promise((r) => setTimeout(r, 500 - elapsedTime))
       }
 
-      localStorage.setItem('last_cart_addition', Date.now().toString())
-      window.dispatchEvent(new Event('storage'))
+      // Guard localStorage usage to avoid errors during server rendering or tests
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('last_cart_addition', Date.now().toString())
+        window.dispatchEvent(new Event('storage'))
+      }
       setAddedToCart(true)
       setTimeout(() => setAddedToCart(false), 3000)
     } catch (error) {

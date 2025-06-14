@@ -40,6 +40,7 @@ export const convertToLocale = ({
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: currency_code,
+      currencyDisplay: currency_code.toUpperCase() === 'USD' ? 'code' : 'symbol',
       minimumFractionDigits,
       maximumFractionDigits,
     }).format(amount)

@@ -19,48 +19,66 @@ const fixPrecision = (num: number): number => {
 }
 
 export const getPricesForVariant = (variant: any) => {
-  // Check if variant is missing
   if (!variant) {
-    return null
+    // If no variant data, return default empty
+    return {
+      calculated_price_number: 0,
+      calculated_price: null,
+      original_price_number: 0,
+      original_price: null,
+      currency_code: 'USD',
+      price_type: 'default',
+      percentage_diff: 0,
+    }
   }
-  
-  // Check if we have prices array from the API
-  if (variant.prices && variant.prices.length > 0) {
-    // Find the price matching the region or first available
-    const price = variant.prices.find((p: any) => p.currency_code === 'USD') || variant.prices[0]
-    
-    if (price) {
-      const amount = price.amount || 0
-      // Treat amount as whole currency units (no division)
+
+  // Determine target currency from calculated_price or fallback to USD, normalized to uppercase
+  const regionCurrency = (variant.calculated_price?.currency_code || 'USD').toUpperCase()
+
+  // 1. Static price list entries on variant.prices
+  const prices = variant.prices || []
+  if (prices.length > 0) {
+    // 1a. Try explicit region price
+    const regionPrice = prices.find((p: any) => p.currency_code.toUpperCase() === regionCurrency)
+    if (regionPrice) {
+      const amount = regionPrice.amount || 0
       const amountInUnits = fixPrecision(amount)
-      
       return {
         calculated_price_number: amountInUnits,
-        calculated_price: convertToLocale({
-          amount: amountInUnits,
-          currency_code: price.currency_code || 'USD',
-        }),
+        calculated_price: convertToLocale({ amount: amountInUnits, currency_code: regionCurrency }),
         original_price_number: amountInUnits,
-        original_price: convertToLocale({
-          amount: amountInUnits,
-          currency_code: price.currency_code || 'USD',
-        }),
-        currency_code: price.currency_code || 'USD',
+        original_price: convertToLocale({ amount: amountInUnits, currency_code: regionCurrency }),
+        currency_code: regionCurrency,
+        price_type: 'default',
+        percentage_diff: 0,
+      }
+    }
+    // 1b. Fallback USD static price
+    const usdPrice = prices.find((p: any) => p.currency_code.toUpperCase() === 'USD')
+    if (usdPrice) {
+      const amount = usdPrice.amount || 0
+      const amountInUnits = fixPrecision(amount)
+      return {
+        calculated_price_number: amountInUnits,
+        calculated_price: convertToLocale({ amount: amountInUnits, currency_code: 'USD' }),
+        original_price_number: amountInUnits,
+        original_price: convertToLocale({ amount: amountInUnits, currency_code: 'USD' }),
+        currency_code: 'USD',
         price_type: 'default',
         percentage_diff: 0,
       }
     }
   }
-  
-  // If we have calculated_price from API, treat it as cents and divide by 100
+
+  // 2. Conversion fallback using calculated_price from API
   if (variant.calculated_price) {
     const rawCal = variant.calculated_price.calculated_amount ?? variant.calculated_price.calculated_price?.calculated_amount ?? 0
     const rawOrig = variant.calculated_price.original_amount ?? variant.calculated_price.calculated_price?.original_amount ?? rawCal
-    const currencyCode = variant.calculated_price.currency_code || 'USD'
-    // Treat calculated prices as whole units (no division)
+    // Use regionCurrency as currency code, or uppercase calculated_price currency_code as fallback
+    const currencyCode = (variant.calculated_price.currency_code || 'USD').toUpperCase()
     const finalCalculated = fixPrecision(rawCal)
     const finalOriginal = fixPrecision(rawOrig)
-    
+
     return {
       calculated_price_number: finalCalculated,
       calculated_price: convertToLocale({ amount: finalCalculated, currency_code: currencyCode }),
@@ -72,10 +90,10 @@ export const getPricesForVariant = (variant: any) => {
     }
   }
 
-  // If no price data available, return a default structure
+  // 3. If all else fails, return default
   return {
     calculated_price_number: 0,
-    calculated_price: null, // Will be displayed as "Contact for price"
+    calculated_price: null,
     original_price_number: 0,
     original_price: null,
     currency_code: 'USD',

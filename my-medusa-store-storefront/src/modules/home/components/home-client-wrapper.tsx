@@ -10,6 +10,7 @@ import Image from "next/image"
 import { Heading, Text } from "@medusajs/ui"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ProductPrice from "@modules/products/components/product-price"
 
 type HomeClientWrapperProps = {
   featuredProducts: any[]
@@ -272,14 +273,7 @@ export default function HomeClientWrapper({
                               {product.title}
                             </Text>
                             {product.variants?.[0] && (
-                              <Text className="text-luxury-charcoal/80">
-                                {region?.currency_code && region.currency_code ? 
-                                  new Intl.NumberFormat(undefined, {
-                                    style: 'currency',
-                                    currency: region.currency_code
-                                  }).format((product.variants[0] as any)?.prices?.[0]?.amount || 0) 
-                                  : 'Price unavailable'}
-                              </Text>
+                              <ProductPrice product={product} variant={product.variants[0]} />
                             )}
                           </Link>
                         </div>
