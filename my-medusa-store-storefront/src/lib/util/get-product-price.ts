@@ -26,83 +26,49 @@ export const getPricesForVariant = (variant: any) => {
   
   // Check if we have prices array from the API
   if (variant.prices && variant.prices.length > 0) {
-    // Find the price in USD (or first price if no USD)
+    // Find the price matching the region or first available
     const price = variant.prices.find((p: any) => p.currency_code === 'USD') || variant.prices[0]
     
     if (price) {
       const amount = price.amount || 0
-      const currencyCode = price.currency_code || 'USD'
-      
-      // FIXED: Medusa stores prices in dollars/100, so we need to multiply by 100 for display
-      const amountInDollars = fixPrecision(amount * 100)
+      // Treat amount as whole currency units (no division)
+      const amountInUnits = fixPrecision(amount)
       
       return {
-        calculated_price_number: amountInDollars,
+        calculated_price_number: amountInUnits,
         calculated_price: convertToLocale({
-          amount: amountInDollars,
-          currency_code: currencyCode,
+          amount: amountInUnits,
+          currency_code: price.currency_code || 'USD',
         }),
-        original_price_number: amountInDollars,
+        original_price_number: amountInUnits,
         original_price: convertToLocale({
-          amount: amountInDollars,
-          currency_code: currencyCode,
+          amount: amountInUnits,
+          currency_code: price.currency_code || 'USD',
         }),
-        currency_code: currencyCode,
+        currency_code: price.currency_code || 'USD',
         price_type: 'default',
         percentage_diff: 0,
       }
     }
   }
   
-  // If we have calculated_price, use that
+  // If we have calculated_price from API, treat it as cents and divide by 100
   if (variant.calculated_price) {
-    // IMPORTANT: Check if calculated_amount exists directly on calculated_price
-    // or nested in calculated_price.calculated_price as the API might return either format
-    const calculatedAmount = typeof variant.calculated_price.calculated_amount === 'number' 
-      ? variant.calculated_price.calculated_amount 
-      : (variant.calculated_price.calculated_price?.calculated_amount || 0)
-      
-    // Similarly check for original amount in both locations
-    const originalAmount = typeof variant.calculated_price.original_amount === 'number'
-      ? variant.calculated_price.original_amount
-      : (variant.calculated_price.calculated_price?.original_amount || calculatedAmount)
-
-    // FIXED: Prices need to be multiplied by 100, not divided
-    // If the price seems too low (under 10 for most items), assume it needs multiplication
-    const isLikelyNeedsMultiplication = calculatedAmount < 10
-    
-    const finalCalculatedAmount = isLikelyNeedsMultiplication ? fixPrecision(calculatedAmount * 100) : calculatedAmount
-    const finalOriginalAmount = isLikelyNeedsMultiplication ? fixPrecision(originalAmount * 100) : originalAmount
-    
+    const rawCal = variant.calculated_price.calculated_amount ?? variant.calculated_price.calculated_price?.calculated_amount ?? 0
+    const rawOrig = variant.calculated_price.original_amount ?? variant.calculated_price.calculated_price?.original_amount ?? rawCal
     const currencyCode = variant.calculated_price.currency_code || 'USD'
-    
-    console.log("Price debug:", {
-      variant: variant.title || variant.id,
-      raw_calculated: calculatedAmount,
-      raw_original: originalAmount,
-      final_calculated: finalCalculatedAmount,
-      final_original: finalOriginalAmount,
-      needs_multiplication: isLikelyNeedsMultiplication,
-      currency: currencyCode
-    })
+    // Treat calculated prices as whole units (no division)
+    const finalCalculated = fixPrecision(rawCal)
+    const finalOriginal = fixPrecision(rawOrig)
     
     return {
-      calculated_price_number: finalCalculatedAmount,
-      calculated_price: convertToLocale({
-        amount: finalCalculatedAmount,
-        currency_code: currencyCode,
-      }),
-      original_price_number: finalOriginalAmount,
-      original_price: convertToLocale({
-        amount: finalOriginalAmount,
-        currency_code: currencyCode,
-      }),
+      calculated_price_number: finalCalculated,
+      calculated_price: convertToLocale({ amount: finalCalculated, currency_code: currencyCode }),
+      original_price_number: finalOriginal,
+      original_price: convertToLocale({ amount: finalOriginal, currency_code: currencyCode }),
       currency_code: currencyCode,
       price_type: variant.calculated_price.calculated_price?.price_list_type || 'default',
-      percentage_diff: getPercentageDiff(
-        finalOriginalAmount,
-        finalCalculatedAmount
-      ),
+      percentage_diff: getPercentageDiff(finalOriginal, finalCalculated),
     }
   }
 

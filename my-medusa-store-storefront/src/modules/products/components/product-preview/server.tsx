@@ -68,7 +68,8 @@ export default function ProductPreview({
     if ((variant as any).prices && (variant as any).prices.length > 0) {
       const price = (variant as any).prices[0]
       if (price && price.amount) {
-        const amount = price.amount / 100 // Convert from cents to dollars
+        // Treat amount as whole currency units
+        const amount = price.amount
         displayPrice = new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: price.currency_code || 'USD'

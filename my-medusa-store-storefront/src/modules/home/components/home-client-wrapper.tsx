@@ -277,7 +277,7 @@ export default function HomeClientWrapper({
                                   new Intl.NumberFormat(undefined, {
                                     style: 'currency',
                                     currency: region.currency_code
-                                  }).format((product.variants[0] as any)?.prices?.[0]?.amount / 100 || 0) 
+                                  }).format((product.variants[0] as any)?.prices?.[0]?.amount || 0) 
                                   : 'Price unavailable'}
                               </Text>
                             )}
