@@ -98,19 +98,19 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
   const isFooter = variant === "footer"
   
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-[100]" ref={dropdownRef}>
       <button
-        className={`flex items-center gap-1.5 ${
+        className={`flex items-center gap-1 ${
           isFooter 
             ? "text-luxury-charcoal/80 hover:text-luxury-gold transition-colors duration-300" 
-            : "text-sm"
+            : "text-xs sm:text-sm whitespace-nowrap"
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <ReactCountryFlag 
           svg 
           countryCode={currencyToCountry[currentCurrency] || "us"} 
-          style={{ width: '16px', height: '16px' }}
+          style={{ width: '14px', height: '14px' }}
         />
         <span className={isFooter ? "" : "hidden md:block"}>{currentCurrency}</span>
         <svg 
@@ -124,7 +124,7 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
       </button>
       
       {isOpen && (
-        <div className={`absolute ${isFooter ? "left-0" : "right-0"} mt-2 w-40 bg-luxury-ivory shadow-md rounded-sm border border-luxury-lightgold z-[60]`}>
+        <div className={`absolute ${isFooter ? "left-0" : "right-0"} mt-2 w-40 bg-luxury-ivory shadow-md rounded-sm border border-luxury-lightgold z-[110]`}>
           <div className="py-1">
             {Object.entries(currencies).map(([currency, countryCodes]) => {
               // Use the first country code for this currency as the target

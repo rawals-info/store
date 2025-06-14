@@ -117,7 +117,7 @@ const AnimatedHeader = () => {
     <>
       <motion.header
         className={clx(
-          "fixed top-0 inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-x-hidden",
+          "fixed top-0 inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-visible",
           {
             "border-b border-luxury-gold/10": isScrolled,
             "backdrop-blur-sm": isScrolled,
@@ -158,7 +158,7 @@ const AnimatedHeader = () => {
         <div className={`w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 ${getTextColor()} h-full transition-all duration-300 box-border ${
           isScrolled ? "py-0 h-16" : "py-1 h-20"
         }`}>
-          <div className="w-full flex items-center justify-between h-full">
+          <div className="w-full flex items-center justify-between h-full relative">
             <div className="flex-1 basis-0 h-full flex items-center">
               {/* Mobile menu button */}
               <div className="small:hidden">
@@ -240,7 +240,7 @@ const AnimatedHeader = () => {
             
             {/* Right side links */}
             <div className="flex-1 basis-0 flex items-center justify-end h-full">
-              <div className="hidden small:flex items-center gap-x-6 h-full">
+              <div className="flex items-center gap-x-3 sm:gap-x-6 h-full">
                 {rightLinks.map((link) => (
                   <motion.div 
                     key={link.href} 
@@ -249,7 +249,7 @@ const AnimatedHeader = () => {
                     variants={linkVariants}
                   >
                     <LocalizedClientLink
-                      className={`font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
+                      className={`hidden small:block font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
                         isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
                       }`}
                       href={link.href}
@@ -273,22 +273,12 @@ const AnimatedHeader = () => {
                 ))}
                 
                 {/* Currency Switcher */}
-                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
+                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"} z-[100] mr-1 sm:mr-0`}>
                   <CurrencySwitcher />
                 </div>
                 
                 {/* Cart */}
-                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
-                  <CartButton />
-                </div>
-              </div>
-              
-              {/* Mobile only: Cart button */}
-              <div className="small:hidden flex items-center gap-x-4">
-                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
-                  <CurrencySwitcher />
-                </div>
-                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"}`}>
+                <div className={`${isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"} z-[100]`}>
                   <CartButton />
                 </div>
               </div>

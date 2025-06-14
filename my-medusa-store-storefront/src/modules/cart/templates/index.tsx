@@ -15,7 +15,7 @@ const CartTemplate = ({
   return (
     <div className="py-12">
       <div className="content-container" data-testid="cart-container">
-        {cart?.items?.length ? (
+        {cart && cart.items && cart.items.length > 0 ? (
           <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-8 small:gap-x-16">
             <div className="flex flex-col bg-luxury-ivory border border-luxury-lightgold/30 shadow-luxury-sm py-6 gap-y-6">
               {!customer && (

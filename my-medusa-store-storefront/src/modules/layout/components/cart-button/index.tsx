@@ -5,9 +5,10 @@ import { retrieveCart } from "@lib/data/cart"
 import CartDropdown from "../cart-dropdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { motion, AnimatePresence } from "framer-motion"
+import { HttpTypes } from "@medusajs/types"
 
 export default function CartButton() {
-  const [cart, setCart] = useState(null)
+  const [cart, setCart] = useState<HttpTypes.StoreCart | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAdded, setIsAdded] = useState(false)
 
@@ -40,7 +41,7 @@ export default function CartButton() {
         }, 1500)
         
         // Refresh cart data
-        retrieveCart().then(setCart)
+        retrieveCart().then(cartData => setCart(cartData))
       }
     }
     
@@ -56,7 +57,7 @@ export default function CartButton() {
   if (loading) {
     return (
       <LocalizedClientLink
-        className="hover:text-luxury-gold transition-colors duration-300 flex items-center gap-2 uppercase tracking-wider text-small-semi relative group"
+        className="hover:text-luxury-gold transition-colors duration-300 flex items-center gap-1 uppercase tracking-wider text-small-semi relative group whitespace-nowrap"
         href="/cart"
         data-testid="nav-cart-link"
       >
@@ -65,14 +66,14 @@ export default function CartButton() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
           </svg>
         </span>
-        <span>Cart</span>
+        <span className="text-xs sm:text-sm">Cart</span>
         <span className="absolute -bottom-px left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
       </LocalizedClientLink>
     )
   }
 
   return (
-    <div className="relative">
+    <div className="relative z-[100]">
       <CartDropdown cart={cart} />
       
       {/* Cart item added animation */}

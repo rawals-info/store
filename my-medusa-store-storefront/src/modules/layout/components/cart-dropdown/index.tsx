@@ -111,7 +111,7 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="hidden small:block absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[360px] text-luxury-charcoal z-[55]"
+            className="absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[360px] max-w-[90vw] text-luxury-charcoal z-[110]"
             data-testid="nav-cart-dropdown"
           >
             {/* Gold line at top */}

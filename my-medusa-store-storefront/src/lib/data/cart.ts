@@ -55,7 +55,8 @@ export async function getOrSetCart(countryCode: string) {
   const region = await getRegion(countryCode)
 
   if (!region) {
-    throw new Error(`Region not found for country code: ${countryCode}`)
+    console.error(`Region not found for country code: ${countryCode}`)
+    return null
   }
 
   let cart = await retrieveCart()
@@ -108,14 +109,19 @@ export async function getOrSetCart(countryCode: string) {
       revalidateTag(cartCacheTag)
     } catch (error) {
       console.error("Error creating cart:", error)
-      throw error
+      return null
     }
   }
 
   if (cart && cart?.region_id !== region.id) {
-    await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
-    const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    try {
+      await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
+      const cartCacheTag = await getCacheTag("carts")
+      revalidateTag(cartCacheTag)
+    } catch (error) {
+      console.error("Error updating cart region:", error)
+      // Continue with existing cart
+    }
   }
 
   return cart
@@ -156,13 +162,15 @@ export async function addToCart({
   countryCode: string
 }) {
   if (!variantId) {
-    throw new Error("Missing variant ID when adding to cart")
+    console.error("Missing variant ID when adding to cart")
+    return
   }
 
   const cart = await getOrSetCart(countryCode)
 
   if (!cart) {
-    throw new Error("Error retrieving or creating cart")
+    console.error("Error retrieving or creating cart")
+    return
   }
 
   const headers = {

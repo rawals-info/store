@@ -33,9 +33,8 @@ export default async function Cart() {
     }
   ])
   
-  if (!cart) {
-    return notFound()
-  }
+  // Even if cart is null, we'll render the cart template which will show an empty cart state
+  // instead of showing a 404 error page
 
   return (
     <Suspense fallback={<CartSkeleton />}>
