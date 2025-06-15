@@ -44,53 +44,59 @@ export const getPricesForVariant = (variant: any) => {
     })
   }
 
-  // Determine target currency from calculated_price or fallback to USD, normalized to uppercase
-  const regionCurrency = (variant.calculated_price?.currency_code || 'USD').toUpperCase()
-
-  // ------------------------------------------------------------------------
-  // SIMPLIFY: Use the calculated_price field directly as the authoritative source
-  // ------------------------------------------------------------------------
-  if (variant.calculated_price) {
-    const calculatedAmount = variant.calculated_price.calculated_amount;
+  // Get the requested currency from calculated_price or fallback to USD
+  const requestedCurrency = (variant.calculated_price?.currency_code || 'USD').toUpperCase()
+  
+  // 1. FIRST: Try to use calculated_price specific to the requested currency
+  if (variant.calculated_price && 
+      variant.calculated_price.currency_code && 
+      variant.calculated_price.currency_code.toUpperCase() === requestedCurrency && 
+      variant.calculated_price.calculated_amount !== undefined && 
+      variant.calculated_price.calculated_amount !== null) {
     
-    if (calculatedAmount !== undefined && calculatedAmount !== null) {
-      const amount = Number(calculatedAmount);
-      const currencyCode = (variant.calculated_price.currency_code || 'USD').toUpperCase();
-      
-      return {
-        calculated_price_number: amount,
-        calculated_price: convertToLocale({ amount, currency_code: currencyCode }),
-        original_price_number: amount,
-        original_price: convertToLocale({ amount, currency_code: currencyCode }),
-        currency_code: currencyCode,
-        price_type: 'default',
-        percentage_diff: 0,
-      }
+    const amount = Number(variant.calculated_price.calculated_amount);
+    return {
+      calculated_price_number: amount,
+      calculated_price: convertToLocale({ amount, currency_code: requestedCurrency }),
+      original_price_number: amount,
+      original_price: convertToLocale({ amount, currency_code: requestedCurrency }),
+      currency_code: requestedCurrency,
+      price_type: 'default',
+      percentage_diff: 0,
     }
   }
-
-  // Use static price list entries on variant.prices as fallback
-  const prices = variant.prices || []
-  if (prices.length > 0) {
-    // Try explicit region price first
-    const regionPrice = prices.find((p: any) => p.currency_code.toUpperCase() === regionCurrency)
-    if (regionPrice) {
-      const amount = regionPrice.amount || 0
-      return {
-        calculated_price_number: amount,
-        calculated_price: convertToLocale({ amount, currency_code: regionCurrency }),
-        original_price_number: amount,
-        original_price: convertToLocale({ amount, currency_code: regionCurrency }),
-        currency_code: regionCurrency,
-        price_type: 'default',
-        percentage_diff: 0,
-      }
+  
+  // 2. SECOND: Look for a price with matching currency code in prices array
+  const prices = variant.prices || [];
+  const matchingPrice = prices.find((p: any) => 
+    p.currency_code && p.currency_code.toUpperCase() === requestedCurrency
+  );
+  
+  if (matchingPrice) {
+    const amount = Number(matchingPrice.amount) || 0;
+    return {
+      calculated_price_number: amount,
+      calculated_price: convertToLocale({ amount, currency_code: requestedCurrency }),
+      original_price_number: amount,
+      original_price: convertToLocale({ amount, currency_code: requestedCurrency }),
+      currency_code: requestedCurrency,
+      price_type: 'default',
+      percentage_diff: 0,
     }
+  }
+  
+  // 3. THIRD: Get USD price as fallback and display it in USD (don't convert)
+  
+  // First try calculated_price with USD
+  if (variant.calculated_price) {
+    // Look through all prices for a USD one
+    const allPrices = variant.calculated_price.prices || [];
+    const usdCalculatedPrice = allPrices.find((p: any) => 
+      p.currency_code && p.currency_code.toUpperCase() === 'USD'
+    );
     
-    // Fallback to USD static price
-    const usdPrice = prices.find((p: any) => p.currency_code.toUpperCase() === 'USD')
-    if (usdPrice) {
-      const amount = usdPrice.amount || 0
+    if (usdCalculatedPrice && usdCalculatedPrice.amount) {
+      const amount = Number(usdCalculatedPrice.amount);
       return {
         calculated_price_number: amount,
         calculated_price: convertToLocale({ amount, currency_code: 'USD' }),
@@ -100,6 +106,40 @@ export const getPricesForVariant = (variant: any) => {
         price_type: 'default',
         percentage_diff: 0,
       }
+    }
+  }
+  
+  // Then try static USD price in prices array
+  const usdPrice = prices.find((p: any) => 
+    p.currency_code && p.currency_code.toUpperCase() === 'USD'
+  );
+  
+  if (usdPrice) {
+    const amount = Number(usdPrice.amount) || 0;
+    return {
+      calculated_price_number: amount,
+      calculated_price: convertToLocale({ amount, currency_code: 'USD' }),
+      original_price_number: amount,
+      original_price: convertToLocale({ amount, currency_code: 'USD' }),
+      currency_code: 'USD',
+      price_type: 'default',
+      percentage_diff: 0,
+    }
+  }
+  
+  // 4. LAST RESORT: If we have any calculated price, use it regardless of currency
+  if (variant.calculated_price && variant.calculated_price.calculated_amount !== undefined) {
+    const amount = Number(variant.calculated_price.calculated_amount);
+    const currencyCode = (variant.calculated_price.currency_code || 'USD').toUpperCase();
+    
+    return {
+      calculated_price_number: amount,
+      calculated_price: convertToLocale({ amount, currency_code: currencyCode }),
+      original_price_number: amount,
+      original_price: convertToLocale({ amount, currency_code: currencyCode }),
+      currency_code: currencyCode,
+      price_type: 'default',
+      percentage_diff: 0,
     }
   }
 
