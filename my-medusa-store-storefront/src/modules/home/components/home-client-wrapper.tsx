@@ -327,7 +327,7 @@ export default function HomeClientWrapper({
           
           {/* View all button */}
           <div className="text-center mt-10">
-            <Link href={`/${countryCode}/store`}>
+            <Link href={`/${countryCode}/products`}>
               <AnimatedButton variant="outline" size="medium">
                 View All Products
               </AnimatedButton>
