@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Button, clx } from "@medusajs/ui"
-import React, { Fragment, useMemo } from "react"
+import React, { Fragment, useMemo, useState } from "react"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
@@ -35,6 +35,19 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   optionsDisabled,
 }) => {
   const { state, open, close } = useToggleState()
+  const [quantity, setQuantity] = useState(1)
+
+  const incrementQuantity = () => {
+    if (quantity < 10) {
+      setQuantity(quantity + 1)
+    }
+  }
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1)
+    }
+  }
 
   const price = getProductPrice({
     product: product,
@@ -98,10 +111,32 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 <div></div>
               )}
             </div>
+            
+            {/* Quantity selector */}
+            <div className="flex items-center mb-2">
+              <button 
+                className="w-8 h-8 flex items-center justify-center border border-luxury-charcoal/20 text-luxury-charcoal hover:bg-luxury-cream/50 transition-colors"
+                onClick={decrementQuantity}
+                disabled={quantity <= 1 || optionsDisabled || isAdding}
+              >
+                <span className="text-lg">−</span>
+              </button>
+              
+              <span className="w-12 text-center text-luxury-charcoal">{quantity}</span>
+              
+              <button 
+                className="w-8 h-8 flex items-center justify-center border border-luxury-charcoal/20 text-luxury-charcoal hover:bg-luxury-cream/50 transition-colors"
+                onClick={incrementQuantity}
+                disabled={quantity >= 10 || optionsDisabled || isAdding}
+              >
+                <span className="text-lg">+</span>
+              </button>
+            </div>
+            
             <div className={clx("grid grid-cols-2 w-full gap-x-4", {
-              "!grid-cols-1": isSimple
+              "!grid-cols-1": isSimple || product.variants?.length === 1
             })}>
-              {!isSimple && <Button
+              {!isSimple && product.variants && product.variants.length > 1 && <Button
                 onClick={open}
                 variant="secondary"
                 className="w-full"
@@ -110,7 +145,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 <div className="flex items-center justify-between w-full">
                   <span>
                     {variant
-                      ? Object.values(options).join(" / ")
+                      ? Object.values(options).join(" / ")
                       : "Select Options"}
                   </span>
                   <ChevronDown />
@@ -118,16 +153,16 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               </Button>}
               <Button
                 onClick={handleAddToCart}
-                disabled={!inStock || !variant}
+                disabled={!inStock || (!variant && product.variants && product.variants.length > 1)}
                 className="w-full"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
               >
-                {!variant
+                {!variant && product.variants && product.variants.length > 1
                   ? "Select variant"
                   : !inStock
                   ? "Out of stock"
-                  : "Add to cart"}
+                  : `Add to cart (${quantity})`}
               </Button>
             </div>
           </div>

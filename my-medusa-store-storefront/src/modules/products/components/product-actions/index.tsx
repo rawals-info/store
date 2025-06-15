@@ -9,6 +9,7 @@ import { isEqual } from "lodash"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
+import ProductVariantInfo from "../product-variant-info"
 import MobileActions from "./mobile-actions"
 
 type ProductActionsProps = {
@@ -27,6 +28,74 @@ const optionsAsKeymap = (
   }, {})
 }
 
+// For variant finding
+const isEqualVariant = (v: HttpTypes.StoreProductVariant, opts: Record<string, string | undefined>): boolean => {
+  const variantOptions = optionsAsKeymap(v.options)
+  return isEqual(variantOptions, opts)
+}
+
+// Helper function to generate options from variant titles
+const generateOptionsFromVariants = (variants: HttpTypes.StoreProductVariant[] | undefined): any[] => {
+  if (!variants || variants.length <= 0) return []
+
+  // Try to detect option types from variant titles
+  // This is a fallback when the backend doesn't provide proper option data
+  const optionTypes: Record<string, Set<string>> = {}
+  
+  // First, collect all potential option types and values
+  variants.forEach(variant => {
+    const title = variant.title || ""
+    
+    // Common patterns to identify options (Size: L, Color: Blue, etc.)
+    const optionMatches = title.match(/([a-zA-Z]+)\s*:\s*([a-zA-Z0-9]+)/g)
+    
+    if (optionMatches) {
+      // Parse structured variant titles like "Size: L, Color: Blue"
+      optionMatches.forEach(match => {
+        const [optionType, optionValue] = match.split(/:/).map(s => s.trim())
+        if (optionType && optionValue) {
+          if (!optionTypes[optionType]) {
+            optionTypes[optionType] = new Set()
+          }
+          optionTypes[optionType].add(optionValue)
+        }
+      })
+    } else {
+      // If no structured pattern, use "Option" as fallback
+      // For titles like "Small", "Large", "Red", etc.
+      if (!optionTypes["Option"]) {
+        optionTypes["Option"] = new Set()
+      }
+      if (title) {
+        optionTypes["Option"].add(title)
+      }
+    }
+  })
+  
+  // Convert the collected data to the required format
+  return Object.entries(optionTypes).map(([optionType, valueSet], index) => {
+    const optionId = `generated_option_id_${index}`
+    
+    return {
+      id: optionId,
+      title: optionType,
+      values: Array.from(valueSet).map((value: string) => ({
+        id: `value_${value.replace(/\s+/g, '_')}`,
+        value: value,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        option_id: optionId,
+        variant_id: undefined,
+        metadata: undefined
+      })),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      product_id: undefined,
+      metadata: undefined
+    }
+  })
+}
+
 export default function ProductActions({
   product,
   disabled,
@@ -35,36 +104,202 @@ export default function ProductActions({
   const [isAdding, setIsAdding] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [manuallySelectedVariant, setManuallySelectedVariant] = useState<HttpTypes.StoreProductVariant | undefined>(undefined)
   const countryCode = useParams().countryCode as string
+
+  // Create dynamic options if none exist
+  const productOptions = useMemo(() => {
+    // Debug the actual data we're getting
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Product variant data for debugging:", product.variants?.map(v => ({
+        id: v.id,
+        title: v.title,
+        sku: v.sku,
+        options: v.options
+      })));
+    }
+    
+    // Use options directly from the product if they exist and have values
+    if (product.options && product.options.length > 0) {
+      // Ensure each option has values
+      const validOptions = product.options.filter(option => 
+        option.values && option.values.length > 0
+      );
+      
+      if (validOptions.length > 0) {
+        return validOptions;
+      }
+    }
+    
+    // Only generate options if we have no options but have variants
+    if ((!product.options || product.options.length === 0) && product.variants && product.variants.length > 0) {
+      // Try to extract options from variant.options first, as this is more reliable than titles
+      const variantsWithOptions = product.variants.filter(v => v.options && v.options.length > 0);
+      
+      if (variantsWithOptions.length > 0) {
+        // Group variant options by option_id to create synthetic product options
+        const optionGroups: Record<string, any> = {};
+        
+        variantsWithOptions.forEach(variant => {
+          variant.options?.forEach(opt => {
+            // Skip if option_id is null or undefined
+            if (!opt.option_id) return;
+            
+            if (!optionGroups[opt.option_id]) {
+              // Try to get the option title from any option on any variant
+              let optionTitle = "Option";
+              // Look through all variants to find a title for this option_id
+              for (const v of product.variants || []) {
+                for (const o of v.options || []) {
+                  if (o.option_id === opt.option_id && (o as any).title) {
+                    optionTitle = (o as any).title;
+                    break;
+                  }
+                }
+                if (optionTitle !== "Option") break;
+              }
+              
+              optionGroups[opt.option_id] = {
+                id: opt.option_id,
+                title: optionTitle,
+                values: []
+              };
+            }
+            
+            // Check if value exists and add it if not already in the array
+            if (opt.value) {
+              const existing = optionGroups[opt.option_id].values.find((v: any) => v.value === opt.value);
+              if (!existing) {
+                optionGroups[opt.option_id].values.push({
+                  id: `${opt.option_id}_${opt.value}`.replace(/\s+/g, '_'),
+                  value: opt.value,
+                  option_id: opt.option_id
+                });
+              }
+            }
+          });
+        });
+        
+        const generatedOptions = Object.values(optionGroups);
+        if (process.env.NODE_ENV === 'development') {
+          console.log("Generated options from variants:", generatedOptions);
+        }
+        
+        // Only return if we have valid options with values
+        if (generatedOptions.length > 0 && generatedOptions.every(opt => opt.values && opt.values.length > 0)) {
+          return generatedOptions;
+        }
+      }
+      
+      // Use our fallback generator if variant.options is not available
+      const generatedOptions = generateOptionsFromVariants(product.variants);
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Generated options from variant titles:", generatedOptions);
+      }
+      
+      return generatedOptions.filter(opt => opt.values && opt.values.length > 0);
+    }
+    
+    return []
+  }, [product])
 
   // If there is only 1 variant, preselect the options
   useEffect(() => {
-    if (product.variants?.length === 1) {
-      const variantOptions = optionsAsKeymap(product.variants[0].options)
-      setOptions(variantOptions ?? {})
+    // Reset options when product changes
+    if (product) {
+      // Create default options map
+      const defaultOptions: Record<string, string | undefined> = {}
+      
+      // If product options exist, use them
+      if (productOptions.length > 0) {
+        // For each option, select the first value
+        productOptions.forEach(option => {
+          if (option.values?.length) {
+            defaultOptions[option.id] = option.values[0].value || undefined
+          }
+        })
+        
+        // If there's only one variant, select its exact options - ensure it's always selected
+        if (product.variants?.length === 1 && product.variants[0].options) {
+          const variantOptions = optionsAsKeymap(product.variants[0].options)
+          Object.assign(defaultOptions, variantOptions)
+        }
+        
+        // Set the default options
+        if (Object.keys(defaultOptions).length > 0) {
+          setOptions(defaultOptions)
+        }
+      } else if (product.variants?.length === 1) {
+        // If there are no options but there is one variant, make sure it's selected
+        setManuallySelectedVariant(product.variants[0])
+      }
     }
-  }, [product.variants])
+  }, [product, productOptions])
 
   const selectedVariant = useMemo(() => {
+    if (manuallySelectedVariant) {
+      return manuallySelectedVariant
+    }
+
     if (!product.variants || product.variants.length === 0) {
       return
     }
 
-    const variant = product.variants.find((v) => {
-      const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
-    })
+    // For products with standard options
+    if (product.options && product.options.length > 0) {
+      const variant = product.variants.find((v) => {
+        const variantOptions = optionsAsKeymap(v.options)
+        return isEqual(variantOptions, options)
+      })
+      return variant
+    }
     
-    return variant
-  }, [product.variants, options])
+    // For products with generated options
+    if (Object.keys(options).length > 0) {
+      // First try to find by exact option match (for formatted titles)
+      const variant = product.variants.find(v => {
+        if (!v.title) return false
+        
+        // For options like "Size: L, Color: Blue"
+        const optionMatches = v.title.match(/([a-zA-Z]+)\s*:\s*([a-zA-Z0-9]+)/g)
+        if (optionMatches) {
+          // Check if all options match
+          return Object.entries(options).every(([optionId, value]) => {
+            // Find the option title from productOptions
+            const option = productOptions.find(o => o.id === optionId)
+            if (!option || !value) return false
+            
+            // Check if this option's value is in the variant title
+            const pattern = new RegExp(`${option.title}\\s*:\\s*${value}`, 'i')
+            return pattern.test(v.title || '')
+          })
+        }
+        
+        // For simple titles, match if any of our options match the title
+        return Object.values(options).includes(v.title)
+      })
+      
+      if (variant) return variant
+    }
+    
+    // Default to first variant if no match found
+    return product.variants[0]
+  }, [product.variants, options, product.options, productOptions])
 
   // Side effect: store selected variant ID in localStorage when it changes
   useEffect(() => {
     if (typeof window !== 'undefined' && selectedVariant?.id) {
-      localStorage.setItem('selectedVariantId', selectedVariant.id)
-      window.dispatchEvent(new Event('storage'))
+      // Only update localStorage if the value actually changed
+      const currentVariantId = localStorage.getItem('selectedVariantId');
+      if (currentVariantId !== selectedVariant.id) {
+        localStorage.setItem('selectedVariantId', selectedVariant.id);
+        
+        // Dispatch a single storage event instead of relying on automatic events
+        // This helps reduce the number of event handlers firing
+        window.dispatchEvent(new Event('storage'));
+      }
     }
-  }, [selectedVariant])
+  }, [selectedVariant?.id]); // Only depend on the ID, not the entire variant
 
   // update the options when a variant is selected
   const setOptionValue = (optionId: string, value: string) => {
@@ -76,11 +311,47 @@ export default function ProductActions({
 
   //check if the selected options produce a valid variant
   const isValidVariant = useMemo(() => {
-    return product.variants?.some((v) => {
-      const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
-    })
-  }, [product.variants, options])
+    if (!product.variants || product.variants.length === 0) {
+      return false
+    }
+    
+    // For products with standard options
+    if (product.options && product.options.length > 0) {
+      return product.variants.some((variant) => {
+        const variantOptions = optionsAsKeymap(variant.options)
+        return isEqual(variantOptions, options)
+      })
+    }
+    
+    // For products with generated options
+    if (Object.keys(options).length > 0) {
+      // First try to find by exact option match
+      return product.variants.some(variant => {
+        if (!variant.title) return false
+        
+        // For options like "Size: L, Color: Blue"
+        const optionMatches = variant.title.match(/([a-zA-Z]+)\s*:\s*([a-zA-Z0-9]+)/g)
+        if (optionMatches) {
+          // Check if all options match
+          return Object.entries(options).every(([optionId, value]) => {
+            // Find the option title from productOptions
+            const option = productOptions.find(o => o.id === optionId)
+            if (!option || !value) return false
+            
+            // Check if this option's value is in the variant title
+            const pattern = new RegExp(`${option.title}\\s*:\\s*${value}`, 'i')
+            return pattern.test(variant.title || '')
+          })
+        }
+        
+        // For simple titles, match if any of our options match the title
+        return Object.values(options).includes(variant.title)
+      })
+    }
+    
+    // If no options to check, default to having variants
+    return product.variants.length > 0
+  }, [product.variants, options, product.options, productOptions])
 
   // check if the selected variant is in stock
   const inStock = useMemo(() => {
@@ -179,123 +450,104 @@ export default function ProductActions({
 
   return (
     <>
-      <div className="flex flex-col gap-y-4" ref={actionsRef}>
-        {/* Variants */}
-        {(product.variants?.length ?? 0) > 1 && (
-          <div className="flex flex-col gap-y-4">
-            {(product.options || []).map((option) => {
-              return (
-                <div key={option.id} className="product-option">
-                  <OptionSelect
-                    option={option}
-                    current={options[option.id]}
-                    updateOption={setOptionValue}
-                    title={option.title ?? ""}
-                    data-testid="product-options"
-                    disabled={!!disabled || isAdding}
-                  />
-                </div>
-              )
-            })}
-            <div className="h-px bg-luxury-gold/20 my-2"></div>
-          </div>
+      <div className="flex flex-col gap-y-2">
+        <div>
+          {/* Only show options selector if there are multiple variants */}
+          {product.variants && product.variants.length > 1 && (
+            <div className="flex flex-col gap-y-2" data-testid="product-options">
+              {productOptions.map((option) => {
+                return (
+                  <div key={option.id} data-testid={option.title}>
+                    <OptionSelect
+                      option={option}
+                      current={options[option.id]}
+                      updateOption={setOptionValue}
+                      title={option.title}
+                      disabled={disabled || false}
+                      product={product}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Only show the variant info section if there's more than one variant */}
+        {selectedVariant && product.variants && product.variants.length > 1 && (
+          <ProductVariantInfo variant={selectedVariant} product={product} />
         )}
 
-        {/* Price display */}
-        <div className="mb-2">
-          <ProductPrice product={product} variant={selectedVariant} />
-        </div>
-        
-        {/* Quantity selector */}
-        <div className="flex flex-col gap-y-2">
-          <p className="text-small-semi uppercase tracking-wider text-luxury-charcoal/70">Quantity</p>
-          <div className="flex items-center">
-            <button 
-              className="w-8 h-8 flex items-center justify-center border border-luxury-gold/30 text-luxury-gold hover:bg-luxury-cream transition-colors"
-              onClick={decrementQuantity}
-              disabled={quantity <= 1 || !!disabled || isAdding}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 12H4"></path>
-              </svg>
-            </button>
+        <div className="mt-4">
+          <div className="flex flex-col gap-y-6">
+            <ProductPrice product={product} variant={selectedVariant} />
             
-            <span className="w-12 text-center text-luxury-charcoal">{quantity}</span>
+            {/* Quantity selector */}
+            <div className="flex flex-col gap-y-2">
+              <p className="text-sm text-luxury-charcoal/70">Quantity</p>
+              <div className="flex items-center">
+                <button 
+                  className="w-8 h-8 flex items-center justify-center border border-luxury-charcoal/20 text-luxury-charcoal hover:bg-luxury-cream/50 transition-colors"
+                  onClick={decrementQuantity}
+                  disabled={quantity <= 1 || !!disabled || isAdding}
+                >
+                  <span className="text-lg">−</span>
+                </button>
+                
+                <span className="w-12 text-center text-luxury-charcoal">{quantity}</span>
+                
+                <button 
+                  className="w-8 h-8 flex items-center justify-center border border-luxury-charcoal/20 text-luxury-charcoal hover:bg-luxury-cream/50 transition-colors"
+                  onClick={incrementQuantity}
+                  disabled={quantity >= 10 || !!disabled || isAdding}
+                >
+                  <span className="text-lg">+</span>
+                </button>
+              </div>
+            </div>
             
-            <button 
-              className="w-8 h-8 flex items-center justify-center border border-luxury-gold/30 text-luxury-gold hover:bg-luxury-cream transition-colors"
-              onClick={incrementQuantity}
-              disabled={quantity >= 10 || !!disabled || isAdding}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4"></path>
-              </svg>
-            </button>
+            <div>
+              <Button
+                onClick={handleAddToCart}
+                disabled={
+                  // For multiple variants, require selection
+                  (product.variants && product.variants.length > 1 && !selectedVariant) ||
+                  // For all cases, check calculated price and inventory
+                  !selectedVariant?.calculated_price ||
+                  (selectedVariant && typeof selectedVariant.inventory_quantity === 'number' && selectedVariant.inventory_quantity < 1)
+                }
+                variant="primary"
+                className="w-full bg-luxury-charcoal hover:bg-luxury-charcoal/90 h-12 rounded-md text-luxury-ivory"
+                isLoading={isAdding}
+                data-testid="add-to-cart-button"
+              >
+                {!selectedVariant
+                  ? "Select options"
+                  : selectedVariant && typeof selectedVariant.inventory_quantity === 'number' && selectedVariant.inventory_quantity < 1
+                    ? "Out of stock"
+                    : addedToCart
+                      ? "Added!"
+                      : `Add to cart (${quantity})`}
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Add to cart button */}
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            !isValidVariant
-          }
-          variant="primary"
-          className={`w-full h-12 mt-2 font-medium tracking-wider uppercase transition-all duration-300 ${
-            addedToCart 
-              ? 'bg-emerald-600 hover:bg-emerald-700' 
-              : !selectedVariant || !isValidVariant 
-                ? 'bg-neutral-200 text-neutral-600 hover:bg-neutral-300'
-                : 'bg-luxury-gold hover:bg-luxury-gold/90'
-          }`}
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant && !Object.keys(options).length
-            ? "Select options to continue"
-            : !selectedVariant || !isValidVariant
-            ? "Select all options"
-            : !inStock
-            ? "Out of stock"
-            : isAdding
-            ? "Adding..."
-            : addedToCart
-            ? "Added to cart!"
-            : `Add to cart`}
-        </Button>
-        
-        {/* Additional info */}
-        <div className="text-xs text-luxury-charcoal/60 mt-2">
-          <p className="flex items-center">
-            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-            </svg>
-            Free shipping on orders over $150
-          </p>
-          <p className="flex items-center mt-1">
-            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-            </svg>
-            Each purchase is protected by our quality guarantee
-          </p>
-        </div>
-        
+      {/* Only show MobileActions when there are multiple variants */}
+      {product.variants && product.variants.length > 1 && (
         <MobileActions
           product={product}
-          variant={selectedVariant}
           options={options}
+          variant={selectedVariant}
           updateOptions={setOptionValue}
-          inStock={inStock}
+          inStock={selectedVariant ? typeof selectedVariant.inventory_quantity !== 'number' || selectedVariant.inventory_quantity > 0 : false}
           handleAddToCart={handleAddToCart}
           isAdding={isAdding}
           show={!inView}
-          optionsDisabled={!!disabled || isAdding}
+          optionsDisabled={disabled || false}
         />
-      </div>
+      )}
     </>
   )
 }

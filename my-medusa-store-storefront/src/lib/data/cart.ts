@@ -5,6 +5,7 @@ import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
+import { ExtendedStoreCartLineItem } from "../../types/cart"
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -31,8 +32,9 @@ export async function retrieveCart(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
+  // Optimize caching with a reasonable revalidation window
   const next = {
-    revalidate: 5,
+    revalidate: 5, // Revalidate after 5 seconds
     tags: ['cart', `cart-${id}`],
   }
 
@@ -45,9 +47,21 @@ export async function retrieveCart(cartId?: string) {
       },
       headers,
       next,
-      cache: "force-cache",
+      cache: "default", // Use default caching behavior instead of force-cache
     })
-    .then(({ cart }) => cart)
+    .then(({ cart }) => {
+      // Mark cart items and variants to help identify them in price calculations
+      if (cart && cart.items) {
+        cart.items = cart.items.map(item => {
+          if (item.variant) {
+            // Use type assertion to avoid TypeScript errors
+            (item.variant as any).in_cart = true;
+          }
+          return item;
+        });
+      }
+      return cart;
+    })
     .catch(() => null)
 }
 

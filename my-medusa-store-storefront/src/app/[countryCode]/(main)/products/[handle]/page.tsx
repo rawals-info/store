@@ -73,7 +73,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       path: `/store/products`,
       query: { 
         limit: 1,
-        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories,+variants.options,+options",
+        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories,+variants.options,+variants.sku,+options,+options.values",
         handle: handle 
       },
       cacheTags: ["products"],
@@ -122,7 +122,7 @@ export default async function ProductPage(props: Props) {
       path: `/store/products`,
       query: { 
         limit: 1,
-        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories,+variants.options,+options",
+        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories,+variants.options,+variants.sku,+options,+options.values",
         handle: handle
       },
       cacheTags: ["products"],

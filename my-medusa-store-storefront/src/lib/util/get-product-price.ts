@@ -32,37 +32,70 @@ export const getPricesForVariant = (variant: any) => {
     }
   }
 
+  // Logging variant data in development to help debug prices
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Variant pricing data:', {
+      variant_id: variant.id,
+      variant_title: variant.title,
+      variant_sku: variant.sku,
+      amount: variant.amount,
+      prices: variant.prices,
+      calculated_price: variant.calculated_price,
+    })
+  }
+
   // Determine target currency from calculated_price or fallback to USD, normalized to uppercase
   const regionCurrency = (variant.calculated_price?.currency_code || 'USD').toUpperCase()
 
-  // 1. Static price list entries on variant.prices
+  // ------------------------------------------------------------------------
+  // SIMPLIFY: Use the calculated_price field directly as the authoritative source
+  // ------------------------------------------------------------------------
+  if (variant.calculated_price) {
+    const calculatedAmount = variant.calculated_price.calculated_amount;
+    
+    if (calculatedAmount !== undefined && calculatedAmount !== null) {
+      const amount = Number(calculatedAmount);
+      const currencyCode = (variant.calculated_price.currency_code || 'USD').toUpperCase();
+      
+      return {
+        calculated_price_number: amount,
+        calculated_price: convertToLocale({ amount, currency_code: currencyCode }),
+        original_price_number: amount,
+        original_price: convertToLocale({ amount, currency_code: currencyCode }),
+        currency_code: currencyCode,
+        price_type: 'default',
+        percentage_diff: 0,
+      }
+    }
+  }
+
+  // Use static price list entries on variant.prices as fallback
   const prices = variant.prices || []
   if (prices.length > 0) {
-    // 1a. Try explicit region price
+    // Try explicit region price first
     const regionPrice = prices.find((p: any) => p.currency_code.toUpperCase() === regionCurrency)
     if (regionPrice) {
       const amount = regionPrice.amount || 0
-      const amountInUnits = fixPrecision(amount)
       return {
-        calculated_price_number: amountInUnits,
-        calculated_price: convertToLocale({ amount: amountInUnits, currency_code: regionCurrency }),
-        original_price_number: amountInUnits,
-        original_price: convertToLocale({ amount: amountInUnits, currency_code: regionCurrency }),
+        calculated_price_number: amount,
+        calculated_price: convertToLocale({ amount, currency_code: regionCurrency }),
+        original_price_number: amount,
+        original_price: convertToLocale({ amount, currency_code: regionCurrency }),
         currency_code: regionCurrency,
         price_type: 'default',
         percentage_diff: 0,
       }
     }
-    // 1b. Fallback USD static price
+    
+    // Fallback to USD static price
     const usdPrice = prices.find((p: any) => p.currency_code.toUpperCase() === 'USD')
     if (usdPrice) {
       const amount = usdPrice.amount || 0
-      const amountInUnits = fixPrecision(amount)
       return {
-        calculated_price_number: amountInUnits,
-        calculated_price: convertToLocale({ amount: amountInUnits, currency_code: 'USD' }),
-        original_price_number: amountInUnits,
-        original_price: convertToLocale({ amount: amountInUnits, currency_code: 'USD' }),
+        calculated_price_number: amount,
+        calculated_price: convertToLocale({ amount, currency_code: 'USD' }),
+        original_price_number: amount,
+        original_price: convertToLocale({ amount, currency_code: 'USD' }),
         currency_code: 'USD',
         price_type: 'default',
         percentage_diff: 0,
@@ -70,27 +103,7 @@ export const getPricesForVariant = (variant: any) => {
     }
   }
 
-  // 2. Conversion fallback using calculated_price from API
-  if (variant.calculated_price) {
-    const rawCal = variant.calculated_price.calculated_amount ?? variant.calculated_price.calculated_price?.calculated_amount ?? 0
-    const rawOrig = variant.calculated_price.original_amount ?? variant.calculated_price.calculated_price?.original_amount ?? rawCal
-    // Use regionCurrency as currency code, or uppercase calculated_price currency_code as fallback
-    const currencyCode = (variant.calculated_price.currency_code || 'USD').toUpperCase()
-    const finalCalculated = fixPrecision(rawCal)
-    const finalOriginal = fixPrecision(rawOrig)
-
-    return {
-      calculated_price_number: finalCalculated,
-      calculated_price: convertToLocale({ amount: finalCalculated, currency_code: currencyCode }),
-      original_price_number: finalOriginal,
-      original_price: convertToLocale({ amount: finalOriginal, currency_code: currencyCode }),
-      currency_code: currencyCode,
-      price_type: variant.calculated_price.calculated_price?.price_list_type || 'default',
-      percentage_diff: getPercentageDiff(finalOriginal, finalCalculated),
-    }
-  }
-
-  // 3. If all else fails, return default
+  // Final fallback: If all else fails, return default
   return {
     calculated_price_number: 0,
     calculated_price: null,

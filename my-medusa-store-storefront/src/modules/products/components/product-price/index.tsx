@@ -1,7 +1,7 @@
 import { clx } from "@medusajs/ui"
-
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
+import { useEffect } from "react"
 
 export default function ProductPrice({
   product,
@@ -16,6 +16,21 @@ export default function ProductPrice({
   })
 
   const selectedPrice = variant ? variantPrice : cheapestPrice
+  
+  // Debug logging in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ProductPrice component:', {
+        product_id: product.id,
+        product_title: product.title,
+        variant_id: variant?.id,
+        variant_title: variant?.title,
+        selectedPrice,
+        cheapestPrice,
+        variantPrice
+      })
+    }
+  }, [product, variant, selectedPrice, cheapestPrice, variantPrice])
 
   if (!selectedPrice) {
     return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />
