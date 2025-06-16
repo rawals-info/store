@@ -40,6 +40,8 @@ export default function HomeClientWrapper({
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
   const [productsPerView, setProductsPerView] = useState(4)
   const [totalProductPages, setTotalProductPages] = useState(1)
+  const [productAutoRotate, setProductAutoRotate] = useState(true)
+  const productAutoRotateRef = useRef<NodeJS.Timeout | null>(null)
   
   // Background colors for categories
   const bgGradients = [
@@ -77,6 +79,21 @@ export default function HomeClientWrapper({
     }
   }, [autoRotate, parentCategories.length])
   
+  // Auto-rotate products
+  useEffect(() => {
+    if (productAutoRotate && totalProductPages > 1) {
+      productAutoRotateRef.current = setInterval(() => {
+        setCurrentProductIndex((prev) => (prev + 1) % totalProductPages)
+      }, 5000)
+    }
+    
+    return () => {
+      if (productAutoRotateRef.current) {
+        clearInterval(productAutoRotateRef.current)
+      }
+    }
+  }, [productAutoRotate, totalProductPages])
+  
   // Calculate products per view based on screen size
   useEffect(() => {
     const handleResize = () => {
@@ -108,7 +125,7 @@ export default function HomeClientWrapper({
     }
   }, [featuredProducts.length, productsPerView])
   
-  // Pause auto-rotation when user interacts
+  // Pause auto-rotation when user interacts with categories
   const handleNavigation = (index: number) => {
     setCurrentIndex(index)
     setAutoRotate(false)
@@ -123,7 +140,7 @@ export default function HomeClientWrapper({
     }, 10000)
   }
   
-  // Handle next/prev navigation
+  // Handle next/prev navigation for categories
   const handlePrev = () => {
     const newIndex = currentIndex === 0 ? parentCategories.length - 1 : currentIndex - 1
     handleNavigation(newIndex)
@@ -137,10 +154,20 @@ export default function HomeClientWrapper({
   // Handle product carousel navigation
   const handlePrevProduct = () => {
     setCurrentProductIndex((prev) => (prev === 0 ? totalProductPages - 1 : prev - 1))
+    setProductAutoRotate(false)
+    if (productAutoRotateRef.current) {
+      clearInterval(productAutoRotateRef.current)
+    }
+    setTimeout(() => setProductAutoRotate(true), 10000)
   }
   
   const handleNextProduct = () => {
     setCurrentProductIndex((prev) => (prev + 1) % totalProductPages)
+    setProductAutoRotate(false)
+    if (productAutoRotateRef.current) {
+      clearInterval(productAutoRotateRef.current)
+    }
+    setTimeout(() => setProductAutoRotate(true), 10000)
   }
 
   return (
@@ -220,118 +247,136 @@ export default function HomeClientWrapper({
             {/* Carousel Container */}
             <div className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-500 ease-in-out"
+                className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentProductIndex * 100}%)` }}
               >
-                {Array(totalProductPages).fill(0).map((_, pageIndex) => (
-                  <div 
-                    key={`product-page-${pageIndex}`} 
-                    className="min-w-full flex gap-4 sm:gap-6"
-                  >
-                    {featuredProducts
-                      .slice(
-                        pageIndex * productsPerView, 
-                        (pageIndex + 1) * productsPerView
-                      )
-                      .map((product, idx) => (
-                        <div 
-                          key={product.id} 
-                          className="group flex-1 min-w-0 transition-all duration-500 hover:-translate-y-1"
-                          style={{ minWidth: `calc(${100 / productsPerView}% - ${(productsPerView - 1) * 24 / productsPerView}px)` }}
-                        >
-                          <div className="relative h-[300px] overflow-hidden rounded-lg mb-4 w-full">
-                            {product.thumbnail ? (
-                              <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
-                                <Image
-                                  src={product.thumbnail}
-                                  alt={product.title}
-                                  fill
-                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                  className="object-cover"
-                                  onError={(e) => {
-                                    // @ts-ignore - TypeScript doesn't know about currentTarget
-                                    e.currentTarget.src = fallbackImage;
-                                  }}
-                                />
+                {Array(totalProductPages).fill(0).map((_, pageIndex) => {
+                  const startIdx = pageIndex * productsPerView;
+                  const itemsToShow = featuredProducts.slice(startIdx, startIdx + productsPerView);
+                  
+                  return (
+                    <div 
+                      key={`product-page-${pageIndex}`} 
+                      className="min-w-full"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {itemsToShow.map((product, idx) => (
+                          <div 
+                            key={`${product.id}-${idx}`} 
+                            className="group transition-all duration-500 hover:-translate-y-1"
+                          >
+                            <div className="relative aspect-square overflow-hidden rounded-lg mb-4">
+                              {product.thumbnail ? (
+                                <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
+                                  <Image
+                                    src={product.thumbnail}
+                                    alt={product.title}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                    className="object-cover"
+                                    onError={(e) => {
+                                      // @ts-ignore - TypeScript doesn't know about currentTarget
+                                      e.currentTarget.src = fallbackImage;
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                  <span className="text-gray-400">No image available</span>
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
+                              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <Link href={`/${countryCode}/products/${product.handle}`}>
+                                  <AnimatedButton variant="gold" size="small" className="w-full">
+                                    View Details
+                                  </AnimatedButton>
+                                </Link>
                               </div>
-                            ) : (
-                              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                <span className="text-gray-400">No image available</span>
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
-                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <Link href={`/${countryCode}/products/${product.handle}`}>
-                                <AnimatedButton variant="gold" size="small" className="w-full">
-                                  View Details
-                                </AnimatedButton>
+                            </div>
+                            
+                            <div className="text-center">
+                              <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold transition-colors mb-1">
+                                <h3 className="font-serif text-xl line-clamp-1">{product.title}</h3>
                               </Link>
+                              
+                              {/* Display product price */}
+                              <div className="text-luxury-charcoal/90">
+                                {product.variants && product.variants[0] ? (
+                                  <ProductPrice 
+                                    product={product}
+                                    variant={product.variants[0]} 
+                                  />
+                                ) : (
+                                  <span>Price not available</span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <Link href={`/${countryCode}/products/${product.handle}`} className="block">
-                            <Text className="font-medium text-lg mb-1 group-hover:text-luxury-gold transition-colors duration-300 truncate">
-                              {product.title}
-                            </Text>
-                            {product.variants?.[0] && (
-                              <ProductPrice product={product} variant={product.variants[0]} />
-                            )}
-                          </Link>
-                        </div>
-                      ))
-                    }
-                  </div>
-                ))}
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             
-            {/* Navigation arrows */}
+            {/* Navigation buttons - only show if we have more than one page */}
             {totalProductPages > 1 && (
               <>
                 <button 
                   onClick={handlePrevProduct}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 lg:-translate-x-6 w-10 h-10 bg-white/90 shadow-md rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 lg:-translate-x-6 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
                   aria-label="Previous products"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
+                
                 <button 
                   onClick={handleNextProduct}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 lg:translate-x-6 w-10 h-10 bg-white/90 shadow-md rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 lg:translate-x-6 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
                   aria-label="Next products"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
               </>
             )}
-          </div>
-          
-          {/* Pagination dots */}
-          {totalProductPages > 1 && (
-            <div className="flex justify-center mt-8 gap-2">
-              {Array(totalProductPages).fill(0).map((_, i) => (
-                <button
-                  key={`dot-${i}`}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    currentProductIndex === i ? 'bg-luxury-gold w-4' : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                  onClick={() => setCurrentProductIndex(i)}
-                  aria-label={`Go to product page ${i + 1}`}
-                />
-              ))}
+            
+            {/* Pagination dots */}
+            {totalProductPages > 1 && (
+              <div className="flex justify-center mt-8 gap-2">
+                {Array(totalProductPages).fill(0).map((_, i) => (
+                  <button
+                    key={`dot-${i}`}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      currentProductIndex === i ? 'bg-luxury-gold w-4' : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                    onClick={() => {
+                      setCurrentProductIndex(i);
+                      setProductAutoRotate(false);
+                      if (productAutoRotateRef.current) {
+                        clearInterval(productAutoRotateRef.current);
+                      }
+                      setTimeout(() => setProductAutoRotate(true), 10000);
+                    }}
+                    aria-label={`Go to product page ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {/* View all button */}
+            <div className="text-center mt-10">
+              <Link href={`/${countryCode}/products`}>
+                <AnimatedButton variant="outline" size="medium">
+                  View All Products
+                </AnimatedButton>
+              </Link>
             </div>
-          )}
-          
-          {/* View all button */}
-          <div className="text-center mt-10">
-            <Link href={`/${countryCode}/products`}>
-              <AnimatedButton variant="outline" size="medium">
-                View All Products
-              </AnimatedButton>
-            </Link>
           </div>
         </div>
       </section>
