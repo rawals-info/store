@@ -6,15 +6,17 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 export function Pagination({
   page,
   totalPages,
+  searchParams: customParams,
   'data-testid': dataTestid
 }: {
   page: number
   totalPages: number
+  searchParams?: URLSearchParams
   'data-testid'?: string
 }) {
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const urlSearchParams = useSearchParams()
 
   // Helper function to generate an array of numbers within a range
   const arrayRange = (start: number, stop: number) =>
@@ -22,7 +24,7 @@ export function Pagination({
 
   // Function to handle page changes
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(customParams || urlSearchParams)
     params.set("page", newPage.toString())
     router.push(`${pathname}?${params.toString()}`)
   }

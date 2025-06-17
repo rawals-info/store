@@ -2,8 +2,8 @@ import { NextResponse } from "next/server"
 import { retrieveCart } from "@lib/data/cart"
 
 // Update the caching strategy to be more efficient
-// Use default dynamic behavior instead of force-dynamic
-export const dynamic = "default"
+// Use auto dynamic behavior which is the default option
+export const dynamic = "auto"
 
 // Small stale-while-revalidate window to prevent excessive requests
 export const revalidate = 3 // Revalidate after 3 seconds

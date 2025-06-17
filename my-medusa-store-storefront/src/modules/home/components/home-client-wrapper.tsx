@@ -11,6 +11,7 @@ import { Heading, Text } from "@medusajs/ui"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductPrice from "@modules/products/components/product-price"
+import CategoryCarousel from "./category-carousel"
 
 type HomeClientWrapperProps = {
   featuredProducts: any[]
@@ -382,150 +383,7 @@ export default function HomeClientWrapper({
       </section>
       
       {/* Category Carousel Section */}
-      <section className="py-16 bg-white relative overflow-hidden w-full">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-luxury-gold opacity-5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-luxury-gold opacity-5 rounded-full blur-3xl"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 relative z-10 w-full box-border">
-          <ScrollReveal>
-            <div className="text-center mb-12">
-              <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif">
-                Shop by Category
-              </Heading>
-              <div className="h-px w-24 bg-luxury-gold mx-auto mb-4"></div>
-              <Text className="text-luxury-charcoal/80 max-w-xl mx-auto">
-                Explore our curated collection of handcrafted marble pieces
-              </Text>
-            </div>
-          </ScrollReveal>
-          
-          {/* Always display as carousel */}
-          {(!parentCategories || parentCategories.length === 0) ? (
-            <div className="text-center">
-              <Text className="text-luxury-charcoal/80">
-                Categories coming soon...
-              </Text>
-            </div>
-          ) : (
-            <div className="relative w-full">
-              {/* Category cards */}
-              <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-lg w-full">
-                {parentCategories.map((category, index) => {
-                  const bgGradient = bgGradients[index % bgGradients.length]
-                  const categoryImage = getCategoryImage(category.handle)
-                  
-                  return (
-                    <motion.div
-                      key={category.id}
-                      className="absolute inset-0 flex items-center justify-center"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ 
-                        opacity: currentIndex === index ? 1 : 0,
-                        scale: currentIndex === index ? 1 : 0.9,
-                        zIndex: currentIndex === index ? 10 : 0
-                      }}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <div className="w-full h-full relative overflow-hidden rounded-lg">
-                        {/* Background image or gradient */}
-                        {categoryImage ? (
-                          <div className="absolute inset-0">
-                            <Image 
-                              src={categoryImage}
-                              alt={category.name}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 1024px) 100vw, 1024px"
-                            />
-                            <div className="absolute inset-0 bg-black/40"></div>
-                          </div>
-                        ) : (
-                          <div className={`absolute inset-0 bg-gradient-to-br ${bgGradient}`}></div>
-                        )}
-                        
-                        {/* Content overlay */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-20">
-                          <motion.h3 
-                            className="text-3xl md:text-4xl mb-4 text-white font-serif"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2, duration: 0.6 }}
-                          >
-                            {category.name}
-                          </motion.h3>
-                          
-                          {category.description && (
-                            <motion.p 
-                              className="mb-8 text-white/90 max-w-md text-base md:text-lg"
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.3, duration: 0.6 }}
-                            >
-                              {category.description}
-                            </motion.p>
-                          )}
-                          
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.6 }}
-                          >
-                            <LocalizedClientLink href={`/${countryCode}/categories/${category.handle}`}>
-                              <AnimatedButton variant="gold" size="large">
-                                View Collection
-                              </AnimatedButton>
-                            </LocalizedClientLink>
-                          </motion.div>
-                        </div>
-                        
-                        {/* Decorative corner elements */}
-                        <div className="absolute top-8 right-8 w-12 h-12 border-t border-r border-white/30"></div>
-                        <div className="absolute bottom-8 left-8 w-12 h-12 border-b border-l border-white/30"></div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
-              
-              {/* Navigation buttons */}
-              <button 
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/80 rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-white transition-colors z-20"
-                onClick={handlePrev}
-                aria-label="Previous category"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              
-              <button 
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/80 rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-white transition-colors z-20"
-                onClick={handleNext}
-                aria-label="Next category"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              
-              {/* Dots indicator */}
-              <div className="flex justify-center mt-6 gap-2">
-                {parentCategories.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-3 h-3 rounded-full transition-colors ${
-                      currentIndex === index ? 'bg-luxury-gold' : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    onClick={() => handleNavigation(index)}
-                    aria-label={`Go to category ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+      <CategoryCarousel categories={categories} countryCode={countryCode} />
     </div>
   )
 }

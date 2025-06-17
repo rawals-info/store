@@ -11,7 +11,7 @@ export default function ProductPreview({
 }: {
   product: HttpTypes.StoreProduct
   isFeatured?: boolean
-  region: HttpTypes.StoreRegion
+  region?: HttpTypes.StoreRegion
 }) {
   console.log("ProductPreview: Rendering product", {
     id: product.id,
@@ -81,7 +81,7 @@ export default function ProductPreview({
   // Make sure product handle is available
   const productHandle = product.handle || `product-${product.id}`
   
-  // Get country code from region
+  // Get country code from region or default to "us"
   const countryCode = region?.countries?.[0]?.iso_2 || "us"
 
   // Prepare debug payload

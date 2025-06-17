@@ -11,14 +11,20 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CurrencySwitcher from "@modules/layout/components/currency-switcher"
 import { usePathname } from "next/navigation"
+import SearchBar from "@modules/search/components/search-bar"
+import CategoryDropdown from "@modules/layout/components/category-dropdown/index"
 
 const AnimatedHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [regions, setRegions] = useState<StoreRegion[]>([])
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false)
   const { scrollY } = useScroll()
   const pathname = usePathname()
+  
+  // Extract country code from pathname
+  const countryCode = pathname?.split('/')[1] || 'us'
   
   // Check if we're on the homepage (root country path)
   const isHomePage = pathname?.split('/').length === 2
@@ -42,7 +48,8 @@ const AnimatedHeader = () => {
   
   // Navigation links data with refined labeling
   const navLinks = [
-    { href: "/", label: "Shop", testId: "nav-shop-link" },
+    { href: "/", label: "Home", testId: "nav-home-link" },
+    { href: "/products", label: "Shop", testId: "nav-shop-link" },
     { href: "/categories", label: "Categories", testId: "nav-categories-link" },
     { href: "/about", label: "About", testId: "nav-about-link" },
   ]
@@ -178,36 +185,68 @@ const AnimatedHeader = () => {
               
               {/* Navigation links - desktop */}
               <div className="hidden small:flex items-center gap-x-8 h-full">
-                {navLinks.map((link) => (
-                  <motion.div 
-                    key={link.href} 
-                    className="relative"
-                    whileHover="hover"
-                    variants={linkVariants}
-                  >
-                    <LocalizedClientLink
-                      className={`font-medium text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
-                        isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
-                      }`}
-                      href={link.href}
-                      data-testid={link.testId}
-                      onMouseEnter={() => setHoveredLink(link.href)}
-                      onMouseLeave={() => setHoveredLink(null)}
+                {navLinks.map((link, i) => {
+                  // Check if this is the Categories link
+                  const isCategories = link.href === "/categories"
+                  
+                  return (
+                    <motion.div 
+                      key={link.href} 
+                      className={`relative ${isCategories ? 'static md:relative' : ''}`}
+                      whileHover="hover"
+                      variants={linkVariants}
+                      onMouseEnter={() => {
+                        setHoveredLink(link.href)
+                        if (isCategories) setCategoryDropdownOpen(true)
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredLink(null)
+                        if (isCategories) setTimeout(() => setCategoryDropdownOpen(false), 300)
+                      }}
                     >
-                      {link.label}
-                    </LocalizedClientLink>
-                    {hoveredLink === link.href && (
-                      <motion.div 
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-luxury-gold"
-                        layoutId="underline"
-                        initial={{ width: 0, opacity: 0, left: "25%" }}
-                        animate={{ width: "100%", opacity: 1, left: 0 }}
-                        exit={{ width: 0, opacity: 0, left: "75%" }}
-                        transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
-                      />
-                    )}
-                  </motion.div>
-                ))}
+                      <LocalizedClientLink
+                        className={`text-sm hover:text-luxury-gold transition-colors duration-300 tracking-wider py-2 flex items-center ${
+                          isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
+                        }`}
+                        href={link.href}
+                        data-testid={link.testId}
+                      >
+                        {link.label}
+                        {isCategories && (
+                          <svg 
+                            className={`inline-block ml-1 w-3 h-3 transition-transform duration-300 ${categoryDropdownOpen ? 'rotate-180' : ''}`} 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24" 
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
+                          </svg>
+                        )}
+                      </LocalizedClientLink>
+                      {hoveredLink === link.href && (
+                        <motion.div 
+                          className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
+                          layoutId="underline"
+                          initial={{ width: 0, opacity: 0, left: "25%" }}
+                          animate={{ width: "100%", opacity: 1, left: 0 }}
+                          exit={{ width: 0, opacity: 0, left: "75%" }}
+                          transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
+                        />
+                      )}
+                      
+                      {/* Render category dropdown if this is the Categories link */}
+                      {isCategories && (
+                        <CategoryDropdown 
+                          countryCode={countryCode}
+                          isOpen={categoryDropdownOpen}
+                          onMouseEnter={() => setCategoryDropdownOpen(true)}
+                          onMouseLeave={() => setCategoryDropdownOpen(false)}
+                        />
+                      )}
+                    </motion.div>
+                  )
+                })}
               </div>
             </div>
 
@@ -240,8 +279,17 @@ const AnimatedHeader = () => {
             
             {/* Right side items: Account, Cart, etc. */}
             <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
+              {/* Search Bar - Added to desktop view */}
+              <div className="hidden small:block w-40 md:w-60">
+                <SearchBar
+                  isHomePage={isHomePage}
+                  isScrolled={isScrolled}
+                  autoSearch={true}
+                />
+              </div>
+              
               <div className="hidden small:flex items-center gap-x-6">
-                {rightLinks.map((link) => (
+                {rightLinks.map((link, i) => (
                   <motion.div 
                     key={link.href} 
                     className="relative"
@@ -356,6 +404,17 @@ const AnimatedHeader = () => {
                   </nav>
                   <div className="h-px w-full bg-luxury-lightgold/20 my-6" />
                   <div className="flex flex-col gap-y-6 w-full">
+                    {/* Add Search to mobile menu */}
+                    <motion.div
+                      custom={navLinks.length + rightLinks.length}
+                      initial="closed"
+                      animate="open"
+                      variants={menuVariants}
+                      className="w-full"
+                    >
+                      <SearchBar autoSearch={true} />
+                    </motion.div>
+                    
                     <motion.div
                       custom={navLinks.length + rightLinks.length + 1}
                       initial="closed"
