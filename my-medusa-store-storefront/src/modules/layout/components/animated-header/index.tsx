@@ -186,45 +186,35 @@ const AnimatedHeader = () => {
               {/* Navigation links - desktop */}
               <div className="hidden small:flex items-center gap-x-8 h-full">
                 {navLinks.map((link, i) => {
-                  // Check if this is the Categories link
+                  const isActive = pathname === link.href || 
+                    (link.href !== "/" && pathname?.startsWith(link.href))
                   const isCategories = link.href === "/categories"
                   
                   return (
                     <motion.div 
                       key={link.href} 
-                      className={`relative ${isCategories ? 'static md:relative' : ''}`}
+                      className="relative"
                       whileHover="hover"
                       variants={linkVariants}
-                      onMouseEnter={() => {
-                        setHoveredLink(link.href)
-                        if (isCategories) setCategoryDropdownOpen(true)
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredLink(null)
-                        if (isCategories) setTimeout(() => setCategoryDropdownOpen(false), 300)
-                      }}
                     >
                       <LocalizedClientLink
-                        className={`text-sm hover:text-luxury-gold transition-colors duration-300 tracking-wider py-2 flex items-center ${
+                        className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
                           isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
-                        }`}
+                        } ${isActive ? "text-luxury-gold" : ""}`}
                         href={link.href}
                         data-testid={link.testId}
+                        onMouseEnter={() => {
+                          setHoveredLink(link.href)
+                          if (isCategories) setCategoryDropdownOpen(true)
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredLink(null)
+                          if (isCategories) setCategoryDropdownOpen(false)
+                        }}
                       >
                         {link.label}
-                        {isCategories && (
-                          <svg 
-                            className={`inline-block ml-1 w-3 h-3 transition-transform duration-300 ${categoryDropdownOpen ? 'rotate-180' : ''}`} 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24" 
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
-                          </svg>
-                        )}
                       </LocalizedClientLink>
-                      {hoveredLink === link.href && (
+                      {(hoveredLink === link.href || isActive) && (
                         <motion.div 
                           className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
                           layoutId="underline"
@@ -237,12 +227,14 @@ const AnimatedHeader = () => {
                       
                       {/* Render category dropdown if this is the Categories link */}
                       {isCategories && (
-                        <CategoryDropdown 
-                          countryCode={countryCode}
-                          isOpen={categoryDropdownOpen}
-                          onMouseEnter={() => setCategoryDropdownOpen(true)}
-                          onMouseLeave={() => setCategoryDropdownOpen(false)}
-                        />
+                        <div className="relative">
+                          <CategoryDropdown 
+                            countryCode={countryCode}
+                            isOpen={categoryDropdownOpen}
+                            onMouseEnter={() => setCategoryDropdownOpen(true)}
+                            onMouseLeave={() => setCategoryDropdownOpen(false)}
+                          />
+                        </div>
                       )}
                     </motion.div>
                   )

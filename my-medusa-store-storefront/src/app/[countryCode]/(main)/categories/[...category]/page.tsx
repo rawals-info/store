@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { cache } from "react"
 import { Suspense } from "react"
 
@@ -23,8 +23,32 @@ export const revalidate = 60 // Revalidate every 60 seconds
 
 // Cache category data to prevent redundant fetches
 const getCachedCategory = cache(async (handle: string) => {
-  return await getCategoryByHandle(handle);
+  try {
+    return await getCategoryByHandle(handle);
+  } catch (error) {
+    console.error(`Error fetching category with handle ${handle}:`, error);
+    // Return null instead of calling notFound() to allow fallback handling
+    return null;
+  }
 });
+
+// Function to find similar category handles
+async function findSimilarCategory(handle: string) {
+  try {
+    // Get all categories
+    const allCategories = await listCategories();
+    
+    // Check if there's a similar category (e.g., "marble-table" vs "marble-table-top")
+    const similarCategory = allCategories.find(c => 
+      c.handle?.includes(handle) || handle.includes(c.handle || '')
+    );
+    
+    return similarCategory;
+  } catch (error) {
+    console.error("Error finding similar category:", error);
+    return null;
+  }
+}
 
 export async function generateStaticParams() {
   const categories = await listCategories()
@@ -59,7 +83,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const categoryObj = await getCachedCategory(categoryHandle);
 
     if (!categoryObj) {
-      return notFound()
+      // Try to find a similar category before giving up
+      const similarCategory = await findSimilarCategory(categoryHandle);
+      
+      if (similarCategory) {
+        return {
+          title: `${similarCategory.name} | Luxury Marble Collection`,
+          description: similarCategory.description || `Browse our exclusive ${similarCategory.name.toLowerCase()} collection, handcrafted by master artisans for your luxury home.`,
+        };
+      }
+      
+      return {
+        title: "Category | Luxury Marble Collection",
+        description: "Browse our exclusive marble collection, handcrafted by master artisans for your luxury home.",
+      };
     }
 
     return {
@@ -102,7 +139,27 @@ export default async function CategoryPage({
     const categoryObj = await getCachedCategory(categoryHandle);
 
     if (!categoryObj) {
-      return notFound()
+      // Try to find a similar category
+      const similarCategory = await findSimilarCategory(categoryHandle);
+      
+      if (similarCategory) {
+        // Redirect to the correct category URL
+        console.log(`Redirecting from ${categoryHandle} to ${similarCategory.handle}`);
+        redirect(`/${countryCode}/categories/${similarCategory.handle}`);
+      }
+      
+      // If no similar category found, show a helpful not found page
+      return (
+        <div className="py-8 px-4">
+          <h2 className="text-2xl font-bold">Category not found</h2>
+          <p className="mt-4 text-gray-500">
+            We couldn't find the category "{categoryHandle}". Please check the URL or browse our available categories.
+          </p>
+          <a href={`/${countryCode}/categories`} className="mt-4 inline-block py-2 px-4 bg-luxury-gold text-white rounded hover:bg-luxury-gold/90 transition-colors">
+            Browse All Categories
+          </a>
+        </div>
+      );
     }
 
     return (

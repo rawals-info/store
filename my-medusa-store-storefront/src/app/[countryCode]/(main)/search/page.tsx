@@ -35,7 +35,7 @@ export async function generateMetadata({
   params, 
   searchParams 
 }: SearchPageProps): Promise<Metadata> {
-  const query = searchParams.q || ""
+  const query = (await searchParams.q) || ""
   
   return {
     title: query ? `Search results for "${query}"` : "Search Results",
@@ -57,11 +57,6 @@ async function SearchContent({
 }) {
   const parsedPage = parseInt(pageNum, 10)
   const offset = (parsedPage - 1) * PRODUCT_LIMIT
-
-  // Special case for chess searches
-  if (query.toLowerCase().includes('chess')) {
-    console.log('[SEARCH DEBUG] Chess search detected, preparing fallback')
-  }
 
   // Get categories for suggested browsing
   const categories: Category[] = await listCategories().catch(err => {
@@ -94,9 +89,8 @@ async function SearchContent({
   let regions: StoreRegion[] = []
   try {
     regions = await listRegions()
-    console.log(`[SEARCH DEBUG] Found ${regions.length} regions`)
   } catch (error) {
-    console.error("[SEARCH DEBUG] Error fetching regions:", error)
+    console.error("Error fetching regions:", error)
   }
 
   // Even if we can't find the exact region, attempt the search anyway with available info
@@ -104,11 +98,7 @@ async function SearchContent({
     (r) => r.countries?.find((c) => c.iso_2 === countryCode.toLowerCase())
   )
 
-  console.log(`[SEARCH DEBUG] Selected region:`, region?.name || "Not found")
-
-  try {
-    console.log(`[SEARCH DEBUG] Starting search for "${query}" in ${countryCode}`)
-    
+  try {    
     const { products, count } = await searchProducts({
       query,
       limit: PRODUCT_LIMIT,
@@ -116,22 +106,6 @@ async function SearchContent({
       countryCode,
       filter: region ? { region_id: region.id } : {},
     })
-
-    console.log(`[SEARCH DEBUG] Search completed. Found ${count} products`)
-
-    // Special case for chess - if no results but search is for chess, redirect to category
-    if (count === 0 && query.toLowerCase().includes('chess')) {
-      console.log('[SEARCH DEBUG] No chess results found, redirecting to chess category')
-      // Find chess category
-      const chessCategory = categories.find(c => 
-        (c.name?.toLowerCase() || '').includes('chess') || 
-        (c.handle?.toLowerCase() || '').includes('chess')
-      )
-      
-      if (chessCategory) {
-        return redirect(`/${countryCode}/categories/${chessCategory.handle}`)
-      }
-    }
 
     const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
@@ -150,7 +124,10 @@ async function SearchContent({
                   {products.map((product) => (
                     <li key={product.id}>
                       <Suspense fallback={<div className="aspect-[9/16] bg-luxury-ivory/50 rounded-sm animate-pulse"></div>}>
-                        <ProductPreview product={product} region={region} />
+                        <ProductPreview 
+                          product={product} 
+                          region={region} 
+                        />
                       </Suspense>
                     </li>
                   ))}
@@ -205,7 +182,7 @@ async function SearchContent({
       </div>
     )
   } catch (error) {
-    console.error("[SEARCH DEBUG] Error during search:", error);
+    console.error("Error during search:", error);
     return (
       <div className="py-10">
         <div className="content-container">
@@ -226,10 +203,10 @@ async function SearchContent({
 }
 
 // Main page component that uses the search content component
-export default function SearchPage({ params, searchParams }: SearchPageProps) {
-  const countryCode = params.countryCode
-  const query = searchParams.q || ""
-  const pageNum = searchParams.page || "1"
+export default async function SearchPage({ params, searchParams }: SearchPageProps) {
+  const countryCode = await params.countryCode
+  const query = (await searchParams.q) || ""
+  const pageNum = (await searchParams.page) || "1"
   
   return <SearchContent countryCode={countryCode} query={query} pageNum={pageNum} />
 } 

@@ -21,6 +21,7 @@ const CategoryDropdown = ({ countryCode, isOpen, onMouseEnter, onMouseLeave }: C
   // Parent category images mapping
   const categoryImages: Record<string, string> = {
     "table-top": "/category_table_top.webp",
+    "marble-table-top": "/category_table_top.webp",
     "jewelry": "/category_jewelry.webp",
     "home-decor": "/category_home_decor.webp", 
     "sculpture": "/category_sculpture.webp"
@@ -51,7 +52,7 @@ const CategoryDropdown = ({ countryCode, isOpen, onMouseEnter, onMouseLeave }: C
 
   return (
     <div 
-      className="absolute top-full left-0 z-50"
+      className="absolute top-full left-1/2 transform -translate-x-1/2 z-50"
       ref={dropdownRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

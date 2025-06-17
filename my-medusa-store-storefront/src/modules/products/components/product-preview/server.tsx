@@ -57,10 +57,12 @@ export default function ProductPreview({
 
   // Get direct price from variants if available
   let displayPrice = "Contact for price"
+  let priceValue = 0
   
   // First try to get price from cheapestPrice
   if (cheapestPrice?.calculated_price) {
     displayPrice = cheapestPrice.calculated_price
+    priceValue = cheapestPrice.calculated_price_number || 0
   } 
   // Fallback to direct variant prices if available
   else if (product.variants && product.variants.length > 0) {
@@ -68,12 +70,12 @@ export default function ProductPreview({
     if ((variant as any).prices && (variant as any).prices.length > 0) {
       const price = (variant as any).prices[0]
       if (price && price.amount) {
-        // Treat amount as whole currency units
-        const amount = price.amount
+        // Format the price with proper currency
+        priceValue = price.amount
         displayPrice = new Intl.NumberFormat('en-US', {
           style: 'currency',
-          currency: price.currency_code || 'USD'
-        }).format(amount)
+          currency: price.currency_code || 'EUR'
+        }).format(price.amount / 100) // Divide by 100 if needed (depends on API)
       }
     }
   }
@@ -176,7 +178,7 @@ export default function ProductPreview({
               
               <div className="flex items-center">
                 <Text className="text-luxury-gold font-medium text-sm">
-                  {displayPrice}
+                  {priceValue > 0 ? displayPrice : "Contact for price"}
                 </Text>
               </div>
             </div>
