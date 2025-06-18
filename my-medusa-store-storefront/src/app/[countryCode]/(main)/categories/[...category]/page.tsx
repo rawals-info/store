@@ -8,6 +8,7 @@ import { listRegions } from "@lib/data/regions"
 import { CategoryTemplate } from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import { getCategoryByLegacyHandle } from "@lib/config/categories"
 
 type Props = {
   params: { category: string[]; countryCode: string }
@@ -35,7 +36,13 @@ const getCachedCategory = cache(async (handle: string) => {
 // Function to find similar category handles
 async function findSimilarCategory(handle: string) {
   try {
-    // Get all categories
+    // First check our configuration for known legacy handles
+    const configCategory = getCategoryByLegacyHandle(handle);
+    if (configCategory) {
+      return { handle: configCategory.handle, name: configCategory.displayName };
+    }
+    
+    // If not in config, try to find a similar one by string matching
     const allCategories = await listCategories();
     
     // Check if there's a similar category (e.g., "marble-table" vs "marble-table-top")
@@ -89,7 +96,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       if (similarCategory) {
         return {
           title: `${similarCategory.name} | Luxury Marble Collection`,
-          description: similarCategory.description || `Browse our exclusive ${similarCategory.name.toLowerCase()} collection, handcrafted by master artisans for your luxury home.`,
+          description: 'description' in similarCategory && similarCategory.description 
+            ? similarCategory.description 
+            : `Browse our exclusive ${similarCategory.name.toLowerCase()} collection, handcrafted by master artisans for your luxury home.`,
         };
       }
       
@@ -136,6 +145,15 @@ export default async function CategoryPage({
     
     // Safe to use now that we've properly handled the async operations
     const categoryHandle = category[category.length - 1];
+    
+    // First check if this is a known legacy handle from our config
+    const configCategory = getCategoryByLegacyHandle(categoryHandle);
+    if (configCategory) {
+      console.log(`Redirecting from legacy handle ${categoryHandle} to ${configCategory.handle}`);
+      redirect(`/${countryCode}/categories/${configCategory.handle}`);
+    }
+    
+    // Then proceed with regular category lookup
     const categoryObj = await getCachedCategory(categoryHandle);
 
     if (!categoryObj) {

@@ -72,6 +72,16 @@ async function getCountryData() {
 export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl
+
+    // Check if the URL has Builder.io preview parameters
+    const isPreviewing =
+      request.nextUrl.searchParams.has("builder.preview") ||
+      request.nextUrl.searchParams.has("__builder_editing__");
+
+    // If the page is in Builder.io preview mode, skip redirect logic
+    if (isPreviewing) {
+      return NextResponse.next();
+    }
     
     // Get country data from backend (cached)
     const { validCountries, defaultCountry } = await getCountryData()
