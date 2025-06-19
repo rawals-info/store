@@ -3,132 +3,103 @@ import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
 
-// In-memory cache for categories to prevent redundant API calls
-const categoriesCache: Record<string, {
-  data: HttpTypes.StoreProductCategory[] | HttpTypes.StoreProductCategory,
-  timestamp: number
-}> = {}
+const getCategories = cache(async (
+  options: {
+    limit?: number
+    offset?: number
+    fields?: string
+    parent_category_id?: string | null
+  } = {}
+) => {
+  const { 
+    limit = 100, 
+    offset = 0, 
+    fields = "id,name,handle,description,category_children,parent_category",
+    parent_category_id = null
+  } = options
 
-// Cache duration in milliseconds (5 minutes)
-const CACHE_DURATION = 5 * 60 * 1000
+  const queryParams: any = { limit, offset, fields }
 
-/**
- * Fetches a list of categories with optional filters
- * @param options Options to filter categories by
- * @returns Array of categories
- */
-export const listCategories = cache(async (
+  if (parent_category_id !== null) {
+    queryParams.parent_category_id = parent_category_id
+  }
+
+  const { product_categories } = await sdk.client.fetch<{
+    product_categories: HttpTypes.StoreProductCategory[]
+  }>("/store/product-categories", {
+    query: queryParams,
+    next: {
+      tags: ["categories"],
+    },
+  })
+
+  if (!product_categories) {
+    return notFound()
+  }
+
+  return product_categories
+})
+
+export const listCategories = async (
   options: {
     limit?: number
     offset?: number
     fields?: string
   } = {}
-): Promise<HttpTypes.StoreProductCategory[]> => {
-  // Use a higher limit to ensure we get all categories
-  const { limit = 1000, offset = 0, fields = "id,name,handle,description,category_children,parent_category" } = options
-  
-  // Create a cache key based on the options
-  const cacheKey = `categories-list-${limit}-${offset}-${fields}`
-  
-  // Check if we have a valid cached response
-  const cachedData = categoriesCache[cacheKey]
-  if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
-    return cachedData.data as HttpTypes.StoreProductCategory[]
-  }
+) => {
+  return await getCategories({ ...options, parent_category_id: "null" })
+}
 
-  try {
-    console.log("Fetching all categories from API with params:", { limit, offset, fields })
-    
-    const { product_categories } = await sdk.client.fetch<{
-      product_categories: HttpTypes.StoreProductCategory[]
-    }>(
-      "/store/product-categories",
-      {
-        query: {
-          limit,
-          offset,
-          fields,
-        },
-        next: {
-          revalidate: 0, // Don't cache during development
-          tags: ["categories"],
-        },
-        cache: "no-store", // Don't use browser cache during development
-      }
-    )
-    
-    console.log("API returned categories:", product_categories?.length || 0)
-    
-    // Cache the response
-    if (product_categories) {
-      categoriesCache[cacheKey] = {
-        data: product_categories,
-        timestamp: Date.now()
-      }
-    }
+export const getCategoriesByParentId = async (
+  parentId: string,
+  options: {
+    limit?: number
+    offset?: number
+    fields?: string
+  } = {}
+) => {
+  return await getCategories({ ...options, parent_category_id: parentId })
+}
 
-    return product_categories || []
-  } catch (error) {
-    console.error("Error fetching categories:", error)
-    return []
-  }
-})
-
-/**
- * Fetches a category by handle
- * @param handle The handle of the category to fetch (string or string array)
- * @returns The category
- */
 export const getCategoryByHandle = cache(async (
   handle: string | string[]
 ): Promise<HttpTypes.StoreProductCategory> => {
-  // Handle both string and string array inputs
-  const categoryHandle = Array.isArray(handle) 
-    ? handle[handle.length - 1] 
-    : handle
+  const categoryHandle = Array.isArray(handle) ? handle[handle.length - 1] : handle
 
-  // Create a cache key based on the handle
-  const cacheKey = `category-${categoryHandle}`;
-  
-  // Check if we have a valid cached response
-  const cachedData = categoriesCache[cacheKey]
-  if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
-    return cachedData.data as HttpTypes.StoreProductCategory
-  }
+  const { product_categories } = await sdk.client.fetch<{
+    product_categories: HttpTypes.StoreProductCategory[]
+  }>("/store/product-categories", {
+    query: {
+      handle: categoryHandle,
+      fields: "*category_children, *products",
+    },
+    next: {
+      tags: ["categories"],
+    },
+  })
 
-  try {
-    const { product_categories } = await sdk.client.fetch<{
-      product_categories: HttpTypes.StoreProductCategory[]
-    }>(
-      "/store/product-categories",
-      {
-        query: {
-          handle: categoryHandle,
-          fields: "*category_children, *products",
-        },
-        next: {
-          revalidate: 60, // Cache for 60 seconds
-          tags: ["categories", cacheKey],
-        },
-        cache: "force-cache", // Use force-cache to avoid duplicate requests
-      }
-    )
+  const category = product_categories?.[0]
 
-    const category = product_categories?.[0]
-
-    if (!category) {
-      notFound()
-    }
-    
-    // Cache the response
-    categoriesCache[cacheKey] = {
-      data: category,
-      timestamp: Date.now()
-    }
-
-    return category
-  } catch (error) {
-    console.error(`Error fetching category with handle ${categoryHandle}:`, error)
+  if (!category) {
     notFound()
   }
+
+  return category
+})
+
+export const getCachedCategories = cache(async () => {
+  // To avoid fetching all categories at once, let's fetch only top-level ones
+  const topLevelCategories = await listCategories()
+
+  // For each top-level category, fetch its children
+  const withChildren = await Promise.all(
+    topLevelCategories.map(async (c) => {
+      if (c.id) {
+        c.category_children = await getCategoriesByParentId(c.id)
+      }
+      return c
+    })
+  )
+
+  return withChildren
 })
