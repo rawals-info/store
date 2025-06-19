@@ -2,23 +2,14 @@
 
 import { Text } from "@medusajs/ui"
 import { CalculatedVariant } from "@lib/util/get-product-price"
+import { clx } from "@medusajs/ui"
+import { convertToLocale } from "@lib/util/money"
 
 export default function PreviewPrice({
   price,
 }: {
   price: CalculatedVariant
 }) {
-  // Add debug logging in dev mode
-  if (process.env.NODE_ENV === 'development') {
-    console.log("PreviewPrice - rendering price:", {
-      price_type: price.price_type,
-      calculated_price: price.calculated_price,
-      original_price: price.original_price,
-      calculated_price_number: price.calculated_price_number,
-      original_price_number: price.original_price_number,
-    })
-  }
-  
   // Handle case where price might not be available
   if (!price || !price.calculated_price || price.calculated_price_number === 0) {
     return (
@@ -36,7 +27,12 @@ export default function PreviewPrice({
     price.original_price_number > price.calculated_price_number
 
   return (
-    <div className="font-serif flex flex-col items-end">
+    <div
+      className={clx("font-serif flex flex-col items-end", {
+        "text-luxury-gold": price.price_type === "sale",
+        "text-luxury-charcoal/90": price.price_type !== "sale",
+      })}
+    >
       {isSale && (
         <Text className="text-ui-fg-muted line-through text-small-regular">
           {price.original_price}

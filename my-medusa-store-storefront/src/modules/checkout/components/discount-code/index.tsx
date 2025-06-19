@@ -54,7 +54,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   return (
     <div className="w-full flex flex-col">
       <div className="text-[#8a7f72]">
-        <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
+        <form action={formAction} className="w-full mb-5">
           <Label className="flex gap-x-1 my-2 items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -126,7 +126,13 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                               "percentage"
                                 ? `${promotion.application_method.value}%`
                                 : convertToLocale({
-                                    amount: promotion.application_method.value,
+                                    amount:
+                                      typeof promotion.application_method
+                                        .value === "string"
+                                        ? parseInt(
+                                            promotion.application_method.value
+                                          )
+                                        : promotion.application_method.value,
                                     currency_code:
                                       promotion.application_method
                                         .currency_code,

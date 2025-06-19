@@ -32,18 +32,6 @@ export const getPricesForVariant = (variant: any) => {
     }
   }
 
-  // Logging variant data in development to help debug prices
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Variant pricing data:', {
-      variant_id: variant.id,
-      variant_title: variant.title,
-      variant_sku: variant.sku,
-      amount: variant.amount,
-      prices: variant.prices,
-      calculated_price: variant.calculated_price,
-    })
-  }
-
   // Get the requested currency from calculated_price or fallback to USD
   const requestedCurrency = (variant.calculated_price?.currency_code || 'USD').toUpperCase()
   

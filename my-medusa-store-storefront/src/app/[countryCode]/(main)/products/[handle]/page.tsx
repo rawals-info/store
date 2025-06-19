@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
-import { batchFetch } from "@lib/util/batch-fetch"
+import { getProductData } from "@lib/data/products"
 import ProductTemplate from "@modules/products/templates"
 import { Suspense } from "react"
 import SkeletonProductPage from "@modules/skeletons/templates/skeleton-product-page"
@@ -58,96 +58,66 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata(props: Props): Promise<Metadata> {
-  const paramsData = await props.params
-  const { countryCode, handle } = paramsData
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  try {
+    const { product } = await getProductData(params.handle, params.countryCode)
 
-  // Use batch fetch for metadata generation
-  const responses = await batchFetch([
-    {
-      path: `/store/regions`,
-      cacheTags: ["regions"],
-      cacheRevalidate: 60
-    },
-    {
-      path: `/store/products`,
-      query: { 
-        limit: 1,
-        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories,+variants.options,+variants.sku,+options,+options.values",
-        handle: handle 
-      },
-      cacheTags: ["products"],
-      cacheRevalidate: 60
+    if (!product) {
+      return notFound()
     }
-  ])
 
-  const regionResponse = (responses[0].data as any)
-  const regions = regionResponse?.regions || []
-  const region = regions.find((r: any) => r.countries.some((c: any) => c.iso_2 === countryCode))
-  
-  const productResponse = (responses[1].data as any)
-  const product = productResponse?.products?.[0]
-
-  if (!region || !product) {
-    notFound()
-  }
-
-  return {
-    title: `${product.title} | Marble Luxe`,
-    description: product.description?.substring(0, 160) || `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
-    openGraph: {
+    return {
       title: `${product.title} | Marble Luxe`,
-      description: product.description?.substring(0, 160) || `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
-      images: product.thumbnail ? [product.thumbnail] : [],
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-    },
+      description:
+        product.description?.substring(0, 160) ||
+        `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
+      openGraph: {
+        title: `${product.title} | Marble Luxe`,
+        description:
+          product.description?.substring(0, 160) ||
+          `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
+        images: product.thumbnail ? [product.thumbnail] : [],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+      },
+    }
+  } catch (error) {
+    console.error(`Error generating metadata for product ${params.handle}:`, error)
+    return {
+      title: "Product not found",
+    }
   }
 }
 
-export default async function ProductPage(props: Props) {
-  const paramsData = await props.params
-  const { countryCode, handle } = paramsData
-  
-  // Use batch fetch instead of parallelFetch to reduce API calls
-  const responses = await batchFetch([
-    {
-      path: `/store/regions`,
-      cacheTags: ["regions"],
-      cacheRevalidate: 60
-    },
-    {
-      path: `/store/products`,
-      query: { 
-        limit: 1,
-        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,+categories,+variants.options,+variants.sku,+options,+options.values",
-        handle: handle
-      },
-      cacheTags: ["products"],
-      cacheRevalidate: 60
+export default async function ProductPage({
+  params,
+}: {
+  params: { handle: string; countryCode: string }
+}) {
+  try {
+    const { product, region } = await getProductData(
+      params.handle,
+      params.countryCode
+    )
+
+    if (!product || !region) {
+      return notFound()
     }
-  ])
 
-  const regionResponse = (responses[0].data as any)
-  const regions = regionResponse?.regions || []
-  const region = regions.find((r: any) => r.countries.some((c: any) => c.iso_2 === countryCode))
-  
-  const productResponse = (responses[1].data as any)
-  const pricedProduct = productResponse?.products?.[0]
-
-  if (!region || !pricedProduct) {
-    notFound()
+    return (
+      <Suspense fallback={<SkeletonProductPage />}>
+        <ProductTemplate
+          product={product}
+          region={region}
+          countryCode={params.countryCode}
+        />
+      </Suspense>
+    )
+  } catch (error) {
+    console.error(`Error in ProductPage for handle ${params.handle}:`, error)
+    // You can return a more user-friendly error page here
+    return <div>Error loading product. Please try again later.</div>
   }
-
-  return (
-    <Suspense fallback={<SkeletonProductPage />}>
-      <ProductTemplate
-        product={pricedProduct}
-        region={region}
-        countryCode={countryCode}
-      />
-    </Suspense>
-  )
 }

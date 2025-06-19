@@ -18,7 +18,7 @@ interface BuilderPageProps {
 }
 
 export default async function BuilderPage({ params }: BuilderPageProps) {
-  const { countryCode, page = [] } = params;
+  const { countryCode, page = [] } = await params;
   const urlPath = `/${page.join("/")}`.replace(/\/$/, "");
 
   const content = await builder

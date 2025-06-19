@@ -106,16 +106,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   // Fetch tags
   let tagsList: any[] = []
   try {
-    const tagsResponse = await sdk.client.fetch<{ tags: any[] }>(
-      "/store/products/tag-usage",
-      {
-        next: {
-          revalidate: 60,
-          tags: ['tags'],
-        }
-      }
-    )
-    tagsList = tagsResponse.tags || []
+    tagsList = await listTags()
   } catch (error) {
     console.error("Error fetching tags:", error)
   }

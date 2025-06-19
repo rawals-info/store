@@ -99,59 +99,6 @@ export default async function PaginatedProducts({
     
     const { products, count } = response
     
-    // If no products found in the category, fetch all products instead
-    if (products.length === 0 && categoryId) {
-      console.log("No products found in category, fetching all products instead")
-      
-      // Create a new query without category filter
-      const allProductsQuery = { ...queryParams }
-      delete allProductsQuery.category_id
-      
-      const allProductsResult = await listProductsWithSort({
-        page,
-        queryParams: allProductsQuery,
-        sortBy,
-        countryCode,
-      })
-      
-      if (allProductsResult.response.products.length > 0) {
-        const totalPages = Math.ceil(allProductsResult.response.count / PRODUCT_LIMIT)
-        
-        return (
-          <>
-            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-sm">
-              <p className="text-sm text-amber-800">
-                No products found in this category. Showing all available products instead.
-              </p>
-            </div>
-            
-            <Suspense fallback={<ProductListSkeleton count={PRODUCT_LIMIT} />}>
-              <ul
-                className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-4 gap-y-8"
-                data-testid="products-list"
-              >
-                {allProductsResult.response.products.map((p) => (
-                  <li key={p.id}>
-                    <Suspense fallback={<div className="aspect-[9/16] bg-luxury-ivory/50 rounded-sm animate-pulse"></div>}>
-                      <ProductPreview product={p} region={region} />
-                    </Suspense>
-                  </li>
-                ))}
-              </ul>
-            </Suspense>
-            
-            {totalPages > 1 && (
-              <Pagination
-                data-testid="product-pagination"
-                page={page}
-                totalPages={totalPages}
-              />
-            )}
-          </>
-        )
-      }
-    }
-
     const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
     // If no products found, show a message

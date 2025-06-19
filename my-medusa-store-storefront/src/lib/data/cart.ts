@@ -47,7 +47,6 @@ export async function retrieveCart(cartId?: string) {
       },
       headers,
       next,
-      cache: "default", // Use default caching behavior instead of force-cache
     })
     .then(({ cart }) => {
       // Mark cart items and variants to help identify them in price calculations
@@ -81,21 +80,6 @@ export async function getOrSetCart(countryCode: string) {
 
   // Build parameters for cart creation: always include region, optionally sales_channel_id
   const createParams: Record<string, any> = { region_id: region.id }
-  try {
-    const response = await sdk.client.fetch<{ sales_channels: Array<{ id: string; name: string }> }>("/store/sales-channels", {
-      method: "GET",
-      headers,
-    })
-    if (response.sales_channels?.length) {
-      const defaultChannel = response.sales_channels.find((c) => c.name === "Default Sales Channel")?.id
-        ?? response.sales_channels[0].id
-      if (defaultChannel) {
-        createParams.sales_channel_id = defaultChannel
-      }
-    }
-  } catch (error) {
-    console.error("Error fetching sales channels, skipping sales_channel_id:", error)
-  }
 
   if (!cart) {
     try {

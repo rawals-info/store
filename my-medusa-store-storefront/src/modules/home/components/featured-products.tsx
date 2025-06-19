@@ -9,93 +9,30 @@ import ScrollReveal from "@modules/common/components/scroll-reveal"
 import AnimatedButton from "@modules/common/components/animated-button"
 import Link from "next/link"
 import { HttpTypes } from "@medusajs/types"
+import { notFound } from "next/navigation"
+import { Region } from "@medusajs/medusa"
 
-export default async function FeaturedProducts({ countryCode }: { countryCode: string }) {
-  console.log("FeaturedProducts: Starting to fetch featured products")
-  
-  // Fetch region
-  const region = await getRegion(countryCode)
+export default async function FeaturedProducts({
+  region,
+  countryCode,
+}: {
+  region: HttpTypes.StoreRegion
+  countryCode: string
+}) {
+  const featuredCollection = await getCollectionByHandle(
+    "featured-products"
+  ).catch(() => null)
 
-  if (!region) {
-    console.log("FeaturedProducts: No region found for countryCode", countryCode)
-    return null
+  if (!featuredCollection) {
+    return notFound()
   }
-  
-  console.log("FeaturedProducts: Region found", region.name)
-  
-  // First try to fetch all collections to debug
-  let collections: HttpTypes.StoreCollection[] = []
-  try {
-    const result = await listCollections()
-    collections = result.collections
-    console.log("Available collections:", collections.map(c => ({ 
-      id: c.id, 
-      handle: c.handle, 
-      title: c.title 
-    })))
-  } catch (error) {
-    console.error("Error listing collections:", error)
-  }
-  
-  // Try to fetch products from a featured collection first
-  let displayProducts: HttpTypes.StoreProduct[] = []
-  let collectionTitle = "Featured Products"
-  
-  // Try to find a collection with "featured" in the handle
-  const featuredCollection = collections.find(c => 
-    c.handle?.includes("featured") || 
-    c.title?.toLowerCase().includes("featured")
-  )
-  
-  if (featuredCollection) {
-    try {
-      console.log("Found featured collection:", featuredCollection.title)
-      collectionTitle = featuredCollection.title
-      
-      // Get the products from this collection
-      const collection = await getCollectionByHandle(featuredCollection.handle)
-      if (collection && collection.products && collection.products.length > 0) {
-        displayProducts = collection.products as HttpTypes.StoreProduct[]
-        console.log(`Found ${displayProducts.length} products in featured collection`)
-      }
-    } catch (error) {
-      console.error("Error fetching featured collection products:", error)
-    }
-  }
-  
-  // If no products found in collections, fetch any products
-  if (displayProducts.length === 0) {
-    try {
-      console.log("No products in featured collection, fetching any products")
-      // Simplified query without tags to avoid errors
-      const { response } = await listProducts({
-        countryCode,
-        queryParams: { 
-          limit: 8,
-        },
-        isDetailed: true
-      })
-      
-      displayProducts = response.products
-      console.log(`Found ${displayProducts.length} products as fallback`)
-      
-      // Debug: log some info about the products
-      if (displayProducts.length > 0) {
-        const firstProduct = displayProducts[0]
-        console.log("First product:", {
-          id: firstProduct.id,
-          title: firstProduct.title,
-          handle: firstProduct.handle,
-          hasVariants: firstProduct.variants && firstProduct.variants.length > 0,
-          hasImages: firstProduct.images && firstProduct.images.length > 0,
-          thumbnail: firstProduct.thumbnail
-        })
-      }
-    } catch (error: any) {
-      console.error("Error fetching products:", error)
-      console.error("Error details:", error.message || String(error))
-    }
-  }
+
+  const {
+    response: { products: displayProducts },
+  } = await listProducts({
+    queryParams: { collection_id: [featuredCollection.id] },
+    countryCode,
+  })
 
   return (
     <section className="relative overflow-hidden py-20 bg-gradient-to-b from-white to-luxury-ivory/50">
@@ -109,7 +46,7 @@ export default async function FeaturedProducts({ countryCode }: { countryCode: s
         <div className="text-center mb-16">
           <ScrollReveal>
             <Heading level="h2" className="font-display text-3xl md:text-4xl mb-4">
-              {collectionTitle}
+              {featuredCollection.title}
             </Heading>
             <div className="h-px w-24 bg-luxury-gold mx-auto mb-6"></div>
             <Text className="text-serif-regular text-luxury-charcoal/80 max-w-xl mx-auto">

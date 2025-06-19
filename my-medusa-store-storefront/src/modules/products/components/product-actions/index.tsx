@@ -109,16 +109,6 @@ export default function ProductActions({
 
   // Create dynamic options if none exist
   const productOptions = useMemo(() => {
-    // Debug the actual data we're getting
-    if (process.env.NODE_ENV === 'development') {
-      console.log("Product variant data for debugging:", product.variants?.map(v => ({
-        id: v.id,
-        title: v.title,
-        sku: v.sku,
-        options: v.options
-      })));
-    }
-    
     // Use options directly from the product if they exist and have values
     if (product.options && product.options.length > 0) {
       // Ensure each option has values
@@ -181,9 +171,6 @@ export default function ProductActions({
         });
         
         const generatedOptions = Object.values(optionGroups);
-        if (process.env.NODE_ENV === 'development') {
-          console.log("Generated options from variants:", generatedOptions);
-        }
         
         // Only return if we have valid options with values
         if (generatedOptions.length > 0 && generatedOptions.every(opt => opt.values && opt.values.length > 0)) {
@@ -193,9 +180,6 @@ export default function ProductActions({
       
       // Use our fallback generator if variant.options is not available
       const generatedOptions = generateOptionsFromVariants(product.variants);
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Generated options from variant titles:", generatedOptions);
-      }
       
       return generatedOptions.filter(opt => opt.values && opt.values.length > 0);
     }

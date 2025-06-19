@@ -7,14 +7,19 @@ if (process.env.MEDUSA_BACKEND_URL) {
   MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 }
 
-// Use the publishable key from the environment or fallback to a hardcoded one
-// This key was found in the terminal logs
-const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || 
-  "pk_b3673015769dc80c7f8c6d3bf797d09541dbc2459b8044afdd33937af1731b99"
+// Use the publishable key from the environment. Throw an error if it's not set.
+const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_API_KEY) {
+  throw new Error(
+    "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY is not set in your environment. " +
+    "Please set it in .env.local"
+  )
+}
 
 export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,
-  debug: process.env.NODE_ENV === "development",
+  debug: false,
   publishableKey: PUBLISHABLE_API_KEY,
 })
 

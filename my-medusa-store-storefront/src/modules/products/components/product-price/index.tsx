@@ -1,55 +1,34 @@
 import { clx } from "@medusajs/ui"
-import { getProductPrice } from "@lib/util/get-product-price"
+import { convertToLocale } from "@lib/util/money"
+import { getProductPrice, CalculatedVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
-import { useEffect } from "react"
 
 export default function ProductPrice({
   product,
-  variant,
+  variantId,
 }: {
   product: HttpTypes.StoreProduct
-  variant?: HttpTypes.StoreProductVariant
+  variantId?: string
 }) {
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
-    variantId: variant?.id,
+    variantId,
   })
 
-  const selectedPrice = variant ? variantPrice : cheapestPrice
-  
-  // Debug logging in development
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('ProductPrice component:', {
-        product_id: product.id,
-        product_title: product.title,
-        variant_id: variant?.id,
-        variant_title: variant?.title,
-        selectedPrice,
-        cheapestPrice,
-        variantPrice
-      })
-    }
-  }, [product, variant, selectedPrice, cheapestPrice, variantPrice])
+  const selectedPrice = variantId ? variantPrice : cheapestPrice
 
   if (!selectedPrice) {
     return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />
   }
 
   return (
-    <div className="flex flex-col text-ui-fg-base">
+    <div className="flex flex-col text-luxury-charcoal/90">
       <span
-        className={clx("text-xl-semi", {
-          "text-ui-fg-interactive": selectedPrice.price_type === "sale",
+        className={clx("text-lg", {
+          "text-luxury-gold": selectedPrice.price_type === "sale",
         })}
       >
-        {!variant && "From "}
-        <span
-          data-testid="product-price"
-          data-value={selectedPrice.calculated_price_number}
-        >
-          {selectedPrice.calculated_price}
-        </span>
+        {selectedPrice.calculated_price}
       </span>
       {selectedPrice.price_type === "sale" && (
         <>

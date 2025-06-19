@@ -39,8 +39,6 @@ export const searchProducts = cache(async ({
     return { products: [], count: 0 }
   }
 
-  console.log(`[SEARCH DEBUG] Searching for "${query}" in country ${countryCode}`)
-
   try {
     const headers = {
       ...(await getAuthHeaders()),
@@ -62,10 +60,7 @@ export const searchProducts = cache(async ({
       cache: "no-store",
     })
 
-    console.log(`[SEARCH DEBUG] Found ${allProducts?.products?.length || 0} total products`)
-
     if (!allProducts?.products || allProducts.products.length === 0) {
-      console.log("[SEARCH DEBUG] No products returned from API")
       return { products: [], count: 0 }
     }
 
@@ -123,11 +118,6 @@ export const searchProducts = cache(async ({
       return product
     })
     
-    // Log all matching product titles
-    if (processedProducts.length > 0) {
-      console.log("[SEARCH DEBUG] Matching products:", processedProducts.map(p => p.title).join(", "))
-    }
-
     // Apply pagination
     const paginatedProducts = processedProducts.slice(offset, offset + limit)
 

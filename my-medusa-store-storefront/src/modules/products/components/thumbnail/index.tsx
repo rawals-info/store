@@ -58,12 +58,6 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   }
 
   const imageUrl = getImageUrl();
-  
-  console.log("Thumbnail: Image data", { 
-    thumbnail, 
-    hasImages: !!images && images.length > 0,
-    imageUrl
-  });
 
   return (
     <Container

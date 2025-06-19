@@ -3,6 +3,10 @@ import { getRegion } from "@lib/data/regions"
 import { CategoriesTemplate } from "@modules/categories/templates"
 import { HttpTypes } from "@medusajs/types"
 import { sdk } from "@lib/config"
+import { notFound } from "next/navigation"
+import { listCategories } from "@lib/data/categories"
+import CategorySection from "@modules/categories/components/category-section"
+import { ProductCategory } from "@medusajs/medusa"
 
 export const metadata: Metadata = {
   title: "Categories",
@@ -40,37 +44,26 @@ async function getAllCategories() {
   }
 }
 
-export default async function CategoriesPage({
+export default async function Categories({
   params,
 }: {
   params: { countryCode: string }
 }) {
-  // Properly await params before using them
-  const paramsData = await params
-  const countryCode = paramsData.countryCode
-  
-  const region = await getRegion(countryCode)
-  
-  console.log("Fetching categories for region:", region?.id || "unknown region")
-  const categories = await getAllCategories()
-  
-  console.log("Categories page received:", categories?.length || 0, "categories")
-  console.log("Parent categories:", categories?.filter(c => !c?.parent_category)?.length || 0)
-  console.log("Parent category names:", categories?.filter(c => !c?.parent_category)?.map(c => c.name))
-  
-  if (!categories || categories.length === 0) {
-    console.log("No categories found")
-    return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="text-center">
-          <h2 className="text-2xl font-serif mb-4">Categories Coming Soon</h2>
-          <p className="text-luxury-charcoal/70">
-            Our category selection is being updated. Please check back later.
-          </p>
-        </div>
-      </div>
-    )
+  const region = await getRegion(params.countryCode).catch(() => null)
+  const categories = await listCategories().catch(() => null)
+
+  if (!categories) {
+    return notFound()
   }
 
-  return <CategoriesTemplate categories={categories} region={region} />
+  // Get only parent categories
+  const parentCategories = categories.filter((c) => !c.parent_category)
+
+  return (
+    <div className="flex flex-col gap-y-12 py-12">
+      {parentCategories.map((c: ProductCategory) => (
+        <CategorySection category={c} key={c.id} />
+      ))}
+    </div>
+  )
 } 

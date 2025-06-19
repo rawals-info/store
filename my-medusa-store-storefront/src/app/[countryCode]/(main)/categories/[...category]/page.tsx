@@ -125,82 +125,21 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: Props) {
-  try {
-    // IMPORTANT: Await params and searchParams to fix Next.js 15 async API requirements
-    const paramsData = await params;
-    const searchParamsData = await searchParams;
-    
-    // Now safe to destructure after properly awaiting
-    const category = paramsData.category;
-    const countryCode = paramsData.countryCode;
-    
-    // Handle pagination and sorting with proper type checking after awaiting searchParams
-    const sortBy = searchParamsData.sortBy;
-    const pageParam = searchParamsData.page;
-    const pageNumber = pageParam ? parseInt(pageParam) : 1;
-    
-    // Important: Create a stable key for React to recognize the page has changed
-    // Use after awaiting params to avoid the sync-dynamic-apis error
-    const pageKey = `category-${category.join('-')}-${countryCode}-${Date.now()}`;
-    
-    // Safe to use now that we've properly handled the async operations
-    const categoryHandle = category[category.length - 1];
-    
-    // First check if this is a known legacy handle from our config
-    const configCategory = getCategoryByLegacyHandle(categoryHandle);
-    if (configCategory) {
-      console.log(`Redirecting from legacy handle ${categoryHandle} to ${configCategory.handle}`);
-      redirect(`/${countryCode}/categories/${configCategory.handle}`);
-    }
-    
-    // Then proceed with regular category lookup
-    const categoryObj = await getCachedCategory(categoryHandle);
+  const { sortBy, page } = searchParams
+  const categoryHandle = params.category[params.category.length - 1]
 
-    if (!categoryObj) {
-      // Try to find a similar category
-      const similarCategory = await findSimilarCategory(categoryHandle);
-      
-      if (similarCategory) {
-        // Redirect to the correct category URL
-        console.log(`Redirecting from ${categoryHandle} to ${similarCategory.handle}`);
-        redirect(`/${countryCode}/categories/${similarCategory.handle}`);
-      }
-      
-      // If no similar category found, show a helpful not found page
-      return (
-        <div className="py-8 px-4">
-          <h2 className="text-2xl font-bold">Category not found</h2>
-          <p className="mt-4 text-gray-500">
-            We couldn't find the category "{categoryHandle}". Please check the URL or browse our available categories.
-          </p>
-          <a href={`/${countryCode}/categories`} className="mt-4 inline-block py-2 px-4 bg-luxury-gold text-white rounded hover:bg-luxury-gold/90 transition-colors">
-            Browse All Categories
-          </a>
-        </div>
-      );
-    }
+  const category = await getCategoryByHandle(categoryHandle)
 
-    return (
-      <div key={pageKey} id={`category-${categoryObj.id}`}>
-        <Suspense fallback={<SkeletonProductGrid numberOfProducts={8} />}>
-          <CategoryTemplate
-            category={categoryObj}
-            sortBy={sortBy}
-            page={pageNumber.toString()}
-            countryCode={countryCode}
-          />
-        </Suspense>
-      </div>
-    )
-  } catch (error) {
-    console.error("Error loading category:", error)
-    return (
-      <div className="py-8 px-4">
-        <h2 className="text-2xl font-bold">Error loading category</h2>
-        <p className="mt-4 text-gray-500">
-          We encountered an error while loading this category. Please try again later.
-        </p>
-      </div>
-    )
+  if (!category) {
+    notFound()
   }
+
+  return (
+    <CategoryTemplate
+      category={category}
+      sortBy={sortBy}
+      page={page}
+      countryCode={params.countryCode}
+    />
+  )
 }

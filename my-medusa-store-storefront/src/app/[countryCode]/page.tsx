@@ -4,7 +4,7 @@ import { getRegion } from "@lib/data/regions"
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
 
 export default async function Home({ params }: { params: { countryCode: string } }) {
-  const { countryCode } = params
+  const { countryCode } = await params
   
   const region = await getRegion(countryCode).catch(() => null)
   const categories = await getCachedCategories().catch(() => [])

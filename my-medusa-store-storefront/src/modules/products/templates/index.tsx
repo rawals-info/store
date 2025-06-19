@@ -17,31 +17,12 @@ type ProductTemplateProps = {
   countryCode: string
 }
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({
+export default async function ProductTemplate({
   product,
   region,
   countryCode,
-}) => {
-  // Add debug logging in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Product template data:', {
-      product_id: product.id,
-      product_title: product.title,
-      variants: product.variants?.map(v => ({
-        id: v.id,
-        title: v.title,
-        sku: v.sku,
-        calculated_price: v.calculated_price,
-      })),
-      region: {
-        id: region.id,
-        name: region.name,
-        currency_code: region.currency_code
-      }
-    })
-  }
-
-  if (!product || !product.id) {
+}: ProductTemplateProps) {
+  if (!product) {
     return notFound()
   }
 
@@ -152,5 +133,3 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     </>
   )
 }
-
-export default ProductTemplate

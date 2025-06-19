@@ -75,18 +75,15 @@ export async function deduplicateRequest<T>(
   // Check if we have a valid cached response
   const cached = requestCache.get(cacheKey);
   if (cached && now - cached.timestamp < effectiveTtl) {
-    console.log(`Cache hit for ${cacheKey}`);
     return cached.data as T;
   }
   
   // Check if there's already an in-flight request for this key
   if (pendingRequests.has(cacheKey)) {
-    console.log(`Request coalescence for ${cacheKey}`);
     return pendingRequests.get(cacheKey) as Promise<T>;
   }
   
   // If not cached or expired, fetch fresh data
-  console.log(`Cache miss for ${cacheKey}`);
   
   // Create a new request and store it in pending requests
   const requestPromise = fetcher()

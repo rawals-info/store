@@ -33,27 +33,17 @@ export const retrieveRegion = cache(async (id: string) => {
 })
 
 const getRegionByCountryCode = cache(async (countryCode: string) => {
-  const { regions } = await sdk.client.fetch<{ regions: HttpTypes.StoreRegion[] }>(
-    `/store/regions?country_code=${countryCode}`,
-    {
-      method: 'GET',
-      next: {
-        tags: ['regions'],
-      },
-    }
-  ).catch((err) => {
-    throw new Error(err)
-  });
-
-  const region = regions[0];
+  const regions = await listRegions()
+  const region = regions.find((r) =>
+    r.countries?.some((c) => c.iso_2 === countryCode)
+  )
 
   if (!region) {
-    notFound();
+    return null
   }
 
-  return region;
-});
-
+  return region
+})
 
 export const getRegion = async (countryCode: string) => {
   try {
