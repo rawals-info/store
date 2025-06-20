@@ -3,6 +3,7 @@ import path from "path"
 import createAbortController from "../create-abort-controller.js"
 import { FactBoxOptions } from "../facts.js"
 import ProcessManager from "../process-manager.js"
+import PackageManager from "../package-manager.js"
 
 export interface ProjectOptions {
   repoUrl?: string
@@ -25,6 +26,7 @@ export interface ProjectCreator {
 export abstract class BaseProjectCreator {
   protected spinner: Ora
   protected processManager: ProcessManager
+  protected packageManager: PackageManager
   protected abortController: AbortController
   protected factBoxOptions: FactBoxOptions
   protected projectName: string
@@ -39,6 +41,7 @@ export abstract class BaseProjectCreator {
   ) {
     this.spinner = ora()
     this.processManager = new ProcessManager()
+    this.packageManager = new PackageManager(this.processManager)
     this.abortController = createAbortController(this.processManager)
     this.projectName = projectName
     const basePath =

@@ -30,6 +30,44 @@ medusaIntegrationTestRunner({
       ).data.shipping_profile
     })
 
+    describe("GET /admin/orders", () => {
+      beforeEach(async () => {
+        seeder = await createOrderSeeder({
+          api,
+          container: getContainer(),
+        })
+        order = seeder.order
+      })
+
+      it("should search orders by display_id", async () => {
+        let response = await api.get(`/admin/orders`, adminHeaders)
+
+        expect(response.data.orders).toHaveLength(1)
+        expect(response.data.orders).toEqual([
+          expect.objectContaining({
+            id: order.id,
+          }),
+        ])
+
+        response = await api.get(
+          `/admin/orders?q=${order.display_id}`,
+          adminHeaders
+        )
+
+        expect(response.data.orders).toHaveLength(1)
+        expect(response.data.orders).toEqual([
+          expect.objectContaining({
+            id: order.id,
+          }),
+        ])
+
+        response = await api.get(`/admin/orders?q=2345`, adminHeaders)
+
+        expect(response.data.orders).toHaveLength(0)
+        expect(response.data.orders).toEqual([])
+      })
+    })
+
     describe("POST /orders/:id", () => {
       beforeEach(async () => {
         seeder = await createOrderSeeder({

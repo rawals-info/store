@@ -42,6 +42,9 @@ const withMDX = mdx({
               projectPath: path.resolve("..", "api-reference"),
               skipSlugValidation: true,
             },
+            cloud: {
+              projectPath: path.resolve("..", "cloud"),
+            },
           },
         },
       ],
