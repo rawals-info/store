@@ -3,6 +3,8 @@ import { MedusaContainer } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   createMedusaContainer,
+  getResolvedPlugins,
+  mergePluginModules,
 } from "@medusajs/framework/utils"
 import { asValue } from "awilix"
 import { logger } from "@medusajs/framework/logger"
@@ -140,6 +142,13 @@ class MedusaTestRunner {
   private async setupApplication(): Promise<void> {
     const { container, MedusaAppLoader } = await import("@medusajs/framework")
     const appLoader = new MedusaAppLoader()
+
+    // Load plugins modules
+    const configModule = container.resolve(
+      ContainerRegistrationKeys.CONFIG_MODULE
+    )
+    const plugins = await getResolvedPlugins(this.cwd, configModule)
+    mergePluginModules(configModule, plugins)
 
     container.register({
       [ContainerRegistrationKeys.LOGGER]: asValue(logger),

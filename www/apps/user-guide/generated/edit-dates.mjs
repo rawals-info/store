@@ -1,5 +1,5 @@
 export const generatedEditDates = {
-  "app/tips/languages/page.mdx": "2025-04-11T09:14:21.012Z",
+  "app/tips/languages/page.mdx": "2025-06-10T13:21:36.282Z",
   "app/tips/bulk-editor/page.mdx": "2025-04-07T13:20:09.040Z",
   "app/tips/lists/page.mdx": "2025-02-14T14:16:04.867Z",
   "app/settings/sales-channels/page.mdx": "2025-05-30T13:31:09.754Z",

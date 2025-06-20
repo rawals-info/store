@@ -2297,12 +2297,12 @@ export interface CreateOrderCreditLineDTO {
   /**
    * The reference model name that the credit line is generated from
    */
-  reference: string | null
+  reference?: string | null
 
   /**
    * The reference model id that the credit line is generated from
    */
-  reference_id: string | null
+  reference_id?: string | null
 
   /**
    * The metadata of the order detail

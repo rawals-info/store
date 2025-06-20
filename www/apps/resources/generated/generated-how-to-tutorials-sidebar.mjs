@@ -537,8 +537,8 @@ const generatedgeneratedHowToTutorialsSidebarSidebar = {
           "loaded": true,
           "isPathHref": true,
           "type": "link",
-          "title": "Medusa Cloud",
-          "path": "https://medusajs.com/pricing",
+          "title": "Cloud",
+          "path": "https://docs.medusajs.com/cloud",
           "children": []
         },
         {

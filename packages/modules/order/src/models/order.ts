@@ -1,16 +1,16 @@
 import { model, OrderStatus } from "@medusajs/framework/utils"
+import { Return } from "@models"
 import { OrderAddress } from "./address"
 import { OrderCreditLine } from "./credit-line"
 import { OrderItem } from "./order-item"
 import { OrderShipping } from "./order-shipping-method"
 import { OrderSummary } from "./order-summary"
 import { OrderTransaction } from "./transaction"
-import { Return } from "@models"
 
 const _Order = model
   .define("Order", {
     id: model.id({ prefix: "order" }).primaryKey(),
-    display_id: model.autoincrement(),
+    display_id: model.autoincrement().searchable(),
     region_id: model.text().nullable(),
     customer_id: model.text().nullable(),
     version: model.number().default(1),

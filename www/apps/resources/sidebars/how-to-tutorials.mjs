@@ -182,8 +182,8 @@ While tutorials show you a specific use case, they also help you understand how 
       },
       {
         type: "link",
-        title: "Medusa Cloud",
-        path: "https://medusajs.com/pricing",
+        title: "Cloud",
+        path: "https://docs.medusajs.com/cloud",
       },
       {
         type: "sub-category",
