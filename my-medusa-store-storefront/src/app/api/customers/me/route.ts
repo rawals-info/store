@@ -3,6 +3,9 @@ import { getCacheTag, getAuthHeaders } from "@lib/data/cookies"
 import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 
+// Force dynamic behavior since this route uses cookies
+export const dynamic = "force-dynamic"
+
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()

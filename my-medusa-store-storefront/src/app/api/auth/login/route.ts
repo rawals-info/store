@@ -4,6 +4,9 @@ import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
+// Force dynamic behavior since this route uses cookies
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
   try {
     let email = "";

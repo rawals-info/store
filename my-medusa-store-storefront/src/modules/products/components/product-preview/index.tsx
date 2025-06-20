@@ -8,15 +8,13 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 
-export default function ProductPreviewClient({
+const ProductPreview = ({
   product,
-  isFeatured,
   region,
 }: {
   product: HttpTypes.StoreProduct
-  isFeatured?: boolean
   region: HttpTypes.StoreRegion
-}) {
+}) => {
   const { cheapestPrice } = getProductPrice({
     product,
   })
@@ -42,7 +40,7 @@ export default function ProductPreviewClient({
               thumbnail={product.thumbnail}
               images={product.images}
               size="full"
-              isFeatured={isFeatured}
+              isFeatured={product.isFeatured}
               className="transition-transform duration-700 group-hover:scale-110 object-cover w-full h-full"
             />
           </div>
@@ -116,3 +114,5 @@ export default function ProductPreviewClient({
     </LocalizedClientLink>
   )
 }
+
+export default ProductPreview

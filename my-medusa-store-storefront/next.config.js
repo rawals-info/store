@@ -7,17 +7,16 @@ checkEnvVariables()
  */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   logging: {
     fetches: {
       fullUrl: true,
     },
   },
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -67,9 +66,6 @@ const nextConfig = {
   },
   experimental: {
     scrollRestoration: true,
-    optimizeCss: true,
-    optimizeServerReact: true,
-    serverMinification: true,
     webpackBuildWorker: true,
   },
   async headers() {

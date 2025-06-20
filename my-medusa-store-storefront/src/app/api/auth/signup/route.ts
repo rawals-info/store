@@ -3,6 +3,9 @@ import { getCacheTag, getCartId, setAuthToken } from "@lib/data/cookies"
 import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 
+// Force dynamic behavior since this route uses cookies
+export const dynamic = "force-dynamic"
+
 export async function POST(req: NextRequest) {
   try {
     let customerForm: any = {};

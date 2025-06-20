@@ -8,6 +8,9 @@ import { dataFetchingConfig } from "@lib/config"
 export const dynamic = 'force-dynamic'
 export const revalidate = 60
 
+// Skip static generation for account pages
+// This is necessary because account pages use cookies and server-side data
+// that can't be statically generated
 export async function generateStaticParams() {
   const regions = await getRegions()
   const countryCodes = Object.keys(regions).map((countryCode) => ({

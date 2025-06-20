@@ -1,21 +1,28 @@
+"use client"
+
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
 
-import { listProducts } from "@lib/data/products"
-import { getRegion } from "@lib/data/regions"
+import { listProducts } from "../../../lib/data/products"
+import { getRegion } from "../../../lib/data/regions"
+import { SortOptions } from "../../store/components/refinement-list/sort-products"
 
-import CategoryHero from "@modules/categories/components/category-hero"
-import ProductList from "@modules/categories/components/product-list"
-import SubcategoryGrid from "@modules/categories/components/subcategory-grid"
+import CategoryHero from "../components/category-hero"
+import ProductList from "../components/product-list"
+import SubcategoryGrid from "../components/subcategory-grid"
 
 type CategoryTemplateProps = {
   category: HttpTypes.StoreProductCategory
   countryCode: string
+  sortBy?: SortOptions
+  page?: string
 }
 
 export default async function CategoryTemplate({
   category,
   countryCode,
+  sortBy,
+  page,
 }: CategoryTemplateProps) {
   const region = await getRegion(countryCode).catch(() => null)
 

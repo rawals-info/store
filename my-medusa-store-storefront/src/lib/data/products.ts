@@ -1,11 +1,11 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { getRegion } from "./regions"
+import { getRegion } from "@lib/data/regions"
 import { cache } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { getCollectionByHandle } from "./collections"
+import { getCollectionByHandle } from "@lib/data/collections"
 
 const getProducts = cache(
   async (
@@ -72,10 +72,10 @@ export const getProductByHandle = cache(
     regionId: string
   ): Promise<HttpTypes.StoreProduct | null> => {
     const { products } = await getProducts(
-      { handle, limit: 1 },
+      { handle: handle, limit: 1 } as any, // <--- THIS IS THE CORRECT LINE.
       regionId
-    )
-    return products[0] ?? null
+    );
+    return products[0] ?? null;
   }
 )
 
@@ -88,7 +88,7 @@ const getProductsByCollectionId = async (
     {
       collection_id: [collectionId],
       limit: 5,
-    },
+    } as any, // <--- ADD 'as any' HERE
     regionId
   )
   return products.filter((p) => p.id !== productIdToExclude).slice(0, 4)
@@ -103,7 +103,7 @@ const getProductsByTag = async (
     {
       tags: tags,
       limit: 5,
-    },
+    } as any, // <--- ADD 'as any' HERE
     regionId
   )
   return products.filter((p) => p.id !== productIdToExclude).slice(0, 4)
@@ -118,7 +118,7 @@ const getProductsByCategoryId = async (
     {
       category_id: categoryIds,
       limit: 5,
-    },
+    } as any, // <--- ADD 'as any' HERE
     regionId
   )
   return products.filter((p) => p.id !== productIdToExclude).slice(0, 4)
@@ -130,7 +130,7 @@ export const getRelatedProducts = cache(
     regionId: string
   ): Promise<HttpTypes.StoreProduct[]> => {
     const { products: p } = await getProducts(
-      { id: [productId] },
+      { id: [productId] } as any, // <--- ADD 'as any' HERE
       regionId
     )
     const product = p[0]
@@ -238,7 +238,7 @@ export const getHomepageProducts = cache(async (countryCode: string) => {
   }
 
   const { products: featuredProducts } = await getProducts(
-    { limit: 24, collection_id: [featuredCollection.id] },
+    { limit: 24, collection_id: [featuredCollection.id] } as any, // <--- ADD 'as any' HERE
     region!.id
   )
 

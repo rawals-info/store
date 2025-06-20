@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { addToCart, getOrSetCart } from "@lib/data/cart"
 
+// Force dynamic behavior since this route uses cookies
+export const dynamic = "force-dynamic"
+
 export async function POST(request: Request) {
   const { variantId, quantity, countryCode } = await request.json()
   

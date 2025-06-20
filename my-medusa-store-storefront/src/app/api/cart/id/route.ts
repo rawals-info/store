@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
+// Force dynamic behavior since this route uses cookies
+export const dynamic = "force-dynamic"
+
 // Get cart ID
 export async function GET() {
   try {

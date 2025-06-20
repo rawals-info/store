@@ -7,6 +7,8 @@ type Props = {
   params: Promise<{ id: string }>
 }
 
+export const dynamic = "force-dynamic"
+
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   const order = await retrieveOrder(params.id).catch(() => null)
