@@ -86,29 +86,33 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   const products = response.products
   const productCount = response.count
 
-  // Fetch categories
+  // Fetch categories and tags concurrently to reduce overall TTFB
   let categories: HttpTypes.StoreProductCategory[] = []
-  try {
-    const categoriesResponse = await sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
-      "/store/product-categories",
-      {
-        query: { 
-          limit: 100,
-          fields: "*category_children, *parent_category", 
-        },
-      }
-    )
-    categories = categoriesResponse.product_categories || []
-  } catch (error) {
-    console.error("Error fetching categories:", error)
-  }
-
-  // Fetch tags
   let tagsList: any[] = []
+
   try {
-    tagsList = await listTags()
+    const [categoriesResponse, tagsResponse] = await Promise.all([
+      // Categories – SDK fetch gives richer object graph
+      sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
+        "/store/product-categories",
+        {
+          query: {
+            limit: 100,
+            fields: "*category_children, *parent_category",
+          },
+        }
+      ),
+      // Tags – simple helper
+      listTags(),
+    ])
+
+    categories = categoriesResponse.product_categories || []
+    tagsList = tagsResponse || []
   } catch (error) {
-    console.error("Error fetching tags:", error)
+    // Only log in non-production environments
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error fetching categories or tags:", error)
+    }
   }
 
   // Calculate price range

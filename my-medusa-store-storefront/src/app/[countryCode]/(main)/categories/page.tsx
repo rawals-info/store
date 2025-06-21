@@ -10,10 +10,8 @@ export const metadata: Metadata = {
   description: "Explore all categories of our products.",
 }
 
-// Add dynamic configuration for faster loading
-export const dynamic = "force-dynamic"
-export const fetchCache = "force-no-store"
-export const revalidate = 0
+// Cache the rendered page for 5 minutes and serve stale content while revalidating.
+export const revalidate = 300
 
 export default async function Categories(props: {
   params: { countryCode: string }

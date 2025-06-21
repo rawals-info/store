@@ -2,11 +2,9 @@
 
 import { handleLogin } from "@lib/data/client-actions"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
-import ErrorMessage from "@modules/checkout/components/error-message"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
-import { useActionState } from "react"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -15,6 +13,7 @@ type Props = {
 const Login = ({ setCurrentView }: Props) => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -30,8 +29,8 @@ const Login = ({ setCurrentView }: Props) => {
       if (result.error) {
         setError(result.error)
       } else if (result.success) {
-        // Login successful, redirect
-        window.location.href = "/account"
+        // Login successful – soft navigate to account page to avoid full reload
+        router.push("/account")
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")
