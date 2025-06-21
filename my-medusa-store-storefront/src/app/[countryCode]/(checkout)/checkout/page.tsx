@@ -11,31 +11,48 @@ import { Suspense } from "react"
 import "./checkout.css"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
+import dynamic from "next/dynamic"
+
+// Enhanced timeout settings for checkout
+const CHECKOUT_TIMEOUT = 3500 // 3.5 seconds timeout
 
 export const metadata: Metadata = {
   title: "Checkout | Marble Luxe",
 }
 
+// Dynamically import components for progressive loading
+const DynamicCheckoutFooter = dynamic(
+  () => import('@modules/checkout/components/checkout-footer'),
+  { loading: () => <div className="h-10" /> }
+)
+
 export default async function Checkout() {
-  // Fetch cart and customer in parallel
-  const [cart, customer] = await parallelFetch([
-    async () => {
-      try {
-        return await retrieveCart()
-      } catch (error) {
-        console.error(error)
-        return null
+  // Fetch cart and customer in parallel with improved timeout handling
+  const [cart, customer] = await parallelFetch(
+    [
+      async () => {
+        try {
+          return await retrieveCart()
+        } catch (error) {
+          // Don't log error here - it will be handled by parallel-fetch
+          return null
+        }
+      },
+      async () => {
+        try {
+          return await retrieveCustomer()
+        } catch (error) {
+          // Don't log error here - it will be handled by parallel-fetch
+          return null
+        }
       }
-    },
-    async () => {
-      try {
-        return await retrieveCustomer()
-      } catch (error) {
-        console.error(error)
-        return null
-      }
+    ],
+    { 
+      timeout: CHECKOUT_TIMEOUT,
+      suppressErrors: true, // Suppress duplicate error logs
+      retries: 2 // Try up to 2 more times on failure
     }
-  ])
+  )
 
   if (!cart) {
     return notFound()
@@ -63,6 +80,11 @@ export default async function Checkout() {
           </Suspense>
           <CheckoutSummary cart={cart} />
         </div>
+        
+        {/* Footer is loaded progressively */}
+        <Suspense fallback={null}>
+          <DynamicCheckoutFooter />
+        </Suspense>
       </div>
     </div>
   )

@@ -213,9 +213,11 @@ export default function ProductActions({
         if (Object.keys(defaultOptions).length > 0) {
           setOptions(defaultOptions)
         }
-      } else if (product.variants?.length === 1) {
-        // If there are no options but there is one variant, make sure it's selected
-        setManuallySelectedVariant(product.variants[0])
+      } else {
+        // If there are no selectable options, auto-select the first variant (even if there are many)
+        if (product.variants && product.variants.length > 0) {
+          setManuallySelectedVariant(product.variants[0])
+        }
       }
     }
   }, [product, productOptions])
@@ -383,11 +385,19 @@ export default function ProductActions({
     if (!selectedVariant?.id) return null
 
     setIsAdding(true)
+    
+    // Update button state immediately
+    setAddedToCart(true)
+    
+    // For optimistic updates, we'll store the current cart state
+    const previousCartState = typeof window !== 'undefined' ? 
+      localStorage.getItem('last_cart_addition') : null
 
-    try {
-      // Show loading state immediately but still provide visual feedback
-      setAddedToCart(true)
-      
+    // Create a timestamp that we'll use for our optimistic update
+    const newTimestamp = Date.now().toString()
+    
+    try {      
+      // Make the actual API call without timeout that could cause issues
       const response = await fetch('/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -396,34 +406,29 @@ export default function ProductActions({
           quantity,
           countryCode,
         }),
+        // No signal to avoid timeouts causing failed requests
       })
 
       if (!response.ok) {
         throw new Error('Failed to add to cart')
       }
 
-      // Guard localStorage usage to avoid errors during server rendering or tests
       if (typeof window !== 'undefined') {
-        // Immediately fetch a fresh cart to update all cart components
-        fetch('/api/cart', { 
-          credentials: 'include',
-          cache: 'no-store',
-          headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' }
-        })
-        .then(res => res.json())
-        .then(() => {
-          // After successful update, dispatch events to notify components
-          localStorage.setItem('last_cart_addition', Date.now().toString())
-          window.dispatchEvent(new Event('storage'))
-          window.dispatchEvent(new CustomEvent('cartUpdated', { 
-            detail: { variantId: selectedVariant.id, quantity, forceOpen: true }
-          }))
-        })
-        .catch(err => console.error('Error refreshing cart:', err))
+        // Update local storage after successful API call so other tabs know
+        localStorage.setItem('last_cart_addition', newTimestamp)
+        
+        // Notify other tabs/components that cart has changed
+        window.dispatchEvent(new CustomEvent('cartUpdated', { 
+          detail: { 
+            variantId: selectedVariant.id, 
+            quantity, 
+            forceOpen: true
+          }
+        }))
       }
       
-      // Keep success message displayed for a moment
-      setTimeout(() => setAddedToCart(false), 2000)
+      // Keep success message displayed longer for better UX
+      setTimeout(() => setAddedToCart(false), 3000)
     } catch (error) {
       console.error('Failed to add to cart:', error)
       setAddedToCart(false)
@@ -464,7 +469,10 @@ export default function ProductActions({
 
         <div className="mt-4">
           <div className="flex flex-col gap-y-6">
-            <ProductPrice product={product} variant={selectedVariant} />
+            <ProductPrice 
+              product={product} 
+              variantId={selectedVariant?.id} 
+            />
             
             {/* Quantity selector */}
             <div className="flex flex-col gap-y-2">
@@ -494,8 +502,8 @@ export default function ProductActions({
               <Button
                 onClick={handleAddToCart}
                 disabled={
-                  // For multiple variants, require selection
-                  (product.variants && product.variants.length > 1 && !selectedVariant) ||
+                  // Require manual selection only when real options exist
+                  (productOptions.length > 0 && product.variants && product.variants.length > 1 && !selectedVariant) ||
                   // For all cases, check calculated price and inventory
                   !selectedVariant?.calculated_price ||
                   (selectedVariant && typeof selectedVariant.inventory_quantity === 'number' && selectedVariant.inventory_quantity < 1)

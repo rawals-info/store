@@ -149,23 +149,22 @@ export async function addToCart({
   countryCode: string
 }) {
   if (!variantId) {
-    console.error("Missing variant ID when adding to cart")
-    return
+    return { success: false, error: "Missing variant ID" }
   }
 
   const cart = await getOrSetCart(countryCode)
 
   if (!cart) {
-    console.error("Error retrieving or creating cart")
-    return
+    return { success: false, error: "Failed to retrieve or create cart" }
   }
 
   const headers = {
     ...(await getAuthHeaders()),
   }
 
-  await sdk.store.cart
-    .createLineItem(
+  try {
+    // Add the item
+    const result = await sdk.store.cart.createLineItem(
       cart.id,
       {
         variant_id: variantId,
@@ -174,14 +173,79 @@ export async function addToCart({
       {},
       headers
     )
-    .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+    
+    // Only revalidate the cart cache tag (optimize by removing unnecessary tag invalidation)
+    const cartCacheTag = await getCacheTag("carts")
+    revalidateTag(cartCacheTag)
+    
+    return { success: true, cart: result.cart }
+  } catch (error) {
+    // Handle error but don't log it (caller will handle logging if needed)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+  }
+}
 
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
-    })
-    .catch(medusaError)
+// New function to support batch operations
+export async function batchAddToCart({
+  items,
+  countryCode,
+}: {
+  items: Array<{ variantId: string; quantity: number }>
+  countryCode: string
+}) {
+  if (!items?.length) {
+    return { success: false, error: "No items provided" }
+  }
+
+  const cart = await getOrSetCart(countryCode)
+
+  if (!cart) {
+    return { success: false, error: "Failed to retrieve or create cart" }
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  try {
+    // We could implement this with a batch endpoint if available
+    // For now, we'll use Promise.all to add items in parallel
+    const results = await Promise.all(
+      items.map(({ variantId, quantity }) =>
+        sdk.store.cart.createLineItem(
+          cart.id,
+          {
+            variant_id: variantId,
+            quantity,
+          },
+          {},
+          headers
+        ).catch(error => ({ error }))
+      )
+    )
+    
+    // Check for any errors
+    const errors = results.filter(result => 'error' in result)
+    if (errors.length) {
+      // Some items failed to add
+      return { 
+        success: false, 
+        error: "Some items could not be added to cart", 
+        partialSuccess: errors.length < items.length 
+      }
+    }
+    
+    // Get the last successful result that contains the cart
+    const lastValidResult = results[results.length - 1] as HttpTypes.StoreCartResponse
+    
+    // Revalidate cache only once for all additions
+    const cartCacheTag = await getCacheTag("carts")
+    revalidateTag(cartCacheTag)
+    
+    return { success: true, cart: lastValidResult.cart }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+  }
 }
 
 export async function updateLineItem({

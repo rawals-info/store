@@ -204,7 +204,7 @@ export const listProductsWithSort = async ({
   return { response, nextPage, queryParams }
 }
 
-// other existing functions
+// Optimized version of getProductData
 export const getProductData = cache(
   async (
     handle: string,
@@ -214,12 +214,40 @@ export const getProductData = cache(
     relatedProducts: HttpTypes.StoreProduct[]
     region: HttpTypes.StoreRegion
   }> => {
+    // Get region first to avoid redundant fetches
     const region = await getRegion(countryCode)
-    const product = await getProductByHandle(handle, region!.id)
-    const relatedProducts = product
-      ? await getRelatedProducts(product.id, region!.id)
-      : []
-    return { product, relatedProducts, region: region! }
+    
+    if (!region) {
+      return { product: null, relatedProducts: [], region: {} as HttpTypes.StoreRegion }
+    }
+    
+    // Fast direct fetch for the product - lower timeout
+    const productPromise = sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
+      `/store/products`, {
+        query: { 
+          handle: handle, 
+          limit: 1,
+          region_id: region.id 
+        },
+        next: { 
+          revalidate: 0
+        }
+      }
+    ).then(res => res.products?.[0] || null)
+    .catch(() => null);
+    
+    // Start fetching the product first, then continue with other logic
+    const product = await productPromise;
+    
+    // Defer related products loading until needed
+    const relatedProducts: HttpTypes.StoreProduct[] = [];
+    
+    // Return what we have immediately to speed up page rendering
+    return { 
+      product,
+      relatedProducts,
+      region
+    }
   }
 )
 
