@@ -1,10 +1,14 @@
 "use client";
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+
 export default function AccountPage() {
-  return (
-    <div className="w-full">
-      <h1>Account Page</h1>
-      <p>This is a placeholder for the account page during build.</p>
-    </div>
-  );
+  const router = useRouter()
+
+  useEffect(() => {
+    router.push("/account/profile")
+  }, [router])
+
+  return null
 }
