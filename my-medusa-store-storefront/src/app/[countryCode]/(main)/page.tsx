@@ -4,6 +4,9 @@ import { RenderBuilderContent } from "@modules/common/components/builder";
 
 import { listCollections } from "@lib/data/collections";
 import { getRegion } from "@lib/data/regions";
+import { getCachedCategories } from "@modules/home/components/categories"
+import { getHomepageProducts } from "@lib/data/products"
+import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
 
 // Initialize Builder.io with the environment variable
 builder.init(process.env.YOUR_BUILDER_API_KEY || "38d68438e314470e9a024d29227f1e31");
@@ -20,9 +23,13 @@ interface HomeProps {
 }
 
 export default async function Home({ params }: HomeProps) {
-  const { countryCode } = params;
+  const { countryCode } = await params;
   const region = await getRegion(countryCode);
   const { collections } = await listCollections({ fields: "id, handle, title" });
+  const categories = await getCachedCategories().catch(() => [])
+  const { featuredProducts } = await getHomepageProducts(countryCode).catch(() => ({
+    featuredProducts: [],
+  }))
 
   if (!collections || !region) {
     return null;
@@ -40,7 +47,12 @@ export default async function Home({ params }: HomeProps) {
   return (
     <>
       {content && <RenderBuilderContent content={content} model="page" />}
-      {/* Your existing home page content can remain below */}
+      <HomeClientWrapper
+        featuredProducts={featuredProducts}
+        categories={categories}
+        region={region}
+        countryCode={countryCode}
+      />
     </>
   );
 } 

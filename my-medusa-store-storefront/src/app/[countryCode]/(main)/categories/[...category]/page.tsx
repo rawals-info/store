@@ -125,8 +125,12 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: Props) {
-  const { sortBy, page } = searchParams
-  const categoryHandle = params.category[params.category.length - 1]
+  // Await params and searchParams to comply with Next.js 15 dynamic routes
+  const paramsData = await params
+  const searchData = await searchParams
+
+  const { sortBy, page } = searchData
+  const categoryHandle = paramsData.category[paramsData.category.length - 1]
 
   const category = await getCategoryByHandle(categoryHandle)
 
@@ -139,7 +143,7 @@ export default async function CategoryPage({
       category={category}
       sortBy={sortBy}
       page={page}
-      countryCode={params.countryCode}
+      countryCode={paramsData.countryCode}
     />
   )
 }

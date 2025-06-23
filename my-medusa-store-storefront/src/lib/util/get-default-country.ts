@@ -12,27 +12,24 @@ interface StoreResponse {
 }
 
 /**
- * Gets the default country code from the backend
- * @returns The default country code
+ * Gets the default country code from the backend.
+ *
+ * The original implementation attempted to read the store settings via
+ * `GET /store`, but that endpoint no longer exists in Medusa v2. Instead we
+ * optionally look for an environment variable `NEXT_PUBLIC_DEFAULT_REGION_ID`
+ * and fall back to the first region that has a country configured.
+ *
+ * @returns The default ISO-2 country code (lower-case)
  */
 export async function getDefaultCountry(): Promise<string> {
-  // Attempt to fetch store settings for default_region_id
-  let defaultRegionId: string | undefined
-  try {
-    const { store } = await sdk.client.fetch<StoreResponse>(`/store`, {
-      method: "GET",
-      next: { revalidate: 60 }
-    })
-    defaultRegionId = store?.default_region_id
-  } catch (error) {
-    console.error("Error fetching store settings, skipping default_region_id:", error)
-  }
-  
-  // If a default region ID is configured, try to use it
+  // 1. Try to honour an explicit region configured in the environment.
+  const defaultRegionId = process.env.NEXT_PUBLIC_DEFAULT_REGION_ID
+
   if (defaultRegionId) {
     try {
       const regions = await listRegions()
-      const defaultRegion = regions.find(region => region.id === defaultRegionId)
+      const defaultRegion = regions.find((region) => region.id === defaultRegionId)
+
       if (defaultRegion?.countries?.length) {
         const iso = defaultRegion.countries[0].iso_2?.toLowerCase()
         if (iso) {
@@ -40,14 +37,15 @@ export async function getDefaultCountry(): Promise<string> {
         }
       }
     } catch (error) {
-      console.error("Error listing regions for default_region_id:", error)
+      // Log at debug level – do not treat as fatal.
+      console.debug("Failed to resolve NEXT_PUBLIC_DEFAULT_REGION_ID", error)
     }
   }
-  
-  // Fallback: use the first available region from backend
+
+  // 2. Fallback: use the first available region that has a country.
   try {
     const regions = await listRegions()
-    const regionWithCountry = regions.find(region => region.countries?.length)
+    const regionWithCountry = regions.find((region) => region.countries?.length)
     if (regionWithCountry?.countries?.length) {
       const iso = regionWithCountry.countries[0].iso_2?.toLowerCase()
       if (iso) {
@@ -57,7 +55,7 @@ export async function getDefaultCountry(): Promise<string> {
   } catch (error) {
     console.error("Error listing regions for fallback:", error)
   }
-  
-  // Last fallback to 'us'
+
+  // 3. Final fallback: default to "us".
   return "us"
 } 
