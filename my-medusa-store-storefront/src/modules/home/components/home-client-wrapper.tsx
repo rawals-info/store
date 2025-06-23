@@ -175,29 +175,29 @@ export default function HomeClientWrapper({
     <div className="w-full overflow-hidden">
       {/* Hero Section */}
       <motion.section
-        className="relative h-screen flex items-center justify-center overflow-hidden pt-20 w-full"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
         initial="initial"
         animate="animate"
         variants={staggerContainer}
       >
         {/* Hero image with marble piece in situ */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 w-full h-full">
           <Image
-            src="/table-top.webp"
+            src="/hero_img.webp"
             alt="Luxury marble tabletop in elegant interior"
             fill
             priority={true}
             sizes="100vw"
-            className="object-cover"
+            className="object-cover w-full h-full"
             quality={90}
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
           />
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-black/25"></div>
         </div>
         
         {/* Content */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 w-full">
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 w-full mt-16">
           <motion.div variants={fadeIn} className="mb-6">
             <Heading level="h1" className="text-4xl md:text-6xl lg:text-7xl mb-4 font-serif text-white">
               Bespoke Marble Handicrafts<br />for Timeless Luxury
