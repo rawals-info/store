@@ -20,6 +20,8 @@ type RefinementListProps = {
     name: string
     handle: string
     products_count?: number
+    parent_category?: any
+    category_children?: any[]
   }[]
   tags?: {
     id: string
@@ -67,12 +69,16 @@ const RefinementList = ({
           if (response.ok) {
             const data = await response.json();
             if (data.product_categories) {
-              setLocalCategories(data.product_categories.map((cat: any) => ({
-                id: cat.id,
-                name: cat.name,
-                handle: cat.handle,
-                products_count: cat.products?.length
-              })));
+              setLocalCategories(
+                data.product_categories.map((cat: any) => ({
+                  id: cat.id,
+                  name: cat.name,
+                  handle: cat.handle,
+                  parent_category: cat.parent_category,
+                  category_children: cat.category_children,
+                  products_count: cat.products?.length,
+                }))
+              );
             }
           }
         } catch (error) {
@@ -347,13 +353,34 @@ const RefinementList = ({
         {/* Filters */}
         <div className="flex flex-col gap-3 w-full">
           {localCategories.length > 0 && (
+            // Build a flat list of categories with indentation for children
             <FilterDropdown
               title="Categories"
-              items={localCategories.map(c => ({
-                id: c.id,
-                name: c.name,
-                count: c.products_count
-              }))}
+              items={(() => {
+                const parents = localCategories.filter(c => !c.parent_category)
+                return parents.flatMap((parent) => {
+                  const list: { id: string; name: string; count?: number }[] = [
+                    {
+                      id: parent.id,
+                      name: parent.name,
+                      count: parent.products_count,
+                    },
+                  ]
+
+                  if (parent.category_children && parent.category_children.length) {
+                    list.push(
+                      ...parent.category_children.map((child: any) => ({
+                        id: child.id,
+                        // prepend bullet & non-breaking spaces for visual indent
+                        name: `\u00A0\u00A0— ${child.name}`,
+                        count: child.products_count,
+                      }))
+                    )
+                  }
+
+                  return list
+                })
+              })()}
               selectedItems={categoryIds}
               handleChange={handleCategoryChange}
               data-testid="category-filter"
