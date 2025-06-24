@@ -14,4 +14,23 @@ module.exports = defineConfig({
     },
     redisUrl: process.env.REDIS_URL,
   },
+  /**
+   * Register additional infrastructure modules
+   * – Event Bus powered by Redis (BullMQ under the hood)
+   *   See docs: https://docs.medusajs.com/v1/development/events/modules/redis
+   */
+  modules: {
+    eventBus: {
+      resolve: "@medusajs/event-bus-redis",
+      options: {
+        redisUrl: process.env.EVENTS_REDIS_URL || process.env.REDIS_URL,
+      },
+    },
+    // cacheService: {
+    //   resolve: "@medusajs/medusa/cache-redis",
+    //   options: {
+    //     redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL,
+    //   },
+    // },
+  },
 })

@@ -1924,7 +1924,7 @@
   dependencies:
     ulid "^2.3.0"
 
-"@medusajs/event-bus-redis@2.8.3":
+"@medusajs/event-bus-redis@^2.8.3", "@medusajs/event-bus-redis@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/event-bus-redis/-/event-bus-redis-2.8.3.tgz"
   integrity sha512-96w2OSMF1K+FJsMW70x0eGGdOuVPngIazbXkGqUYq1Yc0ewQ3KNTzzhyC3E3qHHfyN64t7d45WF97t8wRN+e9w==
