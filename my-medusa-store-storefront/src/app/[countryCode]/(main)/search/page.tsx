@@ -35,11 +35,11 @@ export async function generateMetadata({
   params, 
   searchParams 
 }: SearchPageProps): Promise<Metadata> {
-  const query = (await searchParams.q) || ""
+  const { q = "" } = await searchParams
   
   return {
-    title: query ? `Search results for "${query}"` : "Search Results",
-    description: query ? `Find products matching "${query}"` : "Find products you're looking for",
+    title: q ? `Search results for "${q}"` : "Search Results",
+    description: q ? `Find products matching "${q}"` : "Find products you're looking for",
   }
 }
 
@@ -204,9 +204,10 @@ async function SearchContent({
 
 // Main page component that uses the search content component
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
-  const countryCode = await params.countryCode
-  const query = (await searchParams.q) || ""
-  const pageNum = (await searchParams.page) || "1"
+  const { countryCode } = await params
+  const { q = "", page = "1" } = await searchParams
+  const query = q
+  const pageNum = page
   
   return <SearchContent countryCode={countryCode} query={query} pageNum={pageNum} />
 } 
