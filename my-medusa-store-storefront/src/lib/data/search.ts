@@ -4,7 +4,6 @@ import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { getAuthHeaders } from "./cookies"
 import { cache } from "react"
-import { getProductPrice } from "@lib/util/get-product-price"
 
 const CACHE_TTL = 0 // Set to 0 to disable caching temporarily for debugging
 
@@ -65,37 +64,36 @@ export const searchProducts = cache(async ({
       return { products: [], count: searchResult?.count || 0 }
     }
 
-    // Ensure pricing data is available on returned products
-    const processedProducts = searchResult.hits.map((product) => {
-      if (product.variants && product.variants.length > 0) {
-        const { cheapestPrice } = getProductPrice({ product })
+    // --- Fetch full product data with pricing for the current region ---
+    const hitIds = searchResult.hits.map((p) => p.id)
 
-        product.variants = product.variants.map((variant) => {
-          const typedVariant: any = variant
+    let detailedProducts: HttpTypes.StoreProduct[] = []
 
-          if (
-            typedVariant.prices?.length > 0 ||
-            typedVariant.calculated_price
-          ) {
-            return variant
-          }
+    if (hitIds.length) {
+      const queryParams = new URLSearchParams()
+      hitIds.forEach((id) => queryParams.append("id[]", id))
 
-          typedVariant.prices = [
-            {
-              amount: cheapestPrice?.calculated_price_number || 0,
-              currency_code: cheapestPrice?.currency_code || "EUR",
-            },
-          ]
-
-          return typedVariant
-        })
+      // Attach region_id if present so Medusa returns calculated prices
+      if (filter.region_id) {
+        queryParams.set("region_id", filter.region_id as string)
       }
 
-      return product
-    })
+      queryParams.set("limit", String(hitIds.length))
+
+      const detailsResp = await sdk.client.fetch<{
+        products: HttpTypes.StoreProduct[]
+      }>(`/store/products?${queryParams.toString()}`, {
+        method: "GET",
+        headers,
+        cache: "no-store",
+      })
+
+      const map = new Map(detailsResp.products.map((p) => [p.id, p]))
+      detailedProducts = hitIds.map((id) => map.get(id)).filter(Boolean) as HttpTypes.StoreProduct[]
+    }
 
     return {
-      products: processedProducts,
+      products: detailedProducts,
       count: searchResult.count,
     }
   } catch (error) {

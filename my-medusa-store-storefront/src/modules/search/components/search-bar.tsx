@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { MagnifyingGlass, XMark } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
@@ -28,6 +28,9 @@ const SearchBar = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
+  // Determine current country code from url (expects /{countryCode}/...)
+  const currentCountryCode = pathname.split("/")[1] || ""
 
   // Load search term from URL if present
   useEffect(() => {
@@ -46,10 +49,11 @@ const SearchBar = ({
       
       if (autoSearch && value.trim()) {
         setIsSearching(false)
-        router.push(`/search?q=${encodeURIComponent(value.trim())}`)
+        const prefix = currentCountryCode ? `/${currentCountryCode}` : ""
+        router.push(`${prefix}/search?q=${encodeURIComponent(value.trim())}`)
       }
     }),
-    [router, onSearchChange, autoSearch]
+    [router, onSearchChange, autoSearch, currentCountryCode]
   )
 
   // Handle input change with debounce
@@ -67,7 +71,8 @@ const SearchBar = ({
     e.preventDefault()
     if (searchTerm.trim()) {
       setIsSearching(true)
-      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`)
+      const prefix = currentCountryCode ? `/${currentCountryCode}` : ""
+      router.push(`${prefix}/search?q=${encodeURIComponent(searchTerm.trim())}`)
     }
   }
 
