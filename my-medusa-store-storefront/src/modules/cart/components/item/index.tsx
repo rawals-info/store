@@ -11,6 +11,7 @@ import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
+import { Table } from "@medusajs/ui"
 import { useState } from "react"
 
 type ItemProps = {
@@ -45,33 +46,41 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   if (type === "preview") {
     return (
-      <div className="flex gap-4 py-4">
-        <LocalizedClientLink href={`/products/${item.product_handle}`} className="w-16">
-          <Thumbnail
-            thumbnail={item.thumbnail}
-            images={item.variant?.product?.images}
-            size="square"
-          />
-        </LocalizedClientLink>
-        <div className="flex flex-col justify-between flex-1">
-          <div>
-            <h3 className="font-display text-base text-luxury-charcoal">
-              {item.product_title}
-            </h3>
-            <LineItemOptions variant={item.variant} />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-luxury-charcoal/70">
-              {item.quantity}x
-            </span>
-            <LineItemPrice
-              item={item}
-              style="tight"
-              currencyCode={currencyCode}
+      <Table.Row className="py-4">
+        {/* Image Cell */}
+        <Table.Cell className="w-16 p-0 pr-4 align-top">
+          <LocalizedClientLink
+            href={`/products/${item.product_handle}`}
+            className="block"
+          >
+            <Thumbnail
+              thumbnail={item.thumbnail}
+              images={item.variant?.product?.images}
+              size="square"
             />
+          </LocalizedClientLink>
+        </Table.Cell>
+
+        {/* Info Cell */}
+        <Table.Cell className="p-0 align-top">
+          <div className="flex flex-col justify-between h-full">
+            <div>
+              <h3 className="font-display text-base text-luxury-charcoal">
+                {item.product_title}
+              </h3>
+              <LineItemOptions variant={item.variant} />
+            </div>
+            <div className="flex justify-between mt-2">
+              <span className="text-luxury-charcoal/70">{item.quantity}x</span>
+              <LineItemPrice
+                item={item}
+                style="tight"
+                currencyCode={currencyCode}
+              />
+            </div>
           </div>
-        </div>
-      </div>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 

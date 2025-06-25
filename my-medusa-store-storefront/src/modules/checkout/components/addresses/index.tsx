@@ -1,13 +1,13 @@
 "use client"
 
-import { setAddresses } from "@lib/data/cart"
+import { setAddresses } from "@lib/actions/cart"
 import compareAddresses from "@lib/util/compare-addresses"
 import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { useToggleState } from "@medusajs/ui"
 import Spinner from "@modules/common/icons/spinner"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useActionState } from "react"
+import { useActionState, startTransition } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
@@ -81,7 +81,7 @@ const Addresses = ({
   }
 
   // Form submission with validation
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsValidating(true)
     
@@ -93,8 +93,12 @@ const Addresses = ({
     setFormErrors(errors)
     
     if (Object.keys(errors).length === 0) {
-      // Form is valid, continue with server action
-      await setAddresses(null, formData)
+      // Form is valid, continue with server action using the generated formAction
+      if (typeof formAction === "function") {
+        startTransition(() => {
+          formAction(formData)
+        })
+      }
     }
     
     setIsValidating(false)
@@ -149,6 +153,8 @@ const Addresses = ({
       </div>
       {isOpen ? (
         <form className="w-full" onSubmit={handleSubmit} noValidate>
+          {/* Hidden field to indicate billing equals shipping */}
+          <input type="hidden" name="same_as_billing" value="on" />
           <div className="grid grid-cols-1 gap-y-2">
             <div className="grid grid-cols-2 gap-x-2">
               <Input

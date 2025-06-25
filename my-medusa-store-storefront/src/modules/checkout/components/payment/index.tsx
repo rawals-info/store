@@ -1,7 +1,7 @@
 "use client"
 
 import { RadioGroup } from "@headlessui/react"
-import { isStripe as isStripeFunc, paymentInfoMap } from "@lib/constants"
+import { isStripe as isStripeFunc, paymentInfoMap, isPaypal as isPaypalFunc } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
@@ -9,6 +9,7 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
   StripeCardContainer,
 } from "@modules/checkout/components/payment-container"
+import PayPalContainer from "@modules/checkout/components/paypal-container"
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
@@ -138,6 +139,13 @@ const Payment = ({
                         setCardBrand={setCardBrand}
                         setError={setError}
                         setCardComplete={setCardComplete}
+                      />
+                    ) : isPaypalFunc(paymentMethod.id) ? (
+                      <PayPalContainer
+                        cart={cart}
+                        paymentProviderId={paymentMethod.id}
+                        selectedPaymentOptionId={selectedPaymentMethod}
+                        paymentInfoMap={paymentInfoMap}
                       />
                     ) : (
                       <PaymentContainer
