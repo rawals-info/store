@@ -97,6 +97,14 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
 
   const isFooter = variant === "footer"
   
+  const arrowRotation = isFooter
+    ? isOpen
+      ? "" // open upwards
+      : "rotate-180" // closed points down
+    : isOpen
+    ? "rotate-180" // header open upwards
+    : "" // header closed down
+
   return (
     <div className="relative z-[100]" ref={dropdownRef}>
       <button
@@ -113,8 +121,8 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
           style={{ width: '14px', height: '14px' }}
         />
         <span className={isFooter ? "" : "hidden md:block"}>{currentCurrency}</span>
-        <svg 
-          className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        <svg
+          className={`w-3 h-3 transition-transform ${arrowRotation}`}
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="currentColor"
@@ -124,7 +132,15 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
       </button>
       
       {isOpen && (
-        <div className={`absolute ${isFooter ? "left-0" : "right-0"} mt-2 w-40 bg-luxury-ivory shadow-md rounded-sm border border-luxury-lightgold z-[110]`}>
+        <div
+          className={`absolute ${
+            isFooter ? "left-0 bottom-full mb-2" : "right-0 mt-2"
+          } w-40 rounded-sm border border-luxury-lightgold z-[150] ${
+            isFooter
+              ? "bg-white shadow-lg border-t-4 border-t-luxury-gold"
+              : "bg-luxury-ivory shadow-md"
+          }`}
+        >
           <div className="py-1">
             {Object.entries(currencies).map(([currency, countryCodes]) => {
               // Use the first country code for this currency as the target

@@ -10,6 +10,13 @@ import Image from "next/image"
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
 import CurrencySwitcher from "@modules/layout/components/currency-switcher"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  faCcVisa,
+  faCcMastercard,
+  faCcAmex,
+  faPaypal,
+} from "@fortawesome/free-brands-svg-icons"
 
 export default function Footer() {
   const [collections, setCollections] = useState<any[]>([])
@@ -247,20 +254,21 @@ export default function Footer() {
         </div>
       </div>
       
-      <div className="border-t border-luxury-lightgold/20 py-6">
-        <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between">
+      <div className="border-t border-luxury-lightgold/20 py-6 px-4 sm:px-8 overflow-x-auto">
+        <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between min-w-max">
           <div className="text-small-regular text-luxury-charcoal/60">
             © 2024 Marble Luxe. All rights reserved.
           </div>
-          <div className="flex items-center gap-x-6">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex items-center gap-x-2">
               <CurrencySwitcher variant="footer" />
             </div>
-            <div className="h-6 w-px bg-luxury-lightgold/20"></div>
-            <div className="flex items-center gap-x-2">
-              <img src="/visa.svg" alt="Visa" className="h-6" />
-              <img src="/paypal.svg" alt="PayPal" className="h-6" />
-              <img src="/mastercard.svg" alt="Mastercard" className="h-6" />
+            <div className="hidden xsmall:block h-6 w-px bg-luxury-lightgold/20"></div>
+            <div className="flex items-center gap-x-4 text-2xl text-luxury-charcoal opacity-80">
+              <FontAwesomeIcon icon={faCcVisa} />
+              <FontAwesomeIcon icon={faCcMastercard} />
+              <FontAwesomeIcon icon={faCcAmex} />
+              <FontAwesomeIcon icon={faPaypal} />
             </div>
           </div>
         </div>
