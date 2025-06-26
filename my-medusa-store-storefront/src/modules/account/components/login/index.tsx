@@ -93,6 +93,14 @@ const Login = ({ setCurrentView }: Props) => {
           {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
+      <div className="w-full max-w-sm text-right mt-2">
+        <a
+          href="forgot-password"
+          className="text-[var(--color-luxury-gold)] hover:text-[var(--color-luxury-darkgold)] text-sm"
+        >
+          Forgot password?
+        </a>
+      </div>
       <div className="w-full max-w-sm flex items-center my-8">
         <div className="flex-grow h-px bg-[var(--color-luxury-lightgold)]/20"></div>
         <span className="px-4 text-[var(--color-luxury-charcoal)]/50 text-sm">OR</span>

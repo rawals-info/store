@@ -26,12 +26,12 @@ module.exports = defineConfig({
         redisUrl: process.env.EVENTS_REDIS_URL || process.env.REDIS_URL,
       },
     },
-    // cacheService: {
-    //   resolve: "@medusajs/medusa/cache-redis",
-    //   options: {
-    //     redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL,
-    //   },
-    // },
+    cacheService: {
+      resolve: "@medusajs/medusa/cache-redis",
+      options: {
+        redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL,
+      },
+    },
     payment: {
       resolve: "@medusajs/payment",
       options: {

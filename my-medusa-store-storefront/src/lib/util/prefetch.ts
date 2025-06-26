@@ -14,9 +14,6 @@ const RESOURCES_TO_PREFETCH = [
   '/store/products',
   
   // Common static assets
-  '/fonts/Inter-Regular.woff2',
-  '/fonts/Inter-Medium.woff2',
-  '/fonts/Inter-SemiBold.woff2',
 ]
 
 /**
@@ -34,10 +31,15 @@ function prefetchResources() {
         
         // For API endpoints, use fetch with prefetch
         if (resource.startsWith('/store/')) {
-          fetch(`http://localhost:9000${resource}`, { 
+          // Use the backend URL and include the publishable API key header
+          const backend = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+          const apiKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+          fetch(`${backend}${resource}`, {
             method: 'GET',
             // Using no-store to avoid interfering with actual requests
             cache: 'no-store',
+            headers: apiKey ? { 'x-publishable-api-key': apiKey } : {},
           }).catch(() => {
             // Silently fail on prefetch errors
           })

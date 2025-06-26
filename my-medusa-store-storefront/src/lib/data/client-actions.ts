@@ -152,4 +152,40 @@ export const removeCartId = async (): Promise<void> => {
   await fetch('/api/cart/id', {
     method: 'DELETE',
   })
+}
+
+/** Password reset: request link */
+export async function requestPasswordReset(email: string) {
+  try {
+    const res = await fetch(`/api/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY as string,
+      },
+      body: JSON.stringify({ email }),
+    })
+    return await res.json()
+  } catch (e) {
+    console.error("password reset request error", e)
+    return { error: "Unable to request reset link" }
+  }
+}
+
+/** Password reset: submit new password */
+export async function submitNewPassword(token: string, password: string) {
+  try {
+    const res = await fetch(`/api/auth/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY as string,
+      },
+      body: JSON.stringify({ token, password }),
+    })
+    return await res.json()
+  } catch (e) {
+    console.error("reset password error", e)
+    return { error: "Unable to reset password" }
+  }
 } 
