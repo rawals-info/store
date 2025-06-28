@@ -1,0 +1,17 @@
+{
+  "type": "footer",
+  "footer": {
+    "company": "MARBLE LUXESSSSSSSSSSSSS",
+    "description": "Exquisite handcrafted marble artifacts that embody timeless elegance and unparalleled artistry.",
+    "social": [
+      {
+        "platform": "Instagram",
+        "href": "https://instagram.com"
+      },
+      {
+        "platform": "Facebook",
+        "href": "https://facebook.com"
+      }
+    ]
+  }
+}

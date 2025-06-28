@@ -1,0 +1,34 @@
+{
+  "type": "header",
+  "header": {
+    "logo": "/logo.svg",
+    "links": [
+      {
+        "label": "Home",
+        "href": "/"
+      },
+      {
+        "label": "Shopppp",
+        "href": "/products"
+      },
+      {
+        "label": "Categories",
+        "href": "/categories"
+      },
+      {
+        "label": "About",
+        "href": "/about"
+      }
+    ],
+    "rightLinks": [
+      {
+        "label": "Account",
+        "href": "/account"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ]
+  }
+}
