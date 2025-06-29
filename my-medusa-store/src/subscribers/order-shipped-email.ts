@@ -6,7 +6,7 @@ export default async function orderShippedEmail({
   event,
   container,
 }: SubscriberArgs<{ order_id: string }>) {
-  const orderId = (event as any).data.order_id ?? (event as any).data.id ?? event.data.id
+  const orderId = event.data.order_id
 
   const orderService = container.resolve("order") as any
   const order = await orderService.retrieve(orderId, {

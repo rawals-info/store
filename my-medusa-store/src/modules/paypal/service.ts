@@ -22,8 +22,12 @@ export type PayPalProviderOptions = {
   auth_webhook_id?: string
 }
 
-class PayPalProviderService extends AbstractPaymentProvider<PayPalProviderOptions> {
+export class PayPalProviderService extends AbstractPaymentProvider<PayPalProviderOptions> {
   static identifier = "paypal"
+
+  constructor(container: any, config: PayPalProviderOptions) {
+    super(container, config)
+  }
 
   async initiatePayment(
     input: InitiatePaymentInput

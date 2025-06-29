@@ -1,4 +1,4 @@
-import Typesense from "typesense"
+import { Client } from "typesense"
 import { AbstractSearchService } from "@medusajs/utils"
 
 export type TypesenseOptions = {
@@ -19,7 +19,7 @@ export type TypesenseOptions = {
  */
 class TypesenseService extends AbstractSearchService {
   public readonly isDefault = true
-  protected readonly client_: Typesense.Client
+  protected readonly client_: Client
   protected readonly indexPrefix_: string
 
   constructor(_, options: TypesenseOptions) {
@@ -32,7 +32,7 @@ class TypesenseService extends AbstractSearchService {
       )
     }
 
-    this.client_ = new Typesense.Client({
+    this.client_ = new Client({
       nodes: options.nodes,
       apiKey: options.apiKey,
       connectionTimeoutSeconds: 2,
@@ -123,7 +123,7 @@ class TypesenseService extends AbstractSearchService {
       })
 
     return {
-      hits: response.hits.map((h: any) => h.document),
+      hits: response.hits?.map((h: any) => h.document) ?? [],
       count: response.found,
     }
   }
