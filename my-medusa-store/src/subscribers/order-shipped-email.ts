@@ -20,13 +20,13 @@ export default async function orderShippedEmail({
     <p>Your order <strong>#${order.display_id}</strong> has left our atelier and is now on its way to you.</p>
     ${tracking ? `<p>Your tracking number is <strong>${tracking}</strong>.</p>` : ""}
     <p>We hope the anticipation is as delightful as the unboxing will be.</p>
-    <p style="margin-top:32px">Warm regards,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">Warm regards,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({
     to: order.email,
     name: order.first_name ?? order.email,
-    subject: `Your Marble Luxe Order #${order.display_id} Has Shipped`,
+    subject: `Your Imperial Craft Of India Order #${order.display_id} Has Shipped`,
     html: buildLuxuryTemplate("Order Shipped", body),
   })
 }

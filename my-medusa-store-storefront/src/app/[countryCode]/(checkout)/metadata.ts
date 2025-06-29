@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Checkout - Marble Luxe",
+  title: "Checkout - Imperial Craft Of India",
   description: "Complete your purchase",
 } 

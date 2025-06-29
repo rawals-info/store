@@ -8,7 +8,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "Cart | Marble Luxe",
+  title: "Cart | Imperial Craft Of India",
   description: "View your cart and proceed to checkout",
 }
 

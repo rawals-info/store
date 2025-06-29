@@ -25,11 +25,11 @@ export default async function orderConfirmationEmail({
 
   const body = `
     <p>Dear ${order.first_name ?? order.email},</p>
-    <p>Thank you for shopping with Marble Luxe. We're delighted to confirm that we've received your order <strong>#${order.display_id}</strong> totalling <strong>${
+    <p>Thank you for shopping with Imperial Craft Of India. We're delighted to confirm that we've received your order <strong>#${order.display_id}</strong> totalling <strong>${
       order.total / 100
     } ${order.currency_code.toUpperCase()}</strong>.</p>
     <p>You'll receive another email as soon as your items are on the way.</p>
-    <p style="margin-top:32px">With appreciation,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">With appreciation,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({

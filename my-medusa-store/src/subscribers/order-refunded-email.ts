@@ -18,7 +18,7 @@ export default async function orderRefundedEmail({
     <p>Dear ${order.first_name ?? order.email},</p>
     <p>We have processed a refund for your order <strong>#${order.display_id}</strong>. The amount will be credited back to your original payment method shortly.</p>
     <p>If you have any questions, please reply to this email and our concierge team will assist you.</p>
-    <p style="margin-top:32px">Sincerely,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">Sincerely,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({

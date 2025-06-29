@@ -74,12 +74,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     return {
-      title: `${product.title} | Marble Luxe`,
+      title: `${product.title} | Imperial Craft Of India`,
       description:
         product.description?.substring(0, 160) ||
         `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
       openGraph: {
-        title: `${product.title} | Marble Luxe`,
+        title: `${product.title} | Imperial Craft Of India`,
         description:
           product.description?.substring(0, 160) ||
           `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,

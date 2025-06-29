@@ -29,10 +29,10 @@ export default function Features() {
                 </svg>
               </div>
               <Heading level="h3" className="text-xl mb-3 font-serif text-luxury-charcoal">
-                Hand Carved Detail
+                Master-Level Hand Carving
               </Heading>
               <Text className="text-luxury-charcoal/80">
-                Intricate craftsmanship from master artisans
+                Award-winning artisans craft every intricate detail
               </Text>
             </div>
           </ScrollReveal>
@@ -45,10 +45,10 @@ export default function Features() {
                 </svg>
               </div>
               <Heading level="h3" className="text-xl mb-3 font-serif text-luxury-charcoal">
-                Ethically Sourced
+                Ethically Mined Marble
               </Heading>
               <Text className="text-luxury-charcoal/80">
-                Premium marble, responsibly sourced
+                Responsibly sourced premium-grade stone
               </Text>
             </div>
           </ScrollReveal>
@@ -61,10 +61,10 @@ export default function Features() {
                 </svg>
               </div>
               <Heading level="h3" className="text-xl mb-3 font-serif text-luxury-charcoal">
-                White-Glove Delivery
+                White-Glove Worldwide Delivery
               </Heading>
               <Text className="text-luxury-charcoal/80">
-                Careful handling for a pristine arrival
+                Museum-quality packing for a flawless arrival
               </Text>
             </div>
           </ScrollReveal>

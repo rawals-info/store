@@ -206,7 +206,7 @@ export default function HomeClientWrapper({
           
           <motion.div variants={fadeIn} className="mb-8">
             <Text className="text-lg md:text-xl max-w-2xl mx-auto text-white">
-              Hand-carved by Master Artisans in [Your Region]
+              Hand-carved by Master Artisans in India
             </Text>
           </motion.div>
           
@@ -306,7 +306,7 @@ export default function HomeClientWrapper({
                                 {product.variants && product.variants[0] ? (
                                   <ProductPrice 
                                     product={product}
-                                    variant={product.variants[0]} 
+                                    variantId={product.variants[0]?.id} 
                                   />
                                 ) : (
                                   <span>Price not available</span>

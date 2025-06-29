@@ -52,7 +52,7 @@ const Footer = () => {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Heading level="h3" className="text-xl mb-4 font-display text-luxury-gold">Marble Luxe</Heading>
+            <Heading level="h3" className="text-xl mb-4 font-display text-luxury-gold">Imperial Craft Of India</Heading>
             <Text className="text-luxury-charcoal/80 mb-6 leading-relaxed">
               Exquisite handcrafted marble artifacts that transform spaces into expressions of timeless elegance.
             </Text>
@@ -149,7 +149,7 @@ const Footer = () => {
             </ul>
             
             <div className="mt-6 pt-4 border-t border-luxury-gold/10">
-              <Heading level="h4" className="text-sm mb-3 font-display text-luxury-gold">Currency</Heading>
+              <Heading level="h3" className="text-sm mb-3 font-display text-luxury-gold">Currency</Heading>
               <CurrencySwitcher variant="footer" />
             </div>
           </motion.div>
@@ -214,7 +214,7 @@ const Footer = () => {
             transition={{ duration: 0.5, delay: 0.7 }}
           >
             <Text className="text-luxury-charcoal/60 text-sm">
-              © {currentYear} Marble Luxe. All rights reserved.
+              © {currentYear} Imperial Craft Of India. All rights reserved.
             </Text>
             <div className="flex space-x-8 mt-4 md:mt-0">
               <LocalizedClientLink href="/terms" className="text-luxury-charcoal/60 hover:text-luxury-gold transition-colors duration-300 text-sm">

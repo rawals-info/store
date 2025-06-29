@@ -40,7 +40,7 @@ export default async function AboutPage(props: AboutPageProps) {
           <div className="h-px w-16 bg-luxury-gold mb-8"></div>
           <div className="text-serif-regular text-luxury-charcoal/80 space-y-4">
             <p>
-              Founded in 1978, Marble Luxe began as a small family workshop dedicated to preserving the ancient traditions of marble craftsmanship. Our founder, Master Craftsman Raj Sharma, learned the art from his father and grandfather, carrying forward techniques that have been passed down through generations.
+              Founded in 1978, Imperial Craft Of India began as a small family workshop dedicated to preserving the ancient traditions of marble craftsmanship. Our founder, Master Craftsman Raj Sharma, learned the art from his father and grandfather, carrying forward techniques that have been passed down through generations.
             </p>
             <p>
               What started as a modest operation has grown into an internationally recognized atelier, renowned for creating some of the world's most exquisite marble artworks while maintaining the same dedication to craftsmanship that defined our beginnings.
@@ -61,7 +61,7 @@ export default async function AboutPage(props: AboutPageProps) {
           <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Our Process</h2>
           <div className="h-px w-16 bg-luxury-gold mx-auto mb-8"></div>
           <p className="text-serif-regular text-luxury-charcoal/80 max-w-2xl mx-auto">
-            Every Marble Luxe creation undergoes a meticulous process that honors traditional craftsmanship while embracing modern techniques.
+            Every Imperial Craft Of India creation undergoes a meticulous process that honors traditional craftsmanship while embracing modern techniques.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export default async function AboutPage(props: AboutPageProps) {
           <div className="h-px w-16 bg-luxury-gold mb-8"></div>
           <div className="text-serif-regular text-luxury-charcoal/80 space-y-4">
             <p>
-              Behind every Marble Luxe creation is a team of dedicated artisans who have devoted their lives to mastering the art of marble craftsmanship. Many have trained with us for decades, developing an intuitive understanding of the stone and its possibilities.
+              Behind every Imperial Craft Of India creation is a team of dedicated artisans who have devoted their lives to mastering the art of marble craftsmanship. Many have trained with us for decades, developing an intuitive understanding of the stone and its possibilities.
             </p>
             <p>
               Our workshop functions as both a production studio and a training ground, where senior master craftsmen pass their knowledge to the next generation through rigorous apprenticeships lasting 5-7 years.

@@ -18,17 +18,17 @@ export default async function passwordResetEmail({
 
   const body = `
     <p>Dear Valued Client,</p>
-    <p>We received a request to reset your Marble Luxe account password. Simply click the button below and choose a new, secure password.</p>
+    <p>We received a request to reset your Imperial Craft Of India account password. Simply click the button below and choose a new, secure password.</p>
     <p style="text-align:center;margin:32px 0;">
       <a href="${resetUrl}" style="background:#D4AF37;color:#ffffff;padding:12px 24px;text-decoration:none;font-weight:600;border-radius:3px;">Reset Password</a>
     </p>
     <p>If you did not request this, you can safely ignore this email—your current password will remain unchanged.</p>
-    <p style="margin-top:32px">With care,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">With care,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({
     to: email,
-    subject: "Reset Your Marble Luxe Password",
+    subject: "Reset Your Imperial Craft Of India Password",
     html: buildLuxuryTemplate("Password Reset", body),
   })
 }

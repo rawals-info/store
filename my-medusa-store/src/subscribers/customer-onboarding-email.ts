@@ -21,16 +21,16 @@ export default async function customerOnboardingEmail({
 
   const body = `
     <p>Dear ${order.first_name ?? order.email},</p>
-    <p>Thank you for placing your first order with Marble Luxe! We're honored you chose us to elevate your space.</p>
+    <p>Thank you for placing your first order with Imperial Craft Of India! We're honored you chose us to elevate your space.</p>
     <p>Over the coming weeks we'll share styling ideas, exclusive previews, and stories behind our craft.</p>
-    <p style="margin-top:32px">Stay inspired,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">Stay inspired,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({
     to: order.email,
     name: order.first_name ?? order.email,
-    subject: "Your Journey with Marble Luxe Begins",
-    html: buildLuxuryTemplate("Welcome to the Marble Luxe Family", body),
+    subject: "Your Journey with Imperial Craft Of India Begins",
+    html: buildLuxuryTemplate("Welcome to the Imperial Craft Of India Family", body),
   })
 }
 

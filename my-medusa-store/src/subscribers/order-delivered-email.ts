@@ -14,16 +14,16 @@ export default async function orderDeliveredEmail({
 
   const body = `
     <p>Dear ${order.first_name ?? order.email},</p>
-    <p>We are thrilled to confirm that your Marble Luxe order <strong>#${order.display_id}</strong> has been delivered.</p>
+    <p>We are thrilled to confirm that your Imperial Craft Of India order <strong>#${order.display_id}</strong> has been delivered.</p>
     <p>We hope every detail exceeds your expectations.</p>
     <p>If there is anything we can assist you with, please let us know.</p>
-    <p style="margin-top:32px">Enjoy your new piece,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">Enjoy your new piece,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({
     to: order.email,
     name: order.first_name ?? order.email,
-    subject: `Order #${order.display_id} Delivered – Marble Luxe`,
+    subject: `Order #${order.display_id} Delivered – Imperial Craft Of India`,
     html: buildLuxuryTemplate("Order Delivered", body),
   })
 }

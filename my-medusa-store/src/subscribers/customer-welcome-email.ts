@@ -12,15 +12,15 @@ export default async function customerWelcomeEmail({
 
   const body = `
     <p>Dear ${customer.first_name ?? customer.email},</p>
-    <p>Welcome to Marble Luxe – where timeless elegance meets exquisite craftsmanship.</p>
+    <p>Welcome to Imperial Craft Of India – where timeless elegance meets exquisite craftsmanship.</p>
     <p>As a valued member, you'll enjoy early access to limited editions, private sales, and curated inspiration.</p>
-    <p style="margin-top:32px">We're delighted to have you,<br/>The Marble Luxe Team</p>
+    <p style="margin-top:32px">We're delighted to have you,<br/>The Imperial Craft Of India Team</p>
   `
 
   await sendLuxuryEmail({
     to: customer.email,
     name: customer.first_name ?? customer.email,
-    subject: "Welcome to Marble Luxe",
+    subject: "Welcome to Imperial Craft Of India",
     html: buildLuxuryTemplate("Welcome", body),
   })
 }

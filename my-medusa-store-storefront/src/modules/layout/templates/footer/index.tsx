@@ -33,7 +33,7 @@ export default function Footer() {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [companyName, setCompanyName] = useState("MARBLE LUXE")
+  const [companyName, setCompanyName] = useState("IMPERIAL CRAFT OF INDIA")
   const [companyDescription, setCompanyDescription] = useState("Exquisite handcrafted marble artifacts that embody timeless elegance and unparalleled artistry.")
   const defaultSocial: { platform: string; href: string }[] = [
     { platform: "Instagram", href: "https://instagram.com" },
@@ -138,8 +138,8 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path>
                 </svg>
               </div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Hand Carved Detail</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Intricate craftsmanship from master artisans</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Master-Level Hand Carving</h3>
+              <p className="text-luxury-charcoal/70 text-sm">Award-winning artisans craft every intricate detail</p>
             </motion.div>
             
             <motion.div 
@@ -151,8 +151,8 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                 </svg>
               </div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Ethically Sourced</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Premium marble, responsibly sourced</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Ethically Mined Marble</h3>
+              <p className="text-luxury-charcoal/70 text-sm">Responsibly sourced premium-grade stone</p>
             </motion.div>
             
             <motion.div 
@@ -164,8 +164,8 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
               </div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">White-Glove Delivery</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Careful handling for a pristine arrival</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">White-Glove Worldwide Delivery</h3>
+              <p className="text-luxury-charcoal/70 text-sm">Museum-quality packing for a flawless arrival</p>
             </motion.div>
           </motion.div>
         </div>
@@ -293,7 +293,7 @@ export default function Footer() {
       <div className="border-t border-luxury-lightgold/20 py-6 px-4 sm:px-8 overflow-x-auto">
         <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between min-w-max">
           <div className="text-small-regular text-luxury-charcoal/60">
-            © 2024 Marble Luxe. All rights reserved.
+            © 2024 Imperial Craft Of India. All rights reserved.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex items-center gap-x-2">

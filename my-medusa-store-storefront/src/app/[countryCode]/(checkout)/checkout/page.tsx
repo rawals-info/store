@@ -17,7 +17,7 @@ import dynamic from "next/dynamic"
 const CHECKOUT_TIMEOUT = 3500 // 3.5 seconds timeout
 
 export const metadata: Metadata = {
-  title: "Checkout | Marble Luxe",
+  title: "Checkout | Imperial Craft Of India",
 }
 
 // Dynamically import components for progressive loading

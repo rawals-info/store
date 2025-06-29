@@ -60,7 +60,7 @@ export function buildLuxuryTemplate(title: string, body: string) {
         <h1>${title}</h1>
         <div class="gold-divider"></div>
         ${body}
-        <div class="footer">© ${new Date().getFullYear()} Marble Luxe</div>
+        <div class="footer">© ${new Date().getFullYear()} Imperial Craft Of India</div>
       </div>
     </body>
   </html>`
@@ -80,7 +80,7 @@ export async function sendLuxuryEmail({
   const email = new Brevo.SendSmtpEmail()
   email.sender = {
     email: process.env.EMAIL_FROM ?? "store@example.com",
-    name: "Marble Luxe",
+    name: "Imperial Craft Of India",
   }
   email.to = [
     {
