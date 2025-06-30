@@ -29,6 +29,7 @@ export default defineConfig({
     disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
     // For server mode: tell the built Admin where the backend lives
     backendUrl: process.env.MEDUSA_BACKEND_URL,
+    path: "../packages/admin", 
   },
 
   // Redis‑backed Event Bus & Cache
