@@ -1,13 +1,12 @@
-// medusa-config.ts
+// my-medusa-store/medusa-config.ts
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
 export default defineConfig({
   projectConfig: {
-    // Core URLs
+    // Database
     databaseUrl: process.env.DATABASE_URL!,
-    // We'll use Redis only via modules, so no top‑level redisUrl here
 
     // HTTP / CORS / Secrets
     http: {
@@ -18,18 +17,21 @@ export default defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
 
-    // Worker mode: "server" | "worker" | "shared"
-    workerMode: (process.env.MEDUSA_WORKER_MODE as
-      | "server"
-      | "worker"
-      | "shared") || "server",
-
-    // Whether to serve the Admin UI from this process
-    // In server mode: should be true; in worker: false
-    serve_admin: process.env.DISABLE_MEDUSA_ADMIN !== "true",
+    // Worker mode (“server” | “worker” | “shared”)
+    workerMode:
+      (process.env.MEDUSA_WORKER_MODE as "server" | "worker" | "shared") ||
+      "server",
   },
 
-  // Redis‑backed Event Bus and Cache
+  // Admin UI settings (enable/disable via env)
+  admin: {
+    // When true, Medusa will NOT serve the Admin
+    disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
+    // For server mode: tell the built Admin where the backend lives
+    backendUrl: process.env.MEDUSA_BACKEND_URL,
+  },
+
+  // Redis‑backed Event Bus & Cache
   modules: {
     eventBus: {
       resolve: "@medusajs/event-bus-redis",
@@ -56,6 +58,6 @@ export default defineConfig({
         auth_webhook_id: process.env.PAYPAL_AUTH_WEBHOOK_ID,
       },
     },
-    // …any other plugins you have
+    // …any other plugins
   ],
 })
