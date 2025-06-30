@@ -2026,7 +2026,7 @@
   resolved "https://registry.npmjs.org/@medusajs/file/-/file-2.8.5.tgz"
   integrity sha512-tunk83R6FSCQC0ywLVkbxIraw8j1s2bu9V0yxCjyiX1u68pgFzkxVW56n6gAi4+7sN9LYjJhgCX1yVz57+n5aw==
 
-"@medusajs/framework@2.8.5":
+"@medusajs/framework@^2.8.5", "@medusajs/framework@2.8.5":
   version "2.8.5"
   resolved "https://registry.npmjs.org/@medusajs/framework/-/framework-2.8.5.tgz"
   integrity sha512-bhU6AWtNnB/Hs+iVNv5Q8OqcYKgqOzfODyPGszzW+Al83gAUI41jPVkHZCtwdpj3Yom6TOFZ3ugZeBmdoTVPoA==

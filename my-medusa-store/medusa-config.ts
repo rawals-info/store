@@ -1,5 +1,6 @@
 // my-medusa-store/medusa-config.ts
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
+import path from "path"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
@@ -25,13 +26,10 @@ export default defineConfig({
 
   // Admin UI settings (enable/disable via env)
   admin: {
-    // When true, Medusa will NOT serve the Admin
     disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
-    // For server mode: tell the built Admin where the backend lives
     backendUrl: process.env.MEDUSA_BACKEND_URL,
-    path: "../packages/admin", 
+    path: path.resolve(__dirname, "../packages/admin"), // ✅ this fixes the build
   },
-
   // Redis‑backed Event Bus & Cache
   modules: {
     eventBus: {
