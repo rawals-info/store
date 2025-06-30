@@ -26,7 +26,7 @@ export default defineConfig({
 
     // Whether to serve the Admin UI from this process
     // In server mode: should be true; in worker: false
-    serveAdmin: process.env.DISABLE_MEDUSA_ADMIN !== "true",
+    serve_admin: process.env.DISABLE_MEDUSA_ADMIN !== "true",
   },
 
   // Redis‑backed Event Bus and Cache
