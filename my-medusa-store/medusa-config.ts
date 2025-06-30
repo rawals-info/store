@@ -32,23 +32,16 @@ module.exports = defineConfig({
         redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL,
       },
     },
-    payment: {
-      resolve: "@medusajs/payment",
-      options: {
-        providers: [
-          {
-            resolve: "medusa-payment-paypal",
-            options: {
-              sandbox: process.env.PAYPAL_SANDBOX === "true",
-              client_id: process.env.PAYPAL_CLIENT_ID,
-              client_secret: process.env.PAYPAL_CLIENT_SECRET,
-              auth_webhook_id: process.env.PAYPAL_AUTH_WEBHOOK_ID,
-            },
-          },
-        ],
-      },
-    },
   },
   plugins: [
+    {
+      resolve: "medusa-payment-paypal",
+      options: {
+        sandbox: process.env.PAYPAL_SANDBOX === "true",
+        client_id: process.env.PAYPAL_CLIENT_ID,
+        client_secret: process.env.PAYPAL_CLIENT_SECRET,
+        auth_webhook_id: process.env.PAYPAL_AUTH_WEBHOOK_ID,
+      },
+    },
   ],
 })
