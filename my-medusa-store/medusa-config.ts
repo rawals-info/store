@@ -26,9 +26,7 @@ export default defineConfig({
 
   // Admin UI settings (enable/disable via env)
   admin: {
-    disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
     backendUrl: process.env.MEDUSA_BACKEND_URL,
-    path: path.resolve(__dirname, "../packages/admin") as `/${string}`,
   },
   // Redis‑backed Event Bus & Cache
   modules: {
