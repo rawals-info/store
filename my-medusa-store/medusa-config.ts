@@ -37,7 +37,7 @@ module.exports = defineConfig({
       options: {
         providers: [
           {
-            resolve: "./src/modules/paypal",
+            resolve: "medusa-payment-paypal",
             options: {
               sandbox: process.env.PAYPAL_SANDBOX === "true",
               client_id: process.env.PAYPAL_CLIENT_ID,
