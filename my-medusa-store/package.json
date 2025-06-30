@@ -25,8 +25,9 @@
   "dependencies": {
     "@getbrevo/brevo": "^2.2.0",
     "@medusajs/admin-sdk": "2.8.5",
+    "@medusajs/cache-redis": "^2.8.5",
     "@medusajs/cli": "2.8.5",
-    "@medusajs/event-bus-redis": "2.8.5",
+    "@medusajs/event-bus-redis": "^2.8.5",
     "@medusajs/framework": "2.8.5",
     "@medusajs/medusa": "2.8.5",
     "@medusajs/payment": "2.8.5",
