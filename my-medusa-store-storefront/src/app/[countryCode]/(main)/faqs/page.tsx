@@ -1,7 +1,10 @@
-"use client"
+import FaqAccordion from "@components/FaqAccordion"
 
-import { useState } from "react"
-import Head from "next/head"
+export const metadata = {
+  title: "FAQs | Imperial Craft Of India",
+  description:
+    "Frequently asked questions about Imperial Craft Of India. Shipping, returns, wholesale, and more.",
+}
 
 const faqs = [
   {
@@ -80,45 +83,9 @@ const faqs = [
   },
 ]
 
-function FaqAccordion() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
-
-  return (
-    <div className="space-y-4">
-      {faqs.map((faq, idx) => (
-        <div key={idx} className="border border-luxury-gold/30 rounded-lg bg-white/70 shadow-sm overflow-hidden">
-          <button
-            className={`w-full text-left px-6 py-4 flex items-center justify-between font-serif text-lg md:text-xl text-luxury-charcoal focus:outline-none transition-colors duration-200 ${openIndex === idx ? 'bg-luxury-cream/40' : 'hover:bg-luxury-cream/20'}`}
-            aria-expanded={openIndex === idx}
-            aria-controls={`faq-panel-${idx}`}
-            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-          >
-            <span>{faq.question}</span>
-            <span className={`ml-4 transition-transform duration-300 ${openIndex === idx ? 'rotate-180 text-luxury-gold' : 'text-luxury-gold/60'}`}>▼</span>
-          </button>
-          <div
-            id={`faq-panel-${idx}`}
-            className={`px-6 pb-4 text-base text-luxury-charcoal/90 transition-all duration-300 ${openIndex === idx ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
-            style={{
-              transitionProperty: 'max-height, opacity',
-            }}
-            aria-hidden={openIndex !== idx}
-          >
-            {openIndex === idx && <div className="pt-2">{faq.answer}</div>}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export default function FaqsPage() {
   return (
     <div className="content-container py-12">
-      <Head>
-        <title>FAQs | Imperial Craft Of India</title>
-        <meta name="description" content="Frequently asked questions about Imperial Craft Of India. Shipping, returns, wholesale, and more." />
-      </Head>
       <div className="flex flex-col items-center text-center mb-16">
         <h1 className="font-display text-4xl text-luxury-gold mb-4 tracking-wide uppercase">Frequently Asked Questions</h1>
         <div className="h-px w-20 bg-luxury-gold mb-8"></div>
@@ -127,7 +94,7 @@ export default function FaqsPage() {
         </p>
       </div>
       <div className="max-w-3xl mx-auto">
-        <FaqAccordion />
+        <FaqAccordion faqs={faqs} />
       </div>
     </div>
   )

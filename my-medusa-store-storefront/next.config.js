@@ -66,7 +66,7 @@ const nextConfig = {
   },
   experimental: {
     scrollRestoration: true,
-    webpackBuildWorker: true,
+    webpackBuildWorker: false,
   },
   async headers() {
     return [

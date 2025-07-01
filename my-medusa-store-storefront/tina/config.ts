@@ -7,13 +7,19 @@ const branch =
   process.env.HEAD ||
   "main";
 
+// Toggle by setting TINA_PUBLIC_IS_LOCAL=true when working only with local files
+const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
+
 export default defineConfig({
   branch,
 
-  // Get this from tina.io
-  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
-  // Get this from tina.io
-  token: process.env.TINA_TOKEN,
+  // Only supply Cloud credentials in non-local builds
+  ...(isLocal
+    ? {}
+    : {
+        clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
+        token: process.env.TINA_TOKEN,
+      }),
 
   build: {
     outputFolder: "admin",

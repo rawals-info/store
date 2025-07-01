@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "Something went wrong",
 }
 
+export const dynamic = "force-dynamic"
+
 export default function NotFound() {
   return (
     <div className="flex flex-col gap-4 items-center justify-center min-h-[calc(100vh-64px)]">

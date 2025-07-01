@@ -8,8 +8,8 @@
     "medusa-storefront"
   ],
   "scripts": {
-    "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev  --datalayer-port 9101 -c \"next dev -p 8000\"",
-    "build": "tinacms build && next build",
+    "dev":   "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev -p 8000\"",
+    "build": "TINA_PUBLIC_IS_LOCAL=true tinacms build --local --skip-cloud-checks -c \"NODE_ENV=production next build\"",
     "start": "next start -p 8000",
     "lint": "next lint",
     "analyze": "ANALYZE=true next build"
