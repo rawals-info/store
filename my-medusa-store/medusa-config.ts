@@ -62,13 +62,20 @@ export default defineConfig({
         redisUrl: process.env.EVENTS_REDIS_URL || process.env.REDIS_URL!,
       },
     },
-    // Local file handling – this exposes /static/** and stores public URLs using
-    // the MEDUSA_BACKEND_URL from your environment (e.g. https://medusa-server-production-de80.up.railway.app)
+    // File module with local provider – serves /static/** and builds URLs using MEDUSA_BACKEND_URL
     file: {
-      resolve: "@medusajs/file-local",
+      resolve: "@medusajs/file",
       options: {
-        upload_dir: "static",
-        base_url: process.env.MEDUSA_BACKEND_URL,
+        providers: [
+          {
+            id: "local",
+            resolve: "@medusajs/file-local",
+            options: {
+              upload_dir: "static",
+              backend_url: process.env.MEDUSA_BACKEND_URL,
+            },
+          },
+        ],
       },
     },
     cacheService: {
