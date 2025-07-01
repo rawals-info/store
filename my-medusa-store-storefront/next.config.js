@@ -62,6 +62,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "medusa-server-production-de80.up.railway.app",
+      },
     ],
   },
   experimental: {
