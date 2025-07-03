@@ -1,5 +1,3 @@
-"use client"
-
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
 
@@ -34,10 +32,11 @@ export default async function CategoryTemplate({
     response: { products },
   } = await listProducts({
     countryCode,
+    regionId: region?.id,
     queryParams: {
       category_id: [category.id],
       limit: 100,
-    },
+    } as any,
   }).catch(() => ({ response: { products: [] } }))
 
   return (
@@ -51,11 +50,7 @@ export default async function CategoryTemplate({
         />
       )}
 
-      <ProductList
-        categoryName={category.name}
-        products={products}
-        region={region}
-      />
+      <ProductList products={products} region={region} />
     </div>
   )
 } 

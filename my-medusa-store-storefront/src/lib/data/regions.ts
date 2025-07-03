@@ -61,6 +61,22 @@ export const getRegion = async (countryCode: string) => {
     }
 
     // If still no region, return the first one as a last resort
-    return allRegions[0] ?? null
+    if (allRegions.length > 0) {
+      return allRegions[0]
+    }
+
+    // Graceful hard-coded fallback to keep frontend functional even if backend is unreachable
+    return {
+      id: "fallback-region",
+      name: "Fallback Region",
+      currency_code: "us",
+      tax_provider_id: null,
+      tax_rate: 0,
+      automatic_taxes: false,
+      gift_cards_taxable: false,
+      countries: [
+        { iso_2: countryCode, display_name: countryCode.toUpperCase() } as any,
+      ],
+    } as any // cast to StoreRegion
   }
 }
