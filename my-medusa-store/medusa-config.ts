@@ -62,17 +62,19 @@ export default defineConfig({
         redisUrl: process.env.EVENTS_REDIS_URL || process.env.REDIS_URL!,
       },
     },
-    // File module with local provider – serves /static/** and builds URLs using MEDUSA_BACKEND_URL
+    // File module configured with a custom Cloudinary provider
     file: {
       resolve: "@medusajs/file",
       options: {
         providers: [
           {
-            id: "local",
-            resolve: "@medusajs/file-local",
+            id: "cloudinary",            // can be any ID you like
+            resolve: "./src/cloudinary-file-service",
             options: {
-              upload_dir: "static",
-              backend_url: process.env.MEDUSA_BACKEND_URL,
+              cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+              api_key:    process.env.CLOUDINARY_API_KEY,
+              api_secret: process.env.CLOUDINARY_API_SECRET,
+              secure: true,
             },
           },
         ],
