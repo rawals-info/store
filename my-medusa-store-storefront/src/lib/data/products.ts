@@ -258,16 +258,19 @@ export const getInitialProducts = cache(async (countryCode: string) => {
 })
 
 export const getHomepageProducts = cache(async (countryCode: string) => {
-  const region = await getRegion(countryCode)
-  const featuredCollection = await getCollectionByHandle("featured-products").catch(() => null)
+  // Fetch region and collection in parallel to reduce latency
+  const [region, featuredCollection] = await Promise.all([
+    getRegion(countryCode),
+    getCollectionByHandle("featured-products").catch(() => null),
+  ])
 
-  if (!featuredCollection) {
+  if (!featuredCollection || !region) {
     return { featuredProducts: [] }
   }
 
   const { products: featuredProducts } = await getProducts(
-    { limit: 24, collection_id: [featuredCollection.id] } as any, // <--- ADD 'as any' HERE
-    region!.id
+    { limit: 24, collection_id: [featuredCollection.id] } as any,
+    region.id
   )
 
   return { featuredProducts }

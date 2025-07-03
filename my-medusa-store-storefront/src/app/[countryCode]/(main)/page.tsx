@@ -19,12 +19,15 @@ interface HomeProps {
 
 export default async function Home({ params }: HomeProps) {
   const { countryCode } = await params;
-  const region = await getRegion(countryCode);
-  const { collections } = await listCollections({ fields: "id, handle, title" });
-  const categories = await getCachedCategories().catch(() => [])
-  const { featuredProducts } = await getHomepageProducts(countryCode).catch(() => ({
-    featuredProducts: [],
-  }))
+  const [region, collectionsResp, categories, homepageProducts] = await Promise.all([
+    getRegion(countryCode),
+    listCollections({ fields: "id, handle, title" }),
+    getCachedCategories().catch(() => []),
+    getHomepageProducts(countryCode).catch(() => ({ featuredProducts: [] })),
+  ])
+
+  const { collections } = collectionsResp
+  const { featuredProducts } = homepageProducts
 
   if (!collections || !region) {
     return null;
