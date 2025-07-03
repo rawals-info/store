@@ -1,5 +1,3 @@
-"use client"
-
 import React, { Suspense } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
@@ -16,11 +14,8 @@ type ProductTemplateProps = {
   countryCode: string
 }
 
-// Dynamically load the (relatively heavy) ImageGallery so it's only downloaded
-// on product pages and keeps the core bundle lean.
-const ImageGallery = dynamic(() => import("@modules/products/components/image-gallery"), {
-  ssr: false,
-})
+// Dynamically load the gallery; keep SSR so it renders on the server and avoids the forbidden ssr:false flag.
+const ImageGallery = dynamic(() => import("@modules/products/components/image-gallery"))
 
 export default function ProductTemplate({
   product,
