@@ -33,6 +33,6 @@ export const listCartPaymentMethods = async (regionId: string) => {
     )
     .catch((error) => {
       console.error("Error fetching payment providers:", error)
-      return null
+      return []
     })
 }
