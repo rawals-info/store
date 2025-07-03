@@ -5,6 +5,7 @@ import { getRegion } from "@lib/data/regions";
 import { getCachedCategories } from "@modules/home/components/categories"
 import { getHomepageProducts } from "@lib/data/products"
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Imperial Craft Of India | Fine Hand-Crafts",
@@ -34,11 +35,13 @@ export default async function Home({ params }: HomeProps) {
   }
 
   return (
-    <HomeClientWrapper
-      featuredProducts={featuredProducts}
-      categories={categories}
-      region={region}
-      countryCode={countryCode}
-    />
+    <Suspense fallback={<div className="min-h-screen bg-white" />}> 
+      <HomeClientWrapper
+        featuredProducts={featuredProducts}
+        categories={categories}
+        region={region}
+        countryCode={countryCode}
+      />
+    </Suspense>
   );
 } 

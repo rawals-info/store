@@ -1,8 +1,10 @@
+"use client"
+
 import React, { Suspense } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
 import ProductInfo from "@modules/products/templates/product-info"
-import ImageGallery from "@modules/products/components/image-gallery"
+import dynamic from "next/dynamic"
 import ProductActions from "@modules/products/components/product-actions"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductTabsWrapper from "@modules/products/components/product-tabs-wrapper"
@@ -13,6 +15,12 @@ type ProductTemplateProps = {
   region: HttpTypes.StoreRegion
   countryCode: string
 }
+
+// Dynamically load the (relatively heavy) ImageGallery so it's only downloaded
+// on product pages and keeps the core bundle lean.
+const ImageGallery = dynamic(() => import("@modules/products/components/image-gallery"), {
+  ssr: false,
+})
 
 export default function ProductTemplate({
   product,
