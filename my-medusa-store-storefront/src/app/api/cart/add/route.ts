@@ -25,10 +25,16 @@ export async function POST(request: Request) {
     const existingCartId = cookieStore.get("_medusa_cart_id")?.value
 
     if (existingCartId) {
-      // Fire-and-forget add operation; it will create/update the cart server-side.
-      addToCart({ variantId, quantity, countryCode }).catch((error) => {
-        logError("Error adding item to cart in background:", error)
-      })
+      // Attempt to add item and surface any backend errors instead of ignoring them
+      const result = await addToCart({ variantId, quantity, countryCode })
+
+      if (!result.success) {
+        logError("Add-to-cart failed:", result.error)
+        return NextResponse.json(
+          { success: false, error: result.error },
+          { status: 500 }
+        )
+      }
 
       return NextResponse.json({ success: true, cartId: existingCartId })
     }
@@ -56,10 +62,18 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
     })
 
-    // Background add-to-cart (no await)
-    addToCart({ variantId, quantity, countryCode }).catch((error) => {
-      logError("Error adding item to cart in background:", error)
-    })
+    // Try to add the item right away so we can catch any errors and surface them
+    const result = await addToCart({ variantId, quantity, countryCode })
+
+    if (!result.success) {
+      logError("Add-to-cart failed:", result.error)
+      // Revoke the previously set cookie since the cart is not valid
+      response.cookies.delete("_medusa_cart_id")
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: 500 }
+      )
+    }
 
     return response
   } catch (error: any) {
