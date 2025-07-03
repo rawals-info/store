@@ -1,7 +1,5 @@
-"use client"
-
+import React, { Suspense } from "react"
 import { HttpTypes } from "@medusajs/types"
-import React, { Suspense, useEffect, useState } from "react"
 import { notFound } from "next/navigation"
 import ProductInfo from "@modules/products/templates/product-info"
 import ImageGallery from "@modules/products/components/image-gallery"
@@ -26,13 +24,6 @@ export default function ProductTemplate({
     tag.value?.toLowerCase().includes("limited") || 
     tag.value?.toLowerCase().includes("edition")
   )
-  
-  // Add client-side loading to improve performance
-  const [isClientSide, setIsClientSide] = useState(false)
-  
-  useEffect(() => {
-    setIsClientSide(true)
-  }, [])
 
   if (!product) {
     return notFound()
@@ -78,38 +69,32 @@ export default function ProductTemplate({
           </div>
         </div>
         
-        {/* Only load tabs after initial render */}
-        {isClientSide && (
-          <div className="mt-16 max-w-4xl mx-auto">
-            <div className="border-b border-luxury-gold/20 mb-8">
-              <h2 className="font-display text-2xl text-luxury-charcoal">Product Details</h2>
-            </div>
-            <Suspense fallback={<div className="h-[200px] flex items-center justify-center">
-              <p className="text-luxury-charcoal/50">Loading product details...</p>
-            </div>}>
-              <ProductTabsWrapper product={product} />
-            </Suspense>
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="border-b border-luxury-gold/20 mb-8">
+            <h2 className="font-display text-2xl text-luxury-charcoal">Product Details</h2>
           </div>
-        )}
+          <Suspense fallback={<div className="h-[200px] flex items-center justify-center">
+            <p className="text-luxury-charcoal/50">Loading product details...</p>
+          </div>}>
+            <ProductTabsWrapper product={product} />
+          </Suspense>
+        </div>
       </div>
       
-      {/* Only load related products after initial render */}
-      {isClientSide && (
-        <div className="bg-luxury-cream/10 py-16">
-          <div
-            className="content-container"
-            data-testid="related-products-container"
-          >
-            <div className="text-center mb-12">
-              <h2 className="font-display text-2xl lg:text-3xl text-luxury-charcoal">You May Also Like</h2>
-              <div className="h-px w-24 bg-luxury-gold mx-auto mt-4"></div>
-            </div>
-            <Suspense fallback={<SkeletonRelatedProducts />}>
-              <RelatedProducts product={product} countryCode={countryCode} />
-            </Suspense>
+      <div className="bg-luxury-cream/10 py-16">
+        <div
+          className="content-container"
+          data-testid="related-products-container"
+        >
+          <div className="text-center mb-12">
+            <h2 className="font-display text-2xl lg:text-3xl text-luxury-charcoal">You May Also Like</h2>
+            <div className="h-px w-24 bg-luxury-gold mx-auto mt-4"></div>
           </div>
+          <Suspense fallback={<SkeletonRelatedProducts />}>
+            <RelatedProducts product={product} countryCode={countryCode} />
+          </Suspense>
         </div>
-      )}
+      </div>
       
       {/* Craftsmanship commitment section - lightweight */}
       <div className="content-container my-16">
