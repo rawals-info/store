@@ -471,7 +471,7 @@ export async function placeOrder(cartId?: string) {
 
   // Start pre-fetching order cache invalidation to save time later
   const orderCacheTagPromise = getCacheTag("orders")
-  const cartCacheTagPromise = getCacheTag("carts")
+  const customCartCacheTagPromise = getCacheTag("cart")
 
   const headers = {
     ...(await getAuthHeaders()),
@@ -493,14 +493,20 @@ export async function placeOrder(cartId?: string) {
     ]) as any;
 
     // We can now use the pre-fetched cache tags
-    const [orderCacheTag, cartCacheTag] = await Promise.all([
+    const [orderCacheTag, customCartCacheTag] = await Promise.all([
       orderCacheTagPromise,
-      cartCacheTagPromise
+      customCartCacheTagPromise
     ]);
 
-    // Revalidate caches
-    revalidateTag(cartCacheTag)
-    revalidateTag(orderCacheTag)
+    // Revalidate caches: generic and id-specific cart tags
+    revalidateTag("cart")
+    revalidateTag(`cart-${id}`)
+    if (customCartCacheTag) {
+      revalidateTag(customCartCacheTag)
+    }
+    if (orderCacheTag) {
+      revalidateTag(orderCacheTag)
+    }
 
     if (cartRes?.type === "order") {
       const countryCode =
@@ -519,8 +525,12 @@ export async function placeOrder(cartId?: string) {
   } catch (error) {
     console.error("Error placing order:", error)
     // Revalidate cart to ensure UI is consistent
-    const cartCacheTag = await cartCacheTagPromise
-    revalidateTag(cartCacheTag)
+    const customCartCacheTag = await customCartCacheTagPromise
+    revalidateTag("cart")
+    revalidateTag(`cart-${id}`)
+    if (customCartCacheTag) {
+      revalidateTag(customCartCacheTag)
+    }
     throw error
   }
 }
