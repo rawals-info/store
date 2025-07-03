@@ -20,8 +20,8 @@ import { useCart } from "@lib/hooks/use-cart"
 
 const CartDropdown = () => {
   const { cart: cartState } = useCart()
-  const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
-    undefined
+  const [activeTimer, setActiveTimer] = useState<ReturnType<typeof setTimeout> | null>(
+    null
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
 
@@ -61,7 +61,7 @@ const CartDropdown = () => {
     }
   }, [activeTimer])
 
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ""
 
   // open cart dropdown when modifying the cart items, but only if we're not on the cart page
   useEffect(() => {
@@ -178,7 +178,7 @@ const CartDropdown = () => {
                         <div className="flex flex-col justify-between flex-1">
                           <div className="flex flex-col flex-1">
                             <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[150px]">
+                              <div className="flex flex-col overflow-ellipsis sm:whitespace-nowrap mr-4 w-[150px]">
                                 <h3 className="font-display text-base overflow-hidden text-ellipsis">
                                   <LocalizedClientLink
                                     href={`/products/${item.product_handle}`}

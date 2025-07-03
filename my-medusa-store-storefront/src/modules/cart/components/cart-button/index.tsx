@@ -46,7 +46,7 @@ export default function CartButton() {
   return (
     <div className="relative z-[100]">
       <LocalizedClientLink
-        className="hover:text-luxury-gold transition-colors duration-300 flex items-center gap-1 uppercase tracking-wider text-small-semi relative group whitespace-nowrap"
+        className="hover:text-luxury-gold transition-colors duration-300 flex items-center gap-1 uppercase tracking-wider text-small-semi relative group sm:whitespace-nowrap"
         href="/cart"
         data-testid="nav-cart-link"
       >
@@ -69,7 +69,7 @@ export default function CartButton() {
       <AnimatePresence>
         {isAdded && (
           <motion.div 
-            className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-luxury-gold/90 text-luxury-ivory py-1 px-3 rounded-sm text-xs whitespace-nowrap"
+            className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-luxury-gold/90 text-luxury-ivory py-1 px-3 rounded-sm text-xs sm:whitespace-nowrap"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

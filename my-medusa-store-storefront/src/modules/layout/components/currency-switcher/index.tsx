@@ -14,7 +14,8 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [currencies, setCurrencies] = useState<Record<string, string[]>>({}) // currency -> country codes
   const [currentCurrency, setCurrentCurrency] = useState<string | null>(null)
-  const { countryCode } = useParams()
+  const params = useParams<{ countryCode: string }>()
+  const countryCode = params?.countryCode
   const dropdownRef = useRef<HTMLDivElement>(null)
   
   useEffect(() => {
@@ -111,7 +112,7 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
         className={`flex items-center gap-1 ${
           isFooter 
             ? "text-luxury-charcoal/80 hover:text-luxury-gold transition-colors duration-300" 
-            : "text-xs sm:text-sm whitespace-nowrap"
+            : "text-xs sm:text-sm sm:whitespace-nowrap"
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >

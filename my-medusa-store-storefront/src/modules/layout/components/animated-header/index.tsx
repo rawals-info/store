@@ -227,7 +227,7 @@ const AnimatedHeader = () => {
                       variants={linkVariants}
                     >
                       <LocalizedClientLink
-                        className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
+                        className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap ${
                           isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
                         } ${isActive ? "text-luxury-gold" : ""}`}
                         href={link.href}
@@ -318,7 +318,7 @@ const AnimatedHeader = () => {
                     variants={linkVariants}
                   >
                     <LocalizedClientLink
-                      className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 ${
+                      className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap ${
                         isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
                       }`}
                       href={link.href}
