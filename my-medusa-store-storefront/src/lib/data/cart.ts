@@ -152,20 +152,55 @@ export async function addToCart({
     return { success: false, error: "Missing variant ID" }
   }
 
-  const cart = await getOrSetCart(countryCode)
-
-  if (!cart) {
-    return { success: false, error: "Failed to retrieve or create cart" }
-  }
+  // Try to fetch an existing cart first to avoid unnecessary creation
+  const existingCart = await retrieveCart()
 
   const headers = {
     ...(await getAuthHeaders()),
   }
 
+  // No cart yet → create one and include the requested item in the same request
+  if (!existingCart) {
+    const region = await getRegion(countryCode)
+
+    if (!region) {
+      return { success: false, error: "Region not found" }
+    }
+
+    try {
+      const { cart: newCart } = await sdk.store.cart.create(
+        {
+          region_id: region.id,
+          items: [
+            {
+              variant_id: variantId,
+              quantity,
+            },
+          ],
+        },
+        {},
+        headers
+      )
+
+      // Persist cart ID for subsequent requests
+      await setCartId(newCart.id)
+
+      const cartCacheTag = await getCacheTag("carts")
+      revalidateTag(cartCacheTag)
+
+      return { success: true, cart: newCart }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }
+    }
+  }
+
+  // Cart already exists → add the item via the usual line-item endpoint
   try {
-    // Add the item
     const result = await sdk.store.cart.createLineItem(
-      cart.id,
+      existingCart.id,
       {
         variant_id: variantId,
         quantity,
@@ -173,14 +208,12 @@ export async function addToCart({
       {},
       headers
     )
-    
-    // Only revalidate the cart cache tag (optimize by removing unnecessary tag invalidation)
+
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
-    
+
     return { success: true, cart: result.cart }
   } catch (error) {
-    // Handle error but don't log it (caller will handle logging if needed)
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }

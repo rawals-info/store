@@ -1,5 +1,5 @@
 import PaymentContainer from "@modules/checkout/components/payment-container"
-import PayPalButton from "./paypal-button"
+import dynamic from "next/dynamic"
 
 interface Props {
   cart: any
@@ -7,6 +7,10 @@ interface Props {
   selectedPaymentOptionId: string
   paymentInfoMap: Record<string, any>
 }
+
+// Lazy-load the PayPal button (and thus the PayPal JS SDK) only when the
+// PayPal option is actively selected by the shopper.
+const PayPalButton = dynamic(() => import("./paypal-button"), { ssr: false })
 
 const PayPalContainer: React.FC<Props> = ({
   cart,
