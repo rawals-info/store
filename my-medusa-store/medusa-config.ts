@@ -97,6 +97,7 @@ export default defineConfig({
             options: {
               webhook_url: process.env.SLACK_WEBHOOK_URL,
               admin_url: process.env.SLACK_ADMIN_URL,
+              channels: ["slack"],
             },
           },
         ],

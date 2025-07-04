@@ -9,6 +9,7 @@ import { NotificationTypes } from "@medusajs/framework/types"
 interface SlackProviderOptions {
   webhook_url: string
   admin_url: string
+  channels?: string[]
 }
 
 // This provider currently has no injected dependencies but we keep the type for future-proofing.
@@ -114,6 +115,8 @@ class SlackNotificationProviderService extends AbstractNotificationProviderServi
   async send(
     notification: NotificationTypes.ProviderSendNotificationDTO
   ): Promise<NotificationTypes.ProviderSendNotificationResultsDTO> {
+    console.info("[SlackProvider] Sending notification", JSON.stringify(notification));
+
     if (!notification) {
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
