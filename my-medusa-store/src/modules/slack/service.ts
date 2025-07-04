@@ -49,12 +49,32 @@ class SlackNotificationProviderService extends AbstractNotificationProviderServi
     }
   }
 
-  /** Helper to format prices using Intl API (amount is in the smallest currency unit). */
+  /** Helper to format prices using Intl API.
+   * Medusa already stores monetary amounts in major currency units, so we do not divide by 100.
+   */
   private formatAmount(amount: number, currency: string): string {
     return Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency.toUpperCase(),
-    }).format(amount / 100)
+    }).format(amount)
+  }
+
+  /** Formats a postal address into a multiline string compatible with Slack */
+  private formatAddress(address: any): string {
+    if (!address) {
+      return "—"
+    }
+
+    const parts = [
+      [address.first_name, address.last_name].filter(Boolean).join(" "),
+      address.address_1,
+      address.address_2,
+      `${address.postal_code ?? ""} ${address.city ?? ""}`.trim(),
+      address.country_code ? address.country_code.toUpperCase() : undefined,
+      address.phone,
+    ].filter(Boolean)
+
+    return parts.join("\n")
   }
 
   /**
@@ -93,6 +113,19 @@ class SlackNotificationProviderService extends AbstractNotificationProviderServi
           {
             type: "mrkdwn",
             text: `*Customer*\n${order.email}`,
+          },
+        ],
+      },
+      {
+        type: "section",
+        fields: [
+          {
+            type: "mrkdwn",
+            text: `*Shipping address*\n${this.formatAddress(order.shipping_address)}`,
+          },
+          {
+            type: "mrkdwn",
+            text: `*Payment*\n${(order.payments?.[0]?.provider_id ?? "—").toUpperCase()}`,
           },
         ],
       },
