@@ -34,7 +34,7 @@ export const orderPlacedNotificationWorkflow = createWorkflow(
     // Send a Slack notification using the Notification module.
     sendNotificationsStep([
       {
-        to: "slack-channel", // this is configured inside Slack when generating the webhook
+        to: "slack", // matches provider id/channel id configured
         channel: "slack",
         template: "order-created",
         data: {

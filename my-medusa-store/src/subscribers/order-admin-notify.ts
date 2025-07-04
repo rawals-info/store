@@ -37,18 +37,60 @@ export default async function orderAdminNotify({
 
     /* ----------------- 1. Send email to admin ----------------- */
     if (ADMIN_EMAIL) {
-      const totalAmount = typeof order.total === "number" ? order.total : Number(order.total ?? 0)
-      const totalFormatted = (totalAmount / 100).toFixed(2) +
-        " " +
-        order.currency_code.toUpperCase()
+      const fmt = (amt: number) =>
+        Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: order.currency_code.toUpperCase(),
+        }).format(amt / 100)
+
+      const items: any[] = Array.isArray(order.items) ? order.items : []
+      const itemsHtml = items
+        .map(
+          (it: any) =>
+            `<tr><td>${it.title}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${fmt(Number(it.total ?? it.unit_price * it.quantity))}</td></tr>`
+        )
+        .join("")
+
+      const addressLines = (addr: any) =>
+        [
+          [addr.first_name, addr.last_name].filter(Boolean).join(" "),
+          addr.address_1,
+          addr.address_2,
+          `${addr.postal_code ?? ""} ${addr.city ?? ""}`.trim(),
+          addr.country_code ? addr.country_code.toUpperCase() : undefined,
+          addr.phone,
+        ]
+          .filter(Boolean)
+          .map((l) => `<div>${l}</div>`) // wrap each line
+          .join("")
 
       const body = `
-        <p>A new order has just been placed on Imperial Craft Of India.</p>
-        <p><strong>Order #${order.display_id ?? order.id}</strong><br/>
-        Total: <strong>${totalFormatted}</strong><br/>
-        Customer: ${order.email}</p>
+        <p><strong>Order #${order.display_id ?? order.id}</strong> has been placed.</p>
+
+        <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px;margin-top:16px">
+          <thead><tr><th align="left">Item</th><th align="center">Qty</th><th align="right">Total</th></tr></thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+
+        <p style="margin-top:16px"><strong>Subtotal:</strong> ${fmt(Number(order.subtotal ?? 0))}</p>
+        <p><strong>Shipping:</strong> ${fmt(Number(order.shipping_total ?? 0))}</p>
+        <p><strong>Tax:</strong> ${fmt(Number(order.tax_total ?? 0))}</p>
+        ${order.discount_total ? `<p><strong>Discount:</strong> -${fmt(Number(order.discount_total))}</p>` : ""}
+        <p><strong>Grand Total:</strong> ${fmt(Number(order.total ?? 0))}</p>
+
+        <h3 style="margin-top:24px">Customer Details</h3>
+        <p><strong>Email:</strong> ${order.email}</p>
+        <h4>Shipping Address</h4>
+        ${addressLines(order.shipping_address ?? {})}
+        <h4 style="margin-top:12px">Billing Address</h4>
+        ${addressLines(order.billing_address ?? {})}
+
         <p style="text-align:center;margin:32px 0;">
-          <a href="${process.env.ADMIN_URL ?? process.env.MEDUSA_BACKEND_URL ?? "http://localhost:9000"}/app/orders/${order.id}" style="background:#D4AF37;color:#ffffff;padding:12px 24px;text-decoration:none;font-weight:600;border-radius:3px;">View Order</a>
+          <a href="${
+            process.env.ADMIN_URL ?? process.env.MEDUSA_BACKEND_URL ?? "http://localhost:9000"
+          }/app/orders/${
+        order.id
+          }" style="background:#D4AF37;color:#ffffff;padding:12px 24px;text-decoration:none;font-weight:600;border-radius:3px;">View Order in Admin</a>
         </p>
       `
 

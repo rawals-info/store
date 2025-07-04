@@ -25,12 +25,53 @@ export default async function orderConfirmationEmail({
     ],
   })
 
+  const fmt = (amt: number) =>
+    Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: order.currency_code?.toUpperCase?.() ?? "USD",
+    }).format(amt / 100)
+
+  const items: any[] = Array.isArray(order.items) ? order.items : []
+  const itemsHtml = items
+    .map(
+      (it: any) =>
+        `<tr><td>${it.title}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${fmt(Number(
+          it.total ?? it.unit_price * it.quantity
+        ))}</td></tr>`
+    )
+    .join("")
+
+  const addressLines = (addr: any) =>
+    [
+      [addr.first_name, addr.last_name].filter(Boolean).join(" "),
+      addr.address_1,
+      addr.address_2,
+      `${addr.postal_code ?? ""} ${addr.city ?? ""}`.trim(),
+      addr.country_code ? addr.country_code.toUpperCase() : undefined,
+      addr.phone,
+    ]
+      .filter(Boolean)
+      .map((l) => `<div>${l}</div>`) // wrap each line
+      .join("")
+
   const body = `
     <p>Dear ${order.first_name ?? order.email},</p>
-    <p>Thank you for shopping with Imperial Craft Of India. We're delighted to confirm that we've received your order <strong>#${order.display_id}</strong> totalling <strong>${
-      order.total / 100
-    } ${order.currency_code?.toUpperCase?.() ?? ""}</strong>.</p>
-    <p>You'll receive another email as soon as your items are on the way.</p>
+    <p>Thank you for your purchase! Your order <strong>#${order.display_id}</strong> has been received and is now being processed.</p>
+
+    <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px;margin-top:16px">
+      <thead><tr><th align="left">Item</th><th align="center">Qty</th><th align="right">Total</th></tr></thead>
+      <tbody>${itemsHtml}</tbody>
+    </table>
+    <p style="margin-top:16px"><strong>Subtotal:</strong> ${fmt(Number(order.subtotal ?? 0))}</p>
+    <p><strong>Shipping:</strong> ${fmt(Number(order.shipping_total ?? 0))}</p>
+    <p><strong>Tax:</strong> ${fmt(Number(order.tax_total ?? 0))}</p>
+    ${order.discount_total ? `<p><strong>Discount:</strong> -${fmt(Number(order.discount_total))}</p>` : ""}
+    <p><strong>Grand Total:</strong> ${fmt(Number(order.total ?? 0))}</p>
+
+    <h3 style="margin-top:24px">Shipping To</h3>
+    ${addressLines(order.shipping_address ?? {})}
+
+    <p style="margin-top:32px">You will receive a shipment notification with tracking details as soon as your order is on its way.</p>
     <p style="margin-top:32px">With appreciation,<br/>The Imperial Craft Of India Team</p>
   `
 

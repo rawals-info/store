@@ -125,7 +125,7 @@ class SlackNotificationProviderService extends AbstractNotificationProviderServi
           },
           {
             type: "mrkdwn",
-            text: `*Payment*\n${(order.payments?.[0]?.provider_id ?? "—").toUpperCase()}`,
+            text: `*Payment*\n${this.extractPaymentProvider(order)}`,
           },
         ],
       },
@@ -139,6 +139,28 @@ class SlackNotificationProviderService extends AbstractNotificationProviderServi
     ]
 
     return { text, blocks }
+  }
+
+  /**
+   * Returns the payment provider ID in uppercase or "—" if not available.
+   */
+  private extractPaymentProvider(order: any): string {
+    let provider: string | undefined
+
+    // New module structure – payment_collections -> payments
+    if (Array.isArray(order.payment_collections) && order.payment_collections.length) {
+      const payments = order.payment_collections[0]?.payments
+      if (Array.isArray(payments) && payments.length) {
+        provider = payments[0]?.provider_id
+      }
+    }
+
+    // Fallback to legacy `payments` array
+    if (!provider && Array.isArray(order.payments) && order.payments.length) {
+      provider = order.payments[0]?.provider_id
+    }
+
+    return provider ? provider.toUpperCase() : "—"
   }
 
   /**
