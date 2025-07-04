@@ -86,6 +86,22 @@ export default defineConfig({
         redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL!,
       },
     },
+    // Register Slack notification provider
+    notification: {
+      resolve: "@medusajs/notification",
+      options: {
+        providers: [
+          {
+            id: "slack",
+            resolve: "./src/modules/slack",
+            options: {
+              webhook_url: process.env.SLACK_WEBHOOK_URL,
+              admin_url: process.env.SLACK_ADMIN_URL,
+            },
+          },
+        ],
+      },
+    },
   },
 
   // Plugins (e.g. PayPal)

@@ -13232,6 +13232,7 @@ __metadata:
     "@medusajs/file-local": 2.8.5
     "@medusajs/framework": ^2.8.5
     "@medusajs/medusa": 2.8.5
+    "@medusajs/notification": 2.8.5
     "@medusajs/payment": 2.8.5
     "@medusajs/test-utils": 2.8.5
     "@mikro-orm/cli": 6.4.3
