@@ -86,6 +86,14 @@ export default defineConfig({
         redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL!,
       },
     },
+    workflowEngine: {
+      resolve: "@medusajs/workflow-engine-redis",
+      options: {
+        redis: {
+          url: process.env.REDIS_URL!,
+        },
+      },
+    },
     // Register Slack notification provider
     notification: {
       resolve: "@medusajs/notification",
