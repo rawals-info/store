@@ -54,7 +54,8 @@ export async function generateMetadata({
   }
 }
 
-const PRODUCT_LIMIT = 100 // Increased to match search.ts changes
+// Lower limit to avoid over-fetching and reduce TTFB
+const PRODUCT_LIMIT = 32
 
 // Make each part of the page a separate component to avoid params access issues
 async function SearchContent({ 
@@ -79,12 +80,20 @@ async function SearchContent({
   const parsedPage = parseInt(pageNum, 10)
   const offset = (parsedPage - 1) * PRODUCT_LIMIT
 
-  // Get categories for suggested browsing
-  const categories: Category[] = await listCategories().catch(err => {
-    console.error("Failed to load categories:", err)
-    return []
-  })
-  
+  // Kick off all independent network calls in parallel
+  const [categories, regionsResp, searchRes] = await Promise.all([
+    listCategories().catch((err) => {
+      console.error("Failed to load categories:", err)
+      return [] as Category[]
+    }),
+    listRegions().catch((error) => {
+      console.error("Error fetching regions:", error)
+      return []
+    }),
+    // We still need region_id for price calculation; will reuse later
+    Promise.resolve(undefined),
+  ]) as [Category[], StoreRegion[], undefined]
+
   const topCategories = categories.slice(0, 4)
 
   if (!query) {
@@ -106,13 +115,7 @@ async function SearchContent({
     )
   }
 
-  // Determine user region
-  let regions: StoreRegion[] = []
-  try {
-    regions = await listRegions()
-  } catch (error) {
-    console.error("Error fetching regions:", error)
-  }
+  const regions = regionsResp
 
   // Even if we can't find the exact region, attempt the search anyway with available info
   const region = regions.find(

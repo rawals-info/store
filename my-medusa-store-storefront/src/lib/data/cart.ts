@@ -15,6 +15,7 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
+import { scheduleRevalidate } from "@lib/utils/revalidate"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -93,7 +94,7 @@ export async function getOrSetCart(countryCode: string) {
       await setCartId(cart.id)
 
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
     } catch (error) {
       console.error("Error creating cart:", error)
       return null
@@ -104,7 +105,7 @@ export async function getOrSetCart(countryCode: string) {
     try {
       await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
     } catch (error) {
       console.error("Error updating cart region:", error)
       // Continue with existing cart
@@ -129,10 +130,10 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
     .update(cartId, data, {}, headers)
     .then(async ({ cart }) => {
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
 
       const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      scheduleRevalidate(fulfillmentCacheTag)
 
       return cart
     })
@@ -186,7 +187,7 @@ export async function addToCart({
       await setCartId(newCart.id)
 
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
 
       return { success: true, cart: newCart }
     } catch (error) {
@@ -210,7 +211,7 @@ export async function addToCart({
     )
 
     const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    scheduleRevalidate(cartCacheTag)
 
     return { success: true, cart: result.cart }
   } catch (error) {
@@ -273,7 +274,7 @@ export async function batchAddToCart({
     
     // Revalidate cache only once for all additions
     const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    scheduleRevalidate(cartCacheTag)
     
     return { success: true, cart: lastValidResult.cart }
   } catch (error) {
@@ -306,10 +307,10 @@ export async function updateLineItem({
     .updateLineItem(cartId, lineId, { quantity }, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
 
       const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      scheduleRevalidate(fulfillmentCacheTag)
     })
     .catch(medusaError)
 }
@@ -333,10 +334,10 @@ export async function deleteLineItem(lineId: string) {
     .deleteLineItem(cartId, lineId, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
 
       const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      scheduleRevalidate(fulfillmentCacheTag)
     })
     .catch(medusaError)
 }
@@ -356,7 +357,7 @@ export async function setShippingMethod({
     .addShippingMethod(cartId, { option_id: shippingMethodId }, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
     })
     .catch(medusaError)
 }
@@ -373,7 +374,7 @@ export async function initiatePaymentSession(
     .initiatePaymentSession(cart, data, {}, headers)
     .then(async (resp) => {
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
       return resp
     })
     .catch(medusaError)
@@ -394,10 +395,10 @@ export async function applyPromotions(codes: string[]) {
     .update(cartId, { promo_codes: codes }, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
 
       const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      scheduleRevalidate(fulfillmentCacheTag)
     })
     .catch(medusaError)
 }
@@ -554,7 +555,7 @@ export async function updateRegion(countryCode: string, currentPath: string) {
       try {
         await updateCart({ region_id: region.id })
         const cartCacheTag = await getCacheTag("carts")
-        revalidateTag(cartCacheTag)
+        scheduleRevalidate(cartCacheTag)
       } catch (error) {
         console.error("Error updating cart region, will create new cart:", error)
         // If updating fails, remove the cart ID so we create a new one on next visit
