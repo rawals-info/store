@@ -56,7 +56,7 @@ export default defineConfig({
   },
   // Redis-backed Event Bus & Cache
   modules: {
-    eventBus: {
+    "event_bus": {
       resolve: "@medusajs/event-bus-redis",
       options: {
         redisUrl: process.env.EVENTS_REDIS_URL || process.env.REDIS_URL!,
@@ -80,7 +80,7 @@ export default defineConfig({
         ],
       },
     },
-    cacheService: {
+    cache: {
       resolve: "@medusajs/cache-redis",
       options: {
         redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL!,
