@@ -60,8 +60,8 @@ const Shipping: React.FC<ShippingProps> = ({
     Record<string, number>
   >({})
   const [error, setError] = useState<string | null>(null)
-  const [shippingMethodId, setShippingMethodId] = useState<string | null>(
-    cart.shipping_methods?.at(-1)?.shipping_option_id || null
+  const [shippingMethodId, setShippingMethodId] = useState<string>(
+    cart.shipping_methods?.at(-1)?.shipping_option_id || ""
   )
 
   const searchParams = useSearchParams()
@@ -70,9 +70,9 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const isOpen = searchParams.get("step") === "delivery"
 
-  const _shippingMethods = availableShippingMethods?.filter(
-    (sm) => sm.service_zone?.fulfillment_set?.type !== "pickup"
-  )
+  const _shippingMethods = availableShippingMethods
+    ?.filter((sm) => sm.service_zone?.fulfillment_set?.type !== "pickup")
+    ?.filter((sm) => sm.name.toLowerCase() !== "express shipping")
 
   const _pickupMethods = availableShippingMethods?.filter(
     (sm) => sm.service_zone?.fulfillment_set?.type === "pickup"
@@ -366,7 +366,7 @@ const Shipping: React.FC<ShippingProps> = ({
               className="mt-8 bg-[var(--color-luxury-gold)] hover:bg-[var(--color-luxury-darkgold)] text-white border-none px-8 py-3 rounded-md luxury-btn"
               onClick={handleSubmit}
               isLoading={isLoading}
-              disabled={!cart.shipping_methods?.[0]}
+              disabled={!shippingMethodId || isLoading}
               data-testid="submit-delivery-option-button"
             >
               Continue to payment

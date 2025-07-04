@@ -57,8 +57,22 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           className={className}
         />
       )
-    default:
-      return <Button disabled className={className}>Select a payment method</Button>
+    default: {
+      let label = "Select a payment method"
+
+      // Fine-grained hints for earlier steps
+      if (!cart?.shipping_address || !cart?.billing_address || !cart?.email) {
+        label = "Enter shipping information"
+      } else if ((cart.shipping_methods?.length ?? 0) < 1) {
+        label = "Select a delivery method"
+      }
+
+      return (
+        <Button disabled className={className} aria-disabled>
+          {label}
+        </Button>
+      )
+    }
   }
 }
 
