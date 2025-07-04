@@ -134,7 +134,9 @@ const Footer = () => {
                 { href: "/shipping", label: "Shipping & Returns" },
                 { href: "/faq", label: "FAQ" },
                 { href: "/care", label: "Product Care Guide" },
-                { href: "/privacy", label: "Privacy Policy" }
+                { href: "/privacy", label: "Privacy Policy" },
+                { href: "/terms", label: "Terms & Conditions" },
+                { href: "/csr-policy", label: "CSR Policy" }
               ].map((link) => (
                 <motion.li key={link.href} whileHover={{ x: 3 }} transition={{ duration: 0.2 }}>
                   <LocalizedClientLink 
@@ -218,7 +220,7 @@ const Footer = () => {
             </Text>
             <div className="flex space-x-8 mt-4 md:mt-0">
               <LocalizedClientLink href="/terms" className="text-luxury-charcoal/60 hover:text-luxury-gold transition-colors duration-300 text-sm">
-                Terms of Service
+                Terms & Conditions
               </LocalizedClientLink>
               <LocalizedClientLink href="/privacy" className="text-luxury-charcoal/60 hover:text-luxury-gold transition-colors duration-300 text-sm">
                 Privacy Policy
