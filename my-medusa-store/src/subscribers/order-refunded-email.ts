@@ -1,6 +1,8 @@
 // @ts-ignore
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import { Modules } from "@medusajs/framework/utils"
+import type { IOrderModuleService } from "@medusajs/framework/types"
 
 export default async function orderRefundedEmail({
   event,
@@ -9,8 +11,8 @@ export default async function orderRefundedEmail({
   const orderId = (event as any).data.order_id ?? (event as any).data.id
   if (!orderId) return
 
-  const orderService = container.resolve("order") as any
-  const order = await orderService.retrieve(orderId, {
+  const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
+  const order: any = await orderService.retrieveOrder(orderId, {
     relations: ["customer"],
   })
 
@@ -22,7 +24,8 @@ export default async function orderRefundedEmail({
   `
 
   await sendLuxuryEmail({
-    to: order.email,
+    to: order.email as string,
+    // @ts-ignore
     name: order.first_name ?? order.email,
     subject: `Refund Processed for Order #${order.display_id}`,
     html: buildLuxuryTemplate("Refund Confirmation", body),

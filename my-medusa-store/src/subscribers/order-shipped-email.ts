@@ -1,6 +1,8 @@
 // @ts-ignore
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import { Modules } from "@medusajs/framework/utils"
+import type { IOrderModuleService } from "@medusajs/framework/types"
 
 export default async function orderShippedEmail({
   event,
@@ -8,11 +10,12 @@ export default async function orderShippedEmail({
 }: SubscriberArgs<{ order_id: string }>) {
   const orderId = event.data.order_id
 
-  const orderService = container.resolve("order") as any
-  const order = await orderService.retrieve(orderId, {
+  const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
+  const order: any = await orderService.retrieveOrder(orderId, {
     relations: ["shipping_address", "customer", "fulfillments"],
   })
 
+  // @ts-ignore
   const tracking = order.fulfillments?.[0]?.tracking_numbers?.[0]
 
   const body = `
@@ -24,7 +27,8 @@ export default async function orderShippedEmail({
   `
 
   await sendLuxuryEmail({
-    to: order.email,
+    to: order.email as string,
+    // @ts-ignore
     name: order.first_name ?? order.email,
     subject: `Your Imperial Craft Of India Order #${order.display_id} Has Shipped`,
     html: buildLuxuryTemplate("Order Shipped", body),

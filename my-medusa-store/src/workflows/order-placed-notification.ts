@@ -26,7 +26,7 @@ export const orderPlacedNotificationWorkflow = createWorkflow(
         "items.*",
         "original_total",
         "billing_address.*",
-        "payments.*",
+        "*payment_collections.payments",
       ],
       filters: { id },
     });
