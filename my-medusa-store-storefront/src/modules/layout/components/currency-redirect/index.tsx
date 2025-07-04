@@ -14,7 +14,8 @@ const CurrencyRedirect = () => {
   const [regions, setRegions] = useState<StoreRegion[]>([])
   const [currencies, setCurrencies] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
-  const { countryCode } = useParams()
+  const params = useParams<{ countryCode?: string }>()
+  const currentCountry = params?.countryCode as string | undefined
   
   // Get all available regions/countries
   useEffect(() => {
@@ -60,7 +61,7 @@ const CurrencyRedirect = () => {
           
           // Check if the detected country has a different currency than current country
           const userCurrency = currencies[detectedCountry]
-          const currentCurrency = currencies[countryCode as string]
+          const currentCurrency = currencies[currentCountry as string]
           
           // Get the default country and valid countries from the API
           const countryResponse = await fetch("/api/countries")
@@ -97,7 +98,7 @@ const CurrencyRedirect = () => {
     if (!loading && Object.keys(currencies).length > 0) {
       detectCountry()
     }
-  }, [loading, currencies, countryCode, regions])
+  }, [loading, currencies, currentCountry, regions])
   
   const handleClose = () => {
     setShowPopup(false)
@@ -133,13 +134,13 @@ const CurrencyRedirect = () => {
   }
   
   const userCurrency = currencies[userCountry]
-  const currentCurrency = currencies[countryCode as string]
+  const currentCurrency = currencies[currentCountry as string]
   const flagCountry = currencyToCountry[userCurrency] || userCountry
   
   return (
     <AnimatePresence>
       <motion.div 
-        className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md"
+        className="fixed bottom-4 left-0 right-0 mx-4 sm:left-1/2 sm:right-auto sm:mx-0 sm:-translate-x-1/2 sm:transform z-50 max-w-md"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
@@ -169,7 +170,7 @@ const CurrencyRedirect = () => {
             Would you like to view prices in your local currency ({userCurrency})?
           </p>
           
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-3">
             <button 
               onClick={handleStay}
               className="px-4 py-2 text-sm font-serif text-luxury-charcoal hover:text-luxury-gold transition-colors"

@@ -14,7 +14,8 @@ const CountryRedirect = () => {
   const [regions, setRegions] = useState<StoreRegion[]>([])
   const [availableCountries, setAvailableCountries] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
-  const { countryCode } = useParams()
+  const params = useParams<{ countryCode?: string }>()
+  const currentCountry = params?.countryCode as string | undefined
   
   // Get all available regions/countries
   useEffect(() => {
@@ -81,7 +82,7 @@ const CountryRedirect = () => {
           if (
             detectedCountry && 
             availableCountries[detectedCountry] && 
-            detectedCountry !== countryCode &&
+            detectedCountry !== currentCountry &&
             countryHasRegion &&
             // Always allow redirect popup, even if current store is default
             validCountries.includes(detectedCountry) && // Make sure the detected country is valid
@@ -99,7 +100,7 @@ const CountryRedirect = () => {
     if (!loading && Object.keys(availableCountries).length > 0) {
       detectCountry()
     }
-  }, [loading, availableCountries, countryCode, regions])
+  }, [loading, availableCountries, currentCountry, regions])
   
   const handleClose = () => {
     setShowPopup(false)
@@ -122,8 +123,8 @@ const CountryRedirect = () => {
   
   return (
     <AnimatePresence>
-      <motion.div 
-        className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md"
+      <motion.div
+        className="fixed bottom-4 left-0 right-0 mx-4 sm:left-1/2 sm:right-auto sm:mx-0 sm:-translate-x-1/2 sm:transform z-50 max-w-md"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
@@ -153,7 +154,7 @@ const CountryRedirect = () => {
             Would you like to view prices in your local currency?
           </p>
           
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-3">
             <button 
               onClick={handleStay}
               className="px-4 py-2 text-sm font-serif text-luxury-charcoal hover:text-luxury-gold transition-colors"
