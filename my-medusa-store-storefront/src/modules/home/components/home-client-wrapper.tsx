@@ -197,22 +197,24 @@ export default function HomeClientWrapper({
         </div>
         
         {/* Content */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 w-full mt-16">
-          <motion.div variants={fadeIn} className="mb-6">
-            <Heading level="h1" className="text-4xl md:text-6xl lg:text-7xl mb-4 font-serif text-white">
-              Bespoke Marble Handicrafts<br />for Timeless Luxury
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-6 w-full py-12">
+          <motion.div variants={fadeIn} className="mb-4 md:mb-6">
+            <Heading level="h1" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 font-serif text-white leading-tight">
+              <span className="block">Bespoke Marble</span>
+              <span className="block">Handicrafts</span>
+              <span className="block">for Timeless Luxury</span>
             </Heading>
           </motion.div>
           
-          <motion.div variants={fadeIn} className="mb-8">
-            <Text className="text-lg md:text-xl max-w-2xl mx-auto text-white">
+          <motion.div variants={fadeIn} className="mb-6 md:mb-8">
+            <Text className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-white">
               Hand-carved by Master Artisans in India
             </Text>
           </motion.div>
           
           <motion.div variants={fadeIn}>
             <Link href={`/${countryCode}/categories`}>
-              <AnimatedButton variant="gold" size="large">
+              <AnimatedButton variant="gold" size="large" className="w-full sm:w-auto">
                 Shop Signature Collection
               </AnimatedButton>
             </Link>
@@ -221,7 +223,7 @@ export default function HomeClientWrapper({
         
         {/* Scrolling indicator */}
         <motion.div 
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          className="hidden md:block absolute bottom-10 left-1/2 transform -translate-x-1/2"
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
