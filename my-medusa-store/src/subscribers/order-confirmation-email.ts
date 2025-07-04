@@ -24,11 +24,18 @@ export default async function orderConfirmationEmail({
     ],
   })
 
+  console.info("[CustomerEmail] order totals", {
+    subtotal: order.subtotal,
+    shipping_total: order.shipping_total,
+    tax_total: order.tax_total,
+    total: order.total,
+  })
+
   const fmt = (amt: number) =>
     Intl.NumberFormat("en-US", {
       style: "currency",
       currency: order.currency_code?.toUpperCase?.() ?? "USD",
-    }).format(amt / 100)
+    }).format(amt)
 
   const items: any[] = Array.isArray(order.items) ? order.items : []
   const itemsHtml = items

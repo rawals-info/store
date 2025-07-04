@@ -35,13 +35,20 @@ export default async function orderAdminNotify({
       relations: ["items", "shipping_address", "billing_address"],
     })
 
+    console.info("[AdminEmail] order totals", {
+      subtotal: order.subtotal,
+      shipping_total: order.shipping_total,
+      tax_total: order.tax_total,
+      total: order.total,
+    })
+
     /* ----------------- 1. Send email to admin ----------------- */
     if (ADMIN_EMAIL) {
       const fmt = (amt: number) =>
         Intl.NumberFormat("en-US", {
           style: "currency",
           currency: order.currency_code.toUpperCase(),
-        }).format(amt / 100)
+        }).format(amt)
 
       const items: any[] = Array.isArray(order.items) ? order.items : []
       const itemsHtml = items
