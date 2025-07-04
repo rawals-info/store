@@ -2,6 +2,8 @@ import React, { Suspense } from "react"
 import Footer from "@modules/layout/templates/footer"
 import AnimatedHeader from "@modules/layout/components/animated-header"
 import PrefetchProvider from "@modules/layout/components/prefetch-provider"
+import CountryRedirect from "@modules/layout/components/country-redirect"
+import WorldwidePopup from "@modules/layout/components/worldwide-popup"
 import { getRegions } from "@lib/regions"
 import { dataFetchingConfig } from "@lib/config"
 
@@ -34,6 +36,9 @@ export default async function StoreLayout({
     <PrefetchProvider>
       <div className="relative flex flex-col min-h-screen overflow-x-hidden">
         <AnimatedHeader />
+        {/* Geo-aware notices */}
+        <CountryRedirect />
+        <WorldwidePopup />
         <div className="flex-1">
           {children}
         </div>

@@ -83,7 +83,7 @@ const CountryRedirect = () => {
             availableCountries[detectedCountry] && 
             detectedCountry !== countryCode &&
             countryHasRegion &&
-            countryCode !== defaultCountry && // Don't show popup if already on default country
+            // Always allow redirect popup, even if current store is default
             validCountries.includes(detectedCountry) && // Make sure the detected country is valid
             !hasSeenPopup &&
             !hasSeenPopupForCountry

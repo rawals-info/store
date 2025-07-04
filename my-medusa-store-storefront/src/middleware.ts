@@ -67,6 +67,35 @@ async function getCountryData() {
 }
 
 /**
+ * Utility: best-effort extraction of the visitor's ISO-2 country code.
+ * 1. Prefer Next.js Edge `request.geo` (works on Vercel/Cloudflare).
+ * 2. Fallback to common CDN headers.
+ */
+function extractCountry(req: NextRequest): string | null {
+  // Edge Runtime provides `request.geo`, but the typings may not include it.
+  // Cast to `any` to avoid TypeScript issues in environments where it's missing.
+  const geoCountry = (req as any).geo?.country ||
+    req.headers.get("x-vercel-ip-country") ||
+    req.headers.get("x-country-code") ||
+    req.headers.get("cf-ipcountry")
+
+  if (geoCountry) {
+    return geoCountry.toLowerCase()
+  }
+
+  // Fallback: try to parse region from Accept-Language (e.g., "en-IN,en;q=0.9")
+  const acceptLang = req.headers.get("accept-language")
+  if (acceptLang) {
+    const match = acceptLang.match(/-([A-Za-z]{2})\b/)
+    if (match?.[1]) {
+      return match[1].toLowerCase()
+    }
+  }
+
+  return null
+}
+
+/**
  * Middleware to handle region selection, caching, and performance optimization.
  */
 export async function middleware(request: NextRequest) {
@@ -85,6 +114,9 @@ export async function middleware(request: NextRequest) {
     
     // Get country data from backend (cached)
     const { validCountries, defaultCountry } = await getCountryData()
+    
+    // Determine visitor country from request
+    const visitorCountry = extractCountry(request)
     
     // First, check for nested country codes like /us/in or /us/ae
     const nestedCountryMatch = pathname.match(/^\/([a-z]{2})\/([a-z]{2})($|\/)/)
@@ -157,19 +189,32 @@ export async function middleware(request: NextRequest) {
       return response
     }
 
-    // If no valid country code in URL, redirect to default region
-    const redirectPath = 
-      pathname === "/" ? "" : pathname
+    // Decide where to send the visitor
+    const preferredCountry = visitorCountry && validCountries.includes(visitorCountry)
+      ? visitorCountry
+      : defaultCountry
+
+    const isUnsupportedVisitor = !visitorCountry || !validCountries.includes(visitorCountry)
+
+    const redirectPath = pathname === "/" ? "" : pathname
     const queryString = request.nextUrl.search ? request.nextUrl.search : ""
-    
-    const redirectUrl = `${request.nextUrl.origin}/${defaultCountry}${redirectPath}${queryString}`
+    const redirectUrl = `${request.nextUrl.origin}/${preferredCountry}${redirectPath}${queryString}`
+
     response = NextResponse.redirect(redirectUrl, 307)
-    
+
     // Set cache ID cookie
     response.cookies.set("_medusa_cache_id", crypto.randomUUID(), {
       maxAge: 60 * 60 * 24,
     })
-    
+
+    // Flag unsupported visitors so the client can show a notice once
+    if (isUnsupportedVisitor) {
+      response.cookies.set("unsupported_country", "1", {
+        path: "/",
+        maxAge: 60 * 5, // 5 minutes is enough for first page-load
+      })
+    }
+
     return response
   } catch (error) {
     console.error("Middleware error:", error)
