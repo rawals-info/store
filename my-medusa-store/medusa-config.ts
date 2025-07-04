@@ -86,7 +86,7 @@ export default defineConfig({
         redisUrl: process.env.CACHE_REDIS_URL || process.env.REDIS_URL!,
       },
     },
-    workflowEngine: {
+    workflows: {
       resolve: "@medusajs/workflow-engine-redis",
       options: {
         redis: {
