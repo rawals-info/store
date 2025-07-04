@@ -17,12 +17,29 @@ export default async function orderConfirmationEmail({
   // Retrieve the order with relations so we have customer info
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   const order: any = await orderService.retrieveOrder(orderId, {
+    select: [
+      "subtotal",
+      "shipping_total",
+      "tax_total",
+      "discount_total",
+      "total",
+      "currency_code",
+    ],
     relations: [
       "items",
       "shipping_address",
       "billing_address",
     ],
   })
+
+  const asNumber = (val: any): number => {
+    if (val == null) return 0
+    if (typeof val === "number") return val
+    if (typeof val === "string") return parseFloat(val)
+    if (typeof val.toNumber === "function") return val.toNumber()
+    if (typeof val.value !== "undefined") return Number(val.value)
+    return Number(val)
+  }
 
   console.info("[CustomerEmail] order totals", {
     subtotal: order.subtotal,
@@ -39,12 +56,10 @@ export default async function orderConfirmationEmail({
 
   const items: any[] = Array.isArray(order.items) ? order.items : []
   const itemsHtml = items
-    .map(
-      (it: any) =>
-        `<tr><td>${it.title}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${fmt(Number(
-          it.total ?? it.unit_price * it.quantity
-        ))}</td></tr>`
-    )
+    .map((it: any) => {
+      const lineTotal = asNumber(it.total ?? it.unit_price * it.quantity)
+      return `<tr><td>${it.title}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${fmt(lineTotal)}</td></tr>`
+    })
     .join("")
 
   const addressLines = (addr: any) =>
@@ -68,11 +83,11 @@ export default async function orderConfirmationEmail({
       <thead><tr><th align="left">Item</th><th align="center">Qty</th><th align="right">Total</th></tr></thead>
       <tbody>${itemsHtml}</tbody>
     </table>
-    <p style="margin-top:16px"><strong>Subtotal:</strong> ${fmt(Number(order.subtotal ?? 0))}</p>
-    <p><strong>Shipping:</strong> ${fmt(Number(order.shipping_total ?? 0))}</p>
-    <p><strong>Tax:</strong> ${fmt(Number(order.tax_total ?? 0))}</p>
-    ${order.discount_total ? `<p><strong>Discount:</strong> -${fmt(Number(order.discount_total))}</p>` : ""}
-    <p><strong>Grand Total:</strong> ${fmt(Number(order.total ?? 0))}</p>
+    <p style="margin-top:16px"><strong>Subtotal:</strong> ${fmt(asNumber(order.subtotal))}</p>
+    <p><strong>Shipping:</strong> ${fmt(asNumber(order.shipping_total))}</p>
+    <p><strong>Tax:</strong> ${fmt(asNumber(order.tax_total))}</p>
+    ${order.discount_total ? `<p><strong>Discount:</strong> -${fmt(asNumber(order.discount_total))}</p>` : ""}
+    <p><strong>Grand Total:</strong> ${fmt(asNumber(order.total))}</p>
 
     <h3 style="margin-top:24px">Shipping To</h3>
     ${addressLines(order.shipping_address ?? {})}
