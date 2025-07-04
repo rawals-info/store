@@ -284,6 +284,16 @@ export default function Footer() {
                     FAQs
                   </LocalizedClientLink>
                 </li>
+                <li>
+                  <LocalizedClientLink href="/terms" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Terms & Conditions
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink href="/privacy" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                    Privacy Policy
+                  </LocalizedClientLink>
+                </li>
               </ul>
             </div>
           </div>
