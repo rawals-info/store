@@ -24,6 +24,7 @@ export default async function orderConfirmationEmail({
       "discount_total",
       "total",
       "currency_code",
+      "email",
     ],
     relations: [
       "items",

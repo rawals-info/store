@@ -39,6 +39,7 @@ export default async function orderAdminNotify({
         "discount_total",
         "total",
         "currency_code",
+        "email",
       ],
       relations: ["items", "shipping_address", "billing_address"],
     }) as any
