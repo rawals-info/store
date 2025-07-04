@@ -93,8 +93,8 @@ export async function getOrSetCart(countryCode: string) {
 
       await setCartId(cart.id)
 
-      const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
+      // Revalidation is handled by mutation routes or server actions to avoid
+      // calling `revalidateTag` during a server render.
     } catch (error) {
       console.error("Error creating cart:", error)
       return null
@@ -104,8 +104,8 @@ export async function getOrSetCart(countryCode: string) {
   if (cart && cart?.region_id !== region.id) {
     try {
       await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
-      const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
+      // Revalidation deferred – it will be triggered by the first client-side
+      // cart mutation, which is a supported context for `revalidateTag`.
     } catch (error) {
       console.error("Error updating cart region:", error)
       // Continue with existing cart

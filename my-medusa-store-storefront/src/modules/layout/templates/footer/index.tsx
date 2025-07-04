@@ -303,7 +303,7 @@ export default function Footer() {
       <div className="border-t border-luxury-lightgold/20 py-6 px-4 sm:px-8 overflow-x-auto">
         <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between min-w-max">
           <div className="text-small-regular text-luxury-charcoal/60">
-            © 2024 Imperial Craft Of India. All rights reserved.
+            © 2025 Imperial Craft Of India. All rights reserved.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex items-center gap-x-2">
