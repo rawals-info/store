@@ -25,6 +25,7 @@ export default async function orderConfirmationEmail({
       "total",
       "currency_code",
       "email",
+      "display_id",
     ],
     relations: [
       "items",
@@ -78,7 +79,7 @@ export default async function orderConfirmationEmail({
 
   const body = `
     <p>Dear ${(order as any).shipping_address?.first_name ?? order.email},</p>
-    <p>Thank you for your purchase! Your order <strong>#${order.display_id}</strong> has been received and is now being processed.</p>
+    <p>Thank you for your purchase! Your order <strong>#${order.display_id ?? order.id}</strong> has been received and is now being processed.</p>
 
     <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px;margin-top:16px">
       <thead><tr><th align="left">Item</th><th align="center">Qty</th><th align="right">Total</th></tr></thead>
@@ -100,7 +101,7 @@ export default async function orderConfirmationEmail({
   await sendLuxuryEmail({
     to: order.email as string,
     name: order.email,
-    subject: `Order #${order.display_id} Confirmation`,
+    subject: `Order #${(order.display_id ?? order.id) as string} Confirmation`,
     html: buildLuxuryTemplate("Order Confirmation", body),
   })
 }
