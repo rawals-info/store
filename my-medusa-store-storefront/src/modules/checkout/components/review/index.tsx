@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation"
 const Review = ({ cart }: { cart: any }) => {
   const searchParams = useSearchParams()
 
-  const isOpen = searchParams.get("step") === "review"
+  const isOpen = searchParams?.get("step") === "review"
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
@@ -37,10 +37,7 @@ const Review = ({ cart }: { cart: any }) => {
       <div className="flex items-start gap-x-1 w-full mb-8">
         <div className="w-full">
           <Text className="text-[#8a7f72] mb-1">
-            By clicking the Place Order button, you confirm that you have
-            read, understand and accept our Terms of Use, Terms of Sale and
-            Returns Policy and acknowledge that you have read Marble
-            Luxe&apos;s Privacy Policy.
+            By clicking <strong>Place Order</strong>, you confirm that you have read, understand, and agree to our <a href="/terms" className="underline hover:text-luxury-gold transition-colors">Terms of Use</a>, <a href="/returns" className="underline hover:text-luxury-gold transition-colors">Terms of Sale & Returns Policy</a>, and <a href="/privacy" className="underline hover:text-luxury-gold transition-colors">Privacy Policy</a> of <strong>Imperial Craft of India</strong>.
           </Text>
         </div>
       </div>

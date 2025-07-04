@@ -11,7 +11,6 @@ import { Suspense } from "react"
 import "./checkout.css"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
-import dynamic from "next/dynamic"
 
 // Enhanced timeout settings for checkout
 const CHECKOUT_TIMEOUT = 3500 // 3.5 seconds timeout
@@ -19,12 +18,6 @@ const CHECKOUT_TIMEOUT = 3500 // 3.5 seconds timeout
 export const metadata: Metadata = {
   title: "Checkout | Imperial Craft Of India",
 }
-
-// Dynamically import components for progressive loading
-const DynamicCheckoutFooter = dynamic(
-  () => import('@modules/checkout/components/checkout-footer'),
-  { loading: () => <div className="h-10" /> }
-)
 
 export default async function Checkout() {
   // Fetch cart and customer in parallel with improved timeout handling
@@ -80,11 +73,6 @@ export default async function Checkout() {
           </Suspense>
           <CheckoutSummary cart={cart} />
         </div>
-        
-        {/* Footer is loaded progressively */}
-        <Suspense fallback={null}>
-          <DynamicCheckoutFooter />
-        </Suspense>
       </div>
     </div>
   )
