@@ -10,12 +10,10 @@ export default async function orderDeliveredEmail({
 }: SubscriberArgs<{ id: string }>) {
   const orderId = event.data.id
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  const order: any = await orderService.retrieveOrder(orderId, {
-    relations: ["customer"],
-  })
+  const order: any = await orderService.retrieveOrder(orderId)
 
   const body = `
-    <p>Dear ${order.first_name ?? order.email},</p>
+    <p>Dear ${order.email},</p>
     <p>We are thrilled to confirm that your Imperial Craft Of India order <strong>#${order.display_id}</strong> has been delivered.</p>
     <p>We hope every detail exceeds your expectations.</p>
     <p>If there is anything we can assist you with, please let us know.</p>
@@ -24,8 +22,7 @@ export default async function orderDeliveredEmail({
 
   await sendLuxuryEmail({
     to: order.email as string,
-    // @ts-ignore
-    name: order.first_name ?? order.email,
+    name: order.email,
     subject: `Order #${order.display_id} Delivered – Imperial Craft Of India`,
     html: buildLuxuryTemplate("Order Delivered", body),
   })

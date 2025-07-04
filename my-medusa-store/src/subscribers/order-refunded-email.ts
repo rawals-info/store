@@ -12,12 +12,10 @@ export default async function orderRefundedEmail({
   if (!orderId) return
 
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  const order: any = await orderService.retrieveOrder(orderId, {
-    relations: ["customer"],
-  })
+  const order: any = await orderService.retrieveOrder(orderId)
 
   const body = `
-    <p>Dear ${order.first_name ?? order.email},</p>
+    <p>Dear ${order.email},</p>
     <p>We have processed a refund for your order <strong>#${order.display_id}</strong>. The amount will be credited back to your original payment method shortly.</p>
     <p>If you have any questions, please reply to this email and our concierge team will assist you.</p>
     <p style="margin-top:32px">Sincerely,<br/>The Imperial Craft Of India Team</p>
@@ -25,8 +23,7 @@ export default async function orderRefundedEmail({
 
   await sendLuxuryEmail({
     to: order.email as string,
-    // @ts-ignore
-    name: order.first_name ?? order.email,
+    name: order.email,
     subject: `Refund Processed for Order #${order.display_id}`,
     html: buildLuxuryTemplate("Refund Confirmation", body),
   })

@@ -21,7 +21,6 @@ export default async function orderConfirmationEmail({
       "items",
       "shipping_address",
       "billing_address",
-      "customer",
     ],
   })
 
@@ -55,7 +54,7 @@ export default async function orderConfirmationEmail({
       .join("")
 
   const body = `
-    <p>Dear ${order.first_name ?? order.email},</p>
+    <p>Dear ${(order as any).shipping_address?.first_name ?? order.email},</p>
     <p>Thank you for your purchase! Your order <strong>#${order.display_id}</strong> has been received and is now being processed.</p>
 
     <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px;margin-top:16px">
@@ -77,8 +76,7 @@ export default async function orderConfirmationEmail({
 
   await sendLuxuryEmail({
     to: order.email as string,
-    // @ts-ignore
-    name: order.first_name ?? order.email,
+    name: order.email,
     subject: `Order #${order.display_id} Confirmation`,
     html: buildLuxuryTemplate("Order Confirmation", body),
   })

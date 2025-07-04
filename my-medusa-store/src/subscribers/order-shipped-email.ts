@@ -12,14 +12,14 @@ export default async function orderShippedEmail({
 
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   const order: any = await orderService.retrieveOrder(orderId, {
-    relations: ["shipping_address", "customer", "fulfillments"],
+    relations: ["shipping_address", "fulfillments"],
   })
 
   // @ts-ignore
   const tracking = order.fulfillments?.[0]?.tracking_numbers?.[0]
 
   const body = `
-    <p>Dear ${order.first_name ?? order.email},</p>
+    <p>Dear ${order.email},</p>
     <p>Your order <strong>#${order.display_id}</strong> has left our atelier and is now on its way to you.</p>
     ${tracking ? `<p>Your tracking number is <strong>${tracking}</strong>.</p>` : ""}
     <p>We hope the anticipation is as delightful as the unboxing will be.</p>
@@ -28,8 +28,7 @@ export default async function orderShippedEmail({
 
   await sendLuxuryEmail({
     to: order.email as string,
-    // @ts-ignore
-    name: order.first_name ?? order.email,
+    name: order.email,
     subject: `Your Imperial Craft Of India Order #${order.display_id} Has Shipped`,
     html: buildLuxuryTemplate("Order Shipped", body),
   })
