@@ -99,7 +99,7 @@ export default function HomeClientWrapper({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setProductsPerView(1)
+        setProductsPerView(2) // show 2 products on very small screens
       } else if (window.innerWidth < 768) {
         setProductsPerView(2)
       } else if (window.innerWidth < 1024) {
@@ -262,7 +262,7 @@ export default function HomeClientWrapper({
                       key={`product-page-${pageIndex}`} 
                       className="min-w-full"
                     >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {itemsToShow.map((product, idx) => (
                           <div 
                             key={`${product.id}-${idx}`} 
