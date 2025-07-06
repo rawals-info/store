@@ -84,7 +84,11 @@ const CartDropdown = () => {
       return
     }
 
-    if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
+    if (
+      itemRef.current !== totalItems &&
+      !pathname.includes("/cart") &&
+      !pathname.includes("/checkout")
+    ) {
       timedOpen()
     }
 
@@ -95,7 +99,7 @@ const CartDropdown = () => {
   // Listen for cart updates via custom event
   useEffect(() => {
     const handleCartUpdate = (event: CustomEvent) => {
-      if (!pathname.includes("/cart")) {
+      if (!pathname.includes("/cart") && !pathname.includes("/checkout")) {
         // Force open the cart dropdown immediately
         if (event.detail?.forceOpen) {
           // Clear any existing timer
