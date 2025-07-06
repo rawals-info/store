@@ -56,6 +56,10 @@ export const query = [
     "path": "https://docs.medusajs.com/resources/references/medusa-workflows/steps/useQueryGraphStep"
   },
   {
+    "title": "deleteDraftOrdersWorkflow",
+    "path": "https://docs.medusajs.com/resources/references/medusa-workflows/deleteDraftOrdersWorkflow"
+  },
+  {
     "title": "calculateShippingOptionsPricesWorkflow",
     "path": "https://docs.medusajs.com/resources/references/medusa-workflows/calculateShippingOptionsPricesWorkflow"
   },

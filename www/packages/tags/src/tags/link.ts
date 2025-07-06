@@ -96,6 +96,10 @@ export const link = [
     "path": "https://docs.medusajs.com/resources/references/medusa-workflows/confirmDraftOrderEditWorkflow"
   },
   {
+    "title": "deleteDraftOrdersWorkflow",
+    "path": "https://docs.medusajs.com/resources/references/medusa-workflows/deleteDraftOrdersWorkflow"
+  },
+  {
     "title": "requestDraftOrderEditWorkflow",
     "path": "https://docs.medusajs.com/resources/references/medusa-workflows/requestDraftOrderEditWorkflow"
   },
@@ -154,10 +158,6 @@ export const link = [
   {
     "title": "markPaymentCollectionAsPaid",
     "path": "https://docs.medusajs.com/resources/references/medusa-workflows/markPaymentCollectionAsPaid"
-  },
-  {
-    "title": "processPaymentWorkflow",
-    "path": "https://docs.medusajs.com/resources/references/medusa-workflows/processPaymentWorkflow"
   },
   {
     "title": "createPaymentSessionsWorkflow",

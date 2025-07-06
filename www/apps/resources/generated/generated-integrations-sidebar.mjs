@@ -143,6 +143,23 @@ const generatedgeneratedIntegrationsSidebarSidebar = {
       "loaded": true,
       "isPathHref": true,
       "type": "category",
+      "title": "Instrumentation",
+      "initialOpen": true,
+      "children": [
+        {
+          "loaded": true,
+          "isPathHref": true,
+          "type": "link",
+          "path": "/integrations/guides/sentry",
+          "title": "Sentry",
+          "children": []
+        }
+      ]
+    },
+    {
+      "loaded": true,
+      "isPathHref": true,
+      "type": "category",
       "title": "Migration",
       "initialOpen": true,
       "children": [
@@ -163,6 +180,14 @@ const generatedgeneratedIntegrationsSidebarSidebar = {
       "title": "Notification",
       "initialOpen": true,
       "children": [
+        {
+          "loaded": true,
+          "isPathHref": true,
+          "type": "link",
+          "path": "/integrations/guides/mailchimp",
+          "title": "Mailchimp",
+          "children": []
+        },
         {
           "loaded": true,
           "isPathHref": true,

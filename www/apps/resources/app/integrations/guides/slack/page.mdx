@@ -557,8 +557,8 @@ Medusa provides both steps in its `@medusajs/medusa/core-flows` package.
 So, to create the workflow, create the file `src/workflows/order-placed-notification.ts` with the following content:
 
 export const orderPlacedNotificationWorkflowHighlights = [
-  ["14", "useQueryGraphStep", "Retrieve the order details using the Query Graph."],
-  ["35", "sendNotificationsStep", "Send a notification to Slack with the order details."]
+  ["13", "useQueryGraphStep", "Retrieve the order details using the Query Graph."],
+  ["34", "sendNotificationsStep", "Send a notification to Slack with the order details."]
 ]
 
 ```ts title="src/workflows/order-placed-notification.ts" highlights={orderPlacedNotificationWorkflowHighlights}
@@ -574,7 +574,6 @@ type WorkflowInput = {
 export const orderPlacedNotificationWorkflow = createWorkflow(
   "order-placed-notification",
   ({ id }: WorkflowInput) => {
-    // @ts-ignore
     const { data: orders } = useQueryGraphStep({
       entity: "order",
       fields: [

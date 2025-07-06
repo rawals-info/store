@@ -5,9 +5,21 @@ export const sidebar = [
     title: "Cloud",
     items: [
       {
-        type: "link",
-        path: "/",
-        title: "Introduction",
+        type: "category",
+        title: "Getting Started",
+        initialOpen: true,
+        children: [
+          {
+            type: "link",
+            path: "/",
+            title: "Introduction",
+          },
+          {
+            type: "link",
+            path: "/faq",
+            title: "FAQ",
+          },
+        ],
       },
       {
         type: "separator",
@@ -31,6 +43,23 @@ export const sidebar = [
             type: "link",
             title: "Environments",
             path: "/environments",
+            children: [
+              {
+                type: "link",
+                title: "Long-Lived",
+                path: "/environments/long-lived",
+              },
+              {
+                type: "link",
+                title: "Preview",
+                path: "/environments/preview",
+              },
+              {
+                type: "link",
+                title: "Environment Variables",
+                path: "/environments/environment-variables",
+              },
+            ],
           },
           {
             type: "link",
@@ -44,11 +73,6 @@ export const sidebar = [
         title: "Resources",
         initialOpen: true,
         children: [
-          {
-            type: "link",
-            title: "Infrastructure",
-            path: "/infrastructure",
-          },
           {
             type: "link",
             title: "Database",
@@ -109,11 +133,6 @@ export const sidebar = [
             type: "link",
             title: "Notifications",
             path: "/notifications",
-          },
-          {
-            type: "link",
-            title: "Support",
-            path: "/support",
           },
         ],
       },

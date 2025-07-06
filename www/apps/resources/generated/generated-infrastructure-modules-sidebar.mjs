@@ -422,6 +422,14 @@ const generatedgeneratedInfrastructureModulesSidebarSidebar = {
               "loaded": true,
               "isPathHref": true,
               "type": "ref",
+              "title": "Integrate Mailchimp",
+              "path": "https://docs.medusajs.com/resources/integrations/guides/mailchimp",
+              "children": []
+            },
+            {
+              "loaded": true,
+              "isPathHref": true,
+              "type": "ref",
               "path": "/integrations/guides/resend",
               "title": "Integrate Resend",
               "children": []

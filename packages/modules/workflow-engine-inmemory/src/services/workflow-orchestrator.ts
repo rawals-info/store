@@ -87,6 +87,7 @@ const AnySubscriber = "any"
 export class WorkflowOrchestratorService {
   private subscribers: Subscribers = new Map()
   private container_: MedusaContainer
+  private inMemoryDistributedTransactionStorage_: InMemoryDistributedTransactionStorage
 
   constructor({
     inMemoryDistributedTransactionStorage,
@@ -97,9 +98,19 @@ export class WorkflowOrchestratorService {
     sharedContainer: MedusaContainer
   }) {
     this.container_ = sharedContainer
+    this.inMemoryDistributedTransactionStorage_ =
+      inMemoryDistributedTransactionStorage
     inMemoryDistributedTransactionStorage.setWorkflowOrchestratorService(this)
     DistributedTransaction.setStorage(inMemoryDistributedTransactionStorage)
     WorkflowScheduler.setStorage(inMemoryDistributedTransactionStorage)
+  }
+
+  async onApplicationStart() {
+    await this.inMemoryDistributedTransactionStorage_.onApplicationStart()
+  }
+
+  async onApplicationShutdown() {
+    await this.inMemoryDistributedTransactionStorage_.onApplicationShutdown()
   }
 
   private async triggerParentStep(transaction, result) {

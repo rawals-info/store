@@ -6,10 +6,27 @@ export const generatedSidebars = [
       {
         "loaded": true,
         "isPathHref": true,
-        "type": "link",
-        "path": "/",
-        "title": "Introduction",
-        "children": []
+        "type": "category",
+        "title": "Getting Started",
+        "initialOpen": true,
+        "children": [
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "link",
+            "path": "/",
+            "title": "Introduction",
+            "children": []
+          },
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "link",
+            "path": "/faq",
+            "title": "FAQ",
+            "children": []
+          }
+        ]
       },
       {
         "type": "separator"
@@ -43,7 +60,32 @@ export const generatedSidebars = [
             "type": "link",
             "title": "Environments",
             "path": "/environments",
-            "children": []
+            "children": [
+              {
+                "loaded": true,
+                "isPathHref": true,
+                "type": "link",
+                "title": "Long-Lived",
+                "path": "/environments/long-lived",
+                "children": []
+              },
+              {
+                "loaded": true,
+                "isPathHref": true,
+                "type": "link",
+                "title": "Preview",
+                "path": "/environments/preview",
+                "children": []
+              },
+              {
+                "loaded": true,
+                "isPathHref": true,
+                "type": "link",
+                "title": "Environment Variables",
+                "path": "/environments/environment-variables",
+                "children": []
+              }
+            ]
           },
           {
             "loaded": true,
@@ -62,14 +104,6 @@ export const generatedSidebars = [
         "title": "Resources",
         "initialOpen": true,
         "children": [
-          {
-            "loaded": true,
-            "isPathHref": true,
-            "type": "link",
-            "title": "Infrastructure",
-            "path": "/infrastructure",
-            "children": []
-          },
           {
             "loaded": true,
             "isPathHref": true,
@@ -159,14 +193,6 @@ export const generatedSidebars = [
             "type": "link",
             "title": "Notifications",
             "path": "/notifications",
-            "children": []
-          },
-          {
-            "loaded": true,
-            "isPathHref": true,
-            "type": "link",
-            "title": "Support",
-            "path": "/support",
             "children": []
           }
         ]

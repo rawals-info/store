@@ -508,6 +508,10 @@ export const filesMap = [
     "pathname": "/commerce-modules/promotion"
   },
   {
+    "filePath": "/www/apps/resources/app/commerce-modules/promotion/promotion-taxes/page.mdx",
+    "pathname": "/commerce-modules/promotion/promotion-taxes"
+  },
+  {
     "filePath": "/www/apps/resources/app/commerce-modules/promotion/workflows/page.mdx",
     "pathname": "/commerce-modules/promotion/workflows"
   },
@@ -740,6 +744,14 @@ export const filesMap = [
     "pathname": "/how-to-tutorials/tutorials/abandoned-cart"
   },
   {
+    "filePath": "/www/apps/resources/app/how-to-tutorials/tutorials/first-purchase-discounts/page.mdx",
+    "pathname": "/how-to-tutorials/tutorials/first-purchase-discounts"
+  },
+  {
+    "filePath": "/www/apps/resources/app/how-to-tutorials/tutorials/gift-message/page.mdx",
+    "pathname": "/how-to-tutorials/tutorials/gift-message"
+  },
+  {
     "filePath": "/www/apps/resources/app/how-to-tutorials/tutorials/loyalty-points/page.mdx",
     "pathname": "/how-to-tutorials/tutorials/loyalty-points"
   },
@@ -876,6 +888,10 @@ export const filesMap = [
     "pathname": "/integrations/guides/magento"
   },
   {
+    "filePath": "/www/apps/resources/app/integrations/guides/mailchimp/page.mdx",
+    "pathname": "/integrations/guides/mailchimp"
+  },
+  {
     "filePath": "/www/apps/resources/app/integrations/guides/resend/page.mdx",
     "pathname": "/integrations/guides/resend"
   },
@@ -886,6 +902,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/app/integrations/guides/segment/page.mdx",
     "pathname": "/integrations/guides/segment"
+  },
+  {
+    "filePath": "/www/apps/resources/app/integrations/guides/sentry/page.mdx",
+    "pathname": "/integrations/guides/sentry"
   },
   {
     "filePath": "/www/apps/resources/app/integrations/guides/shipstation/page.mdx",
@@ -1112,10 +1132,6 @@ export const filesMap = [
     "pathname": "/storefront-development/cart/manage-items"
   },
   {
-    "filePath": "/www/apps/resources/app/storefront-development/cart/page.mdx",
-    "pathname": "/storefront-development/cart"
-  },
-  {
     "filePath": "/www/apps/resources/app/storefront-development/cart/retrieve/page.mdx",
     "pathname": "/storefront-development/cart/retrieve"
   },
@@ -1176,10 +1192,6 @@ export const filesMap = [
     "pathname": "/storefront-development/customers/login"
   },
   {
-    "filePath": "/www/apps/resources/app/storefront-development/customers/page.mdx",
-    "pathname": "/storefront-development/customers"
-  },
-  {
     "filePath": "/www/apps/resources/app/storefront-development/customers/profile/page.mdx",
     "pathname": "/storefront-development/customers/profile"
   },
@@ -1216,10 +1228,6 @@ export const filesMap = [
     "pathname": "/storefront-development/products/categories/nested-categories"
   },
   {
-    "filePath": "/www/apps/resources/app/storefront-development/products/categories/page.mdx",
-    "pathname": "/storefront-development/products/categories"
-  },
-  {
     "filePath": "/www/apps/resources/app/storefront-development/products/categories/products/page.mdx",
     "pathname": "/storefront-development/products/categories/products"
   },
@@ -1230,10 +1238,6 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/app/storefront-development/products/collections/list/page.mdx",
     "pathname": "/storefront-development/products/collections/list"
-  },
-  {
-    "filePath": "/www/apps/resources/app/storefront-development/products/collections/page.mdx",
-    "pathname": "/storefront-development/products/collections"
   },
   {
     "filePath": "/www/apps/resources/app/storefront-development/products/collections/products/page.mdx",
@@ -1250,10 +1254,6 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/app/storefront-development/products/list/page.mdx",
     "pathname": "/storefront-development/products/list"
-  },
-  {
-    "filePath": "/www/apps/resources/app/storefront-development/products/page.mdx",
-    "pathname": "/storefront-development/products"
   },
   {
     "filePath": "/www/apps/resources/app/storefront-development/products/price/examples/sale-price/page.mdx",
@@ -18836,6 +18836,10 @@ export const filesMap = [
     "pathname": "/references/types/CommonTypes/interfaces/types.CommonTypes.ConfigModule"
   },
   {
+    "filePath": "/www/apps/resources/references/types/CommonTypes/interfaces/types.CommonTypes.CookieOptions/page.mdx",
+    "pathname": "/references/types/CommonTypes/interfaces/types.CommonTypes.CookieOptions"
+  },
+  {
     "filePath": "/www/apps/resources/references/types/CommonTypes/interfaces/types.CommonTypes.DateComparisonOperator/page.mdx",
     "pathname": "/references/types/CommonTypes/interfaces/types.CommonTypes.DateComparisonOperator"
   },
@@ -21972,6 +21976,10 @@ export const filesMap = [
     "pathname": "/references/types/ModulesSdkTypes/types/types.ModulesSdkTypes.InternalModuleDeclaration"
   },
   {
+    "filePath": "/www/apps/resources/references/types/ModulesSdkTypes/types/types.ModulesSdkTypes.InternalRemoteQueryFilters/page.mdx",
+    "pathname": "/references/types/ModulesSdkTypes/types/types.ModulesSdkTypes.InternalRemoteQueryFilters"
+  },
+  {
     "filePath": "/www/apps/resources/references/types/ModulesSdkTypes/types/types.ModulesSdkTypes.LinkDefinition/page.mdx",
     "pathname": "/references/types/ModulesSdkTypes/types/types.ModulesSdkTypes.LinkDefinition"
   },
@@ -24188,6 +24196,10 @@ export const filesMap = [
     "pathname": "/references/types/types/types.ReadonlyPrimary"
   },
   {
+    "filePath": "/www/apps/resources/references/types/types/types.RemoteQueryFilterOperators/page.mdx",
+    "pathname": "/references/types/types/types.RemoteQueryFilterOperators"
+  },
+  {
     "filePath": "/www/apps/resources/references/types/types/types.RemoveFulfillmentShippingOptionRulesWorkflowDTO/page.mdx",
     "pathname": "/references/types/types/types.RemoveFulfillmentShippingOptionRulesWorkflowDTO"
   },
@@ -24968,6 +24980,10 @@ export const filesMap = [
     "pathname": "/references/workflows/DistributedTransaction/methods/workflows.DistributedTransaction.setTemporaryData"
   },
   {
+    "filePath": "/www/apps/resources/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.clearExpiredExecutions/page.mdx",
+    "pathname": "/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.clearExpiredExecutions"
+  },
+  {
     "filePath": "/www/apps/resources/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.clearRetry/page.mdx",
     "pathname": "/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.clearRetry"
   },
@@ -24982,10 +24998,6 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.get/page.mdx",
     "pathname": "/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.get"
-  },
-  {
-    "filePath": "/www/apps/resources/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.list/page.mdx",
-    "pathname": "/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.list"
   },
   {
     "filePath": "/www/apps/resources/references/workflows/IDistributedTransactionStorage/methods/workflows.IDistributedTransactionStorage.save/page.mdx",

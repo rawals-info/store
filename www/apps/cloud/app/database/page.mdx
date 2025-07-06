@@ -4,15 +4,15 @@ export const metadata = {
 
 # {metadata.title}
 
-In this guide, you'll learn about the managed database service that Cloud provides as part of your project environments.
+In this guide, you'll learn about the managed database service that Medusa provides as part of your project environments.
 
 ## Managed Database Service
 
-Cloud offers a managed PostgreSQL database service for your project environments. Each environment has its own dedicated database that is automatically provisioned when the environment is created.
+Medusa provisions and manages databases for each of your environments.
 
-So, when you create a new project, Cloud creates a production database for the production environment. If you create a staging environment, Cloud creates a separate database for that environment as well.
+Each project environment has a dedicated PostgreSQL database. These databases are entirely isolated from one another.
 
-This isolation between environment databases allows you to safely make or test changes in environments without affecting one another, especially the production environment and its data.
+This isolation allows you to safely make or test changes in environments without affecting one another, especially the production environment and its data.
 
 ![Diagram showcasing isolation between environment databases](https://res.cloudinary.com/dza7lstvk/image/upload/v1750174759/Cloud/databases-cloud_hzjyrn.jpg)
 
@@ -20,27 +20,27 @@ This isolation between environment databases allows you to safely make or test c
 
 ## Database Configurations
 
-Cloud automatically configures the database for your environments. So, you don't need to worry about setting up the database, configuring it with your Medusa application, or monitoring performance and availability on your end.
+Medusa automatically configures the database for your environments. So, you don't need to worry about setting up the database, configuring it with your Medusa application, or monitoring performance and availability on your end.
 
 ---
 
 ## Database Backups
 
-Cloud provides automatic backups for your environment databases. These backups are retained for 14 days and allow you to restore your database to a previous state, if needed.
+Medusa provides automatic backups for your environment databases. These backups are retained for 14 days and allow you to restore your database to a previous state, if needed.
 
-If you need to restore a database backup, you can [contact support](../support/page.mdx) to request a point-in-time recovery. This is useful if you accidentally delete data or need to revert changes made to the database.
+If you need to restore a database backup, you can contact support to request a point-in-time recovery. This is useful if you accidentally delete data or need to revert changes made to the database.
 
 ---
 
 ## Accessing the Database
 
-In some cases, you may need to access the database directly, such as to export or import data. However, since Cloud is a managed service, you can't directly access your database. Cloud also doesn't expose the database connection details.
+In some cases, you may need to access the database directly, such as to export or import data. However, since Cloud is a managed service, you can't directly access your database. Medusa also doesn't expose the database connection details.
 
 This section provides alternative ways to interact with your database based on your needs.
 
 ### Option 1: Database Dump
 
-Cloud allows you to export and import database dumps for any environment. This is useful for seeding the database with initial data, migrating from other hosting platforms, or debugging issues locally.
+Medusa allows you to export and import database dumps for any environment. This is useful for seeding the database with initial data, migrating from other hosting platforms, or debugging issues locally.
 
 To import or export a database dump for an environment:
 
@@ -105,8 +105,8 @@ This approach allows you to perform any database operations you need, such as re
 
 ## Change Preview Environment Database
 
-By default, when Cloud creates a [preview environment](../environments/page.mdx#preview-environments), it replicates the Production database. This allows you to test changes in a safe environment that mirrors production, without affecting the live data.
+By default, when Medusa creates a [preview environment](../environments/preview/page.mdx), it replicates the Production database. This allows you to test changes in a safe environment that mirrors production, without affecting the live data.
 
 Cloud also allows you to configure which environment's database to replicate the preview database from. For example, you can replicate the Staging environment's database instead of Production.
 
-Learn more in the [Environments](../environments/page.mdx#manage-shared-previews-settings) guide.
+Learn more in the [Preview Environments](../environments/preview/page.mdx#manage-shared-previews-settings) guide.

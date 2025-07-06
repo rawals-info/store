@@ -4,13 +4,13 @@ export const metadata = {
 
 # {metadata.title}
 
-In this guide, you'll learn about the managed Redis service that Cloud provides as part of your project environments.
+In this guide, you'll learn about the managed Redis service that Medusa provides as part of your project environments.
 
 ## Managed Redis Service
 
-Cloud offers a managed Redis service for your project environments. Each environment has its own dedicated Redis instance that is automatically provisioned when the environment is created.
+Medusa provisions and manages Redis servers for each of your environments.
 
-So, when you create a new project, Cloud creates a production Redis instance for the production environment. If you create a staging environment, Cloud creates a separate Redis instance for that environment as well.
+Each project environment has a dedicated Redis server. These Redis servers are entirely isolated from one another, similar to the Postgres databases.
 
 ![Diagram showcasing Redis isolation between environments](https://res.cloudinary.com/dza7lstvk/image/upload/v1750230910/Cloud/redis-cloud_llg83c.jpg)
 
@@ -18,7 +18,7 @@ So, when you create a new project, Cloud creates a production Redis instance for
 
 ## Configured Redis Infrastructure Modules
 
-Cloud automatically configures your Medusa application to use Redis-based Infrastructure Modules, including:
+Medusa automatically configures your Medusa application to use Redis-based Infrastructure Modules, including:
 
 - [Redis Event Module](!resources!/infrastructure-modules/event/redis)
 - [Redis Cache Module](!resources!/infrastructure-modules/cache/redis)
@@ -29,13 +29,13 @@ So, you don't need to configure any of these modules and providers or set up Red
 
 <Note>
 
-If you're using a Medusa version before v2.7.0, [contact support](../support/page.mdx) for assistance in configuring the Redis modules.
+If you're using a Medusa version before v2.7.0, contact support for assistance in configuring the Redis modules.
 
 </Note>
 
 ### Access Redis Configurations
 
-Since Cloud is a managed service, you can't directly access your Redis instance or its configurations. Cloud also doesn't expose the Redis instance connection or configuration details.
+Since Cloud is a managed service, you can't directly access your Redis instance or its configurations. Medusa also doesn't expose the Redis instance connection or configuration details.
 
 ### Override Redis Configurations
 
@@ -45,6 +45,6 @@ Then, configure the modules and providers you're overriding in your `medusa-conf
 
 <Note title="Tip">
 
-To set the connection URL of your external Redis instance, refer to the [Environments](../environments/page.mdx#add-environment-variables) guide to learn how to add environment variables. You can then use these variables in your `medusa-config.ts` file to connect to your Redis instance.
+To set the connection URL of your external Redis instance, refer to the [Manage Environment Variables](../environments/environment-variables/page.mdx) guide to learn how to add environment variables. You can then use these variables in your `medusa-config.ts` file to connect to your Redis instance.
 
 </Note>

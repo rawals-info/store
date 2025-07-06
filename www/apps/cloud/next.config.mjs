@@ -130,6 +130,18 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["@medusajs/icons", "@medusajs/ui"],
   },
+  redirects: async () => [
+    {
+      source: "/infrastructure",
+      destination: "/environments",
+      permanent: true,
+    },
+    {
+      source: "/support",
+      destination: "/faq",
+      permanent: true,
+    },
+  ],
 }
 
 const withBundleAnalyzer = bundleAnalyzer({

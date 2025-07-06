@@ -8,11 +8,11 @@ import {
   Textarea,
   toast,
 } from "@medusajs/ui"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { formatValue } from "react-currency-input-field"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import * as zod from "zod"
 import { Form } from "../../../../../components/common/form"
 import { RouteDrawer, useRouteModal } from "../../../../../components/modals"
@@ -29,16 +29,21 @@ type CreateRefundFormProps = {
 }
 
 const CreateRefundSchema = zod.object({
-  amount: zod.string().or(zod.number()),
+  amount: zod.object({
+    value: zod.string().or(zod.number()),
+    float: zod.number().or(zod.null()),
+  }),
   note: zod.string().optional(),
 })
 
 export const CreateRefundForm = ({ order }: CreateRefundFormProps) => {
   const { t } = useTranslation()
   const { handleSuccess } = useRouteModal()
-  const navigate = useNavigate()
+
   const [searchParams] = useSearchParams()
-  const paymentId = searchParams.get("paymentId")
+  const [paymentId, setPaymentId] = useState<string | undefined>(
+    searchParams.get("paymentId") || undefined
+  )
   const payments = getPaymentsFromOrder(order)
   const payment = payments.find((p) => p.id === paymentId)!
   const paymentAmount = payment?.amount || 0
@@ -50,7 +55,10 @@ export const CreateRefundForm = ({ order }: CreateRefundFormProps) => {
 
   const form = useForm<zod.infer<typeof CreateRefundSchema>>({
     defaultValues: {
-      amount: paymentAmount,
+      amount: {
+        value: paymentAmount.toFixed(currency.decimal_digits),
+        float: paymentAmount,
+      },
       note: "",
     },
     resolver: zodResolver(CreateRefundSchema),
@@ -61,21 +69,24 @@ export const CreateRefundForm = ({ order }: CreateRefundFormProps) => {
     const paymentAmount = (payment?.amount || 0) as number
     const pendingAmount =
       pendingDifference < 0
-        ? Math.min(pendingDifference, paymentAmount)
+        ? Math.min(Math.abs(pendingDifference), paymentAmount)
         : paymentAmount
 
     const normalizedAmount =
       pendingAmount < 0 ? pendingAmount * -1 : pendingAmount
 
-    form.setValue("amount", normalizedAmount as number)
-  }, [payment])
+    form.setValue("amount", {
+      value: normalizedAmount.toFixed(currency.decimal_digits),
+      float: normalizedAmount,
+    })
+  }, [payment?.id || ""])
 
   const { mutateAsync, isPending } = useRefundPayment(order.id, payment?.id!)
 
   const handleSubmit = form.handleSubmit(async (data) => {
     await mutateAsync(
       {
-        amount: parseFloat(data.amount as string),
+        amount: data.amount.float!,
         note: data.note,
       },
       {
@@ -83,7 +94,7 @@ export const CreateRefundForm = ({ order }: CreateRefundFormProps) => {
           toast.success(
             t("orders.payment.refundPaymentSuccess", {
               amount: formatCurrency(
-                data.amount as number,
+                data.amount.float!,
                 payment?.currency_code!
               ),
             })
@@ -107,11 +118,9 @@ export const CreateRefundForm = ({ order }: CreateRefundFormProps) => {
         <RouteDrawer.Body className="flex-1 overflow-auto">
           <div className="flex flex-col gap-y-4">
             <Select
-              value={payment?.id}
+              value={paymentId}
               onValueChange={(value) => {
-                navigate(`/orders/${order.id}/refund?paymentId=${value}`, {
-                  replace: true,
-                })
+                setPaymentId(value)
               }}
             >
               <Label className="txt-compact-small mb-[-6px] font-sans font-medium">
@@ -179,9 +188,12 @@ export const CreateRefundForm = ({ order }: CreateRefundFormProps) => {
                         decimalScale={currency.decimal_digits}
                         symbol={currency.symbol_native}
                         code={currency.code}
-                        value={field.value}
+                        value={field.value.value}
                         onValueChange={(_value, _name, values) =>
-                          onChange(values?.value ? values?.value : "")
+                          onChange({
+                            value: values?.value,
+                            float: values?.float || null,
+                          })
                         }
                         autoFocus
                       />

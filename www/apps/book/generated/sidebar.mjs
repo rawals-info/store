@@ -38,6 +38,16 @@ export const generatedSidebars = [
             "children": [],
             "chapterTitle": "1.3. Architecture",
             "number": "1.3."
+          },
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "link",
+            "title": "AI Assistants and LLMs",
+            "path": "/learn/introduction/build-with-llms-ai",
+            "children": [],
+            "chapterTitle": "1.4. AI Assistants and LLMs",
+            "number": "1.4."
           }
         ],
         "chapterTitle": "1. Getting Started",
@@ -1128,7 +1138,18 @@ export const generatedSidebars = [
             "type": "link",
             "path": "/learn/debugging-and-testing/instrumentation",
             "title": "Instrumentation",
-            "children": [],
+            "children": [
+              {
+                "loaded": true,
+                "isPathHref": true,
+                "type": "ref",
+                "path": "/resources/integrations/guides/sentry",
+                "title": "Guide: Sentry",
+                "children": [],
+                "chapterTitle": "7.4.1. Guide: Sentry",
+                "number": "7.4.1."
+              }
+            ],
             "chapterTitle": "7.4. Instrumentation",
             "number": "7.4."
           },

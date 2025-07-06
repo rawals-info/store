@@ -168,6 +168,79 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
             })
           )
         })
+
+        it("complete payment flow successfully when rounded numbers are equal", async () => {
+          let paymentCollection = await service.createPaymentCollections({
+            currency_code: "usd",
+            amount: 200.129,
+          })
+
+          const paymentSession = await service.createPaymentSession(
+            paymentCollection.id,
+            {
+              provider_id: "pp_system_default",
+              amount: 200.129,
+              currency_code: "usd",
+              data: {},
+              context: {
+                customer: { id: "cus-id-1", email: "new@test.tsst" },
+              },
+            }
+          )
+
+          const payment = await service.authorizePaymentSession(
+            paymentSession.id,
+            {}
+          )
+
+          await service.capturePayment({
+            amount: 200.13, // rounded from payment provider
+            payment_id: payment.id,
+          })
+
+          await service.completePaymentCollections(paymentCollection.id)
+
+          paymentCollection = await service.retrievePaymentCollection(
+            paymentCollection.id,
+            { relations: ["payment_sessions", "payments.captures"] }
+          )
+
+          expect(paymentCollection).toEqual(
+            expect.objectContaining({
+              id: expect.any(String),
+              currency_code: "usd",
+              amount: 200.129,
+              authorized_amount: 200.129,
+              captured_amount: 200.13,
+              status: "completed",
+              deleted_at: null,
+              completed_at: expect.any(Date),
+              payment_sessions: [
+                expect.objectContaining({
+                  id: expect.any(String),
+                  currency_code: "usd",
+                  amount: 200.129,
+                  provider_id: "pp_system_default",
+                  status: "authorized",
+                  authorized_at: expect.any(Date),
+                }),
+              ],
+              payments: [
+                expect.objectContaining({
+                  id: expect.any(String),
+                  amount: 200.129,
+                  currency_code: "usd",
+                  provider_id: "pp_system_default",
+                  captures: [
+                    expect.objectContaining({
+                      amount: 200.13,
+                    }),
+                  ],
+                }),
+              ],
+            })
+          )
+        })
       })
 
       describe("PaymentCollection", () => {
@@ -1032,7 +1105,7 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
 
             expect(finalCollection).toEqual(
               expect.objectContaining({
-                status: "authorized",
+                status: "completed",
                 amount: 500,
                 authorized_amount: 1000,
                 captured_amount: 1000,

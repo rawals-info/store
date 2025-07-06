@@ -12,7 +12,7 @@ In this guide, you'll learn about projects, how to create them, view their detai
 
 A project is the collection of resources, environments, deployments, and settings related to a Medusa application deployed to the Cloud. The project is linked to a GitHub repository that hosts the Medusa application's code.
 
-To deploy a Medusa application to the Cloud, you create a project for it. Cloud will automatically set up and configure the necessary resources in the project to run the application, such as PostgreSQL, Redis, and S3.
+To deploy a Medusa application to the Cloud, you create a project for it. Medusa will automatically set up and configure the necessary resources in the project to run the application, such as PostgreSQL, Redis, and S3.
 
 Each project can have multiple environments, such as production and staging. These environments allow you to test changes before pushing them live to users. You can learn more in the [Environments documentation](../environments/page.mdx).
 
@@ -29,11 +29,11 @@ Before creating a project, ensure you have:
 - A Medusa application whose codebase is hosted in a GitHub repository.
     - If you don't have a Medusa application yet, refer to the [Installation](!docs!/learn/installation) guide to set up a new Medusa application.
 - A Cloud account with a valid plan that allows creating more projects.
-    - If you've exceeded the number of projects limit for your plan, you can [contact support](../support/page.mdx) to upgrade your plan.
+    - If you've exceeded the number of projects limit for your plan, you can contact support to upgrade your plan.
 
 #### Medusa Application Configurations
 
-Your Medusa application doesn't need specific configurations to be deployed to Cloud. Cloud will automatically:
+Your Medusa application doesn't need specific configurations to be deployed to Cloud. Medusa will automatically:
 
 - Create the necessary [server and worker instances](!docs!/learn/production/worker-mode).
 - Scale your Medusa application's resources based on the traffic it receives.
@@ -57,20 +57,20 @@ To create a project:
 
 3. If you haven't authenticated with GitHub yet, you'll be asked to authenticate first.
 4. Once you're authenticated, you'll need to select a GitHub account and the repository that contains your Medusa application's code. The repository can be public or private.
-    - If you don't see your repository, you can click the "Configure repositories" link to manage the GitHub repositories that Cloud can access.
+    - If you don't see your repository, you can click the "Configure repositories" link to manage the GitHub repositories that Medusa can access.
 5. Once you find the repository, select it and click the "Next" button.
 
 ![The select repository step in the project creation flow with a repository selected](https://res.cloudinary.com/dza7lstvk/image/upload/v1749741442/Cloud/CleanShot_2025-06-12_at_18.17.08_2x_ev7bum.png)
 
 6. In the next step, configure the project's settings:
     - Enter the name of the project.
-    - Enter a custom subdomain for the project. All projects are subdomains of `medusajs.app`. For example, if you enter `my-project`, the project will be accessible at `my-project.medusajs.app`.
+    - Enter a custom subdomain for the project. All projects are subdomains of `medusajs.app`. For example, if you enter `my-project`, the project will be accessible at `my-project.medusajs.app`. Refer to the [subdomain restrictions](#subdomain-restrictions) section for more details.
 
 ![The project settings step in the project creation flow with the settings filled in](https://res.cloudinary.com/dza7lstvk/image/upload/v1749741990/Cloud/CleanShot_2025-06-12_at_18.26.15_2x_kyxggl.png)
 
 7. You can optionally change the "Build and project" settings by expanding its section:
     - Select a region to deploy the project. For better performance, choose a region that's closer to your target users. The region can't be changed later.
-        - If you don't find the region you need, you can [contact support](../support/page.mdx) to request it.
+        - If you don't find the region you need, you can contact support to request it.
     - If your project is in a monorepo, you can specify the path to the Medusa project in the repository. Otherwise, leave it empty.
     - You can change the email and password for the admin user created for the project. These are the credentials you'll use to access the Medusa Admin.
 
@@ -107,7 +107,19 @@ Once the project is created and deployed, you'll receive a notification in the C
 If you encounter any issues while creating a project:
 
 - [Check the build and runtime logs of the project's production deployment](../logs/page.mdx).
-- [Contact support for help](../support/page.mdx).
+- Contact support for help.
+
+### Subdomain Restrictions
+
+When you choose a subdomain for your project, it must be at least five characters long. It also can't be one of the following reserved subdomains:
+
+- `medusa`
+- `admin`
+- `staging`
+- `production`
+- `preview`
+- `development`
+- `proxy`.
 
 ---
 
@@ -185,7 +197,7 @@ To edit a project's general details:
 
 You can also edit the "Previews" settings of a project from the "Settings" tab, which are general settings related to Previews environments.
 
-Learn more in the [Environments](../environments/page.mdx) guide.
+Learn more in the [Preview Environments](../environments/preview/page.mdx) guide.
 
 ---
 

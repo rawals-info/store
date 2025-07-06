@@ -1311,6 +1311,7 @@
             "id"
           ],
           "referencedTableName": "public.order",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

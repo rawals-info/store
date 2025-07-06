@@ -12,6 +12,10 @@ export const notification = [
     "path": "https://docs.medusajs.com/resources/infrastructure-modules/notification/send-notification"
   },
   {
+    "title": "Integrate Mailchimp",
+    "path": "https://docs.medusajs.com/resources/integrations/guides/mailchimp"
+  },
+  {
     "title": "Integrate Slack",
     "path": "https://docs.medusajs.com/resources/integrations/guides/slack"
   },

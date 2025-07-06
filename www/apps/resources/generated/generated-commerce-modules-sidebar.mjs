@@ -1082,6 +1082,14 @@ const generatedgeneratedCommerceModulesSidebarSidebar = {
             {
               "loaded": true,
               "isPathHref": true,
+              "type": "ref",
+              "title": "Add Gift Message",
+              "path": "https://docs.medusajs.com/resources/how-to-tutorials/tutorials/gift-message",
+              "children": []
+            },
+            {
+              "loaded": true,
+              "isPathHref": true,
               "type": "link",
               "path": "/commerce-modules/cart/extend",
               "title": "Extend Module",
@@ -1101,6 +1109,14 @@ const generatedgeneratedCommerceModulesSidebarSidebar = {
               "type": "ref",
               "title": "Implement Custom Line Item Pricing in Medusa",
               "path": "https://docs.medusajs.com/resources/examples/guides/custom-item-price",
+              "children": []
+            },
+            {
+              "loaded": true,
+              "isPathHref": true,
+              "type": "ref",
+              "title": "Implement First-Purchase Discount",
+              "path": "https://docs.medusajs.com/resources/how-to-tutorials/tutorials/first-purchase-discounts",
               "children": []
             },
             {
@@ -2427,6 +2443,14 @@ const generatedgeneratedCommerceModulesSidebarSidebar = {
               "type": "link",
               "path": "/commerce-modules/customer/extend",
               "title": "Extend Module",
+              "children": []
+            },
+            {
+              "loaded": true,
+              "isPathHref": true,
+              "type": "ref",
+              "title": "Implement First-Purchase Discount",
+              "path": "https://docs.medusajs.com/resources/how-to-tutorials/tutorials/first-purchase-discounts",
               "children": []
             },
             {
@@ -6062,6 +6086,14 @@ const generatedgeneratedCommerceModulesSidebarSidebar = {
           "sort_sidebar": "alphabetize",
           "description": "Learn how to use the Order Module in your customizations on the Medusa application server.",
           "children": [
+            {
+              "loaded": true,
+              "isPathHref": true,
+              "type": "ref",
+              "title": "Add Gift Message",
+              "path": "https://docs.medusajs.com/resources/how-to-tutorials/tutorials/gift-message",
+              "children": []
+            },
             {
               "loaded": true,
               "isPathHref": true,
@@ -13068,6 +13100,14 @@ const generatedgeneratedCommerceModulesSidebarSidebar = {
               "loaded": true,
               "isPathHref": true,
               "type": "link",
+              "path": "/commerce-modules/promotion/promotion-taxes",
+              "title": "Tax-Inclusive Promotions",
+              "children": []
+            },
+            {
+              "loaded": true,
+              "isPathHref": true,
+              "type": "link",
               "path": "/commerce-modules/promotion/application-method",
               "title": "Application Method",
               "children": []
@@ -13114,6 +13154,14 @@ const generatedgeneratedCommerceModulesSidebarSidebar = {
               "type": "link",
               "path": "/commerce-modules/promotion/extend",
               "title": "Extend Module",
+              "children": []
+            },
+            {
+              "loaded": true,
+              "isPathHref": true,
+              "type": "ref",
+              "title": "Implement First-Purchase Discount",
+              "path": "https://docs.medusajs.com/resources/how-to-tutorials/tutorials/first-purchase-discounts",
               "children": []
             },
             {

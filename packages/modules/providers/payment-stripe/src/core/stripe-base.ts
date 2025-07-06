@@ -229,10 +229,7 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
     const paymentIntent = await this.stripe_.paymentIntents.retrieve(id)
     const statusResponse = this.getStatus(paymentIntent)
 
-    return {
-      status: statusResponse.status,
-      data: statusResponse.data as unknown as Record<string, unknown>,
-    }
+    return statusResponse as unknown as GetPaymentStatusOutput
   }
 
   async initiatePayment({
@@ -262,8 +259,9 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
     const isPaymentIntent = "id" in sessionData
     return {
       id: isPaymentIntent ? sessionData.id : (data?.session_id as string),
-      status: isPaymentIntent ? this.getStatus(sessionData).status : undefined,
-      data: sessionData as unknown as Record<string, unknown>,
+      ...(this.getStatus(
+        sessionData as unknown as Stripe.PaymentIntent
+      ) as unknown as Pick<InitiatePaymentOutput, "data" | "status">),
     }
   }
 
@@ -377,7 +375,9 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
   }: UpdatePaymentInput): Promise<UpdatePaymentOutput> {
     const amountNumeric = getSmallestUnit(amount, currency_code)
     if (isPresent(amount) && data?.amount === amountNumeric) {
-      return { data }
+      return this.getStatus(
+        data as unknown as Stripe.PaymentIntent
+      ) as unknown as UpdatePaymentOutput
     }
 
     try {
@@ -392,7 +392,9 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
         }
       )) as unknown as Record<string, unknown>
 
-      return { data: sessionData }
+      return this.getStatus(
+        sessionData as unknown as Stripe.PaymentIntent
+      ) as unknown as UpdatePaymentOutput
     } catch (e) {
       throw this.buildError("An error occurred in updatePayment", e)
     }
@@ -586,9 +588,10 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
     return { id: resp.id, data: resp as unknown as Record<string, unknown> }
   }
 
-  private getStatus(
-    paymentIntent: Stripe.PaymentIntent
-  ): Omit<GetPaymentStatusOutput, "data"> & { data: Stripe.PaymentIntent } {
+  private getStatus(paymentIntent: Stripe.PaymentIntent): {
+    data: Stripe.PaymentIntent
+    status: PaymentSessionStatus
+  } {
     switch (paymentIntent.status) {
       case "requires_payment_method":
         if (paymentIntent.last_payment_error) {

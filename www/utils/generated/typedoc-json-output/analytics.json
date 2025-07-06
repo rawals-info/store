@@ -1,19 +1,19 @@
 {
-	"id": 59939,
+	"id": 60184,
 	"name": "analytics",
 	"variant": "project",
 	"kind": 1,
 	"flags": {},
 	"children": [
 		{
-			"id": 59940,
+			"id": 60185,
 			"name": "IAnalyticsModuleService",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 59941,
+					"id": 60186,
 					"name": "getProvider",
 					"variant": "declaration",
 					"kind": 2048,
@@ -23,12 +23,12 @@
 							"fileName": "analytics/service.ts",
 							"line": 16,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L16"
+							"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L16"
 						}
 					],
 					"signatures": [
 						{
-							"id": 59942,
+							"id": 60187,
 							"name": "getProvider",
 							"variant": "signature",
 							"kind": 4096,
@@ -74,7 +74,7 @@
 									"fileName": "analytics/service.ts",
 									"line": 16,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L16"
+									"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L16"
 								}
 							],
 							"type": {
@@ -90,7 +90,7 @@
 					]
 				},
 				{
-					"id": 59943,
+					"id": 60188,
 					"name": "track",
 					"variant": "declaration",
 					"kind": 2048,
@@ -100,12 +100,12 @@
 							"fileName": "analytics/service.ts",
 							"line": 35,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L35"
+							"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L35"
 						}
 					],
 					"signatures": [
 						{
-							"id": 59944,
+							"id": 60189,
 							"name": "track",
 							"variant": "signature",
 							"kind": 4096,
@@ -159,12 +159,12 @@
 									"fileName": "analytics/service.ts",
 									"line": 35,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L35"
+									"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L35"
 								}
 							],
 							"parameters": [
 								{
-									"id": 59945,
+									"id": 60190,
 									"name": "data",
 									"variant": "param",
 									"kind": 32768,
@@ -207,7 +207,7 @@
 					]
 				},
 				{
-					"id": 59946,
+					"id": 60191,
 					"name": "identify",
 					"variant": "declaration",
 					"kind": 2048,
@@ -217,12 +217,12 @@
 							"fileName": "analytics/service.ts",
 							"line": 52,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L52"
+							"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L52"
 						}
 					],
 					"signatures": [
 						{
-							"id": 59947,
+							"id": 60192,
 							"name": "identify",
 							"variant": "signature",
 							"kind": 4096,
@@ -276,12 +276,12 @@
 									"fileName": "analytics/service.ts",
 									"line": 52,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L52"
+									"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L52"
 								}
 							],
 							"parameters": [
 								{
-									"id": 59948,
+									"id": 60193,
 									"name": "data",
 									"variant": "param",
 									"kind": 32768,
@@ -328,9 +328,9 @@
 				{
 					"title": "Methods",
 					"children": [
-						59941,
-						59943,
-						59946
+						60186,
+						60188,
+						60191
 					]
 				}
 			],
@@ -339,7 +339,7 @@
 					"fileName": "analytics/service.ts",
 					"line": 5,
 					"character": 17,
-					"url": "https://github.com/medusajs/medusa/blob/cab00ff2b8935fdd788157ee36402ae59b079268/packages/core/types/src/analytics/service.ts#L5"
+					"url": "https://github.com/medusajs/medusa/blob/e0b5bb0b224458ebc8c93111e72f9a10aecf0275/packages/core/types/src/analytics/service.ts#L5"
 				}
 			],
 			"extendedTypes": [
@@ -359,49 +359,49 @@
 		{
 			"title": "Interfaces",
 			"children": [
-				59940
+				60185
 			]
 		}
 	],
 	"packageName": "@medusajs/types",
 	"symbolIdMap": {
-		"59939": {
+		"60184": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": ""
 		},
-		"59940": {
+		"60185": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService"
 		},
-		"59941": {
+		"60186": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService.getProvider"
 		},
-		"59942": {
+		"60187": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService.getProvider"
 		},
-		"59943": {
+		"60188": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService.track"
 		},
-		"59944": {
+		"60189": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService.track"
 		},
-		"59945": {
+		"60190": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "data"
 		},
-		"59946": {
+		"60191": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService.identify"
 		},
-		"59947": {
+		"60192": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "IAnalyticsModuleService.identify"
 		},
-		"59948": {
+		"60193": {
 			"sourceFileName": "../../../../packages/core/types/src/analytics/service.ts",
 			"qualifiedName": "data"
 		}
@@ -411,7 +411,7 @@
 			"1": "../../../../packages/core/types/src/analytics/service.ts"
 		},
 		"reflections": {
-			"1": 59939
+			"1": 60184
 		}
 	}
 }

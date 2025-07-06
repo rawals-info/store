@@ -172,6 +172,8 @@ export class Product {
    * [Confirm Product Import](https://docs.medusajs.com/api/admin#products_postproductsimporttransaction_idconfirm)
    * API route.
    *
+   * @version 2.8.5
+   *
    * @param transactionId - The ID of the transaction of the created product import. This is returned
    * by the API route used to create the product import.
    * @param query - Query parameters to pass in the request.

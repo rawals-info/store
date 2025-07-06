@@ -1199,9 +1199,9 @@ You'll now create the workflow that uses the `sendNotificationStep` to send the 
 Create the file `src/workflows/send-order-confirmation.ts` with the following content:
 
 export const workflowHighlights = [
-  ["12", "sendOrderConfirmationWorkflow", "Create the workflow that sends an order confirmation email."],
-  ["16", "useQueryGraphStep", "Retrieve the order's details."],
-  ["44", "sendNotificationStep", "Send the order confirmation email."]
+  ["13", "sendOrderConfirmationWorkflow", "Create the workflow that sends an order confirmation email."],
+  ["15", "useQueryGraphStep", "Retrieve the order's details."],
+  ["43", "sendNotificationStep", "Send the order confirmation email."]
 ]
 
 ```ts title="src/workflows/send-order-confirmation.ts" highlights={workflowHighlights}
@@ -1219,7 +1219,6 @@ type WorkflowInput = {
 export const sendOrderConfirmationWorkflow = createWorkflow(
   "send-order-confirmation",
   ({ id }: WorkflowInput) => {
-    // @ts-ignore
     const { data: orders } = useQueryGraphStep({
       entity: "order",
       fields: [

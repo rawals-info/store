@@ -5,7 +5,6 @@ import {
   clx,
   CurrencyInput,
   Divider,
-  Input,
   Label,
   RadioGroup,
   Select,
@@ -15,8 +14,10 @@ import {
 import { useEffect, useMemo, useState } from "react"
 import { formatValue } from "react-currency-input-field"
 import { useForm } from "react-hook-form"
+import { useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
+
 import { Form } from "../../../../../components/common/form"
 import { RouteDrawer, useRouteModal } from "../../../../../components/modals"
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
@@ -33,13 +34,19 @@ const OrderBalanceSettlementSchema = zod.object({
   settlement_type: zod.enum(["credit_line", "refund"]),
   refund: zod
     .object({
-      amount: zod.string().or(zod.number()).optional(),
+      amount: zod.object({
+        value: zod.string().or(zod.number()).optional(),
+        float: zod.number().or(zod.null()),
+      }),
       note: zod.string().optional(),
     })
     .optional(),
   credit_line: zod
     .object({
-      amount: zod.string().or(zod.number()).optional(),
+      amount: zod.object({
+        value: zod.string().or(zod.number()).optional(),
+        float: zod.number().or(zod.null()),
+      }),
       note: zod.string().optional(),
     })
     .optional(),
@@ -51,19 +58,30 @@ export const OrderBalanceSettlementForm = ({
   order: AdminOrder
 }) => {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
   const { handleSuccess } = useRouteModal()
-  const [activePayment, setActivePayment] = useState<AdminPayment | null>(null)
+  const paymentId = searchParams.get("paymentId")
   const payments = getPaymentsFromOrder(order)
   const pendingDifference = order.summary.pending_difference * -1
+
+  const [activePayment, setActivePayment] = useState<AdminPayment | null>(
+    paymentId ? payments.find((p) => p.id === paymentId) || null : null
+  )
 
   const form = useForm<zod.infer<typeof OrderBalanceSettlementSchema>>({
     defaultValues: {
       settlement_type: "refund",
       refund: {
-        amount: 0,
+        amount: {
+          value: "",
+          float: null,
+        },
       },
       credit_line: {
-        amount: 0,
+        amount: {
+          value: "",
+          float: null,
+        },
       },
     },
     resolver: zodResolver(OrderBalanceSettlementSchema),
@@ -79,9 +97,14 @@ export const OrderBalanceSettlementForm = ({
 
   const handleSubmit = form.handleSubmit(async (data) => {
     if (data.settlement_type === "credit_line") {
+      if (data.credit_line?.amount.float === null) {
+        return
+      }
       await createCreditLine(
         {
-          amount: parseFloat(data.credit_line!.amount! as string) * -1,
+          amount: data.credit_line!.amount.float! * -1,
+          reference: "refund",
+          reference_id: order.id,
         },
         {
           onSuccess: () => {
@@ -97,9 +120,12 @@ export const OrderBalanceSettlementForm = ({
     }
 
     if (data.settlement_type === "refund") {
+      if (data.refund?.amount.float === null) {
+        return
+      }
       await createRefund(
         {
-          amount: parseFloat(data.refund!.amount! as string),
+          amount: data.refund!.amount!.float!,
           note: data.refund!.note,
         },
         {
@@ -107,7 +133,7 @@ export const OrderBalanceSettlementForm = ({
             toast.success(
               t("orders.payment.refundPaymentSuccess", {
                 amount: formatCurrency(
-                  parseFloat(data.refund!.amount! as string),
+                  data.refund!.amount!.float!,
                   order.currency_code!
                 ),
               })
@@ -131,18 +157,23 @@ export const OrderBalanceSettlementForm = ({
   useEffect(() => {
     form.clearErrors()
 
-    const minimum = activePayment?.amount
+    const _minimum = activePayment?.amount
       ? Math.min(pendingDifference, activePayment.amount)
       : pendingDifference
 
+    const minimum = {
+      value: _minimum.toFixed(currency.decimal_digits),
+      float: _minimum,
+    }
+
     if (settlementType === "refund") {
-      form.setValue("refund.amount", activePayment ? minimum : 0)
+      form.setValue("refund.amount", minimum)
     }
 
     if (settlementType === "credit_line") {
       form.setValue("credit_line.amount", minimum)
     }
-  }, [settlementType, activePayment, pendingDifference, form])
+  }, [settlementType, activePayment, pendingDifference, form, currency])
 
   return (
     <RouteDrawer.Form form={form}>
@@ -194,6 +225,7 @@ export const OrderBalanceSettlementForm = ({
               <>
                 <div className="flex flex-col gap-y-4">
                   <Select
+                    defaultValue={activePayment?.id}
                     onValueChange={(value) => {
                       setActivePayment(payments.find((p) => p.id === value)!)
                     }}
@@ -260,9 +292,12 @@ export const OrderBalanceSettlementForm = ({
                             decimalScale={currency.decimal_digits}
                             symbol={currency.symbol_native}
                             code={currency.code}
-                            value={field.value}
+                            value={field.value.value}
                             onValueChange={(_value, _name, values) =>
-                              onChange(values?.value ? values?.value : "")
+                              onChange({
+                                value: values?.value,
+                                float: values?.float || null,
+                              })
                             }
                             autoFocus
                           />
@@ -315,10 +350,13 @@ export const OrderBalanceSettlementForm = ({
                             decimalScale={currency.decimal_digits}
                             symbol={currency.symbol_native}
                             code={currency.code}
-                            value={field.value}
-                            onValueChange={(_value, _name, values) =>
-                              onChange(values?.value ? values?.value : "")
-                            }
+                            value={field.value.value}
+                            onValueChange={(_value, _name, values) => {
+                              onChange({
+                                value: values?.value,
+                                float: values?.float || null,
+                              })
+                            }}
                             autoFocus
                           />
                         </Form.Control>

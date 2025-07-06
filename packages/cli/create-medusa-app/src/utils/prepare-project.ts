@@ -7,6 +7,7 @@ import { displayFactBox, FactBoxOptions } from "./facts.js"
 import ProcessManager from "./process-manager.js"
 import type { Client } from "pg"
 import PackageManager from "./package-manager.js"
+import { updatePackageVersions } from "./update-package-versions.js"
 
 const ADMIN_EMAIL = "admin@medusa-test.com"
 let STORE_CORS = "http://localhost:8000"
@@ -45,6 +46,7 @@ type PrepareProjectOptions = {
   client: Client | null
   verbose?: boolean
   packageManager: PackageManager
+  version?: string
 }
 
 type PrepareOptions = PreparePluginOptions | PrepareProjectOptions
@@ -128,6 +130,7 @@ async function prepareProject({
   client,
   verbose = false,
   packageManager,
+  version,
 }: PrepareProjectOptions) {
   // initialize execution options
   const execOptions = {
@@ -158,6 +161,11 @@ async function prepareProject({
 
   // Update name
   packageJson.name = projectName
+
+  // Update medusa dependencies versions
+  if (version) {
+    updatePackageVersions(packageJson, version)
+  }
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
 

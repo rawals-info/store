@@ -1,3 +1,4 @@
+import { logger } from "@medusajs/framework/logger"
 import { MedusaAppOutput } from "@medusajs/framework/modules-sdk"
 import { MedusaContainer } from "@medusajs/framework/types"
 import {
@@ -7,7 +8,6 @@ import {
   mergePluginModules,
 } from "@medusajs/framework/utils"
 import { asValue } from "awilix"
-import { logger } from "@medusajs/framework/logger"
 import { dbTestUtilFactory, getDatabaseURL } from "./database"
 import {
   applyEnvVarsToProcess,
@@ -18,6 +18,7 @@ import {
   startApp,
   syncLinks,
 } from "./medusa-test-runner-utils"
+import { waitWorkflowExecutions } from "./medusa-test-runner-utils/wait-workflow-executions"
 
 export interface MedusaSuiteOptions {
   dbConnection: any // knex instance
@@ -34,6 +35,9 @@ export interface MedusaSuiteOptions {
     clientUrl: string
   }
   getMedusaApp: () => MedusaAppOutput
+  utils: {
+    waitWorkflowExecutions: (container: MedusaContainer) => Promise<void>
+  }
 }
 
 interface TestRunnerConfig {
@@ -44,6 +48,9 @@ interface TestRunnerConfig {
   schema?: string
   debug?: boolean
   inApp?: boolean
+  hooks?: {
+    beforeServerStart?: (container: MedusaContainer) => Promise<void>
+  }
 }
 
 class MedusaTestRunner {
@@ -68,6 +75,7 @@ class MedusaTestRunner {
   private loadedApplication: any = null
   private shutdown: () => Promise<void> = async () => void 0
   private isFirstTime = true
+  private hooks: TestRunnerConfig["hooks"] = {}
 
   constructor(config: TestRunnerConfig) {
     const tempName = parseInt(process.env.JEST_WORKER_ID || "1")
@@ -89,6 +97,7 @@ class MedusaTestRunner {
       schema: this.schema,
       debug: this.debug,
     }
+    this.hooks = config.hooks ?? {}
 
     this.setupProcessHandlers()
   }
@@ -153,6 +162,10 @@ class MedusaTestRunner {
     container.register({
       [ContainerRegistrationKeys.LOGGER]: asValue(logger),
     })
+
+    if (this.hooks?.beforeServerStart) {
+      await this.hooks.beforeServerStart(container)
+    }
 
     await this.initializeDatabase()
 
@@ -268,6 +281,7 @@ class MedusaTestRunner {
 
   public async afterEach(): Promise<void> {
     try {
+      await waitWorkflowExecutions(this.globalContainer as MedusaContainer)
       await this.dbUtils.teardown({ schema: this.schema })
     } catch (error) {
       logger.error("Error tearing down database:", error?.message)
@@ -287,6 +301,10 @@ class MedusaTestRunner {
         clientUrl: this.dbConfig.clientUrl,
       },
       dbUtils: this.dbUtils,
+      utils: {
+        waitWorkflowExecutions: () =>
+          waitWorkflowExecutions(this.globalContainer as MedusaContainer),
+      },
     }
   }
 }
@@ -300,6 +318,7 @@ export function medusaIntegrationTestRunner({
   debug = false,
   inApp = false,
   testSuite,
+  hooks,
 }: {
   moduleName?: string
   env?: Record<string, any>
@@ -309,6 +328,7 @@ export function medusaIntegrationTestRunner({
   debug?: boolean
   inApp?: boolean
   testSuite: (options: MedusaSuiteOptions) => void
+  hooks?: TestRunnerConfig["hooks"]
 }) {
   const runner = new MedusaTestRunner({
     moduleName,
@@ -318,6 +338,7 @@ export function medusaIntegrationTestRunner({
     env,
     debug,
     inApp,
+    hooks,
   })
 
   return describe("", () => {

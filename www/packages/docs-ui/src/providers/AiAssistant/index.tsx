@@ -13,6 +13,7 @@ import React, {
 import type { Source } from "@kapaai/react-sdk"
 import useResizeObserver from "@react-hook/resize-observer"
 import { AiAssistantSearchWindow } from "../../components"
+import { useIsBrowser } from "../BrowserProvider"
 
 export type AiAssistantChatType = "default" | "popover"
 
@@ -66,6 +67,7 @@ const AiAssistantInnerProvider = ({
     () => isGeneratingAnswer || isPreparingAnswer,
     [isGeneratingAnswer, isPreparingAnswer]
   )
+  const { isBrowser } = useIsBrowser()
 
   const scrollToBottom = () => {
     if (preventAutoScroll) {
@@ -132,6 +134,19 @@ const AiAssistantInnerProvider = ({
       })
     })
   }, [scrollToBottom])
+
+  /**
+   * This effect is required to avoid recaptcha messing up
+   * the page layout.
+   */
+  useEffect(() => {
+    if (!isBrowser) {
+      return
+    }
+
+    const recaptchaElm = document.querySelector(".grecaptcha-badge")
+    recaptchaElm?.parentElement?.classList.add("absolute")
+  }, [isBrowser])
 
   return (
     <AiAssistantContext.Provider

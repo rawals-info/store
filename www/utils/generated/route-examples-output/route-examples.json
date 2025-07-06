@@ -494,7 +494,7 @@
   "POST /admin/products/imports": {
     "js-sdk": "sdk.admin.product.createImport({\n  file // uploaded File instance\n})\n.then(({ transaction_id }) => {\n  console.log(transaction_id)\n})"
   },
-  "POST /admin/products/import/{transactionid}/confirm": {
+  "POST /admin/products/imports/{transactionid}/confirm": {
     "js-sdk": "sdk.admin.product.confirmImport(\"transaction_123\")\n.then(() => {\n  console.log(\"Import confirmed\")\n})"
   },
   "POST /admin/products/export": {

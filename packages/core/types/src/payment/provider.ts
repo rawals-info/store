@@ -257,7 +257,12 @@ export interface AuthorizePaymentOutput extends PaymentProviderOutput {
 /**
  * The result of updating a payment.
  */
-export interface UpdatePaymentOutput extends PaymentProviderOutput {}
+export interface UpdatePaymentOutput extends PaymentProviderOutput {
+  /**
+   * The status of the payment, which will be stored in the payment session's `status` field.
+   */
+  status?: PaymentSessionStatus
+}
 
 /**
  * The result of deleting a payment.

@@ -73,6 +73,13 @@ export const howToTutorialsSidebar = [
 While tutorials show you a specific use case, they also help you understand how to implement similar use cases in your own projects. Also, you can implement the use case in a tutorial differently to fit your business requirements.`,
     children: [
       {
+        type: "link",
+        title: "Add Gift Message",
+        path: "/how-to-tutorials/tutorials/gift-message",
+        description:
+          "Learn how to add a gift option and message to items in the cart.",
+      },
+      {
         type: "ref",
         title: "Analytics with Segment",
         path: "/integrations/guides/segment",
@@ -102,6 +109,13 @@ While tutorials show you a specific use case, they also help you understand how 
       },
       {
         type: "link",
+        title: "First-Purchase Discounts",
+        path: "/how-to-tutorials/tutorials/first-purchase-discounts",
+        description:
+          "Learn how to implement first-purchase discounts in your Medusa store.",
+      },
+      {
+        type: "link",
         title: "Loyalty Points System",
         path: "/how-to-tutorials/tutorials/loyalty-points",
         description:
@@ -119,6 +133,13 @@ While tutorials show you a specific use case, they also help you understand how 
         title: "Magento Migration",
         path: "/integrations/guides/magento",
         description: "Learn how to migrate data from Magento to Medusa.",
+      },
+      {
+        type: "ref",
+        title: "Newsletter with Mailchimp",
+        path: "/integrations/guides/mailchimp",
+        description:
+          "Learn how to integrate Mailchimp with Medusa to manage and automate newsletters.",
       },
       {
         type: "link",
