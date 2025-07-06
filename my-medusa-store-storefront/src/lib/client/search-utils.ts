@@ -1,6 +1,6 @@
 "use client"
 
-const DEBOUNCE_TIME = 300 // milliseconds for debouncing
+const DEBOUNCE_TIME = 200 // milliseconds for debouncing
 
 /**
  * Client-side helper to debounce search requests

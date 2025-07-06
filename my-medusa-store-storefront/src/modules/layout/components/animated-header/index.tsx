@@ -19,6 +19,7 @@ const AnimatedHeader = () => {
   const [regions, setRegions] = useState<StoreRegion[]>([])
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false)
   const { scrollY } = useScroll()
   const pathname = usePathname()
@@ -343,6 +344,30 @@ const AnimatedHeader = () => {
                 <CurrencySwitcher />
               </div>
               
+              {/* Mobile Search Icon */}
+              <div className="small:hidden flex items-center">
+                <button
+                  onClick={() => setMobileSearchOpen(true)}
+                  className="p-2 text-inherit hover:text-luxury-gold transition-colors"
+                  aria-label="Search"
+                >
+                  <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6 text-luxury-charcoal"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                  </svg>
+
+                </button>
+              </div>
+
               {/* Cart */}
               <div className="flex items-center">
                 <CartDropdown />
@@ -352,6 +377,32 @@ const AnimatedHeader = () => {
         </div>
       </motion.header>
       
+      {/* Mobile Search Overlay */}
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.div
+            className="fixed inset-0 z-[55] bg-white p-4 overflow-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="font-serif text-lg">Search</h2>
+              <button
+                onClick={() => setMobileSearchOpen(false)}
+                className="p-2 text-luxury-charcoal hover:text-luxury-gold"
+                aria-label="Close search"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <SearchBar autoSearch={true} autoFocus={true} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mobile menu overlay - Set max width to viewport width */}
       <AnimatePresence>
         {mobileMenuOpen && (

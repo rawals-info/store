@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useState, useEffect, useRef, useCallback } from "react"
+import { HttpTypes } from "@medusajs/types"
 import { MagnifyingGlass, XMark } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -13,6 +14,7 @@ type SearchBarProps = {
   isScrolled?: boolean
   onSearchChange?: (value: string) => void
   autoSearch?: boolean
+  autoFocus?: boolean
 }
 
 const SearchBar = ({
@@ -21,24 +23,30 @@ const SearchBar = ({
   isScrolled = false,
   onSearchChange,
   autoSearch = false,
+  autoFocus = false,
 }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFocused, setIsFocused] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [suggestions, setSuggestions] = useState<HttpTypes.StoreProduct[]>([])
+  const [loadingSuggest, setLoadingSuggest] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const pathname = usePathname()
+  const pathname = usePathname() || ""
   // Determine current country code from url (expects /{countryCode}/...)
   const currentCountryCode = pathname.split("/")[1] || ""
 
   // Load search term from URL if present
   useEffect(() => {
-    const query = searchParams.get("q")
+    const query = searchParams?.get("q")
     if (query) {
       setSearchTerm(query)
     }
-  }, [searchParams])
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [searchParams, autoFocus])
 
   // Create debounced search handler
   const debouncedSearch = useCallback(
@@ -46,6 +54,8 @@ const SearchBar = ({
       if (onSearchChange) {
         onSearchChange(value)
       }
+      // Fetch live suggestions
+      fetchSuggestions(value)
       
       if (autoSearch && value.trim()) {
         setIsSearching(false)
@@ -54,6 +64,30 @@ const SearchBar = ({
       }
     }),
     [router, onSearchChange, autoSearch, currentCountryCode]
+  )
+
+  const fetchSuggestions = useCallback(
+    debounceSearch(async (value: string) => {
+      if (!value.trim()) {
+        setSuggestions([])
+        return
+      }
+      try {
+        setLoadingSuggest(true)
+        const res = await fetch(
+          `/api/search-suggest?q=${encodeURIComponent(value.trim())}&countryCode=${currentCountryCode}`
+        )
+        if (res.ok) {
+          const data = await res.json()
+          setSuggestions(data.products || [])
+        }
+      } catch (e) {
+        console.error("Suggestion fetch error", e)
+      } finally {
+        setLoadingSuggest(false)
+      }
+    }, 300),
+    [currentCountryCode]
   )
 
   // Handle input change with debounce
@@ -79,6 +113,7 @@ const SearchBar = ({
   const clearSearch = () => {
     setSearchTerm("")
     setIsSearching(false)
+    setSuggestions([])
     if (onSearchChange) {
       onSearchChange("")
     }
@@ -142,10 +177,70 @@ const SearchBar = ({
       </button>
       
       {isFocused && searchTerm.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-lg rounded-md py-2 px-1 z-50 border border-luxury-lightgold/20">
-          <div className="px-2 py-1 text-xs text-luxury-charcoal/70">
-            Press Enter to search for "{searchTerm}"
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-lg rounded-md z-50 border border-luxury-lightgold/20 w-full sm:w-[540px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-luxury-lightgold/20 max-h-96 overflow-y-auto">
+            {/* Suggestions column */}
+            <div className="py-2">
+              <h4 className="px-4 mb-2 text-xs font-medium text-luxury-charcoal/60 uppercase">Suggestions</h4>
+              {loadingSuggest ? (
+                <div className="px-4 py-2 text-sm text-luxury-charcoal/70">Searching…</div>
+              ) : suggestions.length ? (
+                suggestions.map((p) => (
+                  <button
+                    key={`sugg-${p.id}`}
+                    className="w-full text-left px-4 py-2 hover:bg-luxury-cream/40 text-sm text-luxury-charcoal truncate"
+                    onMouseDown={() => { // use onMouseDown to avoid blur before click
+                      router.push(`/${currentCountryCode}/search?q=${encodeURIComponent(p.title)}`)
+                      setIsFocused(false)
+                    }}
+                  >
+                    {p.title}
+                  </button>
+                ))
+              ) : (
+                <div className="px-4 py-2 text-sm text-luxury-charcoal/70">No suggestions</div>
+              )}
+            </div>
+
+            {/* Products column */}
+            <div className="py-2">
+              <h4 className="px-4 mb-2 text-xs font-medium text-luxury-charcoal/60 uppercase">Products</h4>
+              {loadingSuggest ? (
+                <div className="px-4 py-2 text-sm text-luxury-charcoal/70">Searching…</div>
+              ) : suggestions.length ? (
+                suggestions.map((product) => (
+                  <LocalizedClientLink
+                    key={product.id}
+                    href={`/${currentCountryCode}/products/${product.handle}`}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-luxury-cream/40"
+                    onClick={() => {
+                      setIsFocused(false)
+                    }}
+                  >
+                    {product.thumbnail && (
+                      <img src={product.thumbnail} alt={product.title} className="w-10 h-10 object-cover rounded" />
+                    )}
+                    <span className="text-sm text-luxury-charcoal break-words whitespace-normal">
+                      {product.title}
+                    </span>
+                  </LocalizedClientLink>
+                ))
+              ) : (
+                <div className="px-4 py-2 text-sm text-luxury-charcoal/70">No products</div>
+              )}
+            </div>
           </div>
+
+          {/* Footer search shortcut */}
+          <button
+            onMouseDown={() => {
+              router.push(`/${currentCountryCode}/search?q=${encodeURIComponent(searchTerm.trim())}`)
+              setIsFocused(false)
+            }}
+            className="block w-full text-left px-4 py-3 bg-luxury-cream/40 hover:bg-luxury-cream text-sm text-luxury-charcoal border-t border-luxury-lightgold/20"
+          >
+            Search for “{searchTerm}”
+          </button>
         </div>
       )}
     </form>
