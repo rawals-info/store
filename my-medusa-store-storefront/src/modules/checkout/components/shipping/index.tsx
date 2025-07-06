@@ -134,6 +134,12 @@ const Shipping: React.FC<ShippingProps> = ({
     })
 
     await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
+      .then(() => {
+        // Notify app-wide listeners (useCart hook, etc.) that the cart has changed
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("cartUpdated"))
+        }
+      })
       .catch((err) => {
         setShippingMethodId(currentId)
 

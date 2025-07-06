@@ -30,6 +30,24 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Listen for explicit cart update events to make sure we use the freshest data
+  useEffect(() => {
+    const handleCartUpdated = () => {
+      // Force‐refresh the cart bypassing any cache
+      refetchCart()
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("cartUpdated", handleCartUpdated)
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("cartUpdated", handleCartUpdated)
+      }
+    }
+  }, [refetchCart])
+
   // Fallback to the prop passed from the server on first render.
   const cart = liveCart ?? initialCart
 
