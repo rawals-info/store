@@ -55,7 +55,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
     <div className="flex flex-col gap-4">
       {/* Main image */}
       <div 
-        className="relative aspect-square rounded-md overflow-hidden cursor-zoom-in"
+        className="relative w-full aspect-square rounded-md overflow-hidden cursor-zoom-in"
         onClick={handleZoomToggle}
         onMouseMove={handleMouseMove}
       >

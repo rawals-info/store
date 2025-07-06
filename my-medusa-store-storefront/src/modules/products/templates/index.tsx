@@ -35,7 +35,7 @@ export default function ProductTemplate({
   return (
     <>
       <div className="bg-luxury-cream/20 py-3 text-center text-sm text-luxury-charcoal/70">
-        <p>Each marble piece is uniquely handcrafted by our master artisans</p>
+        <p className="small:mt-0 mt-20">Each marble piece is uniquely handcrafted by our master artisans</p>
       </div>
       
       <div
@@ -44,7 +44,7 @@ export default function ProductTemplate({
       >
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           {/* Left column - Image gallery */}
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <Suspense fallback={
               <div className="aspect-[29/36] w-full bg-gray-100 animate-pulse rounded-lg"></div>
             }>
