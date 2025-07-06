@@ -15,9 +15,31 @@ export function scheduleRevalidate(tag: string, delay = 75) {
   }
 
   const timer = setTimeout(() => {
-    // Fire and forget – any error bubbles up normally
-    revalidateTag(tag)
-    pending.delete(tag)
+    try {
+      // Fire and forget – any error bubbles up normally, but gracefully handle
+      // the specific Next.js runtime error that occurs when `revalidateTag`
+      // is invoked during an RSC render.
+      revalidateTag(tag)
+    } catch (err: any) {
+      if (
+        process.env.NODE_ENV !== "production" &&
+        err instanceof Error &&
+        err.message?.includes("used \"revalidateTag\" during render")
+      ) {
+        // Ignore — calling revalidateTag during a server render is unsupported,
+        // but not fatal. Let the next mutation-triggered revalidation handle it.
+        if (process.env.NEXT_PUBLIC_DEBUG_REVALIDATE === "true") {
+          console.warn(
+            `[revalidate] Suppressed revalidateTag error for tag "${tag}": ${err.message}`
+          )
+        }
+      } else {
+        // Re-throw unknown errors so they are surfaced and logged.
+        console.error("revalidateTag failed", err)
+      }
+    } finally {
+      pending.delete(tag)
+    }
   }, delay)
 
   pending.set(tag, timer)

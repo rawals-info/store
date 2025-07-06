@@ -37,7 +37,7 @@ const Payment = ({
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams.get("step") === "payment"
+  const isOpen = searchParams?.get("step") === "payment"
 
   const isStripe = isStripeFunc(selectedPaymentMethod)
 
@@ -79,6 +79,12 @@ const Payment = ({
         await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
+
+        // Notify the rest of the app that the cart has changed so any
+        // listeners (e.g. useCart) can refetch the latest state immediately.
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("cartUpdated"))
+        }
       } catch (err: any) {
         setError(err.message)
         setIsLoading(false)

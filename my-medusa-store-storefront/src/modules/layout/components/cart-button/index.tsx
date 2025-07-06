@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import CartDropdown from "../cart-dropdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { motion, AnimatePresence } from "framer-motion"
@@ -8,13 +8,26 @@ import { useCart } from "@lib/hooks/use-cart"
 
 export default function CartButton() {
   const { cart, loading, totalItems } = useCart()
-  const [isAdded, setIsAdded] = useState(false)
-  
+  /**
+   * `isHighlighted` controls a short-lived luxury glow animation around the
+   * cart icon. It fires when items are added _or_ when the shopper refreshes
+   * and already has items in the cart.
+   */
+  const [isHighlighted, setIsHighlighted] = useState(false)
+
+  // Track first-load so we can trigger the highlight once after the initial
+  // data fetch if the cart isn't empty.
+  const didFirstHighlight = useRef(false)
+
   // Listen for cart updates to show animation
   useEffect(() => {
+    const triggerHighlight = () => {
+      setIsHighlighted(true)
+      setTimeout(() => setIsHighlighted(false), 1500)
+    }
+
     const handleCartUpdate = () => {
-      setIsAdded(true)
-      setTimeout(() => setIsAdded(false), 1500)
+      triggerHighlight()
     }
     
     window.addEventListener('cartUpdated', handleCartUpdate)
@@ -23,6 +36,18 @@ export default function CartButton() {
       window.removeEventListener('cartUpdated', handleCartUpdate)
     }
   }, [])
+
+  // Run once after the cart has loaded to highlight if it already contains items
+  useEffect(() => {
+    if (!loading && totalItems > 0 && !didFirstHighlight.current) {
+      didFirstHighlight.current = true
+      // Give the UI a single paint before triggering so the glow is visible
+      requestAnimationFrame(() => {
+        setIsHighlighted(true)
+        setTimeout(() => setIsHighlighted(false), 1500)
+      })
+    }
+  }, [loading, totalItems])
 
   if (loading) {
     return (
@@ -51,18 +76,18 @@ export default function CartButton() {
     <div className="relative z-[100]">
       <CartDropdown />
       
-      {/* Cart item added animation */}
+      {/* Luxurious glow animation */}
       <AnimatePresence>
-        {isAdded && (
-          <motion.div 
-            className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-luxury-gold/90 text-luxury-ivory py-1 px-3 rounded-sm text-xs whitespace-nowrap"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+        {isHighlighted && (
+          <motion.span
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            Item added to cart
-          </motion.div>
+            <span className="absolute w-10 h-10 rounded-full bg-luxury-gold/20 blur-sm animate-ping"></span>
+          </motion.span>
         )}
       </AnimatePresence>
     </div>

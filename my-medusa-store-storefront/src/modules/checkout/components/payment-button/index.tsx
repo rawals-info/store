@@ -2,10 +2,11 @@
 
 import { isManual, isStripe, isPaypal } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
+import { useCart } from "@lib/hooks/use-cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import ErrorMessage from "../error-message"
 
 type PaymentButtonProps = {
@@ -15,10 +16,23 @@ type PaymentButtonProps = {
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
-  cart,
+  cart: initialCart,
   "data-testid": dataTestId,
   className,
 }) => {
+  const { cart: liveCart, refetch: refetchCart } = useCart()
+
+  // Fetch the latest cart when the component mounts (e.g. right after the user
+  // lands on the review step) so we don't rely on potentially stale cached data.
+  useEffect(() => {
+    refetchCart()
+    // We only want to run this once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Fallback to the prop passed from the server on first render.
+  const cart = liveCart ?? initialCart
+
   const notReady =
     !cart ||
     !cart.shipping_address ||
@@ -27,9 +41,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     (cart.shipping_methods?.length ?? 0) < 1
 
   const paymentSession =
-    cart.payment_collection?.payment_sessions?.find(
-      (s) => s.status === "pending"
-    ) || cart.payment_collection?.payment_sessions?.[0]
+    cart?.payment_collection?.payment_sessions?.find(
+      (s: any) => s.status === "pending"
+    ) || cart?.payment_collection?.payment_sessions?.[0]
 
   switch (true) {
     case isStripe(paymentSession?.provider_id):

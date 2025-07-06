@@ -63,11 +63,23 @@ const CartDropdown = () => {
 
   const pathname = usePathname() ?? ""
 
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
+  // On cart item changes (except for the very first render) open the dropdown
+  // to provide feedback – but skip the initial page-load so the cart doesn't
+  // pop open automatically on refresh.
+  const initialRender = useRef(true)
+
   useEffect(() => {
+    if (initialRender.current) {
+      // Skip the first invocation – just store the items count
+      initialRender.current = false
+      itemRef.current = totalItems
+      return
+    }
+
     if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
       timedOpen()
     }
+
     // Save the current number of items for future comparison
     itemRef.current = totalItems
   }, [totalItems, pathname])
