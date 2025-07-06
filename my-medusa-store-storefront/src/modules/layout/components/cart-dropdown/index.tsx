@@ -70,8 +70,16 @@ const CartDropdown = () => {
 
   useEffect(() => {
     if (initialRender.current) {
-      // Skip the first invocation – just store the items count
+      // First render — just record the current count
       initialRender.current = false
+      itemRef.current = totalItems
+      return
+    }
+
+    // If the previous count was 0 (typical after a refresh when the cart is
+    // fetched async) skip opening once. This prevents the dropdown from
+    // popping open immediately on page load.
+    if (itemRef.current === 0) {
       itemRef.current = totalItems
       return
     }
@@ -150,7 +158,7 @@ const CartDropdown = () => {
         >
           <PopoverPanel
             static
-            className="absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[90vw] sm:w-[360px] text-luxury-charcoal z-[110]"
+            className="absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[75vw] sm:w-[360px] text-luxury-charcoal z-[110]"
             data-testid="nav-cart-dropdown"
           >
             {/* Gold line at top */}

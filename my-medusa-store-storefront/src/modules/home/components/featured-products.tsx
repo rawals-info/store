@@ -56,7 +56,7 @@ export default async function FeaturedProducts({
         </div>
         
         {displayProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
             {displayProducts.map((product, index) => (
               <ScrollReveal key={product.id} delay={0.1 * (index + 1)}>
                 <div className="group transform transition-all duration-500 hover:-translate-y-1">
