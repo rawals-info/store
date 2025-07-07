@@ -1,6 +1,4 @@
-import { retrieveCart } from "@lib/data/cart"
-import { retrieveCustomer } from "@lib/data/customer"
-import { parallelFetch } from "@lib/util/parallel-fetch"
+import { getCheckoutInitialData } from "@lib/data/checkout"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
@@ -20,32 +18,8 @@ export const metadata: Metadata = {
 }
 
 export default async function Checkout() {
-  // Fetch cart and customer in parallel with improved timeout handling
-  const [cart, customer] = await parallelFetch(
-    [
-      async () => {
-        try {
-          return await retrieveCart()
-        } catch (error) {
-          // Don't log error here - it will be handled by parallel-fetch
-          return null
-        }
-      },
-      async () => {
-        try {
-          return await retrieveCustomer()
-        } catch (error) {
-          // Don't log error here - it will be handled by parallel-fetch
-          return null
-        }
-      }
-    ],
-    { 
-      timeout: CHECKOUT_TIMEOUT,
-      suppressErrors: true, // Suppress duplicate error logs
-      retries: 2 // Try up to 2 more times on failure
-    }
-  )
+  const { cart, customer, shippingMethods, paymentProviders } =
+    await getCheckoutInitialData()
 
   // Check if cart is empty or doesn't exist
   if (!cart) {
@@ -74,7 +48,12 @@ export default async function Checkout() {
         <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] gap-x-8 small:gap-x-16 py-6 fade-in">
           <Suspense fallback={<CheckoutSkeleton />}>
             <PaymentWrapper cart={cart}>
-              <CheckoutForm cart={cart} customer={customer} />
+              <CheckoutForm
+                cart={cart}
+                customer={customer}
+                shippingMethods={shippingMethods}
+                paymentProviders={paymentProviders}
+              />
             </PaymentWrapper>
           </Suspense>
           <CheckoutSummary cart={cart} />

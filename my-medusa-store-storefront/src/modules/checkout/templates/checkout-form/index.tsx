@@ -11,23 +11,29 @@ import { Suspense } from "react"
 export default async function CheckoutForm({
   cart,
   customer,
+  shippingMethods,
+  paymentProviders,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  shippingMethods?: HttpTypes.StoreCartShippingOption[]
+  paymentProviders?: HttpTypes.StorePaymentProvider[]
 }) {
   if (!cart) {
     return null
   }
 
-  // Fetch shipping and payment methods in parallel
-  const [shippingMethods, paymentMethods] = await parallelFetch([
-    () => listCartShippingMethods(cart.id),
-    () => listCartPaymentMethods(cart.region?.id ?? ""),
-  ])
+  let safeShipping = shippingMethods ?? []
+  let safePayments = paymentProviders ?? []
 
-  // Ensure we have arrays to work with
-  const safeShipping = shippingMethods ?? []
-  const safePayments = paymentMethods ?? []
+  if (!shippingMethods || !paymentProviders) {
+    const [shipping, payments] = await parallelFetch([
+      () => listCartShippingMethods(cart.id),
+      () => listCartPaymentMethods(cart.region?.id ?? ""),
+    ])
+    safeShipping = shipping ?? []
+    safePayments = payments ?? []
+  }
 
   return (
     <div className="w-full grid grid-cols-1 gap-y-8">
