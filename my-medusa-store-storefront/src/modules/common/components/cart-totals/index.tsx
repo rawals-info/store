@@ -30,11 +30,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({
     total,
     subtotal,
     tax_total,
-    shipping_total,
     discount_total,
     gift_card_total,
     shipping_subtotal,
   } = totals
+
+  // Calculate the itemsSubtotal (products only, excluding shipping)
+  const itemsSubtotal = (subtotal ?? 0) - (shipping_subtotal ?? 0)
 
   // Use specific placeholders if provided, otherwise fall back to the general placeholder
   const finalShippingPlaceholder = shippingPlaceholder || placeholder
@@ -47,8 +49,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({
           <span className="flex gap-x-1 items-center">
             Subtotal (excl. shipping and taxes)
           </span>
-          <span data-testid="cart-subtotal" data-value={subtotal || 0}>
-            {convertToLocale({ amount: subtotal ?? 0, currency_code })}
+          <span data-testid="cart-subtotal" data-value={itemsSubtotal || 0}>
+            {convertToLocale({ amount: itemsSubtotal ?? 0, currency_code })}
           </span>
         </div>
         {!!discount_total && (
