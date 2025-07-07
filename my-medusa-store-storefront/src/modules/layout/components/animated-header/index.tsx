@@ -302,7 +302,7 @@ const AnimatedHeader = () => {
             {/* Right side items: Account, Cart, etc. */}
             <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
               {/* Search Bar - Added to desktop view */}
-              <div className="hidden small:block w-40 md:w-60">
+              <div className="hidden small:block w-1/2 ml-8">
                 <SearchBar
                   isHomePage={isHomePage}
                   isScrolled={isScrolled}
