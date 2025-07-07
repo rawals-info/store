@@ -48,7 +48,7 @@ const SearchBar = ({
     }
   }, [searchParams, autoFocus])
 
-  // Create debounced search handler
+  // Create debounced search handler for suggestions only
   const debouncedSearch = useCallback(
     debounceSearch((value: string) => {
       if (onSearchChange) {
@@ -57,13 +57,10 @@ const SearchBar = ({
       // Fetch live suggestions
       fetchSuggestions(value)
       
-      if (autoSearch && value.trim()) {
-        setIsSearching(false)
-        const prefix = currentCountryCode ? `/${currentCountryCode}` : ""
-        router.push(`${prefix}/search?q=${encodeURIComponent(value.trim())}`)
-      }
+      // Removed auto navigation to search page
+      setIsSearching(false)
     }),
-    [router, onSearchChange, autoSearch, currentCountryCode]
+    [router, onSearchChange, currentCountryCode]
   )
 
   const fetchSuggestions = useCallback(
@@ -239,7 +236,7 @@ const SearchBar = ({
             }}
             className="block w-full text-left px-4 py-3 bg-luxury-cream/40 hover:bg-luxury-cream text-sm text-luxury-charcoal border-t border-luxury-lightgold/20"
           >
-            Search for “{searchTerm}”
+            Search for "{searchTerm}"
           </button>
         </div>
       )}
