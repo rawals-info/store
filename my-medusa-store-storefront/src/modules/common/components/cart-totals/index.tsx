@@ -3,7 +3,7 @@
 import { convertToLocale } from "@lib/util/money"
 import React from "react"
 
-type CartTotalsProps = {
+interface CartTotalsProps {
   totals: {
     total?: number | null
     subtotal?: number | null
@@ -14,19 +14,31 @@ type CartTotalsProps = {
     currency_code: string
     shipping_subtotal?: number | null
   },
-  placeholder?: string
+  placeholder?: string,
+  shippingPlaceholder?: string,
+  taxPlaceholder?: string
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals, placeholder = "Contact for price" }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ 
+  totals, 
+  placeholder = "Contact for price",
+  shippingPlaceholder,
+  taxPlaceholder
+}) => {
   const {
     currency_code,
     total,
     subtotal,
     tax_total,
+    shipping_total,
     discount_total,
     gift_card_total,
     shipping_subtotal,
   } = totals
+
+  // Use specific placeholders if provided, otherwise fall back to the general placeholder
+  const finalShippingPlaceholder = shippingPlaceholder || placeholder
+  const finalTaxPlaceholder = taxPlaceholder || placeholder
 
   return (
     <div>
@@ -57,7 +69,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, placeholder = "Contact 
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
             {shipping_subtotal && shipping_subtotal > 0
               ? convertToLocale({ amount: shipping_subtotal, currency_code })
-              : placeholder}
+              : finalShippingPlaceholder}
           </span>
         </div>
         <div className="flex justify-between items-start">
@@ -69,7 +81,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, placeholder = "Contact 
           >
             {tax_total && tax_total > 0
               ? convertToLocale({ amount: tax_total, currency_code })
-              : placeholder}
+              : finalTaxPlaceholder}
           </span>
         </div>
         {!!gift_card_total && (

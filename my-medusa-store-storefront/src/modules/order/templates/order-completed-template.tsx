@@ -68,7 +68,10 @@ export default async function OrderCompletedTemplate({
           
           <div className="bg-[var(--color-luxury-ivory)] rounded-md p-8 luxury-shadow-sm order-section">
             <div className="h-0.5 w-full gold-gradient mb-6"></div>
-            <CartTotals totals={order} placeholder="No upfront tax; duties paid by buyer at customs clearance" />
+            <CartTotals 
+              totals={order} 
+              taxPlaceholder="No upfront tax; duties paid by buyer at customs clearance" 
+            />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
