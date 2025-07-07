@@ -2085,6 +2085,16 @@
           "nullable": true,
           "mappedType": "text"
         },
+        "is_tax_inclusive": {
+          "name": "is_tax_inclusive",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
+        },
         "item_id": {
           "name": "item_id",
           "type": "text",

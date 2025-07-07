@@ -36,7 +36,7 @@ export interface MedusaSuiteOptions {
   }
   getMedusaApp: () => MedusaAppOutput
   utils: {
-    waitWorkflowExecutions: (container: MedusaContainer) => Promise<void>
+    waitWorkflowExecutions: () => Promise<void>
   }
 }
 

@@ -113,6 +113,13 @@ export class TransactionOrchestrator extends EventEmitter {
     }
   }
 
+  private static isExpectedError(error: Error): boolean {
+    return (
+      SkipCancelledExecutionError.isSkipCancelledExecutionError(error) ||
+      SkipExecutionError.isSkipExecutionError(error)
+    )
+  }
+
   static clone(orchestrator: TransactionOrchestrator): TransactionOrchestrator {
     return new TransactionOrchestrator({
       id: orchestrator.id,
@@ -525,10 +532,7 @@ export class TransactionOrchestrator extends EventEmitter {
     try {
       await transaction.saveCheckpoint()
     } catch (error) {
-      if (
-        !SkipCancelledExecutionError.isSkipCancelledExecutionError(error) &&
-        !SkipExecutionError.isSkipExecutionError(error)
-      ) {
+      if (!TransactionOrchestrator.isExpectedError(error)) {
         throw error
       }
 
@@ -583,10 +587,7 @@ export class TransactionOrchestrator extends EventEmitter {
     try {
       await transaction.saveCheckpoint()
     } catch (error) {
-      if (
-        !SkipCancelledExecutionError.isSkipCancelledExecutionError(error) &&
-        !SkipExecutionError.isSkipExecutionError(error)
-      ) {
+      if (!TransactionOrchestrator.isExpectedError(error)) {
         throw error
       }
 
@@ -764,10 +765,7 @@ export class TransactionOrchestrator extends EventEmitter {
     try {
       await transaction.saveCheckpoint()
     } catch (error) {
-      if (
-        !SkipCancelledExecutionError.isSkipCancelledExecutionError(error) &&
-        !SkipExecutionError.isSkipExecutionError(error)
-      ) {
+      if (!TransactionOrchestrator.isExpectedError(error)) {
         throw error
       }
 
@@ -830,7 +828,7 @@ export class TransactionOrchestrator extends EventEmitter {
       })
 
       await transaction.saveCheckpoint().catch((error) => {
-        if (SkipExecutionError.isSkipExecutionError(error)) {
+        if (TransactionOrchestrator.isExpectedError(error)) {
           continueExecution = false
           return
         }
@@ -900,7 +898,7 @@ export class TransactionOrchestrator extends EventEmitter {
     }
 
     await transaction.saveCheckpoint().catch((error) => {
-      if (!SkipExecutionError.isSkipExecutionError(error)) {
+      if (!TransactionOrchestrator.isExpectedError(error)) {
         throw error
       }
     })
@@ -1063,7 +1061,7 @@ export class TransactionOrchestrator extends EventEmitter {
         await this.handleStepSuccess(transaction, step, response)
       })
       .catch(async (error) => {
-        if (SkipExecutionError.isSkipExecutionError(error)) {
+        if (TransactionOrchestrator.isExpectedError(error)) {
           return
         }
 
@@ -1112,7 +1110,7 @@ export class TransactionOrchestrator extends EventEmitter {
         }
       })
       .catch(async (error) => {
-        if (SkipExecutionError.isSkipExecutionError(error)) {
+        if (TransactionOrchestrator.isExpectedError(error)) {
           return
         }
 

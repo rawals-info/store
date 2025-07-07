@@ -296,6 +296,11 @@ export interface CreateOrderAdjustmentDTO {
    * The associated provider's ID.
    */
   provider_id?: string
+
+  /**
+   * Whether the adjustment is tax inclusive.
+   */
+  is_tax_inclusive?: boolean
 }
 
 /**
