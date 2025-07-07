@@ -107,7 +107,7 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
     : "" // header closed down
 
   return (
-    <div className="relative z-[100]" ref={dropdownRef}>
+    <div className="relative z-[9999] overflow-visible" ref={dropdownRef}>
       <button
         className={`flex items-center gap-1 ${
           isFooter 
@@ -134,7 +134,7 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
       
       {isOpen && (
         <div
-          className={`absolute ${
+          className={`absolute z-[10000] ${
             isFooter ? "left-0 bottom-full mb-2" : "right-0 mt-2"
           } w-40 rounded-sm border border-luxury-lightgold z-[150] ${
             isFooter
