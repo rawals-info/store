@@ -1,4 +1,5 @@
 import { deleteLineItem } from "@lib/data/cart"
+import { announceCart } from "@lib/cart/events"
 import { Spinner, Trash } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
 import { useState } from "react"
@@ -15,10 +16,22 @@ const DeleteButton = ({
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async (id: string) => {
+    // Optimistically announce removal so UI updates instantly
+    if (typeof window !== "undefined") {
+      announceCart({
+        // @ts-ignore extend event
+        removeItemId: id,
+      } as any)
+    }
+
     setIsDeleting(true)
-    await deleteLineItem(id).catch((err) => {
-      setIsDeleting(false)
+    await deleteLineItem(id).catch(() => {
+      // If backend fails, we should probably refetch cart to correct state
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("cartUpdated"))
+      }
     })
+    setIsDeleting(false)
   }
 
   return (

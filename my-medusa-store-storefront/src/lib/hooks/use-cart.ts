@@ -158,28 +158,13 @@ export function useCart() {
   // completes.
   useEffect(() => {
     const remove = addCartListener((detail) => {
-      const lineItemPayload = (detail as any)?.lineItem
-      if (lineItemPayload) {
-        // Use the provided full line item snapshot for immediate display
+      if ((detail as any)?.removeItemId) {
+        const removeId = (detail as any).removeItemId as string
         setCart((prev) => {
-          const baseCart: any = prev || {
-            id: "optimistic-cart",
-            currency_code: lineItemPayload?.currency_code || "usd",
-            items: [],
-            subtotal: 0,
-            total: 0,
-          }
-
-          const items = [...(baseCart.items ?? [])]
-          const existing = items.find((i: any) => i.variant_id === lineItemPayload.variant_id)
-          if (existing) {
-            existing.quantity += lineItemPayload.quantity || 1
-          } else {
-            items.push(lineItemPayload)
-          }
-
+          if (!prev) return prev
+          const items = (prev.items || []).filter((i: any) => i.id !== removeId)
           const subtotal = items.reduce((acc: number, i: any) => acc + (i.total || 0), 0)
-          return { ...baseCart, items, subtotal, total: subtotal }
+          return { ...prev, items, subtotal, total: subtotal }
         })
       } else if (detail?.variantId && detail.quantity) {
         // Legacy minimal payload fallback
@@ -212,6 +197,31 @@ export function useCart() {
           const subtotalLegacy = items.reduce((acc: number, i: any) => acc + (i.total || 0), 0)
           return { ...baseCart, items, subtotal: subtotalLegacy, total: subtotalLegacy }
         })
+      } else if (detail as any) {
+        const lineItemPayload = (detail as any)?.lineItem
+        if (lineItemPayload) {
+          // Use the provided full line item snapshot for immediate display
+          setCart((prev) => {
+            const baseCart: any = prev || {
+              id: "optimistic-cart",
+              currency_code: lineItemPayload?.currency_code || "usd",
+              items: [],
+              subtotal: 0,
+              total: 0,
+            }
+
+            const items = [...(baseCart.items ?? [])]
+            const existing = items.find((i: any) => i.variant_id === lineItemPayload.variant_id)
+            if (existing) {
+              existing.quantity += lineItemPayload.quantity || 1
+            } else {
+              items.push(lineItemPayload)
+            }
+
+            const subtotal = items.reduce((acc: number, i: any) => acc + (i.total || 0), 0)
+            return { ...baseCart, items, subtotal, total: subtotal }
+          })
+        }
       }
 
       // Always fetch the canonical cart afterwards to reconcile
