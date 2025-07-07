@@ -78,7 +78,8 @@
     "webpack": "5",
     "xtend": "^4.0.2",
     "yup": "1.4.0",
-    "zustand": "5.0.2"
+    "zustand": "5.0.2",
+    "swr": "^2.2.0"
   },
   "devDependencies": {
     "@babel/core": "7.17.5",

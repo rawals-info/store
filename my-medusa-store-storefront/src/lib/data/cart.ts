@@ -4,6 +4,7 @@ import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { scheduleRevalidate } from "@lib/utils/revalidate"
+import { scheduleRevalidates } from "@lib/utils/revalidate"
 import { redirect } from "next/navigation"
 import { ExtendedStoreCartLineItem } from "../../types/cart"
 import {
@@ -15,6 +16,8 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
+import { retryWithBackoff } from "@lib/utils/retry"
+import { randomUUID } from "crypto"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -65,14 +68,18 @@ export async function retrieveCart(cartId?: string) {
 }
 
 export async function getOrSetCart(countryCode: string) {
-  const region = await getRegion(countryCode)
+  // Fetch region and existing cart concurrently since they are independent
+  const [region, existingCart] = await Promise.all([
+    getRegion(countryCode),
+    retrieveCart(),
+  ])
 
   if (!region) {
     console.error(`Region not found for country code: ${countryCode}`)
     return null
   }
 
-  let cart = await retrieveCart()
+  let cart = existingCart
 
   const headers = {
     ...(await getAuthHeaders()),
@@ -133,8 +140,7 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
         getCacheTag("fulfillment"),
       ])
 
-      scheduleRevalidate(cartCacheTag)
-      scheduleRevalidate(fulfillmentCacheTag)
+      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
        
       return cart
     })
@@ -201,14 +207,18 @@ export async function addToCart({
 
   // Cart already exists → add the item via the usual line-item endpoint
   try {
-    const result = await sdk.store.cart.createLineItem(
-      existingCart.id,
-      {
-        variant_id: variantId,
-        quantity,
-      },
-      {},
-      headers
+    const idempotentHeaders = { ...headers, "Idempotency-Key": randomUUID() }
+
+    const result = await retryWithBackoff(() =>
+      sdk.store.cart.createLineItem(
+        existingCart.id,
+        {
+          variant_id: variantId,
+          quantity,
+        },
+        {},
+        idempotentHeaders
+      )
     )
 
     const cartCacheTag = await getCacheTag("carts")
@@ -247,14 +257,16 @@ export async function batchAddToCart({
     // For now, we'll use Promise.all to add items in parallel
     const results = await Promise.all(
       items.map(({ variantId, quantity }) =>
-        sdk.store.cart.createLineItem(
-          cart.id,
-          {
-            variant_id: variantId,
-            quantity,
-          },
-          {},
-          headers
+        retryWithBackoff(() =>
+          sdk.store.cart.createLineItem(
+            cart.id,
+            {
+              variant_id: variantId,
+              quantity,
+            },
+            {},
+            { ...headers, "Idempotency-Key": randomUUID() }
+          )
         ).catch(error => ({ error }))
       )
     )
@@ -304,14 +316,19 @@ export async function updateLineItem({
     ...(await getAuthHeaders()),
   }
 
-  await sdk.store.cart
-    .updateLineItem(cartId, lineId, { quantity }, {}, headers)
+  await retryWithBackoff(() => 
+    sdk.store.cart
+      .updateLineItem(cartId, lineId, { quantity }, {}, { 
+        ...headers, 
+        "Idempotency-Key": randomUUID() 
+      })
+  )
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      scheduleRevalidate(fulfillmentCacheTag)
+      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+        getCacheTag("carts"),
+        getCacheTag("fulfillment")
+      ])
+      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     })
     .catch(medusaError)
 }
@@ -331,14 +348,19 @@ export async function deleteLineItem(lineId: string) {
     ...(await getAuthHeaders()),
   }
 
-  await sdk.store.cart
-    .deleteLineItem(cartId, lineId, headers)
+  await retryWithBackoff(() =>
+    sdk.store.cart
+      .deleteLineItem(cartId, lineId, { 
+        ...headers, 
+        "Idempotency-Key": randomUUID() 
+      })
+  )
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      scheduleRevalidate(fulfillmentCacheTag)
+      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+        getCacheTag("carts"),
+        getCacheTag("fulfillment")
+      ])
+      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     })
     .catch(medusaError)
 }
@@ -354,8 +376,15 @@ export async function setShippingMethod({
     ...(await getAuthHeaders()),
   }
 
-  return sdk.store.cart
-    .addShippingMethod(cartId, { option_id: shippingMethodId }, {}, headers)
+  return retryWithBackoff(() =>
+    sdk.store.cart
+      .addShippingMethod(
+        cartId, 
+        { option_id: shippingMethodId }, 
+        {}, 
+        { ...headers, "Idempotency-Key": randomUUID() }
+      )
+  )
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
       scheduleRevalidate(cartCacheTag)
@@ -371,8 +400,15 @@ export async function initiatePaymentSession(
     ...(await getAuthHeaders()),
   }
 
-  return sdk.store.payment
-    .initiatePaymentSession(cart, data, {}, headers)
+  return retryWithBackoff(() =>
+    sdk.store.payment
+      .initiatePaymentSession(
+        cart, 
+        data, 
+        {}, 
+        { ...headers, "Idempotency-Key": randomUUID() }
+      )
+  )
     .then(async (resp) => {
       const cartCacheTag = await getCacheTag("carts")
       scheduleRevalidate(cartCacheTag)
@@ -392,14 +428,21 @@ export async function applyPromotions(codes: string[]) {
     ...(await getAuthHeaders()),
   }
 
-  return sdk.store.cart
-    .update(cartId, { promo_codes: codes }, {}, headers)
+  return retryWithBackoff(() =>
+    sdk.store.cart
+      .update(
+        cartId, 
+        { promo_codes: codes }, 
+        {}, 
+        { ...headers, "Idempotency-Key": randomUUID() }
+      )
+  )
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      scheduleRevalidate(fulfillmentCacheTag)
+      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+        getCacheTag("carts"),
+        getCacheTag("fulfillment")
+      ])
+      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     })
     .catch(medusaError)
 }
@@ -482,7 +525,9 @@ export async function placeOrder(cartId?: string) {
   try {
     // Set a timeout to prevent hanging on slow connections
     const cartRes = await Promise.race([
-      sdk.store.cart.complete(id, {}, headers),
+      retryWithBackoff(() =>
+        sdk.store.cart.complete(id, {}, { ...headers, "Idempotency-Key": randomUUID() })
+      ),
       new Promise((_, reject) => {
         setTimeout(() => {
           reject(
@@ -500,15 +545,13 @@ export async function placeOrder(cartId?: string) {
       customCartCacheTagPromise
     ]);
 
-    // Revalidate caches: generic and id-specific cart tags
-    scheduleRevalidate("cart")
-    scheduleRevalidate(`cart-${id}`)
-    if (customCartCacheTag) {
-      scheduleRevalidate(customCartCacheTag)
-    }
-    if (orderCacheTag) {
-      scheduleRevalidate(orderCacheTag)
-    }
+    // Revalidate caches in a single batched call
+    scheduleRevalidates([
+      "cart",
+      `cart-${id}`,
+      customCartCacheTag,
+      orderCacheTag,
+    ].filter(Boolean))
 
     if (cartRes?.type === "order") {
       const countryCode =
@@ -528,11 +571,11 @@ export async function placeOrder(cartId?: string) {
     console.error("Error placing order:", error)
     // Revalidate cart to ensure UI is consistent
     const customCartCacheTag = await customCartCacheTagPromise
-    scheduleRevalidate("cart")
-    scheduleRevalidate(`cart-${id}`)
-    if (customCartCacheTag) {
-      scheduleRevalidate(customCartCacheTag)
-    }
+    scheduleRevalidates([
+      "cart",
+      `cart-${id}`,
+      customCartCacheTag,
+    ].filter(Boolean))
     throw error
   }
 }
@@ -564,11 +607,11 @@ export async function updateRegion(countryCode: string, currentPath: string) {
       }
     }
 
-    const regionCacheTag = await getCacheTag("regions")
-    scheduleRevalidate(regionCacheTag)
-
-    const productsCacheTag = await getCacheTag("products")
-    scheduleRevalidate(productsCacheTag)
+    const [regionCacheTag, productsCacheTag] = await Promise.all([
+      getCacheTag("regions"),
+      getCacheTag("products")
+    ])
+    scheduleRevalidates([regionCacheTag, productsCacheTag])
 
     // Ensure currentPath doesn't start with a slash to avoid double slashes
     const cleanPath = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath

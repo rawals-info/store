@@ -43,4 +43,13 @@ export function scheduleRevalidate(tag: string, delay = 75) {
   }, delay)
 
   pending.set(tag, timer)
+}
+
+// Add helper to schedule multiple tags at once – ensures consistent batching across the codebase
+export function scheduleRevalidates(tags: string | string[], delay = 75) {
+  if (Array.isArray(tags)) {
+    tags.forEach((tag) => scheduleRevalidate(tag, delay))
+  } else {
+    scheduleRevalidate(tags, delay)
+  }
 } 

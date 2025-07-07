@@ -16,7 +16,8 @@ export const dynamic = "force-dynamic"
 // Use default fetch caching so region list is cached for 60s on the server
 // (still dynamic thanks to force-dynamic)
 // export const fetchCache = "force-no-store"
-export const revalidate = 0 // Disable revalidation for product pages to avoid the delay
+// Cache the product page for 5 minutes to balance freshness with performance.
+export const revalidate = 300
 
 // NOTE: Disabled static params generation to speed up dev and avoid large API calls.
 /*

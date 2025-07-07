@@ -5,7 +5,10 @@ import { HttpTypes } from "@medusajs/types"
 import { getAuthHeaders } from "./cookies"
 import { cache } from "react"
 
-const CACHE_TTL = 0 // Set to 0 to disable caching temporarily for debugging
+// Simple in-memory cache for server-side search results.
+// Key: serialized args, Value: { ts, products, count }
+const SEARCH_CACHE = new Map<string, { ts: number; products: HttpTypes.StoreProduct[]; count: number }>()
+const CACHE_TTL = 60_000 // 1 minute TTL
 
 // Define search response type
 type SearchResponse = {
@@ -38,6 +41,15 @@ export const searchProducts = cache(async ({
   }
 
   try {
+    // Build cache key – ignore offset when limit small to share cache pages  
+    const keyObj = { query: query.toLowerCase(), limit, offset, region: filter.region_id || null }
+    const cacheKey = JSON.stringify(keyObj)
+
+    const cached = SEARCH_CACHE.get(cacheKey)
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      return { products: cached.products, count: cached.count }
+    }
+
     const headers = {
       ...(await getAuthHeaders()),
     }
@@ -85,17 +97,26 @@ export const searchProducts = cache(async ({
       }>(`/store/products?${queryParams.toString()}`, {
         method: "GET",
         headers,
-        cache: "no-store",
+        next: {
+          revalidate: 300,
+          tags: ["products", `search-details-${query.toLowerCase()}`]
+        },
+        cache: "force-cache",
       })
 
       const map = new Map(detailsResp.products.map((p) => [p.id, p]))
       detailedProducts = hitIds.map((id) => map.get(id)).filter(Boolean) as HttpTypes.StoreProduct[]
     }
 
-    return {
+    const finalResult = {
       products: detailedProducts,
       count: searchResult.count,
     }
+
+    // Store in memory cache
+    SEARCH_CACHE.set(cacheKey, { ts: Date.now(), ...finalResult })
+
+    return finalResult
   } catch (error) {
     console.error("Error searching products:", error)
     return { products: [], count: 0 }

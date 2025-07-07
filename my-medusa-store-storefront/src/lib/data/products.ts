@@ -230,7 +230,8 @@ export const getProductData = cache(
           region_id: region.id 
         },
         next: { 
-          revalidate: 0
+          revalidate: 300,
+          tags: ["products", `product-handle-${handle}`]
         }
       }
     ).then(res => res.products?.[0] || null)

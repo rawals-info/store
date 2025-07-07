@@ -7,6 +7,7 @@ import { MagnifyingGlass, XMark } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { debounceSearch } from "@lib/client/search-utils"
+import useSWR from "swr"
 
 // Simple in-memory cache for search suggestions scoped to the browser session.
 // Keyed by `countryCode|query`, values contain `{ ts: number, data: HttpTypes.StoreProduct[] }`.
@@ -15,6 +16,25 @@ const SUGGESTION_CACHE = new Map<string, { ts: number; data: HttpTypes.StoreProd
 
 // Suggestions are re-fetched after this many ms.
 const SUGGESTION_TTL = 30_000 // 30 seconds
+
+// Fetcher using in-memory cache first
+const suggestionFetcher = async (url: string) => {
+  const [_, countryCode, query] = url.split("|")
+  const cacheKey = `${countryCode}|${query}`
+  const cached = SUGGESTION_CACHE.get(cacheKey)
+  if (cached && Date.now() - cached.ts < SUGGESTION_TTL) {
+    return cached.data
+  }
+
+  const res = await fetch(`/api/search-suggest?q=${encodeURIComponent(query)}&countryCode=${countryCode}`)
+  if (!res.ok) {
+    throw new Error("Suggest fetch failed")
+  }
+  const data = await res.json()
+  const products = data.products || []
+  SUGGESTION_CACHE.set(cacheKey, { ts: Date.now(), data: products })
+  return products
+}
 
 type SearchBarProps = {
   className?: string
@@ -36,14 +56,21 @@ const SearchBar = ({
   const [searchTerm, setSearchTerm] = useState("")
   const [isFocused, setIsFocused] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
-  const [suggestions, setSuggestions] = useState<HttpTypes.StoreProduct[]>([])
-  const [loadingSuggest, setLoadingSuggest] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [debouncedQuery, setDebouncedQuery] = useState("")
+
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname() || ""
-  // Determine current country code from url (expects /{countryCode}/...)
   const currentCountryCode = pathname.split("/")[1] || ""
+
+  const {
+    data: suggestions = [],
+    isLoading: loadingSuggest,
+  } = useSWR(debouncedQuery ? `suggest|${currentCountryCode}|${debouncedQuery}` : null, suggestionFetcher, {
+    dedupingInterval: 5000,
+    revalidateOnFocus: false,
+  })
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Load search term from URL if present
   useEffect(() => {
@@ -63,7 +90,7 @@ const SearchBar = ({
         onSearchChange(value)
       }
       // Fetch live suggestions
-      fetchSuggestions(value)
+      setDebouncedQuery(value.trim())
       
       // Removed auto navigation to search page
       setIsSearching(false)
@@ -71,45 +98,6 @@ const SearchBar = ({
     [router, onSearchChange, currentCountryCode]
   )
 
-  const fetchSuggestions = useCallback(
-    debounceSearch(async (value: string) => {
-      const query = value.trim()
-      if (!query) {
-        setSuggestions([])
-        return
-      }
-
-      // Check cache first
-      const cacheKey = `${currentCountryCode}|${query.toLowerCase()}`
-      const cached = SUGGESTION_CACHE.get(cacheKey)
-      if (cached && Date.now() - cached.ts < SUGGESTION_TTL) {
-        setSuggestions(cached.data)
-        return
-      }
-
-      try {
-        setLoadingSuggest(true)
-        const res = await fetch(
-          `/api/search-suggest?q=${encodeURIComponent(query)}&countryCode=${currentCountryCode}`
-        )
-        if (res.ok) {
-          const data = await res.json()
-          const products = data.products || []
-          setSuggestions(products)
-
-          // Cache the result
-          SUGGESTION_CACHE.set(cacheKey, { ts: Date.now(), data: products })
-        }
-      } catch (e) {
-        console.error("Suggestion fetch error", e)
-      } finally {
-        setLoadingSuggest(false)
-      }
-    }, 300),
-    [currentCountryCode]
-  )
-
-  // Handle input change with debounce
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setSearchTerm(value)
@@ -132,7 +120,7 @@ const SearchBar = ({
   const clearSearch = () => {
     setSearchTerm("")
     setIsSearching(false)
-    setSuggestions([])
+    setDebouncedQuery("")
     if (onSearchChange) {
       onSearchChange("")
     }
@@ -204,7 +192,7 @@ const SearchBar = ({
               {loadingSuggest ? (
                 <div className="px-4 py-2 text-sm text-luxury-charcoal/70">Searching…</div>
               ) : suggestions.length ? (
-                suggestions.map((p) => (
+                suggestions.map((p: HttpTypes.StoreProduct) => (
                   <button
                     key={`sugg-${p.id}`}
                     className="w-full text-left px-4 py-2 hover:bg-luxury-cream/40 text-sm text-luxury-charcoal truncate"
@@ -227,7 +215,7 @@ const SearchBar = ({
               {loadingSuggest ? (
                 <div className="px-4 py-2 text-sm text-luxury-charcoal/70">Searching…</div>
               ) : suggestions.length ? (
-                suggestions.map((product) => (
+                suggestions.map((product: HttpTypes.StoreProduct) => (
                   <LocalizedClientLink
                     key={product.id}
                     href={`/${currentCountryCode}/products/${product.handle}`}
