@@ -13,10 +13,11 @@ type CartTotalsProps = {
     gift_card_total?: number | null
     currency_code: string
     shipping_subtotal?: number | null
-  }
+  },
+  placeholder?: string
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, placeholder = "Contact for price" }) => {
   const {
     currency_code,
     total,
@@ -54,13 +55,17 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         <div className="flex items-center justify-between">
           <span>Shipping</span>
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+            {shipping_subtotal && shipping_subtotal > 0
+              ? convertToLocale({ amount: shipping_subtotal, currency_code })
+              : placeholder}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center">Taxes</span>
           <span data-testid="cart-taxes" data-value={tax_total || 0}>
-            {convertToLocale({ amount: tax_total ?? 0, currency_code })}
+            {tax_total && tax_total > 0
+              ? convertToLocale({ amount: tax_total, currency_code })
+              : placeholder}
           </span>
         </div>
         {!!gift_card_total && (

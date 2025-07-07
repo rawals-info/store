@@ -31,7 +31,7 @@ const Summary = ({ cart }: SummaryProps) => {
       <h2 className="font-display text-2xl text-luxury-charcoal">Summary</h2>
       <DiscountCode cart={cart} />
       <div className="h-px bg-luxury-gold/20 my-2"></div>
-      <CartTotals totals={cart} />
+      <CartTotals totals={cart} placeholder="Calculated at checkout" />
       <LocalizedClientLink
         href={"/checkout?step=" + step}
         data-testid="checkout-button"

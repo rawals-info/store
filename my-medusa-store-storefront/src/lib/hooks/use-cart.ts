@@ -139,9 +139,52 @@ export function useCart() {
     }
   }, [cart])
 
-  // Listen for broadcast updates to refresh
+  // Listen for cart updates coming from other components (e.g. product page)
+  // and perform an *optimistic* local update so the UI (badge, dropdown, etc.)
+  // reflects the change instantly. We still trigger `fetchCart(true)` so the
+  // real cart state from the backend reconciles once the network call
+  // completes.
   useEffect(() => {
-    const remove = addCartListener(() => {
+    const remove = addCartListener((detail) => {
+      if (detail?.variantId && detail.quantity) {
+        setCart((prev) => {
+          // If we have an existing cart object, clone it and add/update the
+          // relevant line-item locally. Otherwise create a minimal placeholder
+          // cart so header badge can update immediately.
+          const baseCart: any = prev || {
+            id: "optimistic-cart",
+            currency_code: "usd",
+            items: [],
+            subtotal: 0,
+            total: 0,
+          }
+
+          // Shallow copy items so we don't mutate state directly
+          const items = [...(baseCart.items ?? [])]
+
+          const existing = items.find((i: any) => i.variant_id === detail.variantId)
+          if (existing) {
+            existing.quantity += detail.quantity
+          } else {
+            items.push({
+              id: `optimistic-${detail.variantId}-${Date.now()}`,
+              variant_id: detail.variantId,
+              quantity: detail.quantity,
+              total: 0,
+              original_total: 0,
+              thumbnail: "",
+              variant: null,
+            })
+          }
+
+          return {
+            ...baseCart,
+            items,
+          }
+        })
+      }
+
+      // Always fetch the canonical cart afterwards to reconcile
       fetchCart(true)
     })
     return remove

@@ -399,6 +399,9 @@ export default function ProductActions({
       announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
     }
 
+    // Artificial delay to mimic processing time / allow animations.
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
     try {
       if (typeof navigator !== "undefined" && navigator.onLine) {
         await fetch("/api/cart/add", {
