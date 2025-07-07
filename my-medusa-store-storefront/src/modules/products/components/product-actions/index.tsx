@@ -390,34 +390,7 @@ export default function ProductActions({
 
     setIsAdding(true)
 
-    // Build a rich line-item snapshot for optimistic UI
-    const { variantPrice } = getProductPrice({ product, variantId: selectedVariant.id })
-    const unitAmount = variantPrice?.calculated_price_number || 0
-    const currencyCode = variantPrice?.currency_code || (product as any)?.currency_code || "usd"
-
-    const lineItemSnapshot = {
-      id: `optimistic-${selectedVariant.id}-${Date.now()}`,
-      variant_id: selectedVariant.id,
-      product_handle: (product as any).handle || "",
-      thumbnail: (product as any).thumbnail || (product as any).images?.[0]?.url || "",
-      title: product.title,
-      variant: { title: selectedVariant.title },
-      quantity,
-      total: unitAmount * quantity,
-      original_total: unitAmount * quantity,
-      currency_code: currencyCode,
-    }
-
-    // Announce immediately so dropdown shows snapshot instantly
-    if (typeof window !== "undefined") {
-      announceCart({
-        variantId: selectedVariant.id,
-        quantity,
-        forceOpen: true,
-        // @ts-ignore – extended payload for optimistic UI
-        lineItem: lineItemSnapshot,
-      } as any)
-    }
+    // No optimistic broadcast – wait for backend round-trip
 
     try {
       if (typeof navigator !== "undefined" && navigator.onLine) {
@@ -443,8 +416,6 @@ export default function ProductActions({
       setAddedToCart(true)
 
       if (typeof window !== "undefined") {
-        const timestamp = Date.now().toString()
-        localStorage.setItem("last_cart_addition", timestamp)
         announceCart({
           variantId: selectedVariant.id,
           quantity,
@@ -461,6 +432,14 @@ export default function ProductActions({
       setIsAdding(false)
     }
   }
+
+  const baseBtn = "w-full h-12 rounded-md text-luxury-ivory transition-colors duration-300"
+  const buttonBg = isAdding
+    ? "bg-gray-400"
+    : addedToCart
+      ? "bg-green-600 hover:bg-green-600/90"
+      : "bg-luxury-charcoal hover:bg-luxury-charcoal/90"
+  const buttonClassName = `${baseBtn} ${buttonBg}`
 
   return (
     <>
@@ -534,17 +513,19 @@ export default function ProductActions({
                   (selectedVariant && typeof selectedVariant.inventory_quantity === 'number' && selectedVariant.inventory_quantity < 1)
                 }
                 variant="primary"
-                className="w-full bg-luxury-charcoal hover:bg-luxury-charcoal/90 h-12 rounded-md text-luxury-ivory"
-                isLoading={isAdding}
+                className={buttonClassName}
+                isLoading={false}
                 data-testid="add-to-cart-button"
               >
                 {!selectedVariant
                   ? "Select options"
                   : selectedVariant && typeof selectedVariant.inventory_quantity === 'number' && selectedVariant.inventory_quantity < 1
                     ? "Out of stock"
-                    : addedToCart
-                      ? "Added!"
-                      : `Add to cart (${quantity})`}
+                    : isAdding
+                      ? "Adding to cart..."
+                      : addedToCart
+                        ? "Added!"
+                        : `Add to cart (${quantity})`}
               </Button>
             </div>
           </div>

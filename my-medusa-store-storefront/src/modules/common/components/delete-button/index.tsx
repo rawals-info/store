@@ -1,8 +1,8 @@
 import { deleteLineItem } from "@lib/data/cart"
-import { announceCart } from "@lib/cart/events"
 import { Spinner, Trash } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
 import { useState } from "react"
+import { announceCart } from "@lib/cart/events"
 
 const DeleteButton = ({
   id,
@@ -16,21 +16,22 @@ const DeleteButton = ({
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async (id: string) => {
-    // Optimistically announce removal so UI updates instantly
-    if (typeof window !== "undefined") {
-      announceCart({
-        // @ts-ignore extend event
-        removeItemId: id,
-      } as any)
-    }
-
     setIsDeleting(true)
-    await deleteLineItem(id).catch(() => {
-      // If backend fails, we should probably refetch cart to correct state
+    try {
+      await deleteLineItem(id)
+      // Notify all listeners to refresh cart state
+      if (typeof window !== "undefined") {
+        announceCart({
+          // @ts-ignore
+          removeItemId: id,
+        } as any)
+      }
+    } catch {
+      // On error, also trigger a refresh to reconcile
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("cartUpdated"))
       }
-    })
+    }
     setIsDeleting(false)
   }
 
@@ -42,11 +43,17 @@ const DeleteButton = ({
       )}
     >
       <button
-        className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer"
-        onClick={() => handleDelete(id)}
+        className={clx(
+          "flex gap-x-1 cursor-pointer",
+          isDeleting
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-ui-fg-subtle hover:text-ui-fg-base"
+        )}
+        onClick={() => !isDeleting && handleDelete(id)}
+        disabled={isDeleting}
       >
         {isDeleting ? <Spinner className="animate-spin" /> : <Trash />}
-        <span>{children}</span>
+        <span>{isDeleting ? "Removing..." : children}</span>
       </button>
     </div>
   )
