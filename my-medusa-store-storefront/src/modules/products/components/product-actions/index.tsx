@@ -11,6 +11,26 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import ProductVariantInfo from "../product-variant-info"
 import MobileActions from "./mobile-actions"
+import { announceCart } from "@lib/cart/events"
+import { fetchWithAdaptiveTimeout, retryWithBackoff } from "@lib/util/network"
+
+const mutationQueue: (() => Promise<any>)[] = []
+// @ts-ignore
+let processing = false
+
+const processQueue = async () => {
+  if (processing) return
+  processing = true
+  while (mutationQueue.length) {
+    const job = mutationQueue.shift()!
+    try {
+      await job()
+    } catch (e) {
+      console.error("Cart mutation failed", e)
+    }
+  }
+  processing = false
+}
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -396,36 +416,31 @@ export default function ProductActions({
     // Create a timestamp that we'll use for our optimistic update
     const newTimestamp = Date.now().toString()
     
-    try {      
-      // Make the actual API call without timeout that could cause issues
-      const response = await fetch('/api/cart/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          variantId: selectedVariant.id,
-          quantity,
-          countryCode,
-        }),
-        // No signal to avoid timeouts causing failed requests
-      })
+    try {
+      const job = async () => {
+        const response = await retryWithBackoff(() =>
+          fetchWithAdaptiveTimeout('/api/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Idempotency-Key': (typeof crypto !== 'undefined' && (crypto as any).randomUUID) ? (crypto as any).randomUUID() : Math.random().toString(36).substring(2),
+            },
+            body: JSON.stringify({
+              variantId: selectedVariant.id,
+              quantity,
+              countryCode,
+            }),
+          }).then(r => r.ok ? r : Promise.reject(r))
+        )
 
-      if (!response.ok) {
-        throw new Error('Failed to add to cart')
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('last_cart_addition', newTimestamp)
+          announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
+        }
+        return response
       }
-
-      if (typeof window !== 'undefined') {
-        // Update local storage after successful API call so other tabs know
-        localStorage.setItem('last_cart_addition', newTimestamp)
-        
-        // Notify other tabs/components that cart has changed
-        window.dispatchEvent(new CustomEvent('cartUpdated', { 
-          detail: { 
-            variantId: selectedVariant.id, 
-            quantity, 
-            forceOpen: true
-          }
-        }))
-      }
+      mutationQueue.push(job)
+      processQueue()
       
       // Keep success message displayed longer for better UX
       setTimeout(() => setAddedToCart(false), 3000)

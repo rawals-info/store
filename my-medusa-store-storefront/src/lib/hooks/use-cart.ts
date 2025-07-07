@@ -1,11 +1,26 @@
 import { HttpTypes } from "@medusajs/types"
 import { useCallback, useEffect, useState } from "react"
+import { addCartListener } from "@lib/cart/events"
 
 // Cache the last fetched cart response in memory
 let cartCache: {
   data: HttpTypes.StoreCart | null;
   timestamp: number;
 } | null = null;
+
+// New: Persist key
+const CART_SNAPSHOT_KEY = "cart_snapshot"
+
+// Load snapshot on init if no cache
+if (!cartCache && typeof window !== "undefined") {
+  try {
+    const snap = localStorage.getItem(CART_SNAPSHOT_KEY)
+    if (snap) {
+      const parsed = JSON.parse(snap)
+      cartCache = { data: parsed.data, timestamp: parsed.timestamp }
+    }
+  } catch {}
+}
 
 /**
  * Custom hook for fetching and managing cart data
@@ -111,6 +126,26 @@ export function useCart() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [fetchCart]);
+
+  useEffect(() => {
+    // Persist to localStorage whenever cart changes
+    if (cart) {
+      try {
+        localStorage.setItem(
+          CART_SNAPSHOT_KEY,
+          JSON.stringify({ data: cart, timestamp: Date.now() })
+        )
+      } catch {}
+    }
+  }, [cart])
+
+  // Listen for broadcast updates to refresh
+  useEffect(() => {
+    const remove = addCartListener(() => {
+      fetchCart(true)
+    })
+    return remove
+  }, [fetchCart])
 
   return {
     cart,

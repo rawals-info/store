@@ -1,6 +1,7 @@
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js"
 import Medusa from "@medusajs/js-sdk"
 import { useState } from "react"
+import { fetchWithAdaptiveTimeout, retryWithBackoff } from "@lib/util/network"
 
 // @ts-ignore - js-sdk currently lacks full typings
 const medusa: any = new (Medusa as any)({
@@ -40,18 +41,58 @@ const PayPalButton: React.FC<Props> = ({ cart }) => {
 
   const onApprove = async (_data: unknown, actions: any) => {
     setProcessing(true)
+    setError(null)
 
     const authorization = await actions.order!.authorize()
 
+    // Helper to capture errors as readable messages
+    const mapError = (e: any): string => {
+      if (typeof e === "string") return e
+      if (e?.message) return e.message
+      if (e?.name === "AbortError") return "Network timeout. Please try again."
+      return "Payment failed. Please try again."
+    }
+
     try {
-      await medusa.carts.setPaymentSession(cart.id, { provider_id: "paypal" })
-      await medusa.carts.updatePaymentSession(cart.id, "paypal", {
-        data: { data: authorization },
-      })
-      await medusa.carts.complete(cart.id)
-    } catch (e) {
+      const generateIdempotencyKey = () =>
+        (typeof crypto !== "undefined" && (crypto as any).randomUUID)
+          ? (crypto as any).randomUUID()
+          : Math.random().toString(36).substring(2, 15)
+      const commonHeaders = {
+        "Idempotency-Key": generateIdempotencyKey(),
+      }
+      // Wrap each call with retry + adaptive timeout
+      await retryWithBackoff(() =>
+        fetchWithAdaptiveTimeout(`${medusa.baseUrl}/store/carts/${cart.id}/payment-sessions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...commonHeaders,
+          },
+          body: JSON.stringify({ provider_id: "paypal" }),
+        }).then((r) => (r.ok ? r : Promise.reject(r)))
+      )
+
+      await retryWithBackoff(() =>
+        fetchWithAdaptiveTimeout(`${medusa.baseUrl}/store/carts/${cart.id}/payment-sessions/paypal`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...commonHeaders,
+          },
+          body: JSON.stringify({ data: authorization }),
+        }).then((r) => (r.ok ? r : Promise.reject(r)))
+      )
+
+      await retryWithBackoff(() =>
+        fetchWithAdaptiveTimeout(`${medusa.baseUrl}/store/carts/${cart.id}/complete`, {
+          method: "POST",
+          headers: commonHeaders,
+        }).then((r) => (r.ok ? r : Promise.reject(r)))
+      )
+    } catch (e: any) {
       console.error(e)
-      setError("Payment failed")
+      setError(mapError(e))
     } finally {
       setProcessing(false)
     }
