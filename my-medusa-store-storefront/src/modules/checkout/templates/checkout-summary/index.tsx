@@ -14,7 +14,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <h2 className="font-display text-2xl text-luxury-charcoal mb-6">
           Your Order
         </h2>
-        <CartTotals totals={cart} />
+        <CartTotals totals={cart} placeholder="No upfront tax; duties paid by buyer at customs clearance" />
         <div className="h-px bg-luxury-gold/20 my-6"></div>
         <ItemsPreviewTemplate cart={cart} />
         <div className="h-px bg-luxury-gold/20 my-6"></div>

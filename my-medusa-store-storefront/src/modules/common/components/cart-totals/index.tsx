@@ -60,9 +60,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, placeholder = "Contact 
               : placeholder}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="flex gap-x-1 items-center">Taxes</span>
-          <span data-testid="cart-taxes" data-value={tax_total || 0}>
+        <div className="flex justify-between items-start">
+          <span className="flex gap-x-1 items-center mt-[2px]">Taxes</span>
+          <span
+            className={`${!(tax_total && tax_total > 0) ? "text-sm text-right max-w-[220px] text-[#8a7f72]" : ""}`}
+            data-testid="cart-taxes"
+            data-value={tax_total || 0}
+          >
             {tax_total && tax_total > 0
               ? convertToLocale({ amount: tax_total, currency_code })
               : placeholder}
