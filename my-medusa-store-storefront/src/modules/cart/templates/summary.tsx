@@ -37,7 +37,7 @@ const Summary = ({ cart }: SummaryProps) => {
         data-testid="checkout-button"
       >
         <Button className="luxury-btn w-full h-12 mt-2 font-medium tracking-wider uppercase transition-all duration-300 bg-luxury-gold hover:bg-luxury-gold/90">
-          Go to checkout
+          Proceed to checkout
         </Button>
       </LocalizedClientLink>
     </div>

@@ -387,30 +387,42 @@ export default function ProductActions({
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return null
 
-    setIsAdding(true)
-    
-    // Update button state immediately
+    // Optimistic UI update for instantaneous feedback
     setAddedToCart(true)
-    
-    // Create a timestamp that we'll use for our optimistic update
-    const newTimestamp = Date.now().toString()
-    
-    try {
-      enqueueCartJob({
-        variantId: selectedVariant.id,
-        quantity,
-        countryCode,
-      })
+    setIsAdding(true)
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('last_cart_addition', newTimestamp)
-        announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
+    const timestamp = Date.now().toString()
+
+    // Fire early cart announcement so header badge updates immediately
+    if (typeof window !== "undefined") {
+      localStorage.setItem("last_cart_addition", timestamp)
+      announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.onLine) {
+        await fetch("/api/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            variantId: selectedVariant.id,
+            quantity,
+            countryCode,
+          }),
+        }).then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to add item to cart")
+          }
+        })
+      } else {
+        enqueueCartJob({ variantId: selectedVariant.id, quantity, countryCode })
       }
-       
-      // Keep success message displayed longer for better UX
+
+      // Keep success message visible a little longer
       setTimeout(() => setAddedToCart(false), 3000)
     } catch (error) {
-      console.error('Failed to add to cart:', error)
+      console.error("Failed to add to cart:", error)
       setAddedToCart(false)
     } finally {
       setIsAdding(false)

@@ -36,10 +36,13 @@ export async function retrieveCart(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
-  // Optimize caching with a reasonable revalidation window
+  // Always fetch the latest cart state. Using `revalidate: 0` ensures the
+  // request bypasses any cached response, preventing issues where the
+  // checkout page shows an empty cart even though items have just been
+  // added.
   const next = {
-    revalidate: 5, // Revalidate after 5 seconds
-    tags: ['cart', `cart-${id}`],
+    revalidate: 0,
+    tags: ["cart", `cart-${id}`],
   }
 
   return await sdk.client
@@ -204,7 +207,12 @@ export async function addToCart({
       await setCartId(newCart.id)
 
       const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
+      // Also revalidate the generic and specific cart tags used by RSC fetches
+      scheduleRevalidates([
+        cartCacheTag,
+        "cart",
+        `cart-${newCart.id}`,
+      ])
 
       return { success: true, cart: newCart }
     } catch (error) {
@@ -236,7 +244,11 @@ export async function addToCart({
     )
 
     const cartCacheTag = await getCacheTag("carts")
-    scheduleRevalidate(cartCacheTag)
+    scheduleRevalidates([
+      cartCacheTag,
+      "cart",
+      `cart-${existingCart.id}`,
+    ])
 
     return { success: true, cart: result.cart }
   } catch (error) {
@@ -301,7 +313,11 @@ export async function batchAddToCart({
     
     // Revalidate cache only once for all additions
     const cartCacheTag = await getCacheTag("carts")
-    scheduleRevalidate(cartCacheTag)
+    scheduleRevalidates([
+      cartCacheTag,
+      "cart",
+      `cart-${cart.id}`,
+    ])
     
     return { success: true, cart: lastValidResult.cart }
   } catch (error) {
@@ -401,7 +417,7 @@ export async function setShippingMethod({
   )
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
+      scheduleRevalidates([cartCacheTag])
     })
     .catch(medusaError)
 }
@@ -425,7 +441,7 @@ export async function initiatePaymentSession(
   )
     .then(async (resp) => {
       const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
+      scheduleRevalidates([cartCacheTag])
       return resp
     })
     .catch(medusaError)
@@ -613,7 +629,11 @@ export async function updateRegion(countryCode: string, currentPath: string) {
       try {
         await updateCart({ region_id: region.id })
         const cartCacheTag = await getCacheTag("carts")
-        scheduleRevalidate(cartCacheTag)
+        scheduleRevalidates([
+          cartCacheTag,
+          "cart",
+          `cart-${cartId}`,
+        ])
       } catch (error) {
         console.error("Error updating cart region, will create new cart:", error)
         // If updating fails, remove the cart ID so we create a new one on next visit

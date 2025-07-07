@@ -268,7 +268,7 @@ const CartDropdown = () => {
                       size="large"
                       data-testid="go-to-cart-button"
                     >
-                      Proceed to Checkout
+                      View Cart
                     </Button>
                   </LocalizedClientLink>
                 </div>

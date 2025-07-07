@@ -22,7 +22,10 @@ export async function getCheckoutInitialData(): Promise<CheckoutInitialData> {
   const [cart, customer] = await parallelFetch<[
     HttpTypes.StoreCart | null,
     HttpTypes.StoreCustomer | null
-  ]>([retrieveCart, retrieveCustomer], { suppressErrors: true })
+  ]>([
+    () => retrieveCart(),
+    () => retrieveCustomer(),
+  ], { suppressErrors: true })
 
   if (!cart) {
     return {
