@@ -12,6 +12,7 @@
     "build": "TINA_PUBLIC_IS_LOCAL=true tinacms build --local --skip-cloud-checks -c \"NODE_ENV=production next build\"",
     "start": "next start -p 8000",
     "lint": "next lint",
+    "tina:generate": "tinacms graphql-codegen",
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
@@ -47,7 +48,7 @@
     "@babel/core": "^7.17.5",
     "@medusajs/types": "latest",
     "@medusajs/ui-preset": "latest",
-    "@tinacms/cli": "^1.9.9",
+    "@tinacms/cli": "^1.10.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^24.0.6",
     "@types/pg": "^8.11.0",

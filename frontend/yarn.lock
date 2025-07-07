@@ -4295,7 +4295,7 @@
     typescript "^5.7.3"
     zod "^3.24.2"
 
-"@tinacms/cli@^1.9.9":
+"@tinacms/cli@^1.10.0":
   version "1.10.0"
   resolved "https://registry.npmjs.org/@tinacms/cli/-/cli-1.10.0.tgz"
   integrity sha512-6+PpaqKZQHmAPZBRs3VaEfMNgQ9Zvzz34TXCZT/NMHf+Nr8kO1uQmaRQYwh0zZgA2iR+yHLnW0tI0U6XDfaAFQ==
