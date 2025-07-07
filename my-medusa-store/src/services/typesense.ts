@@ -59,7 +59,6 @@ class TypesenseService extends AbstractSearchService {
         fields: [
           { name: "id", type: "string" },
           { name: "title", type: "string" },
-          { name: "description", type: "string" },
           { name: "handle", type: "string" },
         ],
       })
@@ -117,7 +116,7 @@ class TypesenseService extends AbstractSearchService {
       .documents()
       .search({
         q: query ?? "*",
-        query_by: "title,description,handle",
+        query_by: "title,handle",
         page,
         per_page: limit,
       })
