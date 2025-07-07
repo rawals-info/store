@@ -66,13 +66,25 @@ export function useCart() {
       
       const { cart: cartData } = await response.json();
       
-      // Update memory cache
+      // If the server responds with an empty cart *right after* we already
+      // have items locally (optimistic update), keep the local version until
+      // the next refresh to avoid a jarring flicker where the item disappears
+      // and re-appears a moment later.
+      const localHasItems = cart?.items && cart.items.length > 0;
+      const serverHasNoItems = !cartData?.items || cartData.items.length === 0;
+
+      // Only overwrite the local cart if the server has items or the local
+      // cart was previously empty.
+      const nextCart = localHasItems && serverHasNoItems ? cart : cartData;
+
+      // Update memory cache so future reads use the most recent server data
+      // (even if it's empty) – the skip above only affects the UI state.
       cartCache = {
         data: cartData,
-        timestamp: now
+        timestamp: now,
       };
-      
-      setCart(cartData);
+
+      setCart(nextCart);
       setLastUpdate(now);
     } catch (error) {
       // Only log actual errors, not aborted requests
@@ -146,11 +158,32 @@ export function useCart() {
   // completes.
   useEffect(() => {
     const remove = addCartListener((detail) => {
-      if (detail?.variantId && detail.quantity) {
+      const lineItemPayload = (detail as any)?.lineItem
+      if (lineItemPayload) {
+        // Use the provided full line item snapshot for immediate display
         setCart((prev) => {
-          // If we have an existing cart object, clone it and add/update the
-          // relevant line-item locally. Otherwise create a minimal placeholder
-          // cart so header badge can update immediately.
+          const baseCart: any = prev || {
+            id: "optimistic-cart",
+            currency_code: lineItemPayload?.currency_code || "usd",
+            items: [],
+            subtotal: 0,
+            total: 0,
+          }
+
+          const items = [...(baseCart.items ?? [])]
+          const existing = items.find((i: any) => i.variant_id === lineItemPayload.variant_id)
+          if (existing) {
+            existing.quantity += lineItemPayload.quantity || 1
+          } else {
+            items.push(lineItemPayload)
+          }
+
+          const subtotal = items.reduce((acc: number, i: any) => acc + (i.total || 0), 0)
+          return { ...baseCart, items, subtotal, total: subtotal }
+        })
+      } else if (detail?.variantId && detail.quantity) {
+        // Legacy minimal payload fallback
+        setCart((prev) => {
           const baseCart: any = prev || {
             id: "optimistic-cart",
             currency_code: "usd",
@@ -159,7 +192,6 @@ export function useCart() {
             total: 0,
           }
 
-          // Shallow copy items so we don't mutate state directly
           const items = [...(baseCart.items ?? [])]
 
           const existing = items.find((i: any) => i.variant_id === detail.variantId)
@@ -177,10 +209,8 @@ export function useCart() {
             })
           }
 
-          return {
-            ...baseCart,
-            items,
-          }
+          const subtotalLegacy = items.reduce((acc: number, i: any) => acc + (i.total || 0), 0)
+          return { ...baseCart, items, subtotal: subtotalLegacy, total: subtotalLegacy }
         })
       }
 

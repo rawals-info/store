@@ -162,7 +162,7 @@ const CartDropdown = () => {
         >
           <PopoverPanel
             static
-            className="absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[75vw] sm:w-[360px] text-luxury-charcoal z-[110]"
+            className="absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
             data-testid="nav-cart-dropdown"
           >
             {/* Gold line at top */}
@@ -173,7 +173,7 @@ const CartDropdown = () => {
             </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar py-4">
+                <div className="overflow-y-auto max-h-[65vh] px-4 grid grid-cols-1 gap-y-8 no-scrollbar py-4">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")

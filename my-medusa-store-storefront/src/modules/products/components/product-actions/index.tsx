@@ -13,6 +13,7 @@ import ProductVariantInfo from "../product-variant-info"
 import MobileActions from "./mobile-actions"
 import { announceCart } from "@lib/cart/events"
 import { enqueueCartJob } from "@lib/utils/offline-cart-queue"
+import { getProductPrice } from "@lib/util/get-product-price"
 
 // Legacy in-memory mutation queue replaced by persistent offline queue
 
@@ -387,24 +388,40 @@ export default function ProductActions({
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return null
 
-    // Optimistic UI update for instantaneous feedback
-    setAddedToCart(true)
     setIsAdding(true)
 
-    const timestamp = Date.now().toString()
+    // Build a rich line-item snapshot for optimistic UI
+    const { variantPrice } = getProductPrice({ product, variantId: selectedVariant.id })
+    const unitAmount = variantPrice?.calculated_price_number || 0
+    const currencyCode = variantPrice?.currency_code || (product as any)?.currency_code || "usd"
 
-    // Fire early cart announcement so header badge updates immediately
-    if (typeof window !== "undefined") {
-      localStorage.setItem("last_cart_addition", timestamp)
-      announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
+    const lineItemSnapshot = {
+      id: `optimistic-${selectedVariant.id}-${Date.now()}`,
+      variant_id: selectedVariant.id,
+      product_handle: (product as any).handle || "",
+      thumbnail: (product as any).thumbnail || (product as any).images?.[0]?.url || "",
+      title: product.title,
+      variant: { title: selectedVariant.title },
+      quantity,
+      total: unitAmount * quantity,
+      original_total: unitAmount * quantity,
+      currency_code: currencyCode,
     }
 
-    // Artificial delay to mimic processing time / allow animations.
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    // Announce immediately so dropdown shows snapshot instantly
+    if (typeof window !== "undefined") {
+      announceCart({
+        variantId: selectedVariant.id,
+        quantity,
+        forceOpen: true,
+        // @ts-ignore – extended payload for optimistic UI
+        lineItem: lineItemSnapshot,
+      } as any)
+    }
 
     try {
       if (typeof navigator !== "undefined" && navigator.onLine) {
-        await fetch("/api/cart/add", {
+        const res = await fetch("/api/cart/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -413,16 +430,29 @@ export default function ProductActions({
             quantity,
             countryCode,
           }),
-        }).then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to add item to cart")
-          }
         })
+
+        if (!res.ok) {
+          throw new Error("Failed to add item to cart")
+        }
       } else {
         enqueueCartJob({ variantId: selectedVariant.id, quantity, countryCode })
       }
 
-      // Keep success message visible a little longer
+      // Mark item as added and announce cart update
+      setAddedToCart(true)
+
+      if (typeof window !== "undefined") {
+        const timestamp = Date.now().toString()
+        localStorage.setItem("last_cart_addition", timestamp)
+        announceCart({
+          variantId: selectedVariant.id,
+          quantity,
+          forceOpen: true,
+        })
+      }
+
+      // Hide success state after a short delay
       setTimeout(() => setAddedToCart(false), 3000)
     } catch (error) {
       console.error("Failed to add to cart:", error)
