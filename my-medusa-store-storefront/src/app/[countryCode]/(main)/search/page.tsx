@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import { searchProducts } from "@lib/data/search"
-import { listRegions } from "@lib/data/regions"
+import { getRegion } from "@lib/data/regions"
 import { listCategories } from "@lib/data/categories"
 import { listTags } from "@lib/data/tags"
 import { StoreRegion } from "@medusajs/types"
@@ -80,19 +80,21 @@ async function SearchContent({
   const parsedPage = parseInt(pageNum, 10)
   const offset = (parsedPage - 1) * PRODUCT_LIMIT
 
-  // Kick off all independent network calls in parallel
-  const [categories, regionsResp, searchRes] = await Promise.all([
+  // Fetch region, categories and tags concurrently to reduce total latency
+  const [categories, tags, region] = await Promise.all([
     listCategories().catch((err) => {
       console.error("Failed to load categories:", err)
       return [] as Category[]
     }),
-    listRegions().catch((error) => {
-      console.error("Error fetching regions:", error)
-      return []
+    listTags().catch((err) => {
+      console.error("Error fetching tags:", err)
+      return [] as any[]
     }),
-    // We still need region_id for price calculation; will reuse later
-    Promise.resolve(undefined),
-  ]) as [Category[], StoreRegion[], undefined]
+    getRegion(countryCode).catch((error) => {
+      console.error("Error fetching region:", error)
+      return null
+    }),
+  ]) as [Category[], any[], StoreRegion | null]
 
   const topCategories = categories.slice(0, 4)
 
@@ -115,12 +117,7 @@ async function SearchContent({
     )
   }
 
-  const regions = regionsResp
-
-  // Even if we can't find the exact region, attempt the search anyway with available info
-  const region = regions.find(
-    (r) => r.countries?.find((c) => c.iso_2 === countryCode.toLowerCase())
-  )
+  // region already fetched above; even if null, proceed with search
 
   try {    
     const { products: fetchedProducts, count } = await searchProducts({
@@ -234,13 +231,13 @@ async function SearchContent({
             <div className="sticky top-20">
               <RefinementList
                 sortBy={(sort || "created_at") as SortOptions}
-                categories={categoriesList}
+                categories={categoriesList as any}
                 tags={tagsList}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 currencyCode={region?.currency_code || ""}
                 productCount={products.length}
-                region={region}
+                region={region as any}
                 search
               />
             </div>
@@ -262,7 +259,7 @@ async function SearchContent({
                         <Suspense fallback={<div className="aspect-[9/16] bg-luxury-ivory/50 rounded-sm animate-pulse"></div>}>
                           <ProductPreview 
                             product={product} 
-                            region={region} 
+                            region={region as any} 
                           />
                         </Suspense>
                       </li>
@@ -274,14 +271,14 @@ async function SearchContent({
                   <Pagination
                     page={parsedPage}
                     totalPages={totalPages}
-                    searchParams={new URLSearchParams({
+                    searchParams={new URLSearchParams(Object.entries({
                       q: query,
                       sort,
                       categories: categoryParam,
                       tags: tagParam,
                       price_min,
                       price_max
-                    })}
+                    }).filter(([, v]) => v) as any)}
                   />
                 )}
               </>

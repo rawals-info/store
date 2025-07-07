@@ -22,3 +22,15 @@ export async function retryWithBackoff<T>(
     }
   }
 }
+
+// Promise helper that rejects if the wrapped promise does not settle within `ms` milliseconds.
+export async function withTimeout<T>(promise: Promise<T>, ms = 8000, timeoutMessage = "Operation timed out"):
+  Promise<T> {
+  let timer: NodeJS.Timeout
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(timeoutMessage)), ms)
+    }),
+  ]).finally(() => clearTimeout(timer))
+}

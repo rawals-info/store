@@ -212,42 +212,45 @@ export const getProductData = cache(
   ): Promise<{
     product: HttpTypes.StoreProduct | null
     relatedProducts: HttpTypes.StoreProduct[]
-    region: HttpTypes.StoreRegion
+    region: HttpTypes.StoreRegion | null
   }> => {
-    // Get region first to avoid redundant fetches
-    const region = await getRegion(countryCode)
-    
-    if (!region) {
-      return { product: null, relatedProducts: [], region: {} as HttpTypes.StoreRegion }
-    }
-    
-    // Fast direct fetch for the product - lower timeout
-    const productPromise = sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
-      `/store/products`, {
-        query: { 
-          handle: handle, 
-          limit: 1,
-          region_id: region.id 
-        },
-        next: { 
+    // Kick off region lookup and a lightweight product skeleton fetch in parallel
+    const regionPromise = getRegion(countryCode)
+
+    // Fetch product without region so we at least have a skeleton quickly
+    const productSkeletonPromise = sdk.client
+      .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
+        query: { handle, limit: 1 },
+        next: {
           revalidate: 300,
-          tags: ["products", `product-handle-${handle}`]
-        }
-      }
-    ).then(res => res.products?.[0] || null)
-    .catch(() => null);
-    
-    // Start fetching the product first, then continue with other logic
-    const product = await productPromise;
-    
-    // Defer related products loading until needed
-    const relatedProducts: HttpTypes.StoreProduct[] = [];
-    
-    // Return what we have immediately to speed up page rendering
-    return { 
-      product,
-      relatedProducts,
-      region
+          tags: ["products", `product-handle-${handle}`],
+        },
+      })
+      .then((res) => res.products?.[0] || null)
+      .catch(() => null)
+
+    const [region, productSkeleton] = await Promise.all([regionPromise, productSkeletonPromise])
+
+    if (!region) {
+      // No region information – return skeleton as-is
+      return { product: productSkeleton, relatedProducts: [], region: null as any }
+    }
+
+    // Fetch region-aware pricing/details in parallel with related products lookup
+    const detailedProductPromise = sdk.client
+      .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
+        query: { handle, limit: 1, region_id: region.id },
+      })
+      .then((res) => res.products?.[0] || productSkeleton)
+      .catch(() => productSkeleton)
+
+    // Related products can be fetched lazily – keep cheap for now
+    const detailedProduct = await detailedProductPromise
+
+    return {
+      product: detailedProduct,
+      relatedProducts: [],
+      region,
     }
   }
 )

@@ -17,6 +17,7 @@ import {
 } from "./cookies"
 import { getRegion } from "./regions"
 import { retryWithBackoff } from "@lib/utils/retry"
+import { withTimeout } from "@lib/utils/retry"
 import { randomUUID } from "crypto"
 
 /**
@@ -169,25 +170,34 @@ export async function addToCart({
 
   // No cart yet → create one and include the requested item in the same request
   if (!existingCart) {
-    const region = await getRegion(countryCode)
+    const [region, authHeaders] = await Promise.all([
+      getRegion(countryCode),
+      getAuthHeaders(),
+    ])
 
     if (!region) {
       return { success: false, error: "Region not found" }
     }
 
+    const combinedHeaders = { ...authHeaders }
+
     try {
-      const { cart: newCart } = await sdk.store.cart.create(
-        {
-          region_id: region.id,
-          items: [
-            {
-              variant_id: variantId,
-              quantity,
-            },
-          ],
-        },
-        {},
-        headers
+      const { cart: newCart } = await withTimeout(
+        sdk.store.cart.create(
+          {
+            region_id: region.id,
+            items: [
+              {
+                variant_id: variantId,
+                quantity,
+              },
+            ],
+          },
+          {},
+          combinedHeaders
+        ),
+        10000,
+        "Creating cart timed out"
       )
 
       // Persist cart ID for subsequent requests
@@ -210,14 +220,18 @@ export async function addToCart({
     const idempotentHeaders = { ...headers, "Idempotency-Key": randomUUID() }
 
     const result = await retryWithBackoff(() =>
-      sdk.store.cart.createLineItem(
-        existingCart.id,
-        {
-          variant_id: variantId,
-          quantity,
-        },
-        {},
-        idempotentHeaders
+      withTimeout(
+        sdk.store.cart.createLineItem(
+          existingCart.id,
+          {
+            variant_id: variantId,
+            quantity,
+          },
+          {},
+          { ...headers, "Idempotency-Key": randomUUID() }
+        ),
+        8000,
+        "Adding item to cart timed out"
       )
     )
 
