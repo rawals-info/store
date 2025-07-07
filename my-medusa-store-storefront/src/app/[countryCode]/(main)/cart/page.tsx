@@ -32,6 +32,15 @@ export default async function Cart() {
       }
     }
   ])
+
+  // Prefetch shipping and payment options in the background to speed-up checkout
+  if (cart) {
+    // Fire and forget – we don't await the result
+    parallelFetch([
+      () => import("@lib/data/fulfillment").then(({ listCartShippingMethods }) => listCartShippingMethods(cart.id)),
+      () => import("@lib/data/payment").then(({ listCartPaymentMethods }) => listCartPaymentMethods(cart.region?.id ?? "")),
+    ], { suppressErrors: true })
+  }
   
   // Even if cart is null, we'll render the cart template which will show an empty cart state
   // instead of showing a 404 error page

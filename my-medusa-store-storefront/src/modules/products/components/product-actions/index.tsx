@@ -12,25 +12,9 @@ import ProductPrice from "../product-price"
 import ProductVariantInfo from "../product-variant-info"
 import MobileActions from "./mobile-actions"
 import { announceCart } from "@lib/cart/events"
-import { fetchWithAdaptiveTimeout, retryWithBackoff } from "@lib/util/network"
+import { enqueueCartJob } from "@lib/utils/offline-cart-queue"
 
-const mutationQueue: (() => Promise<any>)[] = []
-// @ts-ignore
-let processing = false
-
-const processQueue = async () => {
-  if (processing) return
-  processing = true
-  while (mutationQueue.length) {
-    const job = mutationQueue.shift()!
-    try {
-      await job()
-    } catch (e) {
-      console.error("Cart mutation failed", e)
-    }
-  }
-  processing = false
-}
+// Legacy in-memory mutation queue replaced by persistent offline queue
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -125,7 +109,8 @@ export default function ProductActions({
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
   const [manuallySelectedVariant, setManuallySelectedVariant] = useState<HttpTypes.StoreProductVariant | undefined>(undefined)
-  const countryCode = useParams().countryCode as string
+  const params = useParams()
+  const countryCode = (params?.countryCode as string) || "us"
 
   // Create dynamic options if none exist
   const productOptions = useMemo(() => {
@@ -295,14 +280,12 @@ export default function ProductActions({
   // Side effect: store selected variant ID in localStorage when it changes
   useEffect(() => {
     if (typeof window !== 'undefined' && selectedVariant?.id) {
-      // Only update localStorage if the value actually changed
-      const currentVariantId = localStorage.getItem('selectedVariantId');
-      if (currentVariantId !== selectedVariant.id) {
-        localStorage.setItem('selectedVariantId', selectedVariant.id);
-        
-        // Dispatch a single storage event instead of relying on automatic events
-        // This helps reduce the number of event handlers firing
-        window.dispatchEvent(new Event('storage'));
+      const id = selectedVariant.id // safe after optional chaining check
+      const currentVariantId = localStorage.getItem('selectedVariantId')
+      if (currentVariantId !== id) {
+        localStorage.setItem('selectedVariantId', id)
+        // Trigger custom storage event for other tabs/components
+        window.dispatchEvent(new Event('storage'))
       }
     }
   }, [selectedVariant?.id]); // Only depend on the ID, not the entire variant
@@ -409,39 +392,21 @@ export default function ProductActions({
     // Update button state immediately
     setAddedToCart(true)
     
-    // For optimistic updates, we'll store the current cart state
-    const previousCartState = typeof window !== 'undefined' ? 
-      localStorage.getItem('last_cart_addition') : null
-
     // Create a timestamp that we'll use for our optimistic update
     const newTimestamp = Date.now().toString()
     
     try {
-      const job = async () => {
-        const response = await retryWithBackoff(() =>
-          fetchWithAdaptiveTimeout('/api/cart/add', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Idempotency-Key': (typeof crypto !== 'undefined' && (crypto as any).randomUUID) ? (crypto as any).randomUUID() : Math.random().toString(36).substring(2),
-            },
-            body: JSON.stringify({
-              variantId: selectedVariant.id,
-              quantity,
-              countryCode,
-            }),
-          }).then(r => r.ok ? r : Promise.reject(r))
-        )
+      enqueueCartJob({
+        variantId: selectedVariant.id,
+        quantity,
+        countryCode,
+      })
 
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('last_cart_addition', newTimestamp)
-          announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
-        }
-        return response
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('last_cart_addition', newTimestamp)
+        announceCart({ variantId: selectedVariant.id, quantity, forceOpen: true })
       }
-      mutationQueue.push(job)
-      processQueue()
-      
+       
       // Keep success message displayed longer for better UX
       setTimeout(() => setAddedToCart(false), 3000)
     } catch (error) {
