@@ -1,6 +1,6 @@
 import { sdk } from "@lib/config"
 import { getCacheTag, getAuthHeaders, getCartId } from "@lib/data/cookies"
-import { revalidateTag } from "next/cache"
+import { scheduleRevalidate } from "@lib/utils/revalidate"
 import { NextResponse } from "next/server"
 
 // Force dynamic behavior since this route uses cookies
@@ -27,7 +27,7 @@ export async function POST() {
     
     // Revalidate cache
     const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    scheduleRevalidate(cartCacheTag)
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {

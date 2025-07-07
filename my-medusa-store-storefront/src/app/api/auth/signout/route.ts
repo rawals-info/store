@@ -1,7 +1,7 @@
 import { sdk } from "@lib/config"
 import { removeAuthToken, removeCartId, getCacheTag } from "@lib/data/cookies"
-import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
+import { scheduleRevalidate } from "@lib/utils/revalidate"
 
 export async function POST() {
   try {
@@ -13,14 +13,14 @@ export async function POST() {
 
     // Revalidate cache tags
     const customerCacheTag = await getCacheTag("customers")
-    revalidateTag(customerCacheTag)
+    scheduleRevalidate(customerCacheTag)
 
     // Remove cart ID from cookies
     await removeCartId()
 
     // Revalidate cart cache tag
     const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    scheduleRevalidate(cartCacheTag)
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {

@@ -1,6 +1,6 @@
 import { sdk } from "@lib/config"
 import { getCacheTag, getCartId, setAuthToken } from "@lib/data/cookies"
-import { revalidateTag } from "next/cache"
+import { scheduleRevalidate } from "@lib/utils/revalidate"
 import { NextRequest, NextResponse } from "next/server"
 
 // Force dynamic behavior since this route uses cookies
@@ -87,14 +87,14 @@ export async function POST(req: NextRequest) {
 
     // Revalidate cache
     const customerCacheTag = await getCacheTag("customers")
-    revalidateTag(customerCacheTag)
+    scheduleRevalidate(customerCacheTag)
 
     // Transfer cart
     const cartId = await getCartId()
     if (cartId) {
       await sdk.store.cart.transferCart(cartId, {}, { authorization: `Bearer ${loginToken}` })
       const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      scheduleRevalidate(cartCacheTag)
     }
 
     return NextResponse.json({ success: true, customer: createdCustomer })

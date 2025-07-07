@@ -3,7 +3,7 @@
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
-import { revalidateTag } from "next/cache"
+import { scheduleRevalidate } from "@lib/utils/revalidate"
 import { redirect } from "next/navigation"
 import { ExtendedStoreCartLineItem } from "../../types/cart"
 import {
@@ -15,7 +15,6 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
-import { scheduleRevalidate } from "@lib/utils/revalidate"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -129,12 +128,14 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
   return sdk.store.cart
     .update(cartId, data, {}, headers)
     .then(async ({ cart }) => {
-      const cartCacheTag = await getCacheTag("carts")
+      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+        getCacheTag("carts"),
+        getCacheTag("fulfillment"),
+      ])
+
       scheduleRevalidate(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
       scheduleRevalidate(fulfillmentCacheTag)
-
+       
       return cart
     })
     .catch(medusaError)
@@ -500,13 +501,13 @@ export async function placeOrder(cartId?: string) {
     ]);
 
     // Revalidate caches: generic and id-specific cart tags
-    revalidateTag("cart")
-    revalidateTag(`cart-${id}`)
+    scheduleRevalidate("cart")
+    scheduleRevalidate(`cart-${id}`)
     if (customCartCacheTag) {
-      revalidateTag(customCartCacheTag)
+      scheduleRevalidate(customCartCacheTag)
     }
     if (orderCacheTag) {
-      revalidateTag(orderCacheTag)
+      scheduleRevalidate(orderCacheTag)
     }
 
     if (cartRes?.type === "order") {
@@ -517,7 +518,7 @@ export async function placeOrder(cartId?: string) {
       await removeCartId()
 
       // Revalidate related data
-      revalidateTag("products") // Potentially update inventory
+      scheduleRevalidate("products") // Potentially update inventory
       
       redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
     }
@@ -527,10 +528,10 @@ export async function placeOrder(cartId?: string) {
     console.error("Error placing order:", error)
     // Revalidate cart to ensure UI is consistent
     const customCartCacheTag = await customCartCacheTagPromise
-    revalidateTag("cart")
-    revalidateTag(`cart-${id}`)
+    scheduleRevalidate("cart")
+    scheduleRevalidate(`cart-${id}`)
     if (customCartCacheTag) {
-      revalidateTag(customCartCacheTag)
+      scheduleRevalidate(customCartCacheTag)
     }
     throw error
   }
@@ -564,10 +565,10 @@ export async function updateRegion(countryCode: string, currentPath: string) {
     }
 
     const regionCacheTag = await getCacheTag("regions")
-    revalidateTag(regionCacheTag)
+    scheduleRevalidate(regionCacheTag)
 
     const productsCacheTag = await getCacheTag("products")
-    revalidateTag(productsCacheTag)
+    scheduleRevalidate(productsCacheTag)
 
     // Ensure currentPath doesn't start with a slash to avoid double slashes
     const cleanPath = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath

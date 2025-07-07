@@ -8,6 +8,14 @@ import { clx } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { debounceSearch } from "@lib/client/search-utils"
 
+// Simple in-memory cache for search suggestions scoped to the browser session.
+// Keyed by `countryCode|query`, values contain `{ ts: number, data: HttpTypes.StoreProduct[] }`.
+// We keep it small and rely on garbage collection when the page reloads.
+const SUGGESTION_CACHE = new Map<string, { ts: number; data: HttpTypes.StoreProduct[] }>()
+
+// Suggestions are re-fetched after this many ms.
+const SUGGESTION_TTL = 30_000 // 30 seconds
+
 type SearchBarProps = {
   className?: string
   isHomePage?: boolean
@@ -65,18 +73,32 @@ const SearchBar = ({
 
   const fetchSuggestions = useCallback(
     debounceSearch(async (value: string) => {
-      if (!value.trim()) {
+      const query = value.trim()
+      if (!query) {
         setSuggestions([])
         return
       }
+
+      // Check cache first
+      const cacheKey = `${currentCountryCode}|${query.toLowerCase()}`
+      const cached = SUGGESTION_CACHE.get(cacheKey)
+      if (cached && Date.now() - cached.ts < SUGGESTION_TTL) {
+        setSuggestions(cached.data)
+        return
+      }
+
       try {
         setLoadingSuggest(true)
         const res = await fetch(
-          `/api/search-suggest?q=${encodeURIComponent(value.trim())}&countryCode=${currentCountryCode}`
+          `/api/search-suggest?q=${encodeURIComponent(query)}&countryCode=${currentCountryCode}`
         )
         if (res.ok) {
           const data = await res.json()
-          setSuggestions(data.products || [])
+          const products = data.products || []
+          setSuggestions(products)
+
+          // Cache the result
+          SUGGESTION_CACHE.set(cacheKey, { ts: Date.now(), data: products })
         }
       } catch (e) {
         console.error("Suggestion fetch error", e)
