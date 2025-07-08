@@ -49,11 +49,18 @@
 }
 
 @layer base {
+  /*
+   * Use a light ivory background and charcoal text by default to improve
+   * contrast. The previous black background with white text made the product
+   * grid and filter sidebar almost invisible. If a dark theme is desired in
+   * the future we can re-introduce it behind a `.dark` class thanks to
+   * Tailwind’s `darkMode: \"class\"` setting.
+   */
   body {
-    @apply bg-black text-white font-sans;
+    @apply bg-luxury-ivory text-luxury-charcoal font-sans;
     /* Subtle golden speckle pattern */
-    background-image: linear-gradient(to right, rgba(244, 193, 16, 0.03) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(244, 193, 16, 0.03) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgba(244, 193, 16, 0.08) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(244, 193, 16, 0.08) 1px, transparent 1px);
     background-size: 20px 20px;
     /* Allow long strings (e.g., very long product names / URLs) to wrap if needed
        without forcibly breaking every word. */

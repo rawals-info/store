@@ -18,7 +18,7 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
   const displayCategories: CategoryConfig[] = Object.values(CATEGORIES)
 
   return (
-    <section className="py-16 bg-luxury-cream">
+    <section className="py-16 bg-luxury-ivory">
       <div className="max-w-7xl mx-auto px-4">
         <ScrollReveal>
           <div className="text-center mb-12">
@@ -27,8 +27,7 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
             </Heading>
             <div className="h-px w-24 bg-luxury-gold mx-auto mb-4"></div>
             <Text className="text-luxury-charcoal/80 max-w-xl mx-auto">
-              Explore our curated collection of handcrafted marble pieces
-            </Text>
+            Explore our curated selection of artisanal Petha, savory snacks & gift boxes</Text>
           </div>
         </ScrollReveal>
         

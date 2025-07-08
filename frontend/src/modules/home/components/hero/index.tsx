@@ -70,7 +70,7 @@ const Hero = () => {
           
           <h1 className="text-display-large mb-4 text-white font-medium leading-tight">
             <span className="block">Taste the Legend</span>
-            <span className="gold-text font-display text-[4rem] italic">of Agra</span>
+            <span className="gold-text font-display text-[4rem] italic">Petha of Agra</span>
           </h1>
           
           <p className="text-serif-regular text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">

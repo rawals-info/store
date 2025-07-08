@@ -118,8 +118,8 @@ export default function Footer() {
     <footer className="w-full bg-black text-white">
       {/* Decorative gold pattern removed */}
       
-      {/* Features section on cream background */}
-      <div className="py-12 bg-luxury-cream">
+      {/* Features section – use the same ivory tone as the page background */}
+      <div className="py-12 bg-luxury-ivory">
         <div className="content-container">
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -180,7 +180,7 @@ export default function Footer() {
                   <a 
                     key={platform}
                     href={social.href || "#"} 
-                    className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300 relative group"
+                    className="text-white hover:text-luxury-gold transition-colors duration-300 relative group"
                     aria-label={platform}
                   >
                     <span className="sr-only">{platform}</span>
@@ -289,13 +289,13 @@ export default function Footer() {
       
       <div className="border-t border-luxury-lightgold/20 py-6 px-4 sm:px-8 overflow-x-auto">
         <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between min-w-max">
-          <div className="text-small-regular text-luxury-charcoal/60">
-            © 2025 Imperial Craft Of India. All rights reserved.
+          <div className="text-small-regular text-white/60">
+            © 2025 Taj Petha. All rights reserved.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             {/* Currency switcher removed */}
             <div className="hidden xsmall:block h-6 w-px bg-luxury-lightgold/20"></div>
-            <div className="flex items-center gap-x-4 text-2xl text-luxury-charcoal opacity-80">
+            <div className="flex items-center gap-x-4 text-2xl text-white opacity-80">
               <FontAwesomeIcon icon={faCcVisa} />
               <FontAwesomeIcon icon={faCcMastercard} />
               <FontAwesomeIcon icon={faCcAmex} />

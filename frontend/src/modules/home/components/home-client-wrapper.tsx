@@ -201,7 +201,7 @@ export default function HomeClientWrapper({
           <motion.div variants={fadeIn} className="mb-4 md:mb-6">
             <Heading level="h1" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 font-serif text-white leading-tight">
               <span className="block">Taste the Legend</span>
-              <span className="block">of Agra</span>
+              <span className="block">Petha of Agra</span>
             </Heading>
           </motion.div>
           
@@ -233,7 +233,7 @@ export default function HomeClientWrapper({
       </motion.section>
       
       {/* Featured Products Section - CAROUSEL */}
-      <section className="py-16 bg-luxury-cream w-full">
+      <section className="py-16 bg-luxury-ivory w-full">
         <div className="max-w-7xl mx-auto px-4 w-full box-border">
           <ScrollReveal>
             <div className="text-center mb-12">
@@ -373,7 +373,7 @@ export default function HomeClientWrapper({
             {/* View all button */}
             <div className="text-center mt-10">
               <Link href={`/${countryCode}/products`}>
-                <AnimatedButton variant="outline" size="medium">
+                <AnimatedButton variant="gold" size="medium">
                   View All Products
                 </AnimatedButton>
               </Link>

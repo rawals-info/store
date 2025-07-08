@@ -164,7 +164,7 @@ export default function ProductsContent({
         {/* Content overlay */}
         <div className="relative z-10 py-8 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
           <h1 className="font-display text-4xl md:text-5xl text-luxury-charcoal mb-2">
-            Luxury Handcrafted Collection
+           Premium Agra Petha Selection
           </h1>
           <div className="h-px w-40 bg-luxury-gold mb-4"></div>
           <p className="text-serif-regular text-luxury-charcoal/80 max-w-2xl mb-6">

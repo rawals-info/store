@@ -168,12 +168,19 @@ const AnimatedHeader = () => {
         }}
       >
         {/* Decorative gold gradient line that appears when scrolled */}
-        <motion.div 
-          className={`absolute top-0 left-0 right-0 h-[2px] ${isScrolled ? 'gold-gradient opacity-80' : 'gold-gradient opacity-30'}`}
-          initial={{ scaleX: 0, transformOrigin: "left" }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
-        />
+        <motion.div
+        className={`
+        absolute top-0 left-0 right-0 h-[2px]
+        ${isScrolled
+        ? "bg-black opacity-100"       /* solid black at 100% when scrolled */
+        : "gold-gradient opacity-30"    /* your existing gold fade when at top */
+      }
+  `   }
+      initial={{ scaleX: 0, transformOrigin: "left" }}
+      animate={{ scaleX: 1 }}
+      transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
+      />
+
         
         {/* Subtle glow effect that appears when scrolled */}
         {isScrolled && (

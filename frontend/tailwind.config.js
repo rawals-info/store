@@ -61,8 +61,8 @@ module.exports = {
           dark: '#2A353D',
         },
         'luxury-ivory': {
-          DEFAULT: '#0A0A0A',   // Black background
-          dark: '#0A0A0A',
+          DEFAULT: '#FFFAF2', // Soft ivory / off-white
+          dark: '#F7F3EB',
         },
         'luxury-saffron': {
           DEFAULT: '#FFB347',
