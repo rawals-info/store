@@ -18,11 +18,11 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
   const displayCategories: CategoryConfig[] = Object.values(CATEGORIES)
 
   return (
-    <section className="py-16 bg-transparent">
+    <section className="py-16 bg-luxury-cream">
       <div className="max-w-7xl mx-auto px-4">
         <ScrollReveal>
           <div className="text-center mb-12">
-            <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif">
+            <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif text-luxury-charcoal">
               Shop by Category
             </Heading>
             <div className="h-px w-24 bg-luxury-gold mx-auto mb-4"></div>
@@ -55,7 +55,7 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
                       {category.displayName}
                     </h3>
                     <LocalizedClientLink href={`/${countryCode}/categories/${category.handle}`}>
-                      <button className="bg-luxury-gold/80 hover:bg-luxury-gold text-white px-3 py-1 rounded text-xs font-medium transition-colors">
+                      <button className="bg-luxury-saffron hover:bg-luxury-gold text-white px-3 py-1 rounded text-xs font-medium shadow-sm hover:shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-luxury-saffron/60">
                         View
                       </button>
                     </LocalizedClientLink>

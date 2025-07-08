@@ -6,7 +6,7 @@ import { Heading, Text } from "@medusajs/ui"
 
 export default function Features() {
   return (
-    <section className="py-16 bg-luxury-ivory/30">
+    <section className="py-16 bg-luxury-cream">
       <div className="max-w-7xl mx-auto px-4">
         <ScrollReveal>
           <div className="text-center mb-12">

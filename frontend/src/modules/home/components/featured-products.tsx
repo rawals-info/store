@@ -35,7 +35,7 @@ export default async function FeaturedProducts({
   })
 
   return (
-    <section className="relative overflow-hidden py-20 bg-transparent">
+    <section className="relative overflow-hidden py-20 bg-white">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-luxury-gold opacity-5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-luxury-gold opacity-5 rounded-full blur-3xl"></div>

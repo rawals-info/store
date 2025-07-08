@@ -8,9 +8,9 @@ import AnimatedButton from "@modules/common/components/animated-button"
 import Link from "next/link"
 import Image from "next/image"
 import { Heading, Text } from "@medusajs/ui"
-import { HttpTypes } from "@medusajs/types"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductPrice from "@modules/products/components/product-price"
+import Features from "./features"
+import { HttpTypes } from "@medusajs/types"
 import CategoryCarousel from "./category-carousel"
 
 type HomeClientWrapperProps = {
@@ -183,7 +183,7 @@ export default function HomeClientWrapper({
         {/* Hero image with marble piece in situ */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <Image
-            src="/hero_imgg.webp"
+            src="/hero_image.webp"
             alt="Luxury marble tabletop in elegant interior"
             fill
             priority={true}
@@ -193,7 +193,7 @@ export default function HomeClientWrapper({
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
           />
-          <div className="absolute inset-0 bg-black/25"></div>
+          <div className="absolute inset-0 bg-black/15"></div>
         </div>
         
         {/* Content */}
@@ -233,11 +233,11 @@ export default function HomeClientWrapper({
       </motion.section>
       
       {/* Featured Products Section - CAROUSEL */}
-      <section className="py-16 bg-white w-full">
+      <section className="py-16 bg-luxury-cream w-full">
         <div className="max-w-7xl mx-auto px-4 w-full box-border">
           <ScrollReveal>
             <div className="text-center mb-12">
-              <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif">
+              <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif text-luxury-charcoal">
                 Featured Products
               </Heading>
               <div className="h-px w-24 bg-luxury-gold mx-auto mb-4"></div>
@@ -298,11 +298,10 @@ export default function HomeClientWrapper({
                             </div>
                             
                             <div className="text-center">
-                              <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold transition-colors mb-1">
+                              <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold text-luxury-charcoal transition-colors mb-1">
                                 <h3 className="font-serif text-xl line-clamp-1">{product.title}</h3>
                               </Link>
                               
-                              {/* Display product price */}
                               <div className="text-luxury-charcoal/90">
                                 {product.variants && product.variants[0] ? (
                                   <ProductPrice 
@@ -385,6 +384,8 @@ export default function HomeClientWrapper({
       
       {/* Category Carousel Section */}
       <CategoryCarousel categories={categories} countryCode={countryCode} />
+
+      {/* Commitment / Features Section removed per request */}
     </div>
   )
 }

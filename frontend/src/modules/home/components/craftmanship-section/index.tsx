@@ -36,7 +36,7 @@ export default function CraftmanshipSection() {
   return (
     <section 
       ref={sectionRef}
-      className="py-24 relative overflow-hidden opacity-0"
+      className="py-24 relative overflow-hidden opacity-0 bg-luxury-cream"
     >
       <div className="content-container">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

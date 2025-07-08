@@ -38,8 +38,9 @@ module.exports = {
           gold: "#F4C110",           // Vibrant golden accent used in the new design
           lightgold: "#FBE57F",     // Softer golden tint for subtle decorations
           charcoal: "#333333",       // Keep for overlays
-          cream: "#111111",          // Darker cream for sections over the black background
-          ivory: "#0A0A0A",          // Black base background colour
+          cream: "#F8F5F0",          // Light cream for contrast sections
+          ivory: "#0A0A0A",          // Black base background color
+          saffron: "#FFB347",        // Warm saffron accent for tertiary highlights
         },
         'luxury-gold': {
           DEFAULT: '#F4C110',
@@ -62,6 +63,19 @@ module.exports = {
         'luxury-ivory': {
           DEFAULT: '#0A0A0A',   // Black background
           dark: '#0A0A0A',
+        },
+        'luxury-saffron': {
+          DEFAULT: '#FFB347',
+          '50': '#FFF8ED',
+          '100': '#FFEBD2',
+          '200': '#FFD29A',
+          '300': '#FFB347',
+          '400': '#E09A2D',
+          '500': '#C48415',
+          '600': '#A46F0E',
+          '700': '#7F5509',
+          '800': '#5C3C06',
+          '900': '#3B2603',
         },
       },
       borderRadius: {

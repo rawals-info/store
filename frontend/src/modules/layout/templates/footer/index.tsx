@@ -115,12 +115,11 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t border-luxury-gold/20 w-full bg-black text-white">
-      {/* Decorative gold pattern */}
-      <div className="w-full h-px gold-gradient"></div>
+    <footer className="w-full bg-black text-white">
+      {/* Decorative gold pattern removed */}
       
-      {/* Features section */}
-      <div className="py-12 bg-black/80">
+      {/* Features section on cream background */}
+      <div className="py-12 bg-luxury-cream">
         <div className="content-container">
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -134,8 +133,8 @@ export default function Footer() {
               variants={itemVariants}
             >
               <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">🥄</div>
-              <h3 className="font-serif text-lg mb-2 text-white">Artisanal Small Batches</h3>
-              <p className="text-white/70 text-sm">We cook each batch slowly for melt-in-the-mouth texture.</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Artisanal Small Batches</h3>
+              <p className="text-luxury-charcoal/80 text-sm">We cook each batch slowly for melt-in-the-mouth texture.</p>
             </motion.div>
             
             <motion.div 
@@ -143,8 +142,8 @@ export default function Footer() {
               variants={itemVariants}
             >
               <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">🌱</div>
-              <h3 className="font-serif text-lg mb-2 text-white">Pure Ingredients</h3>
-              <p className="text-white/70 text-sm">Only farm-fresh ash gourd, cane sugar & rose water.</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Pure Ingredients</h3>
+              <p className="text-luxury-charcoal/80 text-sm">Only farm-fresh ash gourd, cane sugar & rose water.</p>
             </motion.div>
             
             <motion.div 
@@ -152,8 +151,8 @@ export default function Footer() {
               variants={itemVariants}
             >
               <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">📦</div>
-              <h3 className="font-serif text-lg mb-2 text-white">Nationwide Fresh Shipping</h3>
-              <p className="text-white/70 text-sm">Vacuum-sealed & white-glove packaging for perfect delivery.</p>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Nationwide Fresh Shipping</h3>
+              <p className="text-luxury-charcoal/80 text-sm">Vacuum-sealed & white-glove packaging for perfect delivery.</p>
             </motion.div>
           </motion.div>
         </div>
@@ -207,23 +206,23 @@ export default function Footer() {
               </span>
               <ul className="grid grid-cols-1 gap-2 text-white">
                 <li>
-                  <LocalizedClientLink href="/categories/table-top" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Table Top
+                  <LocalizedClientLink href="/categories/petha" className="text-white hover:text-luxury-gold transition-colors duration-300">
+                    Petha
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/categories/jewelry" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
-                    Jewelry
+                  <LocalizedClientLink href="/categories/namkeen" className="text-white hover:text-luxury-gold transition-colors duration-300">
+                    Namkeen
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/categories/home-decor" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
-                    Home Decor
+                  <LocalizedClientLink href="/categories/combo" className="text-white hover:text-luxury-gold transition-colors duration-300">
+                    Combo
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/categories/sculpture" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
-                    Sculpture
+                  <LocalizedClientLink href="/categories/gift-basket" className="text-white hover:text-luxury-gold transition-colors duration-300">
+                    Gift Basket
                   </LocalizedClientLink>
                 </li>
               </ul>
@@ -235,17 +234,17 @@ export default function Footer() {
               </span>
               <ul className="grid grid-cols-1 gap-2">
                 <li>
-                  <LocalizedClientLink href="/about" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/about" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     About
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/contact" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/contact" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Contact
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/csr-policy" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/csr-policy" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     CSR Policy
                   </LocalizedClientLink>
                 </li>
@@ -258,27 +257,27 @@ export default function Footer() {
               </span>
               <ul className="grid grid-cols-1 gap-2">
                 <li>
-                  <LocalizedClientLink href="/shipping" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/shipping" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Shipping
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/returns" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/returns" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Returns
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/faqs" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/faqs" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     FAQs
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/terms" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/terms" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Terms & Conditions
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <LocalizedClientLink href="/privacy" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/privacy" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Privacy Policy
                   </LocalizedClientLink>
                 </li>
