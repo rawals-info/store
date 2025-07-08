@@ -42,9 +42,27 @@ export async function getDefaultCountry(): Promise<string> {
     }
   }
 
-  // 2. Fallback: use the first available region that has a country.
+  // 2. Try to pick the region that matches INR / India if available
   try {
     const regions = await listRegions()
+
+    // Prefer region whose currency is INR
+    const inrRegion = regions.find((region) => region.currency_code?.toLowerCase() === "inr")
+    if (inrRegion?.countries?.length) {
+      const iso = inrRegion.countries[0].iso_2?.toLowerCase()
+      if (iso) return iso
+    }
+
+    // Next prefer region that contains the country code "in"
+    const indiaRegion = regions.find((region) =>
+      region.countries?.some((c) => c.iso_2?.toLowerCase() === "in")
+    )
+    if (indiaRegion?.countries?.length) {
+      const iso = indiaRegion.countries[0].iso_2?.toLowerCase()
+      if (iso) return iso
+    }
+
+    // Otherwise fallback to the first region that has a country.
     const regionWithCountry = regions.find((region) => region.countries?.length)
     if (regionWithCountry?.countries?.length) {
       const iso = regionWithCountry.countries[0].iso_2?.toLowerCase()

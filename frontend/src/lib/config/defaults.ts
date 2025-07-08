@@ -10,26 +10,24 @@ import { getDefaultCountry } from "@lib/util/get-default-country"
 export let DEFAULT_COUNTRY = "in" // sensible initial guess
 export let DEFAULT_CURRENCY = "INR"
 
-;(async () => {
-  try {
-    // Resolve country first (cached internally by getDefaultCountry)
-    const country = await getDefaultCountry()  // e.g. "in"
-    DEFAULT_COUNTRY = country
+// NOTE: We avoid calling server functions during module initialization to
+// comply with Next.js restrictions.  A separate lazy loader can call
+// `hydrateDefaults()` after the first render on the server.
 
-    // Look up the matching region to extract its currency
+export const hydrateDefaults = async () => {
+  if (typeof window !== "undefined") return // run only on server
+  try {
+    const country = await getDefaultCountry()
+    DEFAULT_COUNTRY = country
     const regions = await listRegions()
     const region = regions.find((r) =>
       r.countries?.some((c) => c.iso_2?.toLowerCase() === country)
     )
-
-    if (region?.currency_code) {
-      DEFAULT_CURRENCY = region.currency_code.toUpperCase()
-    }
+    if (region?.currency_code) DEFAULT_CURRENCY = region.currency_code.toUpperCase()
   } catch (err) {
-    console.error("[defaults] Failed to resolve default country/currency", err)
-    // Keep initial fallbacks
+    console.error("[defaults] hydrateDefaults error", err)
   }
-})()
+}
 
 export const getDefaultCurrency = () => DEFAULT_CURRENCY
 export const getDefaultCountrySync = () => DEFAULT_COUNTRY 

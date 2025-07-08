@@ -64,35 +64,34 @@ const Hero = () => {
         {/* Hero text section */}
         <div className="animate-fade-in mb-12 px-4 small:px-0">
           <div className="mb-6">
-            <span className="font-serif text-sm uppercase tracking-[0.3em] text-luxury-gold">Luxury Marble Creations</span>
+            <span className="font-serif text-sm uppercase tracking-[0.3em] text-luxury-gold">From the historic lanes of Agra to your doorstep</span>
             <div className="h-px w-24 bg-luxury-gold mx-auto my-6"></div>
           </div>
           
           <h1 className="text-display-large mb-4 text-white font-medium leading-tight">
-            <span className="block">Artistry in</span>
-            <span className="gold-text font-display text-[4rem] italic">Marble</span>
+            <span className="block">Taste the Legend</span>
+            <span className="gold-text font-display text-[4rem] italic">of Agra</span>
           </h1>
           
           <p className="text-serif-regular text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Each piece a masterpiece, handcrafted by artisans with centuries of tradition.
-            Our marble collections transform spaces into sanctuaries of elegance and sophistication.
+            Authentic, handcrafted Petha—since 1870. Melt-in-the-mouth, fragrant bites steeped in Agra’s rich heritage.
           </p>
           
           <div className="flex flex-col small:flex-row gap-6 justify-center mt-8">
-            <Link href="/collections" passHref>
+            <Link href="/products" passHref>
               <Button
                 className="luxury-btn px-8 py-4 text-base"
                 variant="secondary"
               >
-                Explore Collection
+                Shop Our Signature Petha
               </Button>
             </Link>
-            <Link href="/products" passHref>
+            <Link href="/products?flavors" passHref>
               <Button
                 className="luxury-btn-outline px-8 py-4 text-base hover:bg-transparent hover:text-luxury-gold border-2"
                 variant="secondary"
               >
-                View Signature Pieces
+                Discover Flavors
               </Button>
             </Link>
           </div>

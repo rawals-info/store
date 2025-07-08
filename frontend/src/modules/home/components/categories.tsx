@@ -44,7 +44,7 @@ const Categories = async () => {
   })
   
   return (
-    <section className="py-16 bg-luxury-cream">
+    <section className="py-16 bg-transparent">
       <div className="content-container">
         <div className="flex flex-col items-center mb-12">
           <h2 className="font-display text-3xl md:text-4xl text-luxury-charcoal mb-4">

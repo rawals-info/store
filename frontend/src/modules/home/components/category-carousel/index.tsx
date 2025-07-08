@@ -18,7 +18,7 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
   const displayCategories: CategoryConfig[] = Object.values(CATEGORIES)
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-transparent">
       <div className="max-w-7xl mx-auto px-4">
         <ScrollReveal>
           <div className="text-center mb-12">

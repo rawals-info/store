@@ -34,7 +34,7 @@ export default function Footer() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [companyName, setCompanyName] = useState("TAJ PETHA")
-  const [companyDescription, setCompanyDescription] = useState("Exquisite handcrafted marble artifacts that embody timeless elegance and unparalleled artistry.")
+  const [companyDescription, setCompanyDescription] = useState("Authentic Agra Petha crafted in small batches since 1870. Fragrant, melt-in-the-mouth bites steeped in heritage.")
   const defaultSocial: { platform: string; href: string }[] = [
     { platform: "Instagram", href: "https://instagram.com" },
     { platform: "Facebook", href: "https://facebook.com" },
@@ -133,39 +133,27 @@ export default function Footer() {
               className="flex flex-col items-center text-center"
               variants={itemVariants}
             >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path>
-                </svg>
-              </div>
-              <h3 className="font-serif text-lg mb-2 text-white">Master-Level Hand Carving</h3>
-              <p className="text-white/70 text-sm">Award-winning artisans craft every intricate detail</p>
+              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">🥄</div>
+              <h3 className="font-serif text-lg mb-2 text-white">Artisanal Small Batches</h3>
+              <p className="text-white/70 text-sm">We cook each batch slowly for melt-in-the-mouth texture.</p>
             </motion.div>
             
             <motion.div 
               className="flex flex-col items-center text-center"
               variants={itemVariants}
             >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                </svg>
-              </div>
-              <h3 className="font-serif text-lg mb-2 text-white">Ethically Mined Marble</h3>
-              <p className="text-white/70 text-sm">Responsibly sourced premium-grade stone</p>
+              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">🌱</div>
+              <h3 className="font-serif text-lg mb-2 text-white">Pure Ingredients</h3>
+              <p className="text-white/70 text-sm">Only farm-fresh ash gourd, cane sugar & rose water.</p>
             </motion.div>
             
             <motion.div 
               className="flex flex-col items-center text-center"
               variants={itemVariants}
             >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <h3 className="font-serif text-lg mb-2 text-white">White-Glove Worldwide Delivery</h3>
-              <p className="text-white/70 text-sm">Museum-quality packing for a flawless arrival</p>
+              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">📦</div>
+              <h3 className="font-serif text-lg mb-2 text-white">Nationwide Fresh Shipping</h3>
+              <p className="text-white/70 text-sm">Vacuum-sealed & white-glove packaging for perfect delivery.</p>
             </motion.div>
           </motion.div>
         </div>

@@ -98,6 +98,9 @@
   .text-luxury-charcoal\/70 { @apply text-white/70 !important; }
   .text-luxury-charcoal\/80 { @apply text-white/80 !important; }
   .text-luxury-charcoal\/60 { @apply text-white/60 !important; }
+  /* Force any legacy white backgrounds to black */
+  .bg-white { @apply bg-black !important; }
+  .from-white { --tw-gradient-from: #000000 !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(0 0 0 / 0)); }
 }
 
 @layer utilities {
@@ -602,6 +605,17 @@ button.luxury-btn:hover {
 
 .bg-luxury-cream {
   background-color: rgb(248, 240, 229);
+}
+
+/* Dark theme overrides for legacy light backgrounds */
+.bg-luxury-ivory, .bg-luxury-cream {
+  @apply bg-[#111111] !important;
+}
+.luxury-card {
+  @apply bg-[#1a1a1a] !important;
+}
+.border-luxury-lightgold\/20 { /* slightly adjust border visibility on dark */
+  border-color: rgba(244,193,16,0.2) !important;
 }
 
 /* Product card hover effects */
