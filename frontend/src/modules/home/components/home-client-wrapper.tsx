@@ -183,7 +183,7 @@ export default function HomeClientWrapper({
         {/* Hero image with marble piece in situ */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <Image
-            src="/hero_img.webp"
+            src="/hero_imgg.webp"
             alt="Luxury marble tabletop in elegant interior"
             fill
             priority={true}

@@ -50,7 +50,7 @@ const Hero = () => {
       </div>
       
       {/* Overlay gradient */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-luxury-charcoal/90 via-luxury-charcoal/60 to-transparent"></div>
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-black/90 via-black/60 to-transparent"></div>
       
       {/* Gold decorative elements */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 gold-gradient opacity-10 rounded-full blur-xl animate-gentle-float"></div>
@@ -68,12 +68,12 @@ const Hero = () => {
             <div className="h-px w-24 bg-luxury-gold mx-auto my-6"></div>
           </div>
           
-          <h1 className="text-display-large mb-4 text-luxury-ivory font-medium leading-tight">
+          <h1 className="text-display-large mb-4 text-white font-medium leading-tight">
             <span className="block">Artistry in</span>
             <span className="gold-text font-display text-[4rem] italic">Marble</span>
           </h1>
           
-          <p className="text-serif-regular text-luxury-ivory/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-serif-regular text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
             Each piece a masterpiece, handcrafted by artisans with centuries of tradition.
             Our marble collections transform spaces into sanctuaries of elegance and sophistication.
           </p>
@@ -100,7 +100,7 @@ const Hero = () => {
         
         {/* Scroll indicator */}
         <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-gentle-float">
-          <span className="text-luxury-ivory/60 text-xs mb-2 uppercase tracking-widest">Scroll</span>
+          <span className="text-white/60 text-xs mb-2 uppercase tracking-widest">Scroll</span>
           <div className="w-px h-16 bg-gradient-to-b from-luxury-gold to-transparent"></div>
         </div>
       </div>

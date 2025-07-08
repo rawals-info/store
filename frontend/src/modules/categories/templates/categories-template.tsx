@@ -62,11 +62,10 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
   const getCategoryImage = (handle: string) => {
     // Use the new category images
     const imageMappings: Record<string, string> = {
-      "table-top": "/category_table_top.webp",
-      "jewelry": "/category_jewelry.webp",
-      "home-decor": "/category_home_decor.webp", 
-      "sculpture": "/category_sculpture.webp"
-      // Add more mappings as you add category images
+      "petha": "/categories/petha.png",
+      "namkeen": "/categories/namkeen.png",
+      "dalmoth": "/categories/dalmoth.png",
+      "combo1": "/categories/combo.png",
     }
     
     return imageMappings[handle] || null

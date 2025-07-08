@@ -1,5 +1,7 @@
+// @ts-nocheck
 "use server"
 
+import React from "react";
 import { motion } from "framer-motion"
 import { HttpTypes } from "@medusajs/types"
 import { sdk } from "@lib/config"
@@ -32,8 +34,14 @@ export const getCachedCategories = cache(async () => {
 })
 
 const Categories = async () => {
-  // Fetch categories at build/server time
-  const categories = await getCachedCategories()
+  // Fetch categories and keep only the four main parent categories we want to feature
+  const allCategories = await getCachedCategories()
+  const displayHandles = ["petha", "namkeen", "dalmoth", "combo1"]
+  const categories = allCategories.filter((cat) => {
+    if (cat.parent_category) return false // skip children
+    const handle = (cat.handle || "").replace(/^\//, "") // normalize leading slash
+    return displayHandles.includes(handle)
+  })
   
   return (
     <section className="py-16 bg-luxury-cream">

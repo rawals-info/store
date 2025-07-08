@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { getPercentageDiff } from "./get-precentage-diff"
 import { convertToLocale } from "./money"
+import { DEFAULT_CURRENCY } from "@lib/config/defaults"
 
 // Define and export the CalculatedVariant type
 export type CalculatedVariant = {
@@ -26,14 +27,14 @@ export const getPricesForVariant = (variant: any) => {
       calculated_price: null,
       original_price_number: 0,
       original_price: null,
-      currency_code: 'USD',
+      currency_code: DEFAULT_CURRENCY,
       price_type: 'default',
       percentage_diff: 0,
     }
   }
 
   // Get the requested currency from calculated_price or fallback to USD
-  const requestedCurrency = (variant.calculated_price?.currency_code || 'USD').toUpperCase()
+  const requestedCurrency = (variant.calculated_price?.currency_code || DEFAULT_CURRENCY).toUpperCase()
   
   // 1. FIRST: Try to use calculated_price specific to the requested currency
   if (variant.calculated_price && 
@@ -80,17 +81,17 @@ export const getPricesForVariant = (variant: any) => {
     // Look through all prices for a USD one
     const allPrices = variant.calculated_price.prices || [];
     const usdCalculatedPrice = allPrices.find((p: any) => 
-      p.currency_code && p.currency_code.toUpperCase() === 'USD'
+      p.currency_code && p.currency_code.toUpperCase() === DEFAULT_CURRENCY
     );
     
     if (usdCalculatedPrice && usdCalculatedPrice.amount) {
       const amount = Number(usdCalculatedPrice.amount);
       return {
         calculated_price_number: amount,
-        calculated_price: convertToLocale({ amount, currency_code: 'USD' }),
+        calculated_price: convertToLocale({ amount, currency_code: DEFAULT_CURRENCY }),
         original_price_number: amount,
-        original_price: convertToLocale({ amount, currency_code: 'USD' }),
-        currency_code: 'USD',
+        original_price: convertToLocale({ amount, currency_code: DEFAULT_CURRENCY }),
+        currency_code: DEFAULT_CURRENCY,
         price_type: 'default',
         percentage_diff: 0,
       }
@@ -99,17 +100,17 @@ export const getPricesForVariant = (variant: any) => {
   
   // Then try static USD price in prices array
   const usdPrice = prices.find((p: any) => 
-    p.currency_code && p.currency_code.toUpperCase() === 'USD'
+    p.currency_code && p.currency_code.toUpperCase() === DEFAULT_CURRENCY
   );
   
   if (usdPrice) {
     const amount = Number(usdPrice.amount) || 0;
     return {
       calculated_price_number: amount,
-      calculated_price: convertToLocale({ amount, currency_code: 'USD' }),
+      calculated_price: convertToLocale({ amount, currency_code: DEFAULT_CURRENCY }),
       original_price_number: amount,
-      original_price: convertToLocale({ amount, currency_code: 'USD' }),
-      currency_code: 'USD',
+      original_price: convertToLocale({ amount, currency_code: DEFAULT_CURRENCY }),
+      currency_code: DEFAULT_CURRENCY,
       price_type: 'default',
       percentage_diff: 0,
     }
@@ -118,7 +119,7 @@ export const getPricesForVariant = (variant: any) => {
   // 4. LAST RESORT: If we have any calculated price, use it regardless of currency
   if (variant.calculated_price && variant.calculated_price.calculated_amount !== undefined) {
     const amount = Number(variant.calculated_price.calculated_amount);
-    const currencyCode = (variant.calculated_price.currency_code || 'USD').toUpperCase();
+    const currencyCode = (variant.calculated_price.currency_code || DEFAULT_CURRENCY).toUpperCase();
     
     return {
       calculated_price_number: amount,
@@ -137,7 +138,7 @@ export const getPricesForVariant = (variant: any) => {
     calculated_price: null,
     original_price_number: 0,
     original_price: null,
-    currency_code: 'USD',
+    currency_code: DEFAULT_CURRENCY,
     price_type: 'default',
     percentage_diff: 0,
   }

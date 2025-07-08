@@ -129,10 +129,8 @@ const SearchBar = ({
 
   // Determine text color based on scroll and page
   const getTextColor = () => {
-    if (isHomePage && !isScrolled) {
-      return "text-white placeholder:text-white/70" // White text on transparent background for homepage
-    }
-    return "text-luxury-charcoal placeholder:text-luxury-charcoal/50" // Dark text for all other cases
+    // Header is now dark across the site; use white text for clarity.
+    return isHomePage && !isScrolled ? "text-white placeholder:text-white/70" : "text-white placeholder:text-white/60"
   }
 
   return (
@@ -154,7 +152,7 @@ const SearchBar = ({
         className={clx(
           "bg-transparent border-b transition-all duration-200 outline-none text-sm py-1 pr-8 w-full",
           getTextColor(),
-          isFocused ? "border-luxury-gold" : isHomePage && !isScrolled ? "border-white/30" : "border-luxury-charcoal/20",
+          isFocused ? "border-luxury-gold" : isHomePage && !isScrolled ? "border-white/30" : "border-white/20",
           "focus:border-luxury-gold"
         )}
       />
@@ -172,7 +170,7 @@ const SearchBar = ({
         type="submit"
         className={clx(
           "absolute right-0 transition-colors",
-          isHomePage && !isScrolled ? "text-white/70 hover:text-white" : "text-luxury-charcoal/50 hover:text-luxury-gold"
+          isHomePage && !isScrolled ? "text-white/70 hover:text-white" : "text-white/70 hover:text-luxury-gold"
         )}
       >
         {isSearching ? (

@@ -1,4 +1,5 @@
 import { isEmpty } from "./isEmpty"
+import { DEFAULT_CURRENCY } from "@lib/config/defaults"
 
 type ConvertToLocaleParams = {
   amount: number
@@ -13,7 +14,7 @@ export const convertToLocale = ({
   currency_code,
   minimumFractionDigits = 2,
   maximumFractionDigits = 2,
-  locale = "en-US",
+  locale = "en-IN",
 }: ConvertToLocaleParams) => {
   // Handle invalid inputs
   if (amount === undefined || amount === null || isNaN(amount)) {
@@ -26,7 +27,7 @@ export const convertToLocale = ({
   }
   
   if (!currency_code || isEmpty(currency_code)) {
-    currency_code = 'USD' // Default to USD if no currency code is provided
+    currency_code = DEFAULT_CURRENCY // Use dynamic default currency
   }
   
   // Normalize currency code to uppercase to avoid formatting errors

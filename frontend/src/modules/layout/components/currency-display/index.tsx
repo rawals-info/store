@@ -4,11 +4,13 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import ReactCountryFlag from "react-country-flag"
 import { listRegions } from "@lib/data/regions"
+import { DEFAULT_CURRENCY, DEFAULT_COUNTRY } from "@lib/config/defaults"
 
 const CurrencyDisplay = () => {
   const [currencies, setCurrencies] = useState<Record<string, string>>({})
   const [currentCurrency, setCurrentCurrency] = useState<string | null>(null)
-  const { countryCode } = useParams()
+  const params = useParams<{ countryCode?: string }>()
+  const countryCode = params?.countryCode as string | undefined
   
   useEffect(() => {
     const fetchRegionData = async () => {
@@ -34,13 +36,13 @@ const CurrencyDisplay = () => {
         if (countryCode && currencyMap[countryCode as string]) {
           setCurrentCurrency(currencyMap[countryCode as string])
         } else {
-          // Default to USD if country not found
-          setCurrentCurrency("USD")
+          // Default to backend default currency if country not found
+          setCurrentCurrency(DEFAULT_CURRENCY)
         }
       } catch (error) {
         console.error("Error fetching region data:", error)
-        // Default to USD if there's an error
-        setCurrentCurrency("USD")
+        // Default to backend default currency if there's an error
+        setCurrentCurrency(DEFAULT_CURRENCY)
       }
     }
     
@@ -62,6 +64,7 @@ const CurrencyDisplay = () => {
     INR: "in",
     CNY: "cn",
     AED: "ae",
+    [DEFAULT_CURRENCY]: DEFAULT_COUNTRY,
     // Add more currency to country mappings as needed
   }
   

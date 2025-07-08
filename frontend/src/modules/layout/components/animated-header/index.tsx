@@ -9,7 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
-import CurrencySwitcher from "@modules/layout/components/currency-switcher"
+// Currency switcher removed
 import { usePathname } from "next/navigation"
 import SearchBar from "@modules/search/components/search-bar"
 import CategoryDropdown from "@modules/layout/components/category-dropdown/index"
@@ -39,19 +39,17 @@ const AnimatedHeader = () => {
     ["0px 0px 0px rgba(0,0,0,0)", "0px 6px 24px rgba(0,0,0,0.03), 0px 2px 8px rgba(212,175,55,0.1)"]
   )
   
-  // Use transparent background for homepage initially, solid after scroll
-  // For other pages, always use solid background
+  // Header background: transparent on top of homepage, then solid black. All other pages solid black.
   const headerBg = useTransform(
     scrollY,
     [0, 50],
-    isHomePage ? ["rgba(255,255,255,0)", "rgba(255,255,255,0.97)"] : ["rgb(255,255,255)", "rgb(255,255,255)"]
+    isHomePage ? ["rgba(0,0,0,0)", "rgba(0,0,0,0.96)"] : ["rgb(0,0,0)", "rgb(0,0,0)"]
   )
   
   // Default links so the header still renders without Tina
   const defaultNavLinks = [
     { href: "/", label: "Home", testId: "nav-home-link" },
     { href: "/products", label: "Shop", testId: "nav-shop-link" },
-    { href: "/categories", label: "Categories", testId: "nav-categories-link" },
     { href: "/about", label: "About", testId: "nav-about-link" },
   ]
   
@@ -142,13 +140,8 @@ const AnimatedHeader = () => {
     setMobileMenuOpen(false)
   }
 
-  // Determine text color based on scroll and page
-  const getTextColor = () => {
-    if (isHomePage && !isScrolled) {
-      return "text-white" // White text on transparent background for homepage
-    }
-    return "text-luxury-charcoal" // Dark text for all other cases
-  }
+  // Always use white text for the dark header
+  const getTextColor = () => "text-white"
 
   return (
     <>
@@ -193,7 +186,7 @@ const AnimatedHeader = () => {
         )}
         
         <div className={`w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 ${getTextColor()} h-full transition-all duration-300 box-border ${
-          isScrolled ? "py-0 h-16" : "py-1 h-20"
+          isScrolled ? "py-1 h-20" : "py-2 h-24"
         }`}>
           <div className="w-full flex items-center justify-between h-full relative">
             <div className="flex-1 basis-0 h-full flex items-center">
@@ -202,7 +195,7 @@ const AnimatedHeader = () => {
                 <button
                   onClick={() => setMobileMenuOpen(true)}
                   className={`flex items-center text-sm font-medium tracking-wide group transition-colors duration-300 ${
-                    isHomePage && !isScrolled ? "text-white hover:text-luxury-lightgold" : "text-luxury-charcoal hover:text-luxury-gold"
+                    "text-white hover:text-luxury-gold"
                   }`}
                   aria-label="Open menu"
                 >
@@ -212,10 +205,20 @@ const AnimatedHeader = () => {
                   <span className="sr-only small:not-sr-only">Menu</span>
                 </button>
               </div>
+
+              {/* Brand / Logo */}
+              <LocalizedClientLink href="/" className="hidden small:flex items-center gap-2 mr-10 group">
+                {/* Simple Taj Mahal outline icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-luxury-gold group-hover:scale-105 transition-transform">
+                  <path d="M12 2l2 2h4v4l2 2v10H4V10l2-2V4h4l2-2z" />
+                  <path d="M9 22V12h6v10" />
+                </svg>
+                <span className="font-serif text-lg tracking-wide uppercase text-luxury-gold group-hover:text-white transition-colors">TAJ PETHA</span>
+              </LocalizedClientLink>
               
               {/* Navigation links - desktop */}
               <div className="hidden small:flex items-center gap-x-8 h-full">
-                {navLinks.map((link, i) => {
+                {(navLinks || []).filter(l => l.href !== "/categories" && l.label?.toLowerCase() !== "categories").map((link, i) => {
                   const isActive = pathname === link.href || 
                     (link.href !== "/" && pathname?.startsWith(link.href))
                   const isCategories = link.href === "/categories"
@@ -228,9 +231,7 @@ const AnimatedHeader = () => {
                       variants={linkVariants}
                     >
                       <LocalizedClientLink
-                        className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap ${
-                          isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
-                        } ${isActive ? "text-luxury-gold" : ""}`}
+                        className={`text-sm text-white hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap ${isActive ? "text-luxury-gold" : ""}`}
                         href={link.href}
                         data-testid={link.testId}
                         onMouseEnter={() => {
@@ -272,33 +273,6 @@ const AnimatedHeader = () => {
               </div>
             </div>
 
-            {/* Logo with refined animations */}
-            <motion.div 
-              className="flex items-center h-full"
-              animate={{ 
-                scale: isScrolled ? 0.95 : 1,
-                y: isScrolled ? -1 : 0
-              }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <LocalizedClientLink href="/" className="relative group">
-                <h1 className={`font-serif text-xl md:text-2xl tracking-wide ${
-                  isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
-                }`}>
-                  IMPERIAL CRAFT OF INDIA
-                </h1>
-                <div className={`text-[10px] tracking-widest uppercase text-center -mt-1 opacity-80 ${
-                  isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
-                }`}>
-                  Fine Hand-Crafts
-                </div>
-                <motion.div 
-                  className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full"
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                />
-              </LocalizedClientLink>
-            </motion.div>
-            
             {/* Right side items: Account, Cart, etc. */}
             <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
               {/* Search Bar - Added to desktop view */}
@@ -319,9 +293,7 @@ const AnimatedHeader = () => {
                     variants={linkVariants}
                   >
                     <LocalizedClientLink
-                      className={`text-sm hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap ${
-                        isHomePage && !isScrolled ? "text-white" : "text-luxury-charcoal"
-                      }`}
+                      className="text-sm text-white hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap"
                       href={link.href}
                       data-testid={link.testId}
                       onMouseEnter={() => setHoveredLink(link.href)}
@@ -340,9 +312,7 @@ const AnimatedHeader = () => {
                 ))}
               </div>
               
-              <div className="hidden small:flex items-center">
-                <CurrencySwitcher />
-              </div>
+              {/* Currency switcher removed */}
               
               {/* Mobile Search Icon */}
               <div className="small:hidden flex items-center">
@@ -353,7 +323,7 @@ const AnimatedHeader = () => {
                 >
                   <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-luxury-charcoal"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -423,10 +393,10 @@ const AnimatedHeader = () => {
             >
               <div className="flex flex-col h-full w-full">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20 w-full">
-                  <h2 className="font-serif text-xl text-luxury-charcoal">Menu</h2>
+                  <h2 className="font-serif text-xl text-white">Menu</h2>
                   <button
                     onClick={closeMobileMenu}
-                    className="p-2 text-luxury-charcoal hover:text-luxury-gold transition-colors"
+                    className="p-2 text-white hover:text-luxury-gold transition-colors"
                     aria-label="Close menu"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -436,7 +406,7 @@ const AnimatedHeader = () => {
                 </div>
                 <div className="flex-1 overflow-y-auto py-6 px-6 w-full">
                   <nav className="flex flex-col gap-y-6 w-full">
-                    {navLinks.map((link, i) => (
+                    {(navLinks || []).filter(l => l.href !== "/categories" && l.label?.toLowerCase() !== "categories").map((link, i) => (
                       <motion.div
                         key={link.href}
                         custom={i}
@@ -447,7 +417,7 @@ const AnimatedHeader = () => {
                       >
                         <LocalizedClientLink
                           href={link.href}
-                          className="text-lg font-medium text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                          className="text-lg font-medium text-white hover:text-luxury-gold transition-colors duration-300"
                           onClick={closeMobileMenu}
                         >
                           {link.label}
@@ -455,7 +425,7 @@ const AnimatedHeader = () => {
                       </motion.div>
                     ))}
                     <div className="h-px w-full bg-luxury-lightgold/20 my-2" />
-                    {rightLinks.map((link, i) => (
+                    {(rightLinks || []).map((link, i) => (
                       <motion.div
                         key={link.href}
                         custom={i + navLinks.length}
@@ -466,7 +436,7 @@ const AnimatedHeader = () => {
                       >
                         <LocalizedClientLink
                           href={link.href}
-                          className="text-lg font-medium text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                          className="text-lg font-medium text-white hover:text-luxury-gold transition-colors duration-300"
                           onClick={closeMobileMenu}
                         >
                           {link.label}
@@ -487,18 +457,7 @@ const AnimatedHeader = () => {
                       <SearchBar autoSearch={true} />
                     </motion.div>
                     
-                    <motion.div
-                      custom={navLinks.length + rightLinks.length + 1}
-                      initial="closed"
-                      animate="open"
-                      variants={menuVariants}
-                      className="w-full"
-                    >
-                      <div className="flex items-center gap-x-2 text-luxury-charcoal">
-                        <span className="text-sm font-medium">Currency:</span>
-                        <CurrencySwitcher />
-                      </div>
-                    </motion.div>
+                    {/* Currency switcher removed */}
                   </div>
                 </div>
               </div>

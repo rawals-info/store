@@ -61,7 +61,7 @@ async function getCountryData() {
     // Fallback to whatever we have in cache, or empty arrays if nothing
     return {
       validCountries: cachedValidCountries || [],
-      defaultCountry: cachedDefaultCountry || "us"
+      defaultCountry: cachedDefaultCountry || "in"
     }
   }
 }

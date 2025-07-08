@@ -56,6 +56,6 @@ export async function getDefaultCountry(): Promise<string> {
     console.error("Error listing regions for fallback:", error)
   }
 
-  // 3. Final fallback: default to "us".
-  return "us"
+  // 3. Final fallback: default to "in" (India).
+  return "in"
 } 

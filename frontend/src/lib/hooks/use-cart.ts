@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { useCallback, useEffect, useState } from "react"
 import { addCartListener } from "@lib/cart/events"
+import { DEFAULT_CURRENCY } from "@lib/config/defaults"
 
 // Cache the last fetched cart response in memory
 let cartCache: {
@@ -171,7 +172,7 @@ export function useCart() {
         setCart((prev) => {
           const baseCart: any = prev || {
             id: "optimistic-cart",
-            currency_code: "usd",
+            currency_code: DEFAULT_CURRENCY.toLowerCase(),
             items: [],
             subtotal: 0,
             total: 0,
@@ -204,7 +205,7 @@ export function useCart() {
           setCart((prev) => {
             const baseCart: any = prev || {
               id: "optimistic-cart",
-              currency_code: lineItemPayload?.currency_code || "usd",
+              currency_code: lineItemPayload?.currency_code || DEFAULT_CURRENCY.toLowerCase(),
               items: [],
               subtotal: 0,
               total: 0,

@@ -1,4 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
+import { DEFAULT_CURRENCY, DEFAULT_COUNTRY } from "@lib/config/defaults"
 
 /**
  * Get the currency price for a given region
@@ -17,13 +18,13 @@ export function formatAmount({
   region: HttpTypes.StoreRegion | null
   includeTaxes?: boolean
 } & Omit<Intl.NumberFormatOptions, "currency">) {
-  const regionCurrency = region?.currency_code?.toUpperCase() || "USD"
+  const regionCurrency = region?.currency_code?.toUpperCase() || DEFAULT_CURRENCY
 
   const taxRate = includeTaxes ? 1 : 1
   // Tax handling is not available in this version of the API
   // const taxRate = includeTaxes ? 1 : 1 - (region?.tax_rate || 0) / 100
 
-  const locale = region?.countries?.[0]?.iso_2 || "en-US"
+  const locale = region?.countries?.[0]?.iso_2 || `en-${DEFAULT_COUNTRY}`
 
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -42,7 +43,7 @@ export function formatAmountWithoutCurrency(
   amount: number,
   options?: Intl.NumberFormatOptions
 ) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "decimal",
     minimumFractionDigits: 2,
     ...options,

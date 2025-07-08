@@ -35,20 +35,20 @@ module.exports = {
           90: "#111827",
         },
         luxury: {
-          gold: "#D4AF37",
-          lightgold: "#E5C767",
-          charcoal: "#333333",
-          cream: "#F8F5E6",
-          ivory: "#FFFFF5",
+          gold: "#F4C110",           // Vibrant golden accent used in the new design
+          lightgold: "#FBE57F",     // Softer golden tint for subtle decorations
+          charcoal: "#333333",       // Keep for overlays
+          cream: "#111111",          // Darker cream for sections over the black background
+          ivory: "#0A0A0A",          // Black base background colour
         },
         'luxury-gold': {
-          DEFAULT: '#D4AF37',
+          DEFAULT: '#F4C110',
           '50': '#F8F3E3',
           '100': '#F1E6C7',
           '200': '#E9D59B',
           '300': '#E2C46F',
           '400': '#DBB843',
-          '500': '#D4AF37',
+          '500': '#F4C110',
           '600': '#B0902A',
           '700': '#8B7121',
           '800': '#665219',
@@ -60,8 +60,8 @@ module.exports = {
           dark: '#2A353D',
         },
         'luxury-ivory': {
-          DEFAULT: '#FFFFF0',
-          dark: '#F5F5DC',
+          DEFAULT: '#0A0A0A',   // Black background
+          dark: '#0A0A0A',
         },
       },
       borderRadius: {
@@ -91,7 +91,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "Montserrat",
+          "Poppins",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -102,14 +102,13 @@ module.exports = {
           "sans-serif",
         ],
         serif: [
-          "Playfair Display",
-          "Cormorant Garamond",
+          "Poppins",
           "Georgia",
           "Times New Roman",
           "serif",
         ],
         display: [
-          "Playfair Display",
+          "DM Serif Display",
           "serif",
         ],
       },

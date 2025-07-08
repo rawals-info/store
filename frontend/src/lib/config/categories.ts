@@ -14,71 +14,26 @@ export type CategoryConfig = {
  * Use this to manage category data across the application
  */
 export const CATEGORIES: Record<string, CategoryConfig> = {
-  tajMahal: {
-    displayName: "Marble Taj Mahal",
-    handle: "taj-mahal", // Correct backend handle
-    imageSrc: "/Marble taj mahal.png"
+  petha: {
+    displayName: "Petha",
+    handle: "petha",
+    imageSrc: "/categories/petha.png",
   },
-  ringBox: {
-    displayName: "Marble Ring Box",
-    handle: "ring-box",
-    imageSrc: "/Marble ring box.jpg"
+  namkeen: {
+    displayName: "Namkeen",
+    handle: "namkeen",
+    imageSrc: "/categories/namkeen.png",
   },
-  jewelleryBox: {
-    displayName: "Marble Jewelry Box",
-    handle: "jewelry-box",
-    imageSrc: "/marble jewellery box.jpg"
+  dalmoth: {
+    displayName: "Dalmoth",
+    handle: "dalmoth",
+    imageSrc: "/categories/dalmoth.png",
   },
-  animalSculpture: {
-    displayName: "Marble Animal Sculpture",
-    handle: "animal-sculpture",
-    imageSrc: "/Marble animal sculpture.png"
+  combo: {
+    displayName: "Combo (Petha + Dalmoth)",
+    handle: "combo1",
+    imageSrc: "/categories/combo.png",
   },
-  godSculpture: {
-    displayName: "Marble God Sculpture",
-    handle: "god-sculpture",
-    imageSrc: "/Marble god sculpture.png"
-  },
-  pictureFrame: {
-    displayName: "Agate Picture Frame",
-    handle: "picture-frame",
-    imageSrc: "/agate picture frame.webp"
-  },
-  flowerVase: {
-    displayName: "Marble Flower Vase",
-    handle: "flower-vase",
-    imageSrc: "/Marble flower vase.png"
-  },
-  coaster: {
-    displayName: "Marble Coaster",
-    handle: "coaster-set",
-    imageSrc: "/Marble Coaster.jpg"
-  },
-  table: {
-    displayName: "Marble Table",
-    handle: "marble-table-top",
-    imageSrc: "/Marble table.png"
-  },
-  chessBoard: {
-    displayName: "Marble Chess Board",
-    handle: "marble-chess-board",
-    imageSrc: "/Marble chess board.png"
-  },
-  inlayPlate: {
-    displayName: "Marble Inlay Plate",
-    handle: "marble-inlay-plate",
-    imageSrc: "/Marble inlay plate.png"
-  },
-  gemstoneTable: {
-    displayName: "Gemstone Table",
-    handle: "gemstone-table-top-top",
-    imageSrc: "/Gemstone table.png"
-  },
-  epoxyTable: {
-    displayName: "Epoxy Table",
-    handle: "epoxy-table",
-    imageSrc: "/Epoxy table.png"
-  }
 }
 
 /**

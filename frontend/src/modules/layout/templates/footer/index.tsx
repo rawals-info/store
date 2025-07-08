@@ -9,7 +9,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
-import CurrencySwitcher from "@modules/layout/components/currency-switcher"
+// Currency switcher removed
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faCcVisa,
@@ -33,7 +33,7 @@ export default function Footer() {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [companyName, setCompanyName] = useState("IMPERIAL CRAFT OF INDIA")
+  const [companyName, setCompanyName] = useState("TAJ PETHA")
   const [companyDescription, setCompanyDescription] = useState("Exquisite handcrafted marble artifacts that embody timeless elegance and unparalleled artistry.")
   const defaultSocial: { platform: string; href: string }[] = [
     { platform: "Instagram", href: "https://instagram.com" },
@@ -115,12 +115,12 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t border-luxury-lightgold w-full bg-luxury-ivory">
+    <footer className="border-t border-luxury-gold/20 w-full bg-black text-white">
       {/* Decorative gold pattern */}
       <div className="w-full h-px gold-gradient"></div>
       
       {/* Features section */}
-      <div className="py-12 bg-luxury-cream/30">
+      <div className="py-12 bg-black/80">
         <div className="content-container">
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -138,8 +138,8 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path>
                 </svg>
               </div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Master-Level Hand Carving</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Award-winning artisans craft every intricate detail</p>
+              <h3 className="font-serif text-lg mb-2 text-white">Master-Level Hand Carving</h3>
+              <p className="text-white/70 text-sm">Award-winning artisans craft every intricate detail</p>
             </motion.div>
             
             <motion.div 
@@ -151,8 +151,8 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                 </svg>
               </div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Ethically Mined Marble</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Responsibly sourced premium-grade stone</p>
+              <h3 className="font-serif text-lg mb-2 text-white">Ethically Mined Marble</h3>
+              <p className="text-white/70 text-sm">Responsibly sourced premium-grade stone</p>
             </motion.div>
             
             <motion.div 
@@ -164,8 +164,8 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
               </div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">White-Glove Worldwide Delivery</h3>
-              <p className="text-luxury-charcoal/70 text-sm">Museum-quality packing for a flawless arrival</p>
+              <h3 className="font-serif text-lg mb-2 text-white">White-Glove Worldwide Delivery</h3>
+              <p className="text-white/70 text-sm">Museum-quality packing for a flawless arrival</p>
             </motion.div>
           </motion.div>
         </div>
@@ -182,7 +182,7 @@ export default function Footer() {
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-500 ease-in-out"></span>
             </LocalizedClientLink>
             
-            <p className="text-luxury-charcoal/80 max-w-xs mb-6">
+            <p className="text-white/80 max-w-xs mb-6">
               {companyDescription}
             </p>
             
@@ -217,9 +217,9 @@ export default function Footer() {
               <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
                 Shop
               </span>
-              <ul className="grid grid-cols-1 gap-2">
+              <ul className="grid grid-cols-1 gap-2 text-white">
                 <li>
-                  <LocalizedClientLink href="/categories/table-top" className="text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300">
+                  <LocalizedClientLink href="/categories/table-top" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Table Top
                   </LocalizedClientLink>
                 </li>
@@ -306,9 +306,7 @@ export default function Footer() {
             © 2025 Imperial Craft Of India. All rights reserved.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <div className="flex items-center gap-x-2">
-              <CurrencySwitcher variant="footer" />
-            </div>
+            {/* Currency switcher removed */}
             <div className="hidden xsmall:block h-6 w-px bg-luxury-lightgold/20"></div>
             <div className="flex items-center gap-x-4 text-2xl text-luxury-charcoal opacity-80">
               <FontAwesomeIcon icon={faCcVisa} />
