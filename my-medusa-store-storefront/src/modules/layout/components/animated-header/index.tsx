@@ -353,7 +353,7 @@ const AnimatedHeader = () => {
                 >
                   <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-luxury-charcoal"
+                  className={`w-6 h-6 ${isHomePage && !isScrolled ? 'text-white' : 'text-luxury-charcoal'}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor">
