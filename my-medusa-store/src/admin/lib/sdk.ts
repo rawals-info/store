@@ -1,7 +1,10 @@
 import Medusa from "@medusajs/js-sdk"
 
 export const sdk = new Medusa({
-  baseUrl: "http://localhost:9000",
+  baseUrl:
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    process.env.MEDUSA_BACKEND_URL ||
+    "http://localhost:9000",
   debug: process.env.NODE_ENV === "development",
   auth: {
     type: "session",
