@@ -30,6 +30,10 @@
     "node_modules",
     ".medusa/server",
     ".medusa/admin",
-    ".cache"
+    ".cache",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "tailwind.config.*",
+    "**/*.test.ts"
   ]
 }
