@@ -47,6 +47,7 @@
     "@babel/core": "^7.17.5",
     "@medusajs/types": "latest",
     "@medusajs/ui-preset": "latest",
+    "@swc/core": "^1.12.11",
     "@tinacms/cli": "^1.9.9",
     "@types/lodash": "^4.14.195",
     "@types/node": "^24.0.6",
