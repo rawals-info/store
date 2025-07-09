@@ -6,6 +6,7 @@ import {
 } from "@medusajs/framework/http"
 
 import { PostStoreReviewSchema } from "./store/reviews/route"
+import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
 import { GetAdminReviewsSchema } from "./admin/reviews/route"
 import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
 
@@ -17,6 +18,24 @@ export default defineMiddlewares({
       middlewares: [
         authenticate("customer", ["session", "bearer"]),
         validateAndTransformBody(PostStoreReviewSchema),
+      ],
+    },
+    {
+      method: ["GET"],
+      matcher: "/store/products/:id/reviews",
+      middlewares: [
+        validateAndTransformQuery(GetStoreReviewsSchema, {
+          isList: true,
+          defaults: [
+            "id",
+            "rating",
+            "title",
+            "first_name",
+            "last_name",
+            "content",
+            "created_at",
+          ],
+        }),
       ],
     },
     {
