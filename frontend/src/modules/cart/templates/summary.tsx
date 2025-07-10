@@ -34,7 +34,7 @@ const Summary = ({ cart }: SummaryProps) => {
       <CartTotals 
         totals={cart}
         shippingPlaceholder="Calculated at checkout"
-        taxPlaceholder="No upfront tax; duties paid by buyer at customs clearance"
+        taxPlaceholder="Enjoy tax‑free shopping"
       />
       <LocalizedClientLink
         href={"/checkout?step=" + step}

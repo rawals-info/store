@@ -162,7 +162,7 @@ const CartDropdown = () => {
         >
           <PopoverPanel
             static
-            className="absolute top-[calc(100%+1px)] right-0 bg-luxury-ivory border border-luxury-lightgold shadow-luxury-md w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
+            className="absolute top-[calc(100%+1px)] right-0 bg-black/95 border border-luxury-gold/40 shadow-lg w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[540px] text-white z-[110]"
             data-testid="nav-cart-dropdown"
           >
             {/* Gold line at top */}
@@ -218,7 +218,7 @@ const CartDropdown = () => {
                                   data-value={item.variant}
                                 />
                                 <span
-                                  className="text-serif-regular text-sm text-luxury-charcoal/80 mt-1"
+                                  className="text-serif-regular text-sm text-white/80 mt-1"
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
                                 >
@@ -236,7 +236,7 @@ const CartDropdown = () => {
                           </div>
                           <DeleteButton
                             id={item.id}
-                            className="mt-2 text-xs uppercase tracking-wider text-luxury-charcoal/70 hover:text-luxury-gold transition-colors duration-300"
+                            className="mt-2 text-xs uppercase tracking-wider text-white/70 hover:text-luxury-gold transition-colors duration-300"
                             data-testid="cart-item-remove-button"
                           >
                             Remove
@@ -245,11 +245,11 @@ const CartDropdown = () => {
                       </div>
                     ))}
                 </div>
-                <div className="p-6 flex flex-col gap-y-4 text-small-regular border-t border-luxury-lightgold/30 bg-luxury-cream/20">
+                <div className="p-6 flex flex-col gap-y-4 text-small-regular border-t border-luxury-gold/30 bg-black/80">
                   <div className="flex items-center justify-between">
-                    <span className="text-luxury-charcoal font-serif font-medium text-base">
+                    <span className="text-white font-serif font-medium text-base">
                       Subtotal{" "}
-                      <span className="font-normal text-luxury-charcoal/70">(excl. taxes)</span>
+                      <span className="font-normal text-white/70">(excl. taxes)</span>
                     </span>
                     <span
                       className="font-display text-xl text-luxury-gold"
@@ -276,14 +276,14 @@ const CartDropdown = () => {
             ) : (
               <div>
                 <div className="flex py-16 flex-col gap-y-6 items-center justify-center px-8 text-center">
-                  <div className="w-16 h-16 flex items-center justify-center rounded-full border border-luxury-lightgold">
+                  <div className="w-16 h-16 flex items-center justify-center rounded-full border border-luxury-gold/60">
                     <svg className="w-8 h-8 text-luxury-gold/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                   </div>
                   <div className="flex flex-col gap-y-2">
                     <span className="font-display text-lg">Your shopping bag is empty</span>
-                    <span className="text-serif-regular text-luxury-charcoal/80">Discover our collection of handcrafted marble pieces</span>
+                    <span className="text-serif-regular text-white/80">Discover our collection of authentic Agra Petha</span>
                   </div>
                   <div>
                     <LocalizedClientLink href="/products">

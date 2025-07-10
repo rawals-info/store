@@ -70,7 +70,7 @@ export default async function OrderCompletedTemplate({
             <div className="h-0.5 w-full gold-gradient mb-6"></div>
             <CartTotals 
               totals={order} 
-              taxPlaceholder="No upfront tax; duties paid by buyer at customs clearance" 
+              taxPlaceholder="Enjoy tax‑free shopping" 
             />
           </div>
           

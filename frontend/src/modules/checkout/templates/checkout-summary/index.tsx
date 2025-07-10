@@ -21,7 +21,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <CartTotals 
           totals={cart} 
           shippingPlaceholder={shippingPlaceholder}
-          taxPlaceholder="No upfront tax; duties paid by buyer at customs clearance" 
+          taxPlaceholder="Enjoy tax‑free shopping" 
         />
         <div className="h-px bg-luxury-gold/20 my-6"></div>
         <ItemsPreviewTemplate cart={cart} />
