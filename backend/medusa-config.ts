@@ -111,6 +111,10 @@ export default defineConfig({
         ],
       },
     },
+    // Register custom Product Review module
+    productReview: {
+      resolve: "./src/modules/product-review",
+    },
   },
 
   // Plugins (e.g. PayPal)

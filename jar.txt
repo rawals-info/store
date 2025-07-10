@@ -1,0 +1,2 @@
+# Netscape HTTP Cookie File
+localhost	FALSE	/	FALSE	0	connect.sid	voycE5slQzR7gshutbNeNmrpUl_FUExU.v8kicf26gDFxAhslA9RbMPxH

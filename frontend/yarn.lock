@@ -3974,12 +3974,81 @@
     cosmiconfig "^8.1.3"
     snake-case "^3.0.4"
 
-"@swc/counter@0.1.3":
+"@swc/core-darwin-arm64@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-darwin-arm64/-/core-darwin-arm64-1.12.11.tgz"
+  integrity sha512-J19Jj9Y5x/N0loExH7W0OI9OwwoVyxutDdkyq1o/kgXyBqmmzV7Y/Q9QekI2Fm/qc5mNeAdP7aj4boY4AY/JPw==
+
+"@swc/core-darwin-x64@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-darwin-x64/-/core-darwin-x64-1.12.11.tgz"
+  integrity sha512-PTuUQrfStQ6cjW+uprGO2lpQHy84/l0v+GqRqq8s/jdK55rFRjMfCeyf6FAR0l6saO5oNOQl+zWR1aNpj8pMQw==
+
+"@swc/core-linux-arm-gnueabihf@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-linux-arm-gnueabihf/-/core-linux-arm-gnueabihf-1.12.11.tgz"
+  integrity sha512-poxBq152HsupOtnZilenvHmxZ9a8SRj4LtfxUnkMDNOGrZR9oxbQNwEzNKfi3RXEcXz+P8c0Rai1ubBazXv8oQ==
+
+"@swc/core-linux-arm64-gnu@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-linux-arm64-gnu/-/core-linux-arm64-gnu-1.12.11.tgz"
+  integrity sha512-y1HNamR/D0Hc8xIE910ysyLe269UYiGaQPoLjQS0phzWFfWdMj9bHM++oydVXZ4RSWycO7KyJ3uvw4NilvyMKQ==
+
+"@swc/core-linux-arm64-musl@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-linux-arm64-musl/-/core-linux-arm64-musl-1.12.11.tgz"
+  integrity sha512-LlBxPh/32pyQsu2emMEOFRm7poEFLsw12Y1mPY7FWZiZeptomKSOSHRzKDz9EolMiV4qhK1caP1lvW4vminYgQ==
+
+"@swc/core-linux-x64-gnu@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-linux-x64-gnu/-/core-linux-x64-gnu-1.12.11.tgz"
+  integrity sha512-bOjiZB8O/1AzHkzjge1jqX62HGRIpOHqFUrGPfAln/NC6NR+Z2A78u3ixV7k5KesWZFhCV0YVGJL+qToL27myA==
+
+"@swc/core-linux-x64-musl@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-linux-x64-musl/-/core-linux-x64-musl-1.12.11.tgz"
+  integrity sha512-4dzAtbT/m3/UjF045+33gLiHd8aSXJDoqof7gTtu4q0ZyAf7XJ3HHspz+/AvOJLVo4FHHdFcdXhmo/zi1nFn8A==
+
+"@swc/core-win32-arm64-msvc@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-win32-arm64-msvc/-/core-win32-arm64-msvc-1.12.11.tgz"
+  integrity sha512-h8HiwBZErKvCAmjW92JvQp0iOqm6bncU4ac5jxBGkRApabpUenNJcj3h2g5O6GL5K6T9/WhnXE5gyq/s1fhPQg==
+
+"@swc/core-win32-ia32-msvc@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-win32-ia32-msvc/-/core-win32-ia32-msvc-1.12.11.tgz"
+  integrity sha512-1pwr325mXRNUhxTtXmx1IokV5SiRL+6iDvnt3FRXj+X5UvXXKtg2zeyftk+03u8v8v8WUr5I32hIypVJPTNxNg==
+
+"@swc/core-win32-x64-msvc@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core-win32-x64-msvc/-/core-win32-x64-msvc-1.12.11.tgz"
+  integrity sha512-5gggWo690Gvs7XiPxAmb5tHwzB9RTVXUV7AWoGb6bmyUd1OXYaebQF0HAOtade5jIoNhfQMQJ7QReRgt/d2jAA==
+
+"@swc/core@^1.12.11":
+  version "1.12.11"
+  resolved "https://registry.npmjs.org/@swc/core/-/core-1.12.11.tgz"
+  integrity sha512-P3GM+0lqjFctcp5HhR9mOcvLSX3SptI9L1aux0Fuvgt8oH4f92rCUrkodAa0U2ktmdjcyIiG37xg2mb/dSCYSA==
+  dependencies:
+    "@swc/counter" "^0.1.3"
+    "@swc/types" "^0.1.23"
+  optionalDependencies:
+    "@swc/core-darwin-arm64" "1.12.11"
+    "@swc/core-darwin-x64" "1.12.11"
+    "@swc/core-linux-arm-gnueabihf" "1.12.11"
+    "@swc/core-linux-arm64-gnu" "1.12.11"
+    "@swc/core-linux-arm64-musl" "1.12.11"
+    "@swc/core-linux-x64-gnu" "1.12.11"
+    "@swc/core-linux-x64-musl" "1.12.11"
+    "@swc/core-win32-arm64-msvc" "1.12.11"
+    "@swc/core-win32-ia32-msvc" "1.12.11"
+    "@swc/core-win32-x64-msvc" "1.12.11"
+
+"@swc/counter@^0.1.3", "@swc/counter@0.1.3":
   version "0.1.3"
   resolved "https://registry.npmjs.org/@swc/counter/-/counter-0.1.3.tgz"
   integrity sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==
 
-"@swc/helpers@^0.5.0":
+"@swc/helpers@^0.5.0", "@swc/helpers@>=0.5.17":
   version "0.5.17"
   resolved "https://registry.npmjs.org/@swc/helpers/-/helpers-0.5.17.tgz"
   integrity sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==
@@ -3992,6 +4061,13 @@
   integrity sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==
   dependencies:
     tslib "^2.8.0"
+
+"@swc/types@^0.1.23":
+  version "0.1.23"
+  resolved "https://registry.npmjs.org/@swc/types/-/types-0.1.23.tgz"
+  integrity sha512-u1iIVZV9Q0jxY+yM2vw/hZGDNudsN85bBpTqzAQ9rzkxW9D+e3aEM4Han+ow518gSewkXgjmEK0BD79ZcNVgPw==
+  dependencies:
+    "@swc/counter" "^0.1.3"
 
 "@tailwindcss/aspect-ratio@^0.4.2":
   version "0.4.2"

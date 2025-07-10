@@ -7,6 +7,7 @@ import ProductActions from "@modules/products/components/product-actions"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductTabsWrapper from "@modules/products/components/product-tabs-wrapper"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
+import ProductReviews from "../components/product-reviews"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -82,6 +83,9 @@ export default function ProductTemplate({
             <ProductTabsWrapper product={product} />
           </Suspense>
         </div>
+      </div>
+      <div className="content-container my-16 small:my-32">
+      <ProductReviews productId={product.id} />
       </div>
       
       <div className="bg-luxury-cream/10 py-16">

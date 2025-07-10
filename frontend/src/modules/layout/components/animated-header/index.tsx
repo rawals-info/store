@@ -330,7 +330,11 @@ const AnimatedHeader = () => {
                 >
                   <svg
                   xmlns="http://www.w3.org/2000/svg"
+<<<<<<< HEAD:frontend/src/modules/layout/components/animated-header/index.tsx
                   className="w-6 h-6 text-white"
+=======
+                  className={`w-6 h-6 ${isHomePage && !isScrolled ? 'text-white' : 'text-luxury-charcoal'}`}
+>>>>>>> upstream/head:my-medusa-store-storefront/src/modules/layout/components/animated-header/index.tsx
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor">
