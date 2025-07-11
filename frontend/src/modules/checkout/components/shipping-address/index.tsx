@@ -31,6 +31,8 @@ const ShippingAddress = ({
     "shipping_address.phone": cart?.shipping_address?.phone || "",
     email: cart?.email || "",
   })
+  // Show extra address fields only after a suggestion has been chosen or an existing address is pre-filled
+  const [addressSelected, setAddressSelected] = useState(false)
 
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2),
@@ -63,6 +65,11 @@ const ShippingAddress = ({
         "shipping_address.province": address?.province || "",
         "shipping_address.phone": address?.phone || "",
       }))
+
+    // If an address object contains a street value, reveal the other address fields
+    if (address?.address_1) {
+      setAddressSelected(true)
+    }
 
     email &&
       setFormData((prevState: Record<string, any>) => ({
@@ -151,62 +158,68 @@ const ShippingAddress = ({
                 "shipping_address.province": details.province,
                 "shipping_address.country_code": details.country_code,
               }))
+              // Reveal the rest of the address form once a suggestion is chosen
+              setAddressSelected(true)
             }}
           />
         </div>
-        {/* Manual address field (optional) */}
-        <Input
-          label="Address"
-          name="shipping_address.address_1"
-          autoComplete="address-line1"
-          value={formData["shipping_address.address_1"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-address-input"
-        />
-        <Input
-          label="Company"
-          name="shipping_address.company"
-          value={formData["shipping_address.company"]}
-          onChange={handleChange}
-          autoComplete="organization"
-          data-testid="shipping-company-input"
-        />
-        <Input
-          label="Postal code"
-          name="shipping_address.postal_code"
-          autoComplete="postal-code"
-          value={formData["shipping_address.postal_code"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-postal-code-input"
-        />
-        <Input
-          label="City"
-          name="shipping_address.city"
-          autoComplete="address-level2"
-          value={formData["shipping_address.city"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-city-input"
-        />
-        <CountrySelect
-          name="shipping_address.country_code"
-          autoComplete="country"
-          region={cart?.region}
-          value={formData["shipping_address.country_code"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-country-select"
-        />
-        <Input
-          label="State / Province"
-          name="shipping_address.province"
-          autoComplete="address-level1"
-          value={formData["shipping_address.province"]}
-          onChange={handleChange}
-          data-testid="shipping-province-input"
-        />
+        {addressSelected && (
+          <>
+            {/* Manual address field (optional) */}
+            <Input
+              label="Address"
+              name="shipping_address.address_1"
+              autoComplete="address-line1"
+              value={formData["shipping_address.address_1"]}
+              onChange={handleChange}
+              required
+              data-testid="shipping-address-input"
+            />
+            <Input
+              label="Company"
+              name="shipping_address.company"
+              value={formData["shipping_address.company"]}
+              onChange={handleChange}
+              autoComplete="organization"
+              data-testid="shipping-company-input"
+            />
+            <Input
+              label="Postal code"
+              name="shipping_address.postal_code"
+              autoComplete="postal-code"
+              value={formData["shipping_address.postal_code"]}
+              onChange={handleChange}
+              required
+              data-testid="shipping-postal-code-input"
+            />
+            <Input
+              label="City"
+              name="shipping_address.city"
+              autoComplete="address-level2"
+              value={formData["shipping_address.city"]}
+              onChange={handleChange}
+              required
+              data-testid="shipping-city-input"
+            />
+            <CountrySelect
+              name="shipping_address.country_code"
+              autoComplete="country"
+              region={cart?.region}
+              value={formData["shipping_address.country_code"]}
+              onChange={handleChange}
+              required
+              data-testid="shipping-country-select"
+            />
+            <Input
+              label="State / Province"
+              name="shipping_address.province"
+              autoComplete="address-level1"
+              value={formData["shipping_address.province"]}
+              onChange={handleChange}
+              data-testid="shipping-province-input"
+            />
+          </>
+        )}
       </div>
       <div className="my-8">
         <Checkbox

@@ -141,6 +141,11 @@ const Addresses = ({
     shipping_address?.address_1 || ""
   )
 
+  // Whether the user has selected an address from the autocomplete (or one already exists)
+  const [addressSelected, setAddressSelected] = useState(
+    Boolean(shipping_address?.address_1)
+  )
+
   // Controlled values for autofilled fields
   const [autoFields, setAutoFields] = useState({
     address_1: shipping_address?.address_1 || "",
@@ -206,6 +211,20 @@ const Addresses = ({
               onChange={handleFieldChange}
             />
             <Input
+              label="Phone"
+              name="shipping_address.phone"
+              autoComplete="tel"
+              value={autoFields.phone ?? ""}
+              required
+              className="luxury-input"
+              errors={formErrors}
+              onChange={(e) => {
+                handleFieldChange(e)
+                setAutoFields({ ...autoFields, phone: e.target.value })
+              }}
+            />
+
+            <Input
               label="Company (optional)"
               name="shipping_address.company"
               autoComplete="organization"
@@ -233,94 +252,92 @@ const Addresses = ({
                   postal_code: details.postal_code || "",
                   province: details.province || "",
                 }))
+
+                // Reveal the rest of the address fields once a suggestion is chosen
+                setAddressSelected(true)
               }}
             />
-            <Input
-              label="Address"
-              name="shipping_address.address_1"
-              autoComplete="address-line1"
-              value={autoFields.address_1}
-              required
-              className="luxury-input"
-              errors={formErrors}
-              onChange={(e)=>{
-                handleFieldChange(e);
-                setAutoFields({ ...autoFields, address_1: e.target.value })
-              }}
-            />
-            <Input
-              label="Apartment, suite, etc. (optional)"
-              name="shipping_address.address_2"
-              autoComplete="address-line2"
-              defaultValue={shipping_address?.address_2 || ""}
-              className="luxury-input"
-              errors={formErrors}
-              onChange={handleFieldChange}
-            />
-            <div className="grid grid-cols-2 gap-x-2">
-              <Input
-                label="City"
-                name="shipping_address.city"
-                autoComplete="address-level2"
-                value={autoFields.city}
-                required
-                className="luxury-input"
-                errors={formErrors}
-                onChange={(e)=>{
-                  handleFieldChange(e);
-                  setAutoFields({ ...autoFields, city: e.target.value })
-                }}
-              />
-              <Input
-                label="Postal code"
-                name="shipping_address.postal_code"
-                autoComplete="postal-code"
-                value={autoFields.postal_code}
-                required
-                className="luxury-input"
-                errors={formErrors}
-                onChange={(e)=>{
-                  handleFieldChange(e);
-                  setAutoFields({ ...autoFields, postal_code: e.target.value })
-                }}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-x-2">
-              <Input
-                label="State / Province"
-                name="shipping_address.province"
-                autoComplete="address-level1"
-                value={autoFields.province}
-                className="luxury-input"
-                errors={formErrors}
-                onChange={(e)=>{
-                  handleFieldChange(e);
-                  setAutoFields({ ...autoFields, province: e.target.value })
-                }}
-              />
-              {/* Country is always India. Show disabled input and hidden field with ISO code */}
-              <Input
-                label="Country"
-                name="country_display"
-                value="India"
-                disabled
-                className="luxury-input text-gray-500 bg-gray-50 cursor-not-allowed"
-              />
-              <input type="hidden" name="shipping_address.country_code" value="in" />
-            </div>
-            <Input
-              label="Phone"
-              name="shipping_address.phone"
-              autoComplete="tel"
-              value={autoFields.phone ?? ""}
-              required
-              className="luxury-input"
-              errors={formErrors}
-              onChange={(e)=>{
-                handleFieldChange(e);
-                setAutoFields({ ...autoFields, phone: e.target.value })
-              }}
-            />
+            {addressSelected && (
+              <>
+                <Input
+                  label="Address"
+                  name="shipping_address.address_1"
+                  autoComplete="address-line1"
+                  value={autoFields.address_1}
+                  required
+                  className="luxury-input"
+                  errors={formErrors}
+                  onChange={(e) => {
+                    handleFieldChange(e)
+                    setAutoFields({ ...autoFields, address_1: e.target.value })
+                  }}
+                />
+                <Input
+                  label="Apartment, suite, etc. (optional)"
+                  name="shipping_address.address_2"
+                  autoComplete="address-line2"
+                  defaultValue={shipping_address?.address_2 || ""}
+                  className="luxury-input"
+                  errors={formErrors}
+                  onChange={handleFieldChange}
+                />
+                <div className="grid grid-cols-2 gap-x-2">
+                  <Input
+                    label="City"
+                    name="shipping_address.city"
+                    autoComplete="address-level2"
+                    value={autoFields.city}
+                    required
+                    className="luxury-input"
+                    errors={formErrors}
+                    onChange={(e) => {
+                      handleFieldChange(e)
+                      setAutoFields({ ...autoFields, city: e.target.value })
+                    }}
+                  />
+                  <Input
+                    label="Postal code"
+                    name="shipping_address.postal_code"
+                    autoComplete="postal-code"
+                    value={autoFields.postal_code}
+                    required
+                    className="luxury-input"
+                    errors={formErrors}
+                    onChange={(e) => {
+                      handleFieldChange(e)
+                      setAutoFields({ ...autoFields, postal_code: e.target.value })
+                    }}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-x-2">
+                  <Input
+                    label="State / Province"
+                    name="shipping_address.province"
+                    autoComplete="address-level1"
+                    value={autoFields.province}
+                    className="luxury-input"
+                    errors={formErrors}
+                    onChange={(e) => {
+                      handleFieldChange(e)
+                      setAutoFields({ ...autoFields, province: e.target.value })
+                    }}
+                  />
+                  {/* Country is always India. Show disabled input and hidden field with ISO code */}
+                  <Input
+                    label="Country"
+                    name="country_display"
+                    value="India"
+                    disabled
+                    className="luxury-input text-gray-500 bg-gray-50 cursor-not-allowed"
+                  />
+                  <input
+                    type="hidden"
+                    name="shipping_address.country_code"
+                    value="in"
+                  />
+                </div>
+              </>
+            )}
           </div>
           
           {/* Display validation error summary */}
