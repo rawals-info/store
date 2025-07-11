@@ -52,21 +52,22 @@ const Addresses = ({
   const validateForm = (formData: FormData) => {
     const errors: Record<string, string> = {}
     
-    // Required fields
-    const requiredFields = [
-      "shipping_address.first_name", 
-      "shipping_address.last_name",
-      "shipping_address.address_1", 
-      "shipping_address.city",
-      "shipping_address.country_code",
-      "shipping_address.postal_code",
-      "email"
-    ]
+    // Required fields and their friendly labels
+    const requiredFields: Record<string,string> = {
+      "shipping_address.first_name": "First name",
+      "shipping_address.last_name": "Last name",
+      "shipping_address.address_1": "Address",
+      "shipping_address.city": "City",
+      "shipping_address.country_code": "Country",
+      "shipping_address.postal_code": "Postal code",
+      "email": "Email",
+      "shipping_address.phone": "Phone number",
+    }
     
     // Check required fields
-    requiredFields.forEach(field => {
+    Object.entries(requiredFields).forEach(([field, label]) => {
       if (!formData.get(field)) {
-        errors[field] = "This field is required"
+        errors[field] = `${label} is required`
       }
     })
     
@@ -139,6 +140,15 @@ const Addresses = ({
   const [searchAddress, setSearchAddress] = useState(
     shipping_address?.address_1 || ""
   )
+
+  // Controlled values for autofilled fields
+  const [autoFields, setAutoFields] = useState({
+    address_1: shipping_address?.address_1 || "",
+    city: shipping_address?.city || "",
+    postal_code: shipping_address?.postal_code || "",
+    province: shipping_address?.province || "",
+    phone: shipping_address?.phone || "",
+  })
 
   return (
     <div>
@@ -214,35 +224,29 @@ const Addresses = ({
                 setSearchAddress(e.target.value)
               }}
               onSelect={(details: any) => {
-                const form = document.querySelector<HTMLFormElement>("form")
-                if (!form) return
-                const setField = (name: string, value: string) => {
-                  const input = form.querySelector<HTMLInputElement>(`[name='${name}']`)
-                  if (input) {
-                    input.value = value
-                    // Manually dispatch change event to ensure React tracks value changes
-                    input.dispatchEvent(new Event("input", { bubbles: true }))
-                  }
-                }
-
                 setSearchAddress(details.address_1)
 
-                setField("shipping_address.address_1", details.address_1)
-                setField("shipping_address.city", details.city)
-                setField("shipping_address.postal_code", details.postal_code)
-                setField("shipping_address.province", details.province)
-                setField("shipping_address.country_code", details.country_code)
+                setAutoFields((prev) => ({
+                  ...prev,
+                  address_1: details.address_1 || "",
+                  city: details.city || "",
+                  postal_code: details.postal_code || "",
+                  province: details.province || "",
+                }))
               }}
             />
             <Input
               label="Address"
               name="shipping_address.address_1"
               autoComplete="address-line1"
-              defaultValue={shipping_address?.address_1 || ""}
+              value={autoFields.address_1}
               required
               className="luxury-input"
               errors={formErrors}
-              onChange={handleFieldChange}
+              onChange={(e)=>{
+                handleFieldChange(e);
+                setAutoFields({ ...autoFields, address_1: e.target.value })
+              }}
             />
             <Input
               label="Apartment, suite, etc. (optional)"
@@ -258,21 +262,27 @@ const Addresses = ({
                 label="City"
                 name="shipping_address.city"
                 autoComplete="address-level2"
-                defaultValue={shipping_address?.city || ""}
+                value={autoFields.city}
                 required
                 className="luxury-input"
                 errors={formErrors}
-                onChange={handleFieldChange}
+                onChange={(e)=>{
+                  handleFieldChange(e);
+                  setAutoFields({ ...autoFields, city: e.target.value })
+                }}
               />
               <Input
                 label="Postal code"
                 name="shipping_address.postal_code"
                 autoComplete="postal-code"
-                defaultValue={shipping_address?.postal_code || ""}
+                value={autoFields.postal_code}
                 required
                 className="luxury-input"
                 errors={formErrors}
-                onChange={handleFieldChange}
+                onChange={(e)=>{
+                  handleFieldChange(e);
+                  setAutoFields({ ...autoFields, postal_code: e.target.value })
+                }}
               />
             </div>
             <div className="grid grid-cols-2 gap-x-2">
@@ -280,10 +290,13 @@ const Addresses = ({
                 label="State / Province"
                 name="shipping_address.province"
                 autoComplete="address-level1"
-                defaultValue={shipping_address?.province || ""}
+                value={autoFields.province}
                 className="luxury-input"
                 errors={formErrors}
-                onChange={handleFieldChange}
+                onChange={(e)=>{
+                  handleFieldChange(e);
+                  setAutoFields({ ...autoFields, province: e.target.value })
+                }}
               />
               {/* Country is always India. Show disabled input and hidden field with ISO code */}
               <Input
@@ -296,13 +309,17 @@ const Addresses = ({
               <input type="hidden" name="shipping_address.country_code" value="in" />
             </div>
             <Input
-              label="Phone (optional)"
+              label="Phone"
               name="shipping_address.phone"
               autoComplete="tel"
-              defaultValue={shipping_address?.phone || ""}
+              value={autoFields.phone ?? ""}
+              required
               className="luxury-input"
               errors={formErrors}
-              onChange={handleFieldChange}
+              onChange={(e)=>{
+                handleFieldChange(e);
+                setAutoFields({ ...autoFields, phone: e.target.value })
+              }}
             />
           </div>
           

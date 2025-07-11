@@ -125,15 +125,40 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         address_1 = `${address_1}, ${sublocality}`
       }
 
-      const details: PlaceDetails = {
-        address_1,
-        city,
-        province,
-        postal_code,
-        country_code: country ? country.toLowerCase() : "",
+      const emitDetails = (d: Partial<PlaceDetails>) => {
+        const merged = {
+          address_1,
+          city,
+          province,
+          postal_code,
+          country_code: country ? country.toLowerCase() : "",
+          ...d,
+        } as PlaceDetails
+        onSelect(merged)
       }
 
-      onSelect(details)
+      // Initial emit with what we have
+      emitDetails({})
+
+      // If postal code missing, run an extra reverse-geocode to try and fetch it
+      if (!postal_code && window.google?.maps?.Geocoder) {
+        const geocoder = new window.google.maps.Geocoder()
+        geocoder.geocode({ placeId: place.place_id }, (results: any, status: any) => {
+          if (status === "OK" && results && results[0]) {
+            const comps = results[0].address_components as Array<any>
+            const pcComp = comps.find((c: any) => c.types.includes("postal_code"))
+            const stateComp = comps.find((c: any) => c.types.includes("administrative_area_level_1"))
+            const cityComp = comps.find((c: any) =>
+              ["locality", "administrative_area_level_2", "administrative_area_level_3"].some((t) => c.types.includes(t))
+            )
+            emitDetails({
+              postal_code: pcComp ? pcComp.long_name : postal_code,
+              province: stateComp ? stateComp.long_name : province,
+              city: cityComp ? cityComp.long_name : city,
+            })
+          }
+        })
+      }
     })
 
     return () => {

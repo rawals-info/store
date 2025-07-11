@@ -24,7 +24,7 @@ const ProductPreview = ({
     tag.value?.toLowerCase().includes("edition")
   )
   
-  const isHandcrafted = true // All our products are handcrafted
+  const isHandcrafted = false // All our products are handcrafted
 
   return (
     <LocalizedClientLink
