@@ -162,7 +162,8 @@ const CartDropdown = () => {
         >
           <PopoverPanel
             static
-            className="absolute top-[calc(100%+1px)] right-0 bg-white border border-luxury-gold/40 shadow-lg w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
+            className="cart-ivory-panel absolute top-[calc(100%+1px)] right-0 border border-luxury-gold/40 shadow-lg w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
+            style={{ backgroundColor: "#FFFAF2" }}
             data-testid="nav-cart-dropdown"
           >
             {/* Gold line at top */}
@@ -245,7 +246,7 @@ const CartDropdown = () => {
                       </div>
                     ))}
                 </div>
-                <div className="p-6 flex flex-col gap-y-4 text-small-regular border-t border-luxury-gold/30 bg-white">
+                <div className="cart-ivory-panel p-6 flex flex-col gap-y-4 text-small-regular border-t border-luxury-gold/30" style={{ backgroundColor: "#FFFAF2" }}>
                   <div className="flex items-center justify-between">
                     <span className="text-luxury-charcoal font-serif font-medium text-base">
                       Subtotal{" "}

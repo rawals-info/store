@@ -652,3 +652,18 @@ button.luxury-btn:hover {
 .pac-item .pac-icon {
   @apply hidden;
 }
+
+/* Ensure cart dropdown and cart panels stay ivory regardless of theme */
+[data-testid="nav-cart-dropdown"],
+.cart-ivory-panel {
+  background-color: #FFFAF2 !important;
+}
+[data-testid="nav-cart-dropdown"] span,
+[data-testid="nav-cart-dropdown"] h3,
+[data-testid="nav-cart-dropdown"] p,
+[data-testid="nav-cart-dropdown"] div {
+  color: #36454F !important;
+}
+[data-testid="nav-cart-dropdown"] {
+  color: #36454F !important;
+}
