@@ -638,3 +638,17 @@ button.luxury-btn:hover {
     opacity: 1;
   }
 }
+
+/* Custom styling for Google Places autocomplete dropdown */
+.pac-container {
+  @apply border border-luxury-gold shadow-md rounded-md z-[10000] bg-white text-sm !important;
+}
+.pac-item {
+  @apply px-4 py-2 text-luxury-charcoal cursor-pointer hover:bg-luxury-lightgold !important;
+}
+.pac-item-selected {
+  @apply bg-luxury-lightgold !important;
+}
+.pac-item .pac-icon {
+  @apply hidden;
+}

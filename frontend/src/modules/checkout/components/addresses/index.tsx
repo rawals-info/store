@@ -15,6 +15,7 @@ import { SubmitButton } from "../submit-button"
 import { Fragment, useEffect, useMemo, useState } from "react"
 import { useFormState } from "react-dom"
 import Input from "@modules/common/components/input"
+import AddressAutocomplete from "@modules/common/components/address-autocomplete"
 import { Label } from "@medusajs/ui"
 
 const Addresses = ({
@@ -28,7 +29,7 @@ const Addresses = ({
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams.get("step") === "address"
+  const isOpen = searchParams?.get("step") === "address"
 
   const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
     cart?.shipping_address && cart?.billing_address
@@ -134,6 +135,11 @@ const Addresses = ({
     return null
   }, [cart, customer])
 
+  // Local state for search address input
+  const [searchAddress, setSearchAddress] = useState(
+    shipping_address?.address_1 || ""
+  )
+
   return (
     <div>
       <div className="flex flex-row items-center justify-between mb-8">
@@ -198,6 +204,36 @@ const Addresses = ({
               errors={formErrors}
               onChange={handleFieldChange}
             />
+
+            {/* Search for address autocomplete */}
+            <AddressAutocomplete
+              label="Search for address"
+              name="search_address"
+              value={searchAddress}
+              onChange={(e) => {
+                setSearchAddress(e.target.value)
+              }}
+              onSelect={(details: any) => {
+                const form = document.querySelector<HTMLFormElement>("form")
+                if (!form) return
+                const setField = (name: string, value: string) => {
+                  const input = form.querySelector<HTMLInputElement>(`[name='${name}']`)
+                  if (input) {
+                    input.value = value
+                    // Manually dispatch change event to ensure React tracks value changes
+                    input.dispatchEvent(new Event("input", { bubbles: true }))
+                  }
+                }
+
+                setSearchAddress(details.address_1)
+
+                setField("shipping_address.address_1", details.address_1)
+                setField("shipping_address.city", details.city)
+                setField("shipping_address.postal_code", details.postal_code)
+                setField("shipping_address.province", details.province)
+                setField("shipping_address.country_code", details.country_code)
+              }}
+            />
             <Input
               label="Address"
               name="shipping_address.address_1"
@@ -249,16 +285,15 @@ const Addresses = ({
                 errors={formErrors}
                 onChange={handleFieldChange}
               />
+              {/* Country is always India. Show disabled input and hidden field with ISO code */}
               <Input
                 label="Country"
-                name="shipping_address.country_code"
-                autoComplete="country"
-                defaultValue={shipping_address?.country_code || (cart?.region?.countries && cart.region.countries[0]?.iso_2) || ""}
-                required
-                className="luxury-input"
-                errors={formErrors}
-                onChange={handleFieldChange}
+                name="country_display"
+                value="India"
+                disabled
+                className="luxury-input text-gray-500 bg-gray-50 cursor-not-allowed"
               />
+              <input type="hidden" name="shipping_address.country_code" value="in" />
             </div>
             <Input
               label="Phone (optional)"

@@ -1,0 +1,159 @@
+import React, { useEffect, useRef, useState } from "react"
+import Input from "@modules/common/components/input"
+
+// Extend the Window interface so TS knows about the injected Google script
+declare global {
+  interface Window {
+    google: any // eslint-disable-line @typescript-eslint/no-explicit-any
+  }
+}
+
+interface PlaceDetails {
+  address_1: string
+  city: string
+  province: string
+  postal_code: string
+  country_code: string
+}
+
+interface AddressAutocompleteProps {
+  label?: string
+  value: string
+  name?: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onSelect: (details: PlaceDetails) => void
+}
+
+/**
+ * AddressAutocomplete
+ * --------------------
+ * A thin wrapper around the Google Places `Autocomplete` widget that renders
+ * our existing `Input` component but, once a suggestion is chosen, parses the
+ * returned `place.address_components` object and emits the structured parts
+ * needed by the checkout form (address line, city, province, pin code, etc.).
+ *
+ * NOTE: This component only restricts suggestions to India (ISO-2: "in").
+ *
+ * The Google Maps script is loaded dynamically the first time the component
+ * mounts so there is no need to add the `<script>` tag globally.
+ */
+const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
+  label = "Address",
+  value,
+  name,
+  onChange,
+  onSelect,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [scriptLoaded, setScriptLoaded] = useState<boolean>(false)
+
+  // Dynamically inject the Google Maps JS script (if not already present)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    if (window.google && window.google.maps && window.google.maps.places) {
+      setScriptLoaded(true)
+      return
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[src^="https://maps.googleapis.com/maps/api/js"]'
+    )
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => setScriptLoaded(true))
+      return
+    }
+
+    const script = document.createElement("script")
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
+    script.async = true
+    script.defer = true
+    script.addEventListener("load", () => setScriptLoaded(true))
+    document.body.appendChild(script)
+  }, [])
+
+  // Initialise the Autocomplete widget once the script is ready
+  useEffect(() => {
+    if (!scriptLoaded || !inputRef.current) return
+
+    const autocomplete = new window.google.maps.places.Autocomplete(
+      inputRef.current,
+      {
+        fields: ["address_components", "formatted_address"],
+        types: ["address"],
+        componentRestrictions: { country: "in" },
+      }
+    )
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace()
+      if (!place.address_components) return
+
+      const components = place.address_components as Array<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      const get = (types: string[]): string => {
+        const comp = components.find((c: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
+          types.some((t) => c.types.includes(t))
+        )
+        return comp ? comp.long_name : ""
+      }
+
+      const postal_code = get(["postal_code"])
+      const city =
+        get(["locality"]) ||
+        get(["sublocality", "sublocality_level_1"]) ||
+        get(["administrative_area_level_2"])
+      const province = get(["administrative_area_level_1"])
+      const country = get(["country"])
+      const street_number = get(["street_number"])
+      const route = get(["route"])
+      const sublocality = get([
+        "sublocality_level_3",
+        "sublocality_level_2",
+        "sublocality_level_1",
+      ])
+
+      let address_1 = ""
+      if (street_number || route) {
+        address_1 = `${street_number} ${route}`.trim()
+      } else {
+        address_1 = place.formatted_address || ""
+      }
+
+      if (sublocality) {
+        address_1 = `${address_1}, ${sublocality}`
+      }
+
+      const details: PlaceDetails = {
+        address_1,
+        city,
+        province,
+        postal_code,
+        country_code: country ? country.toLowerCase() : "",
+      }
+
+      onSelect(details)
+    })
+
+    return () => {
+      // Cleanup listeners when component unmounts
+      autocomplete.unbindAll()
+    }
+  }, [scriptLoaded, onSelect])
+
+  return (
+    <Input
+      label={label}
+      name={name ?? ""}
+      autoComplete="address-line1"
+      value={value}
+      onChange={onChange}
+      ref={inputRef}
+      required
+      data-testid="address-autocomplete-input"
+    />
+  )
+}
+
+export default AddressAutocomplete 

@@ -2,6 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Container } from "@medusajs/ui"
 import Checkbox from "@modules/common/components/checkbox"
 import Input from "@modules/common/components/input"
+import AddressAutocomplete from "@modules/common/components/address-autocomplete"
 import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
@@ -129,6 +130,31 @@ const ShippingAddress = ({
           required
           data-testid="shipping-last-name-input"
         />
+        {/* Search bar for address suggestions */}
+        <div className="col-span-2">
+          <AddressAutocomplete
+            label="Search for address"
+            value={formData["shipping_address.address_1"]}
+            onChange={(e) => {
+              // keep internal value but don't mark as address yet
+              setFormData({
+                ...formData,
+                "shipping_address.address_1": e.target.value,
+              })
+            }}
+            onSelect={(details: any) => {
+              setFormData((prev) => ({
+                ...prev,
+                "shipping_address.address_1": details.address_1,
+                "shipping_address.city": details.city,
+                "shipping_address.postal_code": details.postal_code,
+                "shipping_address.province": details.province,
+                "shipping_address.country_code": details.country_code,
+              }))
+            }}
+          />
+        </div>
+        {/* Manual address field (optional) */}
         <Input
           label="Address"
           name="shipping_address.address_1"
