@@ -1,5 +1,5 @@
 // my-medusa-store/medusa-config.ts
-import { loadEnv, defineConfig } from "@medusajs/framework/utils"
+import { loadEnv, defineConfig, Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
@@ -55,6 +55,7 @@ export default defineConfig({
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
   // Redis-backed Event Bus & Cache
+  plugins: [ "medusa-plugin-razorpay-v2"],
   modules: {
     "event_bus": {
       resolve: "@medusajs/event-bus-redis",
@@ -94,6 +95,38 @@ export default defineConfig({
         },
       },
     },
+    // Payment module with Razorpay provider (using medusa-plugin-razorpay-v2)
+    
+    payment: {
+      resolve: "@medusajs/medusa/payment",
+      dependencies: [Modules.PAYMENT, ContainerRegistrationKeys.LOGGER],
+      options: {
+        providers: [
+          {
+            resolve:
+              "medusa-plugin-razorpay-v2/providers/payment-razorpay/src",
+            id: "razorpay",
+            options: {
+              key_id:
+                process?.env?.RAZORPAY_TEST_KEY_ID ??
+                process?.env?.RAZORPAY_ID,
+              key_secret:
+                process?.env?.RAZORPAY_TEST_KEY_SECRET ??
+                process?.env?.RAZORPAY_SECRET,
+              razorpay_account:
+                process?.env?.RAZORPAY_TEST_ACCOUNT ??
+                process?.env?.RAZORPAY_ACCOUNT,
+              automatic_expiry_period: 30, // minutes (12 min – 30 days)
+              manual_expiry_period: 20,
+              refund_speed: "normal",
+              webhook_secret:
+                process?.env?.RAZORPAY_TEST_WEBHOOK_SECRET ??
+                process?.env?.RAZORPAY_WEBHOOK_SECRET,
+            },
+          },
+        ],
+      },
+    },
     // Register Slack notification provider
     notification: {
       resolve: "@medusajs/notification",
@@ -117,17 +150,6 @@ export default defineConfig({
     },
   },
 
-  // Plugins (e.g. PayPal)
-  plugins: [
-    {
-      resolve: "medusa-payment-paypal",
-      options: {
-        sandbox: process.env.PAYPAL_SANDBOX === "true",
-        client_id: process.env.PAYPAL_CLIENT_ID,
-        client_secret: process.env.PAYPAL_CLIENT_SECRET,
-        auth_webhook_id: process.env.PAYPAL_AUTH_WEBHOOK_ID,
-      },
-    },
-    // …any other plugins
-  ],
+  // Plugins
+  
 })

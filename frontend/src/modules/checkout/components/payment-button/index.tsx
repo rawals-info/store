@@ -1,6 +1,6 @@
 "use client"
 
-import { isManual, isStripe, isPaypal } from "@lib/constants"
+import { isManual, isStripe, isPaypal, isRazorpay } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { useCart } from "@lib/hooks/use-cart"
 import { HttpTypes } from "@medusajs/types"
@@ -8,6 +8,7 @@ import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import React, { useState, useEffect } from "react"
 import ErrorMessage from "../error-message"
+import { RazorpayPaymentButton } from "./razorpay-payment-button"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -87,6 +88,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           notReady={notReady}
           data-testid={dataTestId}
           className={className}
+        />
+      )
+    case isRazorpay(paymentSession?.provider_id):
+      return (
+        <RazorpayPaymentButton
+          session={paymentSession as any}
+          notReady={notReady}
+          cart={cart}
         />
       )
     default: {
