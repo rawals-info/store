@@ -43,6 +43,11 @@ type SearchBarProps = {
   onSearchChange?: (value: string) => void
   autoSearch?: boolean
   autoFocus?: boolean
+  /**
+   * Set to true to render the search bar with charcoal-colored text and placeholder
+   * (useful when placing the component on light backgrounds like the mobile menu).
+   */
+  useCharcoal?: boolean
 }
 
 const SearchBar = ({
@@ -52,6 +57,7 @@ const SearchBar = ({
   onSearchChange,
   autoSearch = false,
   autoFocus = false,
+  useCharcoal = false,
 }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFocused, setIsFocused] = useState(false)
@@ -129,8 +135,13 @@ const SearchBar = ({
 
   // Determine text color based on scroll and page
   const getTextColor = () => {
-    // Header is now dark across the site; use white text for clarity.
-    return isHomePage && !isScrolled ? "text-white placeholder:text-white/70" : "text-white placeholder:text-white/60"
+    if (useCharcoal) {
+      return "!text-luxury-charcoal placeholder:!text-luxury-charcoal/60"
+    }
+    // Default white text when on dark header backgrounds
+    return isHomePage && !isScrolled
+      ? "text-white placeholder:text-white/70"
+      : "text-white placeholder:text-white/60"
   }
 
   return (

@@ -375,7 +375,7 @@ const AnimatedHeader = () => {
                 </svg>
               </button>
             </div>
-            <SearchBar autoSearch={true} autoFocus={true} />
+            <SearchBar autoSearch={true} autoFocus={true} useCharcoal={true} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -400,10 +400,10 @@ const AnimatedHeader = () => {
             >
               <div className="flex flex-col h-full w-full">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20 w-full">
-                  <h2 className="font-serif text-xl text-white">Menu</h2>
+                  <h2 className="font-serif text-xl !text-luxury-charcoal">Menu</h2>
                   <button
                     onClick={closeMobileMenu}
-                    className="p-2 text-white hover:text-luxury-gold transition-colors"
+                    className="p-2 !text-luxury-charcoal hover:text-luxury-gold transition-colors"
                     aria-label="Close menu"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -424,7 +424,7 @@ const AnimatedHeader = () => {
                       >
                         <LocalizedClientLink
                           href={link.href}
-                          className="text-lg font-medium text-white hover:text-luxury-gold transition-colors duration-300"
+                          className="text-lg font-medium !text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
                           onClick={closeMobileMenu}
                         >
                           {link.label}
@@ -443,7 +443,7 @@ const AnimatedHeader = () => {
                       >
                         <LocalizedClientLink
                           href={link.href}
-                          className="text-lg font-medium text-white hover:text-luxury-gold transition-colors duration-300"
+                          className="text-lg font-medium !text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
                           onClick={closeMobileMenu}
                         >
                           {link.label}
@@ -461,7 +461,7 @@ const AnimatedHeader = () => {
                       variants={menuVariants}
                       className="w-full"
                     >
-                      <SearchBar autoSearch={true} />
+                      <SearchBar autoSearch={true} useCharcoal={true} />
                     </motion.div>
                     
                     {/* Currency switcher removed */}
