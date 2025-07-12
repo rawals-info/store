@@ -213,14 +213,25 @@ const AnimatedHeader = () => {
                 </button>
               </div>
 
-              {/* Brand / Logo */}
-              <LocalizedClientLink href="/" className="hidden small:flex items-center gap-2 mr-10 group">
-                {/* Simple Taj Mahal outline icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-luxury-gold group-hover:scale-105 transition-transform">
+              {/* Brand / Logo (shown on all sizes) */}
+              <LocalizedClientLink href="/" className="flex items-center gap-2 ml-2 small:ml-0 small:mr-10 group">
+                {/* Simple Taj Mahal outline icon – hide on smaller screens to save space */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="hidden small:block w-6 h-6 text-luxury-gold group-hover:scale-105 transition-transform"
+                >
                   <path d="M12 2l2 2h4v4l2 2v10H4V10l2-2V4h4l2-2z" />
                   <path d="M9 22V12h6v10" />
                 </svg>
-                <span className="font-serif text-lg tracking-wide uppercase text-luxury-gold group-hover:text-white transition-colors">TAJ PETHA</span>
+                <span className="font-serif text-xl small:text-2xl tracking-wide uppercase text-luxury-gold group-hover:text-white transition-colors whitespace-nowrap">
+                  TAJ PETHA
+                </span>
               </LocalizedClientLink>
               
               {/* Navigation links - desktop */}
