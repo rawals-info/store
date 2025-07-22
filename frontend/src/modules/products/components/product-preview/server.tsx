@@ -24,8 +24,6 @@ export default function ProductPreview({
       tag.value?.toLowerCase().includes("edition")
   )
 
-  const isHandcrafted = true // All our products are handcrafted
-
   const productHandle = product.handle || `product-${product.id}`
   const countryCode = region?.countries?.[0]?.iso_2 || "us"
 
@@ -68,28 +66,6 @@ export default function ProductPreview({
           </div>
 
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-            {isHandcrafted && (
-              <div className="badge-container">
-                <span className="bg-luxury-ivory/95 border border-luxury-gold/60 px-2 py-1 text-luxury-charcoal text-[9px] uppercase tracking-wider font-medium flex items-center">
-                  <svg
-                    className="w-2.5 h-2.5 mr-1 text-luxury-gold"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
-                    ></path>
-                  </svg>
-                  Handcrafted
-                </span>
-              </div>
-            )}
-
             {isLimitedEdition && (
               <div className="badge-container">
                 <span className="bg-luxury-gold/90 px-2 py-1 text-luxury-ivory text-[9px] uppercase tracking-wider font-medium flex items-center">

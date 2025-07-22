@@ -136,7 +136,6 @@ const Footer = () => {
                 { href: "/care", label: "Product Care Guide" },
                 { href: "/privacy", label: "Privacy Policy" },
                 { href: "/terms", label: "Terms & Conditions" },
-                { href: "/csr-policy", label: "CSR Policy" }
               ].map((link) => (
                 <motion.li key={link.href} whileHover={{ x: 3 }} transition={{ duration: 0.2 }}>
                   <LocalizedClientLink 

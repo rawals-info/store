@@ -77,7 +77,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
               <svg className="w-3 h-3 mr-1.5 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"></path>
               </svg>
-              Handcrafted
+              Freshly Made
             </span>
           </div>
         </div>
@@ -117,7 +117,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         {/* Craftsmanship note */}
         <div className="bg-luxury-cream/50 border border-luxury-gold/20 p-4 mt-2">
           <p className="text-xs text-luxury-charcoal/70 italic">
-            Each piece is meticulously handcrafted by our master artisans, making every item uniquely yours. Slight variations may occur, reflecting the authentic nature of handmade marble craftsmanship.
+          Our Petha is handmade in small batches—each piece may vary slightly in size, shape, or hue, a true sign of its heritage.
           </p>
         </div>
       </div>

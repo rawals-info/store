@@ -58,34 +58,8 @@ const AnimatedHeader = () => {
     { href: "/contact", label: "Contact", testId: "nav-contact-link" },
   ]
   
-  // Dynamically import Tina client only in browser so build doesn't fail
-  let tinaClientPromise: Promise<any> | null = null
-  const getTinaClient = async () => {
-    if (!tinaClientPromise) {
-      tinaClientPromise = import("../../../../../tina/__generated__/client").then(m => m.default || m)
-    }
-    return tinaClientPromise
-  }
-  
-  const [navLinks, setNavLinks] = useState(() => defaultNavLinks)
-  const [rightLinks, setRightLinks] = useState(() => defaultRightLinks)
-
-  useEffect(() => {
-    const fetchHeader = async () => {
-      try {
-        const client = await getTinaClient()
-        const res = await client.queries.site({ relativePath: "header.json" })
-        const header = res?.data?.site?.header
-        if (header) {
-          if (header.links?.length) setNavLinks(header.links as any)
-          if (header.rightLinks?.length) setRightLinks(header.rightLinks as any)
-        }
-      } catch (e) {
-        // silent – keeps defaults
-      }
-    }
-    if (typeof window !== "undefined") fetchHeader()
-  }, [])
+  const [navLinks] = useState(() => defaultNavLinks)
+  const [rightLinks] = useState(() => defaultRightLinks)
 
   // Animation variants for links with refined motion
   const linkVariants = {

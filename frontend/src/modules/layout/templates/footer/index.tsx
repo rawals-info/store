@@ -18,14 +18,6 @@ import {
   faPaypal,
 } from "@fortawesome/free-brands-svg-icons"
 
-let tinaClientPromise: Promise<any> | null = null
-const getTinaClient = async () => {
-  if (!tinaClientPromise) {
-    tinaClientPromise = import("../../../../../tina/__generated__/client").then(m => m.default || m)
-  }
-  return tinaClientPromise
-}
-
 export default function Footer() {
   const [collections, setCollections] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
@@ -56,24 +48,6 @@ export default function Footer() {
     }
     
     fetchData()
-  }, [])
-  
-  useEffect(() => {
-    const fetchFooter = async () => {
-      try {
-        const client = await getTinaClient()
-        const res = await client.queries.site({ relativePath: "footer.json" })
-        const footer = res?.data?.site?.footer
-        if (footer) {
-          if (footer.company) setCompanyName(footer.company)
-          if (footer.description) setCompanyDescription(footer.description)
-          if (footer.social?.length) setSocialLinks(footer.social as any)
-        }
-      } catch (e) {
-        // keep defaults
-      }
-    }
-    if (typeof window !== "undefined") fetchFooter()
   }, [])
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -241,11 +215,6 @@ export default function Footer() {
                 <li>
                   <LocalizedClientLink href="/contact" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Contact
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/csr-policy" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    CSR Policy
                   </LocalizedClientLink>
                 </li>
               </ul>

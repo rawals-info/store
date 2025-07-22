@@ -55,12 +55,6 @@ const AnimatedProductCard = ({ product, region }: AnimatedProductCardProps) => {
             transition={{ duration: 0.3 }}
           />
           
-          {/* Luxury badge */}
-          {product.tags?.some(tag => tag.value === "handcrafted") && (
-            <div className="absolute top-2 right-2 bg-amber-100 text-amber-900 text-xs px-2 py-1 rounded-sm font-medium">
-              Handcrafted
-            </div>
-          )}
           
           {/* Limited edition badge */}
           {product.tags?.some(tag => tag.value === "limited") && (

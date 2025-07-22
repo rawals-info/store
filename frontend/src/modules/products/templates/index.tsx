@@ -5,7 +5,6 @@ import ProductInfo from "@modules/products/templates/product-info"
 import dynamic from "next/dynamic"
 import ProductActions from "@modules/products/components/product-actions"
 import RelatedProducts from "@modules/products/components/related-products"
-import ProductTabsWrapper from "@modules/products/components/product-tabs-wrapper"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import ProductReviews from "../components/product-reviews"
 
@@ -35,10 +34,6 @@ export default function ProductTemplate({
 
   return (
     <>
-      <div className="bg-luxury-cream/20 py-3 text-center text-sm text-luxury-charcoal/70">
-        <p className="small:mt-0 mt-20">Each marble piece is uniquely handcrafted by our master artisans</p>
-      </div>
-      
       <div
         className="content-container py-12 px-4"
         data-testid="product-container"
@@ -72,20 +67,10 @@ export default function ProductTemplate({
             )}
           </div>
         </div>
-        
-        <div className="mt-16 max-w-4xl mx-auto">
-          <div className="border-b border-luxury-gold/20 mb-8">
-            <h2 className="font-display text-2xl text-luxury-charcoal">Product Details</h2>
-          </div>
-          <Suspense fallback={<div className="h-[200px] flex items-center justify-center">
-            <p className="text-luxury-charcoal/50">Loading product details...</p>
-          </div>}>
-            <ProductTabsWrapper product={product} />
-          </Suspense>
-        </div>
       </div>
+
       <div className="content-container my-16 small:my-32">
-      <ProductReviews productId={product.id} />
+        <ProductReviews productId={product.id} />
       </div>
       
       <div className="bg-luxury-cream/10 py-16">
@@ -103,16 +88,6 @@ export default function ProductTemplate({
         </div>
       </div>
       
-      {/* Craftsmanship commitment section - lightweight */}
-      <div className="content-container my-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <h3 className="font-display text-xl text-luxury-charcoal mb-4">Our Craftsmanship Commitment</h3>
-          <p className="text-luxury-charcoal/80 mb-6">
-            Each marble piece in our collection represents hours of dedicated craftsmanship. Our artisans, with decades of expertise, 
-            transform raw marble into exquisite works of art that bring elegance and timeless beauty to your space.
-          </p>
-        </div>
-      </div>
     </>
   )
 }
