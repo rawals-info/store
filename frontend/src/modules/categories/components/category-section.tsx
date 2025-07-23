@@ -16,7 +16,7 @@ const CategorySection = ({ category, className }: CategorySectionProps) => {
         className
       )}
     >
-      {category.metadata?.image && (
+      {category.metadata?.image ? (
         <Image
           src={category.metadata.image as string}
           alt={category.name}
@@ -24,7 +24,7 @@ const CategorySection = ({ category, className }: CategorySectionProps) => {
           objectFit="cover"
           className="absolute inset-0 z-0"
         />
-      )}
+      ) : null}
       <div className="absolute inset-0 bg-black opacity-40 z-10" />
       <div className="relative z-20 text-center">
         <h2 className="text-3xl font-bold">{category.name}</h2>

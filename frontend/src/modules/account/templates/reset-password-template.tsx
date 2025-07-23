@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 
 export default function ResetPasswordTemplate() {
   const search = useSearchParams()
-  const token = search.get("token")
+  const token = search?.get("token") ?? null
   const router = useRouter()
 
   const [pw1, setPw1] = useState("")

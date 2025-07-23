@@ -41,7 +41,7 @@ const CollectionPreview = ({ collection }: CollectionPreviewProps) => {
           <h3 className="font-display text-2xl text-luxury-ivory mb-3">{collection.title}</h3>
           <div className="h-px w-16 bg-luxury-gold mb-4 transform scale-0 group-hover:scale-100 transition-transform duration-300"></div>
           <p className="text-luxury-ivory/90 text-serif-italic opacity-0 group-hover:opacity-100 transition-opacity duration-500 max-w-xs">
-            {collection.metadata?.description || "Discover our exclusive collection of handcrafted marble pieces."}
+            {collection.metadata?.description as string || "Discover our exclusive collection of handcrafted marble pieces."}
           </p>
         </div>
       </div>

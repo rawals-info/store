@@ -27,8 +27,10 @@ const RegionSelector: React.FC<RegionSelectorProps> = ({
   const [regions, setRegions] = useState<StoreRegion[]>(initialRegions || [])
   
   const [isOpen, setIsOpen] = useState(false)
-  const { countryCode } = useParams()
-  const fullPath = usePathname()
+  const params = useParams() as Record<string, string | string[] | undefined>
+  const countryCode = (params?.countryCode as string | undefined) || ''
+
+  const fullPath = usePathname() || ''
   const currentPath = fullPath.replace(new RegExp(`^/${countryCode}`), '')
   
   // Force refresh regions data from backend

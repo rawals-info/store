@@ -27,7 +27,7 @@ const LocalizedClientLink = ({
   replace = false,
   ...props
 }: LocalizedClientLinkProps) => {
-  const { countryCode } = useParams()
+  const { countryCode } = useParams() as { countryCode?: string }
   
   // Use provided country or fallback to the current country from params
   const code = country || (countryCode as string)

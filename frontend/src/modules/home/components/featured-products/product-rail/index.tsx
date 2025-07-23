@@ -17,10 +17,11 @@ export default async function ProductRail({
     response: { products: pricedProducts },
   } = await listProducts({
     regionId: region.id,
+    // Cast to any to allow collection_id field not present in official typings
     queryParams: {
       collection_id: collection.id,
       fields: "*variants.calculated_price",
-    },
+    } as any,
   })
 
   if (!pricedProducts) {
@@ -40,7 +41,7 @@ export default async function ProductRail({
           </h2>
           <div className="h-px w-24 bg-luxury-gold mx-auto"></div>
           <p className="text-serif-regular text-luxury-charcoal/80 mt-6 max-w-lg mx-auto">
-            {collection.metadata?.description || 
+            {collection.metadata?.description as string || 
              "Discover our handcrafted luxury marble pieces, each one a masterpiece of precision and artistry"}
           </p>
         </div>
@@ -49,7 +50,7 @@ export default async function ProductRail({
           {pricedProducts &&
             pricedProducts.map((product) => (
               <li key={product.id} className="transform transition-transform duration-500 hover:-translate-y-1">
-                <ProductPreview product={product} region={region} isFeatured />
+                <ProductPreview product={product} region={region} />
               </li>
             ))}
         </ul>

@@ -7,7 +7,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { luxuryHover } from "@lib/util/animations"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { formatAmount } from "@lib/util/prices"
+import { formatAmount } from "@lib/util/get-currency-price"
 
 interface AnimatedProductCardProps {
   product: HttpTypes.StoreProduct
@@ -19,8 +19,8 @@ const AnimatedProductCard = ({ product, region }: AnimatedProductCardProps) => {
   
   const { currency_code } = region
   
-  const price = product.variants[0]?.prices?.find(
-    (p) => p.currency_code === currency_code
+  const price = (product.variants?.[0] as any)?.prices?.find(
+    (p: any) => p.currency_code === currency_code
   )
   
   return (

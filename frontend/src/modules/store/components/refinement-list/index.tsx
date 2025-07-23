@@ -28,11 +28,11 @@ type RefinementListProps = {
     value: string
     products_count?: number
   }[]
-  minPrice: number
-  maxPrice: number
-  currencyCode: string
+  minPrice?: number
+  maxPrice?: number
+  currencyCode?: string
   productCount?: number
-  region: HttpTypes.StoreRegion
+  region?: HttpTypes.StoreRegion
 }
 
 const RefinementList = ({ 
@@ -48,7 +48,14 @@ const RefinementList = ({
 }: RefinementListProps) => {
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
+  // `useSearchParams` can potentially return null depending on the Next.js version typings.
+  // We assert non-null here as the hook always returns a value at runtime in the supported versions.
+  const searchParams = useSearchParams()!
+
+  // Provide safe defaults for optional pricing/currency props to satisfy strict TypeScript checks
+  const safeMinPrice = minPrice ?? 0
+  const safeMaxPrice = maxPrice ?? 0
+  const safeCurrencyCode = currencyCode ?? "USD"
   
   // Mobile filter toggle
   const [showMobileFilters, setShowMobileFilters] = useState(false)
@@ -106,10 +113,10 @@ const RefinementList = ({
     const minParam = searchParams.get("price_min")
     const maxParam = searchParams.get("price_max")
     return [
-      minParam ? parseInt(minParam) : minPrice,
-      maxParam ? parseInt(maxParam) : maxPrice
+      minParam ? parseInt(minParam) : safeMinPrice,
+      maxParam ? parseInt(maxParam) : safeMaxPrice,
     ] as [number, number]
-  }, [searchParams, minPrice, maxPrice])
+  }, [searchParams, safeMinPrice, safeMaxPrice])
   
   // Store current price range in component state 
   const [currentPriceRange, setCurrentPriceRange] = useState<[number, number]>(initialPriceRange)
@@ -121,8 +128,11 @@ const RefinementList = ({
   
   // For display and filtering logic
   const hasActivePriceFilter = useMemo(() => {
-    return currentPriceRange[0] > minPrice || currentPriceRange[1] < maxPrice
-  }, [currentPriceRange, minPrice, maxPrice])
+    return (
+      currentPriceRange[0] > safeMinPrice ||
+      currentPriceRange[1] < safeMaxPrice
+    )
+  }, [currentPriceRange, safeMinPrice, safeMaxPrice])
   
   // Check if any filters are active
   const hasActiveFilters = useMemo(() => {
@@ -179,35 +189,35 @@ const RefinementList = ({
     
     const params = new URLSearchParams(searchParams.toString())
     
-    if (value[0] !== minPrice) {
+    if (value[0] !== safeMinPrice) {
       params.set("price_min", value[0].toString())
     } else {
       params.delete("price_min")
     }
     
-    if (value[1] !== maxPrice) {
+    if (value[1] !== safeMaxPrice) {
       params.set("price_max", value[1].toString())
     } else {
       params.delete("price_max")
     }
     
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [searchParams, minPrice, maxPrice, pathname, router])
+  }, [searchParams, safeMinPrice, safeMaxPrice, pathname, router])
   
   // Reset price range
   const resetPriceRange = useCallback(() => {
-    setCurrentPriceRange([minPrice, maxPrice])
+    setCurrentPriceRange([safeMinPrice, safeMaxPrice])
     
     const params = new URLSearchParams(searchParams.toString())
     params.delete("price_min")
     params.delete("price_max")
     
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [searchParams, minPrice, maxPrice, pathname, router])
+  }, [searchParams, safeMinPrice, safeMaxPrice, pathname, router])
   
   // Clear all filters
   const clearAllFilters = useCallback(() => {
-    setCurrentPriceRange([minPrice, maxPrice])
+    setCurrentPriceRange([safeMinPrice, safeMaxPrice])
     
     const params = new URLSearchParams(searchParams.toString())
     params.delete("categories")
@@ -219,7 +229,7 @@ const RefinementList = ({
     const sort = params.get("sortBy")
     
     router.push(`${pathname}${sort ? `?sortBy=${sort}` : ""}`, { scroll: false })
-  }, [searchParams, minPrice, maxPrice, pathname, router])
+  }, [searchParams, safeMinPrice, safeMaxPrice, pathname, router])
   
   // Determine active category names for tags
   const activeCategoryNames = useMemo(() => {
@@ -317,11 +327,11 @@ const RefinementList = ({
                 <FilterTag 
                   label={`${new Intl.NumberFormat("en-US", { 
                     style: "currency", 
-                    currency: currencyCode,
+                    currency: safeCurrencyCode,
                     minimumFractionDigits: 0
                   }).format(currentPriceRange[0])} - ${new Intl.NumberFormat("en-US", { 
                     style: "currency", 
-                    currency: currencyCode,
+                    currency: safeCurrencyCode,
                     minimumFractionDigits: 0
                   }).format(currentPriceRange[1])}`}
                   onClick={resetPriceRange}
@@ -408,13 +418,13 @@ const RefinementList = ({
           )}
           
           <div className="w-full">
-            {minPrice !== maxPrice && (
+            {safeMinPrice !== safeMaxPrice && (
               <PriceRange
-                min={minPrice}
-                max={maxPrice}
+                min={safeMinPrice}
+                max={safeMaxPrice}
                 value={currentPriceRange}
                 handleChange={handlePriceChange}
-                currencyCode={currencyCode}
+                currencyCode={safeCurrencyCode}
                 data-testid="price-filter"
               />
             )}

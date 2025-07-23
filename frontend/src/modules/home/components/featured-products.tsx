@@ -10,7 +10,6 @@ import AnimatedButton from "@modules/common/components/animated-button"
 import Link from "next/link"
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
-import { Region } from "@medusajs/medusa"
 
 export default async function FeaturedProducts({
   region,
@@ -30,7 +29,7 @@ export default async function FeaturedProducts({
   const {
     response: { products: displayProducts },
   } = await listProducts({
-    queryParams: { collection_id: [featuredCollection.id] },
+    queryParams: { collection_id: [featuredCollection.id] } as any,
     countryCode,
   })
 

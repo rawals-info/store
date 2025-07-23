@@ -10,8 +10,8 @@ const CountryDebug = () => {
   const [defaultCountry, setDefaultCountry] = useState<string | null>(null)
   const [storeInfo, setStoreInfo] = useState<any>(null)
   const [availableCountries, setAvailableCountries] = useState<string[]>([])
-  const { countryCode } = useParams()
-  
+  const { countryCode } = useParams()  as { countryCode?: string }
+  const codeParam = countryCode ?? ""
   useEffect(() => {
     const detectCountry = async () => {
       try {
@@ -58,8 +58,8 @@ const CountryDebug = () => {
     <div className="fixed top-2 right-2 z-50 bg-white p-2 border border-gray-300 rounded shadow-md text-xs max-w-xs">
       <div className="flex items-center gap-1">
         <strong>Current country:</strong> 
-        {countryCode && <ReactCountryFlag countryCode={countryCode as string} svg />} 
-        {countryCode}
+        {codeParam && <ReactCountryFlag countryCode={codeParam} svg />} 
+        {codeParam}
       </div>
       <div className="flex items-center gap-1">
         <strong>Default country:</strong> 

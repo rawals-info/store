@@ -10,8 +10,9 @@ const CountrySwitcher = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [countries, setCountries] = useState<Record<string, string>>({})
   const [defaultCountry, setDefaultCountry] = useState<string | null>(null)
-  const { countryCode } = useParams()
-  
+  const { countryCode } = useParams() as { countryCode?: string }
+  const codeParam = countryCode ?? ""
+
   useEffect(() => {
     const fetchRegions = async () => {
       try {
@@ -56,10 +57,10 @@ const CountrySwitcher = () => {
       >
         <ReactCountryFlag 
           svg 
-          countryCode={countryCode as string} 
+          countryCode={codeParam} 
           style={{ width: '16px', height: '16px' }}
         />
-        <span className="hidden md:block">{countries[countryCode as string] || countryCode}</span>
+        <span className="hidden md:block">{countries[codeParam] || codeParam}</span>
         <svg 
           className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
           viewBox="0 0 24 24" 
@@ -78,7 +79,7 @@ const CountrySwitcher = () => {
                 key={code}
                 href={`/${code}`}
                 className={`flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 ${
-                  code === countryCode ? "bg-gray-50" : ""
+                  code === codeParam ? "bg-gray-50" : ""
                 }`}
                 onClick={() => setIsOpen(false)}
                 replace={true}

@@ -21,7 +21,7 @@ type ShippingProps = {
   availableShippingMethods: HttpTypes.StoreCartShippingOption[] | null
 }
 
-function formatAddress(address) {
+function formatAddress(address: any) {
   if (!address) {
     return ""
   }
@@ -68,14 +68,15 @@ const Shipping: React.FC<ShippingProps> = ({
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams.get("step") === "delivery"
+  const isOpen = searchParams?.get("step") === "delivery"
 
-  const _shippingMethods = availableShippingMethods
-    ?.filter((sm) => sm.service_zone?.fulfillment_set?.type !== "pickup")
-    ?.filter((sm) => sm.name.toLowerCase() !== "express shipping")
+  const _shippingMethods = (availableShippingMethods as HttpTypes.StoreCartShippingOption[])
+    // we cast to any here as the typing for service_zone is not in the current Medusa TS types yet.
+    ?.filter((sm: any) => sm.service_zone?.fulfillment_set?.type !== "pickup")
+    ?.filter((sm: any) => sm.name.toLowerCase() !== "express shipping")
 
-  const _pickupMethods = availableShippingMethods?.filter(
-    (sm) => sm.service_zone?.fulfillment_set?.type === "pickup"
+  const _pickupMethods = (availableShippingMethods as HttpTypes.StoreCartShippingOption[])?.filter(
+    (sm: any) => sm.service_zone?.fulfillment_set?.type === "pickup"
   )
 
   const hasPickupOptions = !!_pickupMethods?.length
@@ -101,7 +102,7 @@ const Shipping: React.FC<ShippingProps> = ({
       }
     }
 
-    if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
+    if (_pickupMethods?.find((m: any) => m.id === shippingMethodId)) {
       setShowPickupOptions(PICKUP_OPTION_ON)
     }
   }, [availableShippingMethods])
@@ -126,7 +127,7 @@ const Shipping: React.FC<ShippingProps> = ({
       setShowPickupOptions(PICKUP_OPTION_OFF)
     }
 
-    let currentId: string | null = null
+    let currentId: string = ""
     setIsLoading(true)
     setShippingMethodId((prev) => {
       currentId = prev
@@ -141,7 +142,7 @@ const Shipping: React.FC<ShippingProps> = ({
         }
       })
       .catch((err) => {
-        setShippingMethodId(currentId)
+        setShippingMethodId(currentId ?? "")
 
         setError(err.message)
       })
@@ -205,7 +206,7 @@ const Shipping: React.FC<ShippingProps> = ({
                     value={showPickupOptions}
                     onChange={(value) => {
                       const id = _pickupMethods.find(
-                        (option) => !option.insufficient_inventory
+                        (option: any) => !option.insufficient_inventory
                       )?.id
 
                       if (id) {
@@ -243,7 +244,7 @@ const Shipping: React.FC<ShippingProps> = ({
                   value={shippingMethodId}
                   onChange={(v) => handleSetShippingMethod(v, "shipping")}
                 >
-                  {_shippingMethods?.map((option) => {
+                  {_shippingMethods?.map((option: any) => {
                     const isDisabled =
                       option.price_type === "calculated" &&
                       !isLoadingPrices &&
@@ -314,7 +315,7 @@ const Shipping: React.FC<ShippingProps> = ({
                     value={shippingMethodId}
                     onChange={(v) => handleSetShippingMethod(v, "pickup")}
                   >
-                    {_pickupMethods?.map((option) => {
+                    {_pickupMethods?.map((option: any) => {
                       return (
                         <Radio
                           key={option.id}
@@ -390,7 +391,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 <Text className="text-[#8a7f72]">
                   {cart.shipping_methods?.at(-1)?.name}{" "}
                   {convertToLocale({
-                    amount: cart.shipping_methods.at(-1)?.amount!,
+                    amount: cart.shipping_methods?.at(-1)?.amount ?? 0,
                     currency_code: cart?.currency_code,
                   })}
                 </Text>

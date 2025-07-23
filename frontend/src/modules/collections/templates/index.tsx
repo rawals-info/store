@@ -30,7 +30,7 @@ export default function CollectionTemplate({
           </h1>
           <div className="h-px w-20 bg-luxury-gold mb-8"></div>
           <p className="text-serif-regular text-luxury-charcoal/80 max-w-xl">
-            {collection.metadata?.description || "Discover our exclusive collection of handcrafted marble pieces."}
+            {collection.metadata?.description as string || "Discover our exclusive collection of handcrafted marble pieces."}
           </p>
         </div>
         

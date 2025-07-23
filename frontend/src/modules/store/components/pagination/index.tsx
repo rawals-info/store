@@ -24,7 +24,7 @@ export function Pagination({
 
   // Function to handle page changes
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(customParams || urlSearchParams)
+    const params = new URLSearchParams((customParams || urlSearchParams)?.toString() || "")
     params.set("page", newPage.toString())
     router.push(`${pathname}?${params.toString()}`)
   }
