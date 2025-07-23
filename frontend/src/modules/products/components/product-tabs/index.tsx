@@ -11,7 +11,7 @@ type ProductTabsProps = {
   setActiveTab: (tab: string) => void
 }
 
-const tabVariants = {
+const tabVariants: any = {
   hidden: { opacity: 0, y: 10 },
   visible: { 
     opacity: 1, 

@@ -39,14 +39,14 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
     },
   }
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 20 },
     show: { 
       opacity: 1, 
       y: 0,
       transition: { 
         duration: 0.6,
-        ease: [0.22, 1, 0.36, 1],
+        ease: "easeOut",
       }
     },
   }
@@ -104,7 +104,7 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
         className="text-center mb-16"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-luxury-charcoal mb-4">
           Browse Our Exclusive Categories
@@ -138,7 +138,7 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
                 }`}
                 whileHover={{ 
                   y: -5,
-                  transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] }
+                  transition: { duration: 0.3, ease: "easeOut" }
                 }}
                 onClick={() => setActiveCategory(activeCategory === category.id ? null : category.id)}
               >
@@ -195,7 +195,7 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="bg-luxury-ivory/80 backdrop-blur-sm rounded-lg p-8 mb-16"
           >
             <div className="mb-6">

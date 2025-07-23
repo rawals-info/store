@@ -62,7 +62,7 @@ const AnimatedHeader = () => {
   const [rightLinks] = useState(() => defaultRightLinks)
 
   // Animation variants for links with refined motion
-  const linkVariants = {
+  const linkVariants: any = {
     hover: {
       y: -1,
       transition: { duration: 0.2, ease: [0.25, 1, 0.5, 1] }
@@ -70,7 +70,7 @@ const AnimatedHeader = () => {
   }
 
   // Animation variants for mobile menu items
-  const menuVariants = {
+  const menuVariants: any = {
     closed: {
       opacity: 0,
       y: -20,

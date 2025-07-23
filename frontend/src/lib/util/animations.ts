@@ -4,21 +4,21 @@
  */
 
 // Fade in animation
-export const fadeIn = {
+export const fadeIn: any = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 }
 
 // Fade in animation with delay options
-export const fadeInWithDelay = (delay: number = 0.2) => ({
+export const fadeInWithDelay = (delay: number = 0.2): any => ({
   initial: { opacity: 0 },
   animate: { opacity: 1, transition: { delay, duration: 0.5 } },
   exit: { opacity: 0 },
 })
 
 // Slide up and fade in animation for scroll reveals
-export const slideUp = {
+export const slideUp: any = {
   initial: { opacity: 0, y: 20 },
   animate: { 
     opacity: 1, 
@@ -38,7 +38,7 @@ export const slideUp = {
 }
 
 // Staggered children animation for lists
-export const staggerContainer = {
+export const staggerContainer: any = {
   initial: {},
   animate: {
     transition: {
@@ -48,7 +48,7 @@ export const staggerContainer = {
 }
 
 // Luxury hover effect for interactive elements
-export const luxuryHover = {
+export const luxuryHover: any = {
   initial: { scale: 1 },
   whileHover: { 
     scale: 1.02,
@@ -61,7 +61,7 @@ export const luxuryHover = {
 }
 
 // Page transition animation
-export const pageTransition = {
+export const pageTransition: any = {
   initial: { opacity: 0 },
   animate: { 
     opacity: 1,
@@ -79,7 +79,7 @@ export const pageTransition = {
 }
 
 // Elegant reveal animation for sections
-export const elegantReveal = {
+export const elegantReveal: any = {
   initial: { opacity: 0, y: 30 },
   animate: {
     opacity: 1,
@@ -92,7 +92,7 @@ export const elegantReveal = {
 }
 
 // Scroll reveal animation - use with useInView hook
-export const scrollReveal = {
+export const scrollReveal: any = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
@@ -105,7 +105,7 @@ export const scrollReveal = {
 }
 
 // Luxury loading spinner animation
-export const spinnerAnimation = {
+export const spinnerAnimation: any = {
   animate: {
     rotate: 360,
     transition: {

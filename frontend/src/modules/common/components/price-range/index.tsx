@@ -20,11 +20,6 @@ const PriceRange = ({
   currencyCode,
   "data-testid": dataTestId,
 }: PriceRangeProps) => {
-  // Early conditional return - must be before any hooks
-  if (min === max) {
-    return null
-  }
-
   // Initialize with props but don't update on every prop change
   const [localValue, setLocalValue] = useState<[number, number]>(value)
   // Store the input values as strings to allow proper editing
@@ -32,6 +27,10 @@ const PriceRange = ({
     value[0].toString(),
     value[1].toString(),
   ])
+  // After initializing hooks, early return if no price range needed
+  if (min === max) {
+    return null
+  }
   const sliderRef = useRef<HTMLDivElement>(null)
   const initialRenderRef = useRef(true)
   
