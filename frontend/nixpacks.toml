@@ -1,2 +1,14 @@
+# frontend/nixpacks.toml
+
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+# install Node.js 20 and yarn
+nixPkgs = ["nodejs_20", "yarn"]
+
+[phases.install]
+cmds = ["yarn install"]
+
+[phases.build]
+cmds = ["NODE_ENV=production yarn build"]
+
+[phases.start]
+cmd = "npm run start"
