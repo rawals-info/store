@@ -1,20 +1,30 @@
 {
   "schemaVersion": 2,
+
+  “build”: {
+    "env": {
+      "NODE_ENV": "production",
+      "NEXT_PUBLIC_MEDUSA_BACKEND_URL": "https://medusa-server…",
+      "NEXT_PUBLIC_DEFAULT_REGION_ID": "in",
+      "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSy…",
+      "NEXT_PUBLIC_RAZORPAY_KEY_ID": "rzp_live_…",
+      "NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID": "rzp_test_…",
+      "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY": "pk_7c1b7a37044345e…"
+    },
+    "command": "npm install && npm run build"
+  },
+
   "dockerfileLines": [
     "FROM node:18-alpine",
     "WORKDIR /app",
-    
+
     "COPY frontend/package.json frontend/package-lock.json ./",
-    "RUN npm install",
-    
     "COPY frontend/ .",
-    
-    "ENV NODE_ENV=production",
-    "ENV PORT=8000",
+
     "RUN npm run build",
-    
+
+    "ENV PORT=8000",
     "EXPOSE 8000",
-    
-    "CMD [\"sh\", \"-c\", \"next start -p 8000\"]"
+    "CMD [\"sh\",\"-c\",\"next start -p 8000\"]"
   ]
 }
