@@ -5,7 +5,7 @@
     "WORKDIR /app",
     "# Copy package files from the backend directory",
     "COPY backend/package.json backend/package-lock.json ./",
-    "RUN npm install --frozen-lockfile",
+    "RUN npm install --legacy-peer-deps",
     "# Copy all source code from the backend directory",
     "COPY backend/ .",
     "# Build the Medusa project",
