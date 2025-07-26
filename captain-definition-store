@@ -18,11 +18,11 @@
     "FROM node:18-alpine",
     "WORKDIR /app",
 
-    "# 1) Copy only package metadata and install deps",
+    "# 1) Copy package metadata and install deps (npm install updates lockfile inline)",
     "COPY frontend/package.json frontend/package-lock.json ./",
-    "RUN npm ci",
+    "RUN npm install",
 
-    "# 2) Copy source and build",
+    "# 2) Copy the rest of the source and build",
     "COPY frontend/ .",
     "RUN npm run build",
 
