@@ -18,11 +18,20 @@
     "FROM node:18-alpine",
     "WORKDIR /app",
 
-    "# 1) Copy package metadata and install deps (npm install updates lockfile inline)",
+    "# 1) Copy package metadata and install deps",
     "COPY frontend/package.json frontend/package-lock.json ./",
     "RUN npm install",
 
-    "# 2) Copy the rest of the source and build",
+    "# 2) Inject NEXT_PUBLIC_* env into .env.local for build",
+    "ARG NEXT_PUBLIC_MEDUSA_BACKEND_URL",
+    "ARG NEXT_PUBLIC_DEFAULT_REGION_ID",
+    "ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
+    "ARG NEXT_PUBLIC_RAZORPAY_KEY_ID",
+    "ARG NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID",
+    "ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY",
+    "RUN printf \"NEXT_PUBLIC_MEDUSA_BACKEND_URL=$NEXT_PUBLIC_MEDUSA_BACKEND_URL\\nNEXT_PUBLIC_DEFAULT_REGION_ID=$NEXT_PUBLIC_DEFAULT_REGION_ID\\nNEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY\\nNEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID\\nNEXT_PUBLIC_RAZORPAY_TEST_KEY_ID=$NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID\\nNEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY\" > .env.local",
+
+    "# 3) Copy source and run build",
     "COPY frontend/ .",
     "RUN npm run build",
 
