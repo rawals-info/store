@@ -12,7 +12,7 @@
     "RUN npm run build",
     "# Expose Medusa default port",
     "EXPOSE 9000",
-    "# Run in server mode",
+    "# Run in worker mode",
     "ENV MEDUSA_WORKER_MODE=worker",
     "# Start Medusa",
     "CMD [\"npm\", \"run\", \"start\"]"

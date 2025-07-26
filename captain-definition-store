@@ -1,18 +1,20 @@
 {
   "schemaVersion": 2,
   "dockerfileLines": [
-    "FROM node:lts-alpine",
+    "FROM node:18-alpine",
     "WORKDIR /app",
-    "# Copy package files from the frontend directory",
+    
     "COPY frontend/package.json frontend/package-lock.json ./",
     "RUN npm install",
-    "# Copy all source code from the frontend directory",
+    
     "COPY frontend/ .",
-    "# Build Next.js project",
-    "RUN NODE_ENV=production npx next build",
-    "# Expose Next.js default port",
-    "EXPOSE 3000",
-    "# Start frontend in production mode",
-    "CMD [\"sh\", \"-c\", \"cd .next && npm run start\"]"
+    
+    "ENV NODE_ENV=production",
+    "ENV PORT=8000",
+    "RUN npm run build",
+    
+    "EXPOSE 8000",
+    
+    "CMD [\"sh\", \"-c\", \"next start -p 8000\"]"
   ]
 }
