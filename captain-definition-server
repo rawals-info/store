@@ -4,10 +4,10 @@
     "FROM node:lts-alpine",
     "WORKDIR /app",
 
-    "COPY my-medusa-store/package.json my-medusa-store/package-lock.json ./",
+    "COPY backend/package.json backend/package-lock.json ./",
     "RUN npm install --frozen-lockfile",
 
-    "COPY my-medusa-store/ .",
+    "COPY backend/ .",
 
     "# Build backend + frontend → outputs into .medusa/server",
     "RUN npm run build",

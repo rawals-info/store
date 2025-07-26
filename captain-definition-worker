@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "dockerfileLines": [
+    "FROM node:lts-alpine",
+    "WORKDIR /app",
+    "# Copy package files from the backend directory",
+    "COPY backend/package.json backend/package-lock.json ./",
+    "RUN npm install --frozen-lockfile",
+    "# Copy all source code from the backend directory",
+    "COPY backend/ .",
+    "# Build the Medusa project",
+    "RUN npm run build",
+    "# Expose Medusa default port",
+    "EXPOSE 9000",
+    "# Run in server mode",
+    "ENV MEDUSA_WORKER_MODE=worker",
+    "# Start Medusa",
+    "CMD [\"npm\", \"run\", \"start\"]"
+  ]
+}
