@@ -24,7 +24,8 @@ const CategoryDropdown = ({ countryCode, isOpen, onMouseEnter, onMouseLeave }: C
     "marble-table-top": "/category_table_top.webp",
     "jewelry": "/category_jewelry.webp",
     "home-decor": "/category_home_decor.webp", 
-    "sculpture": "/category_sculpture.webp"
+    "sculpture": "/category_sculpture.webp",
+    "petha-gift-box": "/category_gift_box.webp"
   }
 
   // Get all categories
@@ -73,7 +74,7 @@ const CategoryDropdown = ({ countryCode, isOpen, onMouseEnter, onMouseLeave }: C
             <div className="max-h-[70vh] overflow-y-auto">
               <div className="flex flex-wrap justify-center gap-4 p-6">
                 {categories.map((category) => {
-                  const imageSrc = categoryImages[category.handle] || "/marble-bg.jpg"
+                  const imageSrc = categoryImages[category.handle] || "/petha-bg.jpg"
                   
                   return (
                     <LocalizedClientLink 

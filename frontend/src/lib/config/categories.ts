@@ -45,7 +45,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
 export function getCategoryByLegacyHandle(legacyHandle: string): CategoryConfig | undefined {
   // Common legacy handle mappings
   const legacyHandleMap: Record<string, string> = {
-    "marble-taj-mahal": "tajMahal"
+    "petha-taj-mahal": "tajMahal"
     // Add other legacy mappings as needed
   }
   

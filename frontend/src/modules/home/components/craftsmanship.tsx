@@ -14,7 +14,7 @@ export default function Craftsmanship() {
             <div className="aspect-square rounded-lg overflow-hidden relative">
               <Image
                 src="/craftsmanship.jpg"
-                alt="Marble craftsmanship"
+                alt="Petha craftsmanship"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
@@ -34,7 +34,7 @@ export default function Craftsmanship() {
             
             <ScrollReveal delay={0.1}>
               <Text className="mb-4">
-                Each piece in our collection is handcrafted by master artisans with decades of experience working with the finest marble from around the world.
+                Each piece in our collection is handcrafted by master sweet makers with decades of experience working with the finest ingredients from around the region.
               </Text>
             </ScrollReveal>
             

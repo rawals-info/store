@@ -14,7 +14,7 @@ import ChevronDown from "@modules/common/icons/chevron-down"
 const CHECKOUT_TIMEOUT = 3500 // 3.5 seconds timeout
 
 export const metadata: Metadata = {
-  title: "Checkout | Imperial Craft Of India",
+  title: "Checkout | Taj Petha",
 }
 
 export default async function Checkout() {

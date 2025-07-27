@@ -3,7 +3,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Empty Cart | Imperial Craft Of India",
+  title: "Empty Cart | Taj Petha",
   description: "Your shopping cart is empty",
 }
 

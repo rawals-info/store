@@ -45,7 +45,7 @@ export default function Features() {
                 </svg>
               </div>
               <Heading level="h3" className="text-xl mb-3 font-serif text-luxury-charcoal">
-                Ethically Mined Marble
+                Premium Quality Ingredients
               </Heading>
               <Text className="text-luxury-charcoal/80">
                 Responsibly sourced premium-grade stone

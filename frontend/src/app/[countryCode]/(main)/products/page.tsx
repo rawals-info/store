@@ -155,7 +155,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
             <div className="w-full h-full relative blur-sm">
               <Image
                 src={featuredProduct.thumbnail}
-                alt="Featured marble"
+                alt="Featured petha"
                 fill
                 className="object-cover"
                 priority
@@ -211,7 +211,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               <div className="py-24 flex flex-col items-center justify-center">
                 <h2 className="font-display text-xl text-luxury-gold mb-4">No products found</h2>
                 <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
-                  We're currently updating our collection. Please check back soon for our latest creations.
+                  We're currently updating our sweet collection. Please check back soon for our latest petha creations.
                 </p>
               </div>
             )}

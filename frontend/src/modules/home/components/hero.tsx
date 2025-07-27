@@ -19,11 +19,11 @@ export default function Hero() {
       animate="animate"
       variants={staggerContainer}
     >
-      {/* Background with marble texture and overlay */}
+      {/* Background with petha texture and overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/marble-bg-light.jpg"
-          alt="Marble background"
+          src="/petha-bg-light.jpg"
+          alt="Petha background"
           fill
           priority={true}
           sizes="100vw"
@@ -58,14 +58,14 @@ export default function Hero() {
       <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 md:px-8">
         <motion.div variants={fadeIn} className="mb-4 md:mb-6">
           <Heading level="h1" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 font-serif leading-tight">
-            <span className="luxury-gold block sm:inline">Exquisite Marble</span>{" "}
+            <span className="luxury-gold block sm:inline">Exquisite Pethas</span>{" "}
             <span className="block sm:inline">Handicrafts</span>
           </Heading>
         </motion.div>
         
         <motion.div variants={fadeIn} className="mb-6 md:mb-8">
           <Text className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-luxury-charcoal/90 leading-relaxed">
-            Discover our collection of handcrafted marble pieces, meticulously created by master artisans for your luxury home.
+            Discover our collection of authentic Agra pethas, meticulously created by master sweet makers for your delightful experience.
           </Text>
         </motion.div>
         

@@ -180,11 +180,11 @@ export default function HomeClientWrapper({
         animate="animate"
         variants={staggerContainer}
       >
-        {/* Hero image with marble piece in situ */}
+        {/* Hero image with petha display */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <Image
             src="/hero_image.webp"
-            alt="Luxury marble tabletop in elegant interior"
+            alt="Luxury petha display in elegant setting"
             fill
             priority={true}
             sizes="100vw"

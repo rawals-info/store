@@ -128,19 +128,6 @@ h1, h2, h3, h4, h5, h6 {
   border-color: #D4AF37;
 }
 
-/* Marble texture backgrounds */
-.marble-bg-light {
-  background-image: url('/marble-light.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
-.marble-bg-dark {
-  background-image: url('/marble-dark.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

@@ -45,7 +45,6 @@ async function findSimilarCategory(handle: string) {
     // If not in config, try to find a similar one by string matching
     const allCategories = await listCategories();
     
-    // Check if there's a similar category (e.g., "marble-table" vs "marble-table-top")
     const similarCategory = allCategories.find(c => 
       c.handle?.includes(handle) || handle.includes(c.handle || '')
     );
@@ -95,28 +94,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       
       if (similarCategory) {
         return {
-          title: `${similarCategory.name} | Luxury Marble Collection`,
+          title: `${similarCategory.name} | Taj Petha`,
           description: 'description' in similarCategory && similarCategory.description 
             ? similarCategory.description 
-            : `Browse our exclusive ${similarCategory.name.toLowerCase()} collection, handcrafted by master artisans for your luxury home.`,
+            : `Browse our exclusive ${similarCategory.name.toLowerCase()} collection of authentic Agra pethas, handcrafted with traditional recipes.`,
         };
       }
       
       return {
-        title: "Category | Luxury Marble Collection",
-        description: "Browse our exclusive marble collection, handcrafted by master artisans for your luxury home.",
+        title: "Category | Taj Petha",
+        description: "Browse our exclusive collection of authentic Agra pethas, handcrafted with traditional recipes passed down through generations.",
       };
     }
 
     return {
-      title: `${categoryObj.name} | Luxury Marble Collection`,
-      description: categoryObj.description || `Browse our exclusive ${categoryObj.name.toLowerCase()} collection, handcrafted by master artisans for your luxury home.`,
+      title: `${categoryObj.name} | Taj Petha`,
+      description: categoryObj.description || `Browse our exclusive ${categoryObj.name.toLowerCase()} collection of authentic Agra pethas, handcrafted with traditional recipes.`,
     }
   } catch (error) {
     console.error("Error generating metadata:", error);
     return {
-      title: "Category | Luxury Marble Collection",
-      description: "Browse our exclusive marble collection, handcrafted by master artisans for your luxury home.",
+      title: "Category | Taj Petha",
+      description: "Browse our exclusive collection of authentic Agra pethas, handcrafted with traditional recipes passed down through generations.",
     }
   }
 }

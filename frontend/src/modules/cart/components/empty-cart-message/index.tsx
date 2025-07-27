@@ -16,7 +16,7 @@ const EmptyCartMessage = () => {
       <h1 className="font-display text-2xl text-luxury-charcoal mb-2">Your cart is empty</h1>
       
       <p className="text-luxury-charcoal/70 text-center max-w-md mb-8 px-6">
-        Discover our collection of handcrafted marble pieces to add elegance to your space.
+        Discover our collection of authentic Agra pethas to experience the sweet taste of tradition.
       </p>
       
       <LocalizedClientLink href="/products">

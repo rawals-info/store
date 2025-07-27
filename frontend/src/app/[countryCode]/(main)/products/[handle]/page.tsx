@@ -75,15 +75,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     return {
-      title: `${product.title} | Imperial Craft Of India`,
+      title: `${product.title} | Taj Petha`,
       description:
         product.description?.substring(0, 160) ||
-        `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
+        `Discover the delicious ${product.title}, an authentic Agra petha sweet from our premium collection.`,
       openGraph: {
-        title: `${product.title} | Imperial Craft Of India`,
+        title: `${product.title} | Taj Petha`,
         description:
           product.description?.substring(0, 160) ||
-          `Discover the exquisite ${product.title}, a handcrafted marble piece from our luxury collection.`,
+          `Discover the delicious ${product.title}, an authentic Agra petha sweet from our premium collection.`,
         images: product.thumbnail ? [product.thumbnail] : [],
         type: "website",
       },

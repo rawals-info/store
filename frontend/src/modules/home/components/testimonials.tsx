@@ -16,14 +16,14 @@ export default function Testimonials() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <ScrollReveal className="p-8 border border-gray-200 rounded-lg">
             <Text className="italic mb-4">
-              "The marble centerpiece I purchased is absolutely stunning. The craftsmanship is impeccable and it has become the focal point of my dining room."
+              "The petha centerpiece I purchased is absolutely stunning. The craftsmanship is impeccable and it has become the focal point of my dining table."
             </Text>
             <Text className="font-medium">— Sarah J., Interior Designer</Text>
           </ScrollReveal>
           
           <ScrollReveal delay={0.2} className="p-8 border border-gray-200 rounded-lg">
             <Text className="italic mb-4">
-              "I've been collecting marble pieces for years, and the quality of these handicrafts is truly exceptional. Each piece tells a story of artistry and tradition."
+              "I've been enjoying pethas for years, and the quality of these sweets is truly exceptional. Each piece tells a story of artistry and tradition."
             </Text>
             <Text className="font-medium">— Michael T., Art Collector</Text>
           </ScrollReveal>

@@ -52,7 +52,7 @@ const Categories = async () => {
           </h2>
           <div className="h-px w-24 bg-luxury-gold mb-6" />
           <p className="text-center text-luxury-charcoal/80 max-w-lg">
-            Discover our exquisite collection of handcrafted marble pieces, meticulously created for various aspects of luxury living
+            Discover our exquisite collection of authentic Agra pethas, meticulously created for various sweet-loving occasions
           </p>
         </div>
         

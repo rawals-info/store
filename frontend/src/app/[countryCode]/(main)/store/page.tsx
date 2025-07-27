@@ -6,7 +6,7 @@ import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
   title: "Store",
-  description: "Explore our exclusive collection of handcrafted marble products.",
+  description: "Explore our exclusive collection of authentic Agra petha sweets.",
 }
 
 // Segment config should be a constant, not a function

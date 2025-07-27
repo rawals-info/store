@@ -35,8 +35,8 @@ const Hero = () => {
           }}
         >
           <Image 
-            src="/marble-bg.jpg"
-            alt="Luxury marble background"
+            src="/petha-bg.jpg"
+            alt="Luxury petha background"
             fill
             priority={true}
             sizes="100vw"
@@ -56,8 +56,8 @@ const Hero = () => {
       <div className="absolute top-1/4 left-1/4 w-64 h-64 gold-gradient opacity-10 rounded-full blur-xl animate-gentle-float"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 gold-gradient opacity-10 rounded-full blur-xl animate-gentle-float" style={{ animationDelay: '2s' }}></div>
       
-      {/* Overlapping marble texture */}
-      <div className="absolute inset-0 z-2 bg-luxury-marble opacity-10 mix-blend-overlay"></div>
+      {/* Overlapping petha texture */}
+      <div className="absolute inset-0 z-2 bg-luxury-petha opacity-10 mix-blend-overlay"></div>
       
       {/* Main content container */}
       <div className="absolute inset-0 z-10 flex flex-col justify-center items-center text-center p-4 small:p-24 max-w-7xl mx-auto">
@@ -111,7 +111,7 @@ const Hero = () => {
             <h2 className="font-display text-3xl mb-4">Exquisite Collections</h2>
             <div className="h-px w-24 bg-luxury-gold mx-auto"></div>
             <p className="text-serif-regular text-luxury-charcoal/80 mt-6 max-w-xl mx-auto">
-              Discover our handcrafted luxury marble creations, each piece telling a story of craftsmanship and heritage
+              Discover our handcrafted authentic Agra pethas, each piece telling a story of traditional recipes and heritage
             </p>
           </div>
           

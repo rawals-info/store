@@ -90,15 +90,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   const metadata = {
-    title: `${collection.title} | Imperial Craft Of India`,
+    title: `${collection.title} | Taj Petha`,
     description: collection.handle ? 
-      `Explore our exclusive ${collection.title} collection of premium marble products. Each piece is crafted with exceptional quality and timeless design.` : 
-      "Discover our luxury marble collections, each showcasing the finest craftsmanship and materials.",
+      `Explore our exclusive ${collection.title} collection of premium Agra pethas. Each piece is crafted with authentic ingredients and traditional recipes.` : 
+      "Discover our delicious petha collections, each showcasing the finest flavors and traditional sweetmaking techniques.",
     openGraph: {
-      title: `${collection.title} | Imperial Craft Of India`,
+      title: `${collection.title} | Taj Petha`,
       description: collection.handle ? 
-        `Explore our exclusive ${collection.title} collection of premium marble products. Each piece is crafted with exceptional quality and timeless design.` : 
-        "Discover our luxury marble collections, each showcasing the finest craftsmanship and materials.",
+        `Explore our exclusive ${collection.title} collection of premium Agra pethas. Each piece is crafted with authentic ingredients and traditional recipes.` : 
+        "Discover our delicious petha collections, each showcasing the finest flavors and traditional sweetmaking techniques.",
       type: "website",
     },
     twitter: {

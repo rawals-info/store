@@ -127,9 +127,9 @@ const ProductTabs = ({ product, activeTab, setActiveTab }: ProductTabsProps) => 
       details.push({
         title: "Materials",
         items: [
-          "Premium quality marble",
-          "Natural stone with unique veining",
-          "Non-toxic sealant finish",
+          "Premium quality ingredients",
+          "Pure sugar and natural flavors",
+          "No artificial preservatives",
           product.type?.value
         ].filter(Boolean)
       })
@@ -159,10 +159,10 @@ const ProductTabs = ({ product, activeTab, setActiveTab }: ProductTabsProps) => 
       details.push({
         title: "Features",
         items: [
-          "Handcrafted by master artisans",
-          "One-of-a-kind piece",
-          "Durable and long-lasting",
-          "Easy to clean and maintain"
+          "Handcrafted with traditional recipes",
+          "Authentic Agra taste",
+          "Long shelf life",
+          "Carefully packaged for freshness"
         ]
       })
     }
@@ -189,11 +189,11 @@ const ProductTabs = ({ product, activeTab, setActiveTab }: ProductTabsProps) => 
     
     // Fallback to default shipping info
     return [
-      "All our marble pieces are carefully packaged and shipped with insurance.",
-      "Standard shipping: 5-7 business days",
-      "Express shipping: 2-3 business days",
-      "International shipping available to select countries.",
-      "For custom shipping arrangements or questions, please contact our customer service team."
+      "All our petha sweets are carefully packaged to maintain freshness during transit.",
+      "Standard shipping: 2-3 business days",
+      "Express shipping: 1-2 business days",
+      "We ship across India with temperature-controlled packaging.",
+      "For bulk orders or international shipping inquiries, please contact our customer service team."
     ]
   }
   

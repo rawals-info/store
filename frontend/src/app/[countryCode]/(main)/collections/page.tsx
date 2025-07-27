@@ -30,7 +30,7 @@ export default async function CollectionsPage(props: CollectionsPageProps) {
         </h1>
         <div className="h-px w-20 bg-luxury-gold mb-8"></div>
         <p className="text-serif-regular text-luxury-charcoal/80 max-w-xl mb-12">
-          Explore our curated collections of handcrafted marble art, each representing a unique aspect of our artisanal heritage.
+          Explore our curated collections of authentic Agra pethas, each representing a unique flavor profile and traditional sweet-making heritage.
         </p>
       </div>
 
@@ -44,7 +44,7 @@ export default async function CollectionsPage(props: CollectionsPageProps) {
         <div className="py-24 flex flex-col items-center justify-center">
           <h2 className="font-display text-xl text-luxury-gold mb-4">No collections found</h2>
           <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
-            We're currently updating our collections. Please check back soon for our latest curation.
+            We're currently updating our petha collections. Please check back soon for our latest sweet creations.
           </p>
         </div>
       )}

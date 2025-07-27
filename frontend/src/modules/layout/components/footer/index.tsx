@@ -17,7 +17,7 @@ const Footer = () => {
   return (
     <footer ref={ref} className="bg-luxury-ivory border-t border-luxury-gold/10 py-16">
       <div className="content-container">
-        {/* Decorative marble pattern at the top */}
+        {/* Decorative petha pattern at the top */}
         <motion.div 
           className="w-full flex justify-center mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -35,12 +35,12 @@ const Footer = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <Heading level="h2" className="font-display text-3xl mb-4 text-luxury-charcoal">
-            The Art of <span className="text-luxury-gold">Marble Craftsmanship</span>
+            The Art of <span className="text-luxury-gold">Petha Craftsmanship</span>
           </Heading>
           <Text className="text-luxury-charcoal/80 text-base-regular leading-relaxed max-w-2xl mx-auto">
-            Each piece in our collection is meticulously handcrafted by master artisans who have perfected their craft over generations. 
-            From the initial selection of the finest marble to the final polish, our commitment to excellence and attention to detail 
-            ensures that every creation is a timeless masterpiece worthy of your home.
+            Each piece in our collection is meticulously handcrafted by master sweet makers who have perfected their craft over generations. 
+            From the initial selection of the finest ash gourd to the final crystallization, our commitment to excellence and attention to detail 
+            ensures that every petha is a delightful treat worthy of your palate.
           </Text>
         </motion.div>
 
@@ -52,9 +52,9 @@ const Footer = () => {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Heading level="h3" className="text-xl mb-4 font-display text-luxury-gold">Imperial Craft Of India</Heading>
+            <Heading level="h3" className="text-xl mb-4 font-display text-luxury-gold">Taj Petha</Heading>
             <Text className="text-luxury-charcoal/80 mb-6 leading-relaxed">
-              Exquisite handcrafted marble artifacts that transform spaces into expressions of timeless elegance.
+              Exquisite handcrafted Agra pethas that transform moments into expressions of authentic sweet tradition.
             </Text>
             <div className="flex space-x-5">
               <motion.a 
@@ -103,7 +103,7 @@ const Footer = () => {
             <Heading level="h3" className="text-xl mb-5 font-display text-luxury-gold">Shop</Heading>
             <ul className="space-y-3">
               {[
-                { href: "/products", label: "All Treasures" },
+                { href: "/products", label: "All Sweets" },
                 { href: "/collections", label: "Collections" },
                 { href: "/about", label: "Our Craftsmanship" },
                 { href: "/contact", label: "Contact" }
@@ -194,7 +194,7 @@ const Footer = () => {
         >
           <div className="gold-gradient h-px w-24 mx-auto mb-6"></div>
           <p className="text-luxury-charcoal/70 text-sm italic font-serif mb-6 max-w-xl mx-auto">
-            "The beauty of marble lies not just in its appearance, but in the stories it tells and the legacy it creates through generations of skilled craftsmanship."
+            "The beauty of petha lies not just in its taste, but in the stories it tells and the legacy it creates through generations of skilled sweet-making."
           </p>
           {/* Signature element */}
           <motion.div 
@@ -202,7 +202,7 @@ const Footer = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
           >
-            <span className="font-serif italic text-luxury-gold text-lg">— Alessandro Bertelli, Master Craftsman</span>
+            <span className="font-serif italic text-luxury-gold text-lg">— Siddharth Rawal, Master Sweet Maker</span>
           </motion.div>
         </motion.div>
 
@@ -215,7 +215,7 @@ const Footer = () => {
             transition={{ duration: 0.5, delay: 0.7 }}
           >
             <Text className="text-luxury-charcoal/60 text-sm">
-              © {currentYear} Imperial Craft Of India. All rights reserved.
+              © {currentYear} Taj Petha. All rights reserved.
             </Text>
             <div className="flex space-x-8 mt-4 md:mt-0">
               <LocalizedClientLink href="/terms" className="text-luxury-charcoal/60 hover:text-luxury-gold transition-colors duration-300 text-sm">

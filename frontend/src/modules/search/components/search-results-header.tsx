@@ -80,7 +80,7 @@ const SearchResultsHeader = ({ query, count }: SearchResultsHeaderProps) => {
                 onClick={() => {
                   // Handle chess search specially
                   if (query.toLowerCase().includes('chess')) {
-                    router.push(`/categories/marble-chess-board`)
+                    router.push(`/categories/classic-petha-box`)
                     return
                   }
                   

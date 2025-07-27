@@ -151,7 +151,7 @@ export default function ProductsContent({
             <div className="w-full h-full relative blur-sm">
               <Image
                 src={featuredProduct.thumbnail}
-                alt="Featured marble"
+                alt="Featured petha"
                 fill
                 className="object-cover"
                 priority
@@ -168,8 +168,7 @@ export default function ProductsContent({
           </h1>
           <div className="h-px w-40 bg-luxury-gold mb-4"></div>
           <p className="text-serif-regular text-luxury-charcoal/80 max-w-2xl mb-6">
-            Discover our handcrafted marble masterpieces, each one a testament to generations of 
-            artisanal tradition and meticulous attention to detail.
+            Discover our authentic Agra pethas, each piece crafted with traditional recipes and premium ingredients for a delightful sweet experience.
           </p>
         </div>
       </div>
@@ -209,7 +208,7 @@ export default function ProductsContent({
             <div className="py-24 flex flex-col items-center justify-center">
               <h2 className="font-display text-xl text-luxury-gold mb-4">No products found</h2>
               <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
-                We're currently updating our collection. Please check back soon for our latest creations.
+                We're currently updating our sweet collection. Please check back soon for our latest petha creations.
               </p>
             </div>
           )}

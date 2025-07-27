@@ -57,11 +57,11 @@ const Register = ({ setCurrentView }: Props) => {
       </div>
       
       <h1 className="font-display text-2xl text-[var(--color-luxury-charcoal)] mb-2 uppercase tracking-wider text-center">
-        Become a Imperial Craft Of India Member
+        Become a Taj Petha Member
       </h1>
       <div className="h-0.5 w-32 gold-gradient mb-6"></div>
       <p className="text-center text-[var(--color-luxury-charcoal)]/70 mb-8 max-w-sm">
-        Create your Imperial Craft Of India Member profile, and get access to an enhanced
+        Create your Taj Petha Member profile, and get access to an enhanced
         shopping experience.
       </p>
       <form className="w-full max-w-sm flex flex-col" onSubmit={handleSubmit} encType="multipart/form-data">
@@ -115,7 +115,7 @@ const Register = ({ setCurrentView }: Props) => {
           </div>
         )}
         <span className="text-center text-[var(--color-luxury-charcoal)]/70 mt-8 text-sm">
-          By creating an account, you agree to Imperial Craft Of India&apos;s{" "}
+          By creating an account, you agree to Taj Petha&apos;s{" "}
           <LocalizedClientLink
             href="/content/privacy-policy"
           >

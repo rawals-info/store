@@ -7,9 +7,9 @@ import Link from "next/link"
 export default function Collections() {
   // Static category data
   const categories = [
-    { id: '1', name: 'Table Tops', handle: 'table-tops', description: 'Exquisite marble table tops for your luxury dining experience' },
-    { id: '2', name: 'Jewelry Boxes', handle: 'jewelry-boxes', description: 'Elegant marble jewelry storage for your precious items' },
-    { id: '3', name: 'Home Decor', handle: 'home-decor', description: 'Statement marble pieces to elevate your interior design' }
+    { id: '1', name: 'Classic Pethas', handle: 'classic-pethas', description: 'Exquisite traditional pethas for your authentic Agra sweet experience' },
+    { id: '2', name: 'Flavored Pethas', handle: 'flavored-pethas', description: 'Elegant flavored pethas for your special sweet cravings' },
+    { id: '3', name: 'Gift Boxes', handle: 'gift-boxes', description: 'Statement petha gift boxes to elevate your gifting experience' }
   ]
 
   // Background colors for categories

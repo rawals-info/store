@@ -80,7 +80,7 @@ const AnimatedProductCard = ({ product, region }: AnimatedProductCardProps) => {
           transition={{ duration: 0.2, delay: 0.05 }}
         >
           <Text className="text-ui-fg-subtle text-sm">
-            {product.collection?.title || "Marble Collection"}
+            {product.collection?.title || "Petha Collection"}
           </Text>
         </motion.div>
         

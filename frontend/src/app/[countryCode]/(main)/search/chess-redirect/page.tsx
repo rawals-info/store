@@ -12,7 +12,7 @@ export default function ChessRedirectPage({ params }: { params: { countryCode: s
   // Or fall back to the hardcoded value if not yet in config
   const chessCategory = Object.values(CATEGORIES).find(cat => 
     cat.displayName.toLowerCase().includes("chess")
-  ) || { handle: "marble-chess-board" }
+  ) || { handle: "classic-petha-box" }
   
   // Redirect to the categories page with the correct handle
   redirect(`/${params.countryCode}/categories/${chessCategory.handle}`)

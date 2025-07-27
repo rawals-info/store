@@ -7,21 +7,21 @@ import Image from "next/image"
 const testimonials = [
   {
     id: 1,
-    text: "The craftsmanship of my marble Taj Mahal is simply extraordinary. It's become the centerpiece of my home and draws admiration from every guest.",
+    text: "The craftsmanship of my petha gift box is simply extraordinary. It's become the centerpiece of my celebrations and draws admiration from every guest.",
     author: "Alexander Winston",
     title: "Art Collector",
     image: "/customer-1.jpg" // Replace with actual image path
   },
   {
     id: 2,
-    text: "I've purchased luxury items from around the world, but the marble sculptures from this artisan are truly unparalleled. The attention to detail is breathtaking.",
+    text: "I've purchased sweets from around the world, but the pethas from this artisan are truly unparalleled. The attention to detail is breathtaking.",
     author: "Victoria Harding",
     title: "Interior Designer",
     image: "/customer-2.jpg" // Replace with actual image path
   },
   {
     id: 3,
-    text: "The epoxy marble table I purchased is both a functional piece and a work of art. It's transformed my dining area into a space of elegance and sophistication.",
+    text: "The assorted petha box I purchased is both a delightful treat and a work of art. It's transformed my family gatherings into moments of elegance and joy.",
     author: "Jonathan Pierce",
     title: "Luxury Home Owner",
     image: "/customer-3.jpg" // Replace with actual image path
@@ -67,7 +67,7 @@ export default function TestimonialSection() {
     <section className="relative py-24 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 bg-luxury-charcoal/95 z-0"></div>
-      <div className="absolute inset-0 bg-[url('/marble-bg.jpg')] bg-cover bg-center opacity-10 mix-blend-overlay z-0"></div>
+      <div className="absolute inset-0 bg-[url('/petha-bg.jpg')] bg-cover bg-center opacity-10 mix-blend-overlay z-0"></div>
       
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-64 h-64 gold-gradient opacity-10 rounded-full blur-3xl"></div>

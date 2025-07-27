@@ -111,7 +111,7 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
         </h1>
         <div className="h-px w-32 bg-luxury-gold mx-auto mb-6"></div>
         <Text className="max-w-2xl mx-auto text-luxury-charcoal/80 text-base md:text-lg">
-          Discover our curated selection of handcrafted marble pieces, meticulously created by master artisans to elevate your living space.
+          Discover our curated selection of authentic Agra pethas, meticulously crafted using traditional recipes to bring you the sweetest taste of royal heritage.
         </Text>
       </motion.div>
 
@@ -255,7 +255,7 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
         transition={{ delay: 0.8, duration: 1 }}
       >
         <Text className="italic text-luxury-charcoal/70">
-          "Each piece tells a story of craftsmanship, elegance, and timeless design."
+          "Each piece tells a story of authentic flavor, traditional craftsmanship, and royal sweetness."
         </Text>
       </motion.div>
     </div>

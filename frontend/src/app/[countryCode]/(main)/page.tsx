@@ -8,8 +8,8 @@ import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "Imperial Craft Of India | Fine Hand-Crafts",
-  description: "A custom e-commerce storefront with Next.js and Medusa.",
+  title: "Taj Petha | Authentic Agra Sweets",
+  description: "Discover the finest authentic Agra pethas crafted with traditional recipes.",
 };
 
 interface HomeProps {
