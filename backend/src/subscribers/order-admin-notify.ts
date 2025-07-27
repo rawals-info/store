@@ -18,7 +18,7 @@ export default async function orderAdminNotify({
 }: SubscriberArgs<{ id: string }>) {
   const logger = container.resolve("logger") as any
 
-  const ADMIN_EMAIL = process.env.ADMIN_EMAIL 
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL
   if (!ADMIN_EMAIL) {
     logger?.warn?.(
       "ADMIN_EMAIL env var not set – orderAdminNotify will skip sending admin emails."

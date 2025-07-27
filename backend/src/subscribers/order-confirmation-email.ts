@@ -5,7 +5,7 @@ import { Modules } from "@medusajs/framework/utils"
 import type { IOrderModuleService } from "@medusajs/framework/types"
 
 /**
- * Sends a simple order confirmation email to the customer using Brevo.
+ * Sends an order confirmation email to the customer for their Taj Petha order.
  * Make sure to set BREVO_API_KEY and EMAIL_FROM in your environment.
  */
 export default async function orderConfirmationEmail({
@@ -53,14 +53,14 @@ export default async function orderConfirmationEmail({
   const fmt = (amt: number) =>
     Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: order.currency_code?.toUpperCase?.() ?? "USD",
+      currency: order.currency_code?.toUpperCase?.() ?? "INR",
     }).format(amt)
 
   const items: any[] = Array.isArray(order.items) ? order.items : []
   const itemsHtml = items
     .map((it: any) => {
       const lineTotal = asNumber(it.total ?? it.unit_price * it.quantity)
-      return `<tr><td>${it.title}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${fmt(lineTotal)}</td></tr>`
+      return `<tr><td style="padding: 12px 8px; border-bottom: 1px solid #F0E68C;">${it.title}</td><td style="padding: 12px 8px; text-align:center; border-bottom: 1px solid #F0E68C;">${it.quantity}</td><td style="padding: 12px 8px; text-align:right; border-bottom: 1px solid #F0E68C; font-weight: 600;">${fmt(lineTotal)}</td></tr>`
     })
     .join("")
 
@@ -74,34 +74,60 @@ export default async function orderConfirmationEmail({
       addr.phone,
     ]
       .filter(Boolean)
-      .map((l) => `<div>${l}</div>`) // wrap each line
+      .map((l) => `<div style="margin: 4px 0;">${l}</div>`) // wrap each line
       .join("")
 
   const body = `
     <p>Dear ${(order as any).shipping_address?.first_name ?? order.email},</p>
-    <p>Thank you for your purchase! Your order <strong>#${order.display_id ?? order.id}</strong> has been received and is now being processed.</p>
+    <p>Thank you for choosing <strong>Taj Petha</strong> for your sweet cravings! 🍯 Your order <strong>#${order.display_id ?? order.id}</strong> has been received and our master sweet makers are already preparing your delicious treats.</p>
 
-    <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px;margin-top:16px">
-      <thead><tr><th align="left">Item</th><th align="center">Qty</th><th align="right">Total</th></tr></thead>
-      <tbody>${itemsHtml}</tbody>
+    <div class="highlight-box">
+      <p><strong>🎯 Your Sweet Order Summary</strong></p>
+      <p>Each item is lovingly handcrafted using our traditional family recipes, ensuring you receive the authentic taste of Agra's finest sweets.</p>
+    </div>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin: 24px 0;">
+      <thead>
+        <tr>
+          <th style="text-align: left; padding: 12px 8px; background: linear-gradient(135deg, #E8944A, #D2691E); color: #FFFFFF; font-weight: 600;">Sweet Item</th>
+          <th style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, #E8944A, #D2691E); color: #FFFFFF; font-weight: 600;">Qty</th>
+          <th style="text-align: right; padding: 12px 8px; background: linear-gradient(135deg, #E8944A, #D2691E); color: #FFFFFF; font-weight: 600;">Total</th>
+        </tr>
+      </thead>
+      <tbody style="background: #FFFEF7;">${itemsHtml}</tbody>
     </table>
-    <p style="margin-top:16px"><strong>Subtotal:</strong> ${fmt(asNumber(order.subtotal))}</p>
-    <p><strong>Shipping:</strong> ${fmt(asNumber(order.shipping_total))}</p>
-    <p><strong>Tax:</strong> ${fmt(asNumber(order.tax_total))}</p>
-    ${order.discount_total ? `<p><strong>Discount:</strong> -${fmt(asNumber(order.discount_total))}</p>` : ""}
-    <p><strong>Grand Total:</strong> ${fmt(asNumber(order.total))}</p>
+    
+    <div style="background: #FFF8E7; padding: 20px; border-radius: 8px; margin: 24px 0; border: 1px solid #F0E68C;">
+      <p style="margin: 8px 0; font-size: 16px;"><strong>Subtotal:</strong> <span style="float: right; color: #B8860B;">${fmt(asNumber(order.subtotal))}</span></p>
+      <p style="margin: 8px 0; font-size: 16px;"><strong>Shipping:</strong> <span style="float: right; color: #B8860B;">${fmt(asNumber(order.shipping_total))}</span></p>
+      <p style="margin: 8px 0; font-size: 16px;"><strong>Tax:</strong> <span style="float: right; color: #B8860B;">${fmt(asNumber(order.tax_total))}</span></p>
+      ${order.discount_total ? `<p style="margin: 8px 0; font-size: 16px;"><strong>Discount:</strong> <span style="float: right; color: #E8944A;">-${fmt(asNumber(order.discount_total))}</span></p>` : ""}
+      <hr style="border: none; height: 1px; background: #E8944A; margin: 16px 0;">
+      <p style="margin: 8px 0; font-size: 18px; font-weight: 700;"><strong>Grand Total:</strong> <span style="float: right; color: #B8860B; font-size: 20px;">${fmt(asNumber(order.total))}</span></p>
+    </div>
 
-    <h3 style="margin-top:24px">Shipping To</h3>
-    ${addressLines(order.shipping_address ?? {})}
+    <div class="address-section">
+      <h3>🏠 Delivery Address</h3>
+      ${addressLines(order.shipping_address ?? {})}
+    </div>
 
-    <p style="margin-top:32px">You will receive a shipment notification with tracking details as soon as your order is on its way.</p>
-    <p style="margin-top:32px">With appreciation,<br/>The Imperial Craft Of India Team</p>
+    <div class="highlight-box">
+      <p><strong>📦 What Happens Next?</strong></p>
+      <p>• Our sweet makers will carefully prepare your order with love and tradition<br/>
+      • Your sweets will be packed in our premium, food-safe packaging<br/>
+      • You'll receive a tracking notification once your order is dispatched<br/>
+      • Enjoy your authentic Agra sweets fresh from our kitchen to your home!</p>
+    </div>
+    
+    <p>If you have any questions about your order or need assistance, please don't hesitate to contact us at <strong>support@tajpetha.in</strong>.</p>
+    
+    <p style="margin-top: 32px; font-style: italic;">Sweet regards and thank you for your trust,<br/>The Taj Petha Family 🍯</p>
   `
 
   await sendLuxuryEmail({
     to: order.email as string,
     name: order.email,
-    subject: `Order #${(order.display_id ?? order.id) as string} Confirmation`,
+    subject: `Sweet Order #${(order.display_id ?? order.id) as string} Confirmed - Taj Petha 🍯`,
     html: buildLuxuryTemplate("Order Confirmation", body),
   })
 }

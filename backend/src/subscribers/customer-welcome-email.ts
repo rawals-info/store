@@ -12,16 +12,31 @@ export default async function customerWelcomeEmail({
 
   const body = `
     <p>Dear ${customer.first_name ?? customer.email},</p>
-    <p>Welcome to Imperial Craft Of India – where timeless elegance meets exquisite craftsmanship.</p>
-    <p>As a valued member, you'll enjoy early access to limited editions, private sales, and curated inspiration.</p>
-    <p style="margin-top:32px">We're delighted to have you,<br/>The Imperial Craft Of India Team</p>
+    <p>A warm welcome to the <strong>Taj Petha</strong> family – where every sweet tells a story of tradition, heritage, and the authentic flavors of Agra!</p>
+    
+    <div class="highlight-box">
+      <p><strong>🍯 Welcome to Our Sweet Legacy</strong></p>
+      <p>For generations, we have been crafting the finest pethas, namkeens, and traditional Indian sweets using time-honored recipes passed down through our family. Each bite is a celebration of Agra's rich culinary heritage.</p>
+    </div>
+    
+    <p>As a valued member of our sweet family, you'll enjoy:</p>
+    <ul style="margin: 16px 0; padding-left: 20px;">
+      <li style="margin: 8px 0;">🎯 <strong>Early access</strong> to our seasonal specialties and festival collections</li>
+      <li style="margin: 8px 0;">🎁 <strong>Exclusive offers</strong> on our premium petha varieties</li>
+      <li style="margin: 8px 0;">📦 <strong>Special discounts</strong> on bulk orders for celebrations</li>
+      <li style="margin: 8px 0;">🌟 <strong>First to know</strong> about new flavors and traditional recipes</li>
+    </ul>
+    
+    <p>Whether you're craving our signature <strong>Kesar Petha</strong>, the delightful <strong>Angoori Petha</strong>, or our famous <strong>Dalmoth</strong>, we're here to bring the authentic taste of Agra right to your doorstep.</p>
+    
+    <p style="margin-top: 32px; font-style: italic;">Sweet regards and warm wishes,<br/>The Taj Petha Family</p>
   `
 
   await sendLuxuryEmail({
     to: customer.email,
     name: customer.first_name ?? customer.email,
-    subject: "Welcome to Imperial Craft Of India",
-    html: buildLuxuryTemplate("Welcome", body),
+    subject: "Welcome to Taj Petha - Your Sweet Journey Begins! 🍯",
+    html: buildLuxuryTemplate("Welcome to Our Sweet Family", body),
   })
 }
 
