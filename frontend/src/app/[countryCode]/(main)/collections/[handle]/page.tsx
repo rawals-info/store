@@ -5,6 +5,7 @@ import { getCollectionByHandle, listCollections } from "@lib/data/collections"
 import { listRegions } from "@lib/data/regions"
 import { parallelFetch } from "@lib/util/parallel-fetch"
 import { batchFetch } from "@lib/util/batch-fetch"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -24,7 +25,7 @@ export const dynamic = "force-static"
 export const revalidate = 600
 
 export async function generateStaticParams() {
-  // Fetch collections and regions using batch fetch
+  // Fetch only collections, use hardcoded regions
   const responses = await batchFetch([
     {
       path: "/store/collections",
@@ -32,18 +33,12 @@ export async function generateStaticParams() {
       cacheTags: ["collections"],
       cacheRevalidate: 600
     },
-    {
-      path: "/store/regions",
-      cacheTags: ["regions"],
-      cacheRevalidate: 600
-    }
   ])
 
   const collectionsData = (responses[0].data as any)?.collections || []
-  const regionsData = (responses[1].data as any)?.regions || []
+  // Use hardcoded India regions instead of API call
+  const regions = listIndiaRegions()
   
-  const regions = regionsData || []
-
   if (!collectionsData.length) {
     return []
   }

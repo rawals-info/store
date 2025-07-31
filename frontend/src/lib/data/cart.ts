@@ -42,7 +42,7 @@ export async function retrieveCart(cartId?: string) {
   // checkout page shows an empty cart even though items have just been
   // added.
   const next = {
-    revalidate: 0,
+    revalidate: 30, // Use smart caching with 30s TTL
     tags: ["cart", `cart-${id}`],
   }
 

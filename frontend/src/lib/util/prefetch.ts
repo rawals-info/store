@@ -9,7 +9,6 @@ import { usePathname } from 'next/navigation'
  */
 const RESOURCES_TO_PREFETCH = [
   // Common API endpoints
-  '/store/regions',
   '/store/collections',
   '/store/products',
   

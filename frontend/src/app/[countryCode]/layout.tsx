@@ -3,7 +3,7 @@ import Footer from "@modules/layout/templates/footer"
 import AnimatedHeader from "@modules/layout/components/animated-header"
 import PrefetchProvider from "@modules/layout/components/prefetch-provider"
 import CountryRedirect from "@modules/layout/components/country-redirect"
-import { getRegions } from "@lib/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { dataFetchingConfig } from "@lib/config"
 
 export const dynamic = 'force-dynamic'
@@ -13,10 +13,13 @@ export const revalidate = 60
 // This is necessary because account pages use cookies and server-side data
 // that can't be statically generated
 export async function generateStaticParams() {
-  const regions = await getRegions()
-  const countryCodes = Object.keys(regions).map((countryCode) => ({
-    countryCode: countryCode.toLowerCase(),
-  }))
+  // Use hardcoded India region instead of API call
+  const regions = listIndiaRegions()
+  const countryCodes = regions.flatMap(region => 
+    region.countries?.map(country => ({
+      countryCode: country.iso_2?.toLowerCase() || 'in',
+    })).filter(item => item.countryCode) || []
+  )
 
   return countryCodes
 }

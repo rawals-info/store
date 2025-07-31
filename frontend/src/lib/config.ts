@@ -56,8 +56,9 @@ export const dataFetchingConfig = {
   
   // Set cache behavior for cart data
   cart: {
-    // Cart data should always be fetched fresh
-    revalidate: 0,
+    // Smart cache with short TTL for better performance
+    // Cart mutations will trigger targeted revalidation via scheduleRevalidate
+    revalidate: 30, // 30 seconds cache, invalidated on mutations
   },
 }
 
