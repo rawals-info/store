@@ -48,7 +48,6 @@ const AnimatedHeader = () => {
   
   // Default links so the header still renders without Tina
   const defaultNavLinks = [
-    { href: "/", label: "Home", testId: "nav-home-link" },
     { href: "/products", label: "Shop", testId: "nav-shop-link" },
     { href: "/about", label: "About", testId: "nav-about-link" },
   ]

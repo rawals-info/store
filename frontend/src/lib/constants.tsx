@@ -31,12 +31,12 @@ export const paymentInfoMap: Record<
     icon: <CreditCard />,
   },
   pp_razorpay_razorpay: {
-    title: "Razorpay",
-    icon: <CreditCard />,
+    title: "Razorpay-UPI/Card",
+    icon: <img src="/razorpay.svg" alt="Razorpay" className="h-4 inline" />,
   },
   razorpay: {
-    title: "Razorpay",
-    icon: <CreditCard />,
+    title: "Razorpay-UPI/Card",
+    icon: <img src="/razorpay.svg" alt="Razorpay" className="h-4 inline" />,
   },
   // Add more payment providers here
 }

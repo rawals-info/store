@@ -50,7 +50,7 @@ export async function retrieveCart(cartId?: string) {
       method: "GET",
       query: {
         fields:
-          "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name",
+          "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name, +subtotal, +total, +discount_total, +shipping_subtotal, +shipping_total, +tax_total, +gift_card_total",
       },
       headers,
       next,
@@ -524,9 +524,21 @@ export async function submitPromotionForm(
   currentState: unknown,
   formData: FormData
 ) {
-  const code = formData.get("code") as string
+  const rawCode = formData.get("code") as string | null
+  const code = rawCode?.trim().toUpperCase()
+
+  if (!code) {
+    return "Please enter a promotion code."
+  }
+
   try {
     await applyPromotions([code])
+    // Fetch updated cart to confirm promotion actually applied
+    const cart = await retrieveCart()
+    const applied = cart?.promotions?.some((p) => p.code?.toUpperCase() === code)
+    if (!applied) {
+      return "Invalid or ineligible promotion code."
+    }
   } catch (e: any) {
     return e.message
   }

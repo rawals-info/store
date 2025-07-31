@@ -2,6 +2,7 @@
 
 import { Badge, Heading, Input, Label, Text, Tooltip } from "@medusajs/ui"
 import React, { useActionState } from "react";
+import { useRouter } from "next/navigation"
 
 import { applyPromotions, submitPromotionForm } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
@@ -19,15 +20,23 @@ type DiscountCodeProps = {
 
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [showSuccess, setShowSuccess] = React.useState(false)
+  const router = useRouter()
+  const [submitted, setSubmitted] = React.useState(false)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  const [localError, setLocalError] = React.useState<string | null>(null)
 
   const { items = [], promotions = [] } = cart
   const removePromotionCode = async (code: string) => {
-    const validPromotions = promotions.filter(
+    const remainingPromotions = promotions.filter(
       (promotion) => promotion.code !== code
     )
 
     await applyPromotions(
-      validPromotions.filter((p) => p.code === undefined).map((p) => p.code!)
+      remainingPromotions
+        .filter((p) => p.code !== undefined)
+        .map((p) => p.code!)
     )
   }
 
@@ -36,13 +45,17 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     if (!code) {
       return
     }
-    const input = document.getElementById("promotion-input") as HTMLInputElement
-    const codes = promotions
-      .filter((p) => p.code === undefined)
-      .map((p) => p.code!)
-    codes.push(code.toString())
 
-    await applyPromotions(codes)
+    const input = document.getElementById("promotion-input") as HTMLInputElement
+    const existingCodes = promotions
+      .filter((p) => p.code !== undefined)
+      .map((p) => p.code!)
+
+    const normalizedCode = code.toString().trim().toUpperCase()
+
+    existingCodes.push(normalizedCode)
+
+    await applyPromotions(existingCodes)
 
     if (input) {
       input.value = ""
@@ -51,13 +64,55 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
 
   const [message, formAction] = useActionState(submitPromotionForm, null)
 
+// Trigger a refresh (to fetch the updated cart with the applied promotion) and show a
+// transient success banner once the server action completes without error.
+React.useEffect(() => {
+  if (!submitted) {
+    return
+  }
+
+  // If `message` is undefined the action completed successfully. Any string is an error.
+  if (message === undefined) {
+    // Revalidate Server Components and cached fetches
+    router.refresh()
+    setShowSuccess(true)
+    // Hide success after a short delay
+    const t = setTimeout(() => setShowSuccess(false), 4000)
+    return () => clearTimeout(t)
+  }
+
+  // Reset success state on error
+  setShowSuccess(false)
+}, [message, submitted, router])
+
   return (
     <div className="w-full flex flex-col">
       <div className="text-[#8a7f72]">
-        <form action={formAction} className="w-full mb-5">
+        <form
+          action={formAction}
+          className="w-full mb-5"
+          onSubmit={(e) => {
+            const val = inputRef.current?.value.trim()
+            if (!val) {
+              e.preventDefault()
+              setLocalError("Please enter a promotion code.")
+              return
+            }
+            // Upper-case the value for consistency
+            if (inputRef.current) {
+              inputRef.current.value = val.toUpperCase()
+            }
+            setSubmitted(true)
+            setLocalError(null)
+          }}
+        >
           <Label className="flex gap-x-1 my-2 items-center">
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => {
+                setIsOpen(!isOpen)
+                // reset local error when reopening input
+                setLocalError(null)
+              }}
               type="button"
               className="font-medium text-[#43372f] hover:text-[#2a221e] transition-colors duration-150 ease-in-out"
               data-testid="add-discount-button"
@@ -75,6 +130,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   name="code"
                   type="text"
                   autoFocus={false}
+                  ref={inputRef}
                   data-testid="discount-input"
                 />
                 <SubmitButton
@@ -86,10 +142,16 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                 </SubmitButton>
               </div>
 
+              {/* Server-returned error takes precedence */}
               <ErrorMessage
-                error={message}
+                error={message || localError}
                 data-testid="discount-error-message"
               />
+              {showSuccess && !message && (
+                <div className="mt-4 flex items-start gap-2 rounded-md border border-green-300 bg-green-50 p-3 text-sm text-green-800" role="alert">
+                  <span>Promotion applied successfully!</span>
+                </div>
+              )}
             </>
           )}
         </form>

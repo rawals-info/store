@@ -82,6 +82,17 @@ const Shipping: React.FC<ShippingProps> = ({
   const hasPickupOptions = !!_pickupMethods?.length
 
   useEffect(() => {
+    // If there's exactly one shipping method (and no pickup flow) auto-select it and continue to payment.
+    if (isOpen && !hasPickupOptions && _shippingMethods?.length === 1) {
+      const sole = _shippingMethods[0]
+      if (sole && shippingMethodId === "") {
+        (async () => {
+          await handleSetShippingMethod(sole.id, "shipping")
+          handleSubmit()
+        })()
+      }
+    }
+
     setIsLoadingPrices(true)
 
     if (_shippingMethods?.length) {

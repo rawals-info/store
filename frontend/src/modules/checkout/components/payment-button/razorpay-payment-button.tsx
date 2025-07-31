@@ -42,7 +42,8 @@ export const RazorpayPaymentButton = ({
   }, [session?.data])
 
   const handlePayment = useCallback(async () => {
-    if (!orderData.razorpayOrder.id) return
+    const orderId = orderData?.razorpayOrder?.id
+    if (!orderId) return
     setSubmitting(true)
     setErrorMessage(undefined)
 
@@ -53,10 +54,10 @@ export const RazorpayPaymentButton = ({
         "", // fallback empty – Razorpay will throw if empty
       callback_url: `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/razorpay/hooks`,
       amount: (session.amount || 0) * 100, // amount in paise
-      order_id: orderData.razorpayOrder.id,
+      order_id: orderId,
       currency: (cart.currency_code || "usd").toUpperCase() as CurrencyCode,
       name: process.env.NEXT_PUBLIC_SHOP_NAME ?? "Checkout",
-      description: `Order ${orderData.razorpayOrder.id}`,
+      description: `Order ${orderId}`,
       remember_customer: true,
       image: "/favicon.ico",
       modal: {
@@ -94,7 +95,7 @@ export const RazorpayPaymentButton = ({
       setErrorMessage(err.message || "Razorpay initialization error")
       setSubmitting(false)
     }
-  }, [Razorpay, cart, session.amount, orderData.razorpayOrder.id])
+  }, [Razorpay, cart, session.amount, orderData?.razorpayOrder?.id])
 
   return (
     <>
