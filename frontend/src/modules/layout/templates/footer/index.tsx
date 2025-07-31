@@ -9,6 +9,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 // Currency switcher removed
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -43,7 +44,7 @@ export default function Footer() {
       const categoriesData = await listCategories()
       setCategories(categoriesData || [])
       
-      const regionsData = await listRegions()
+      const regionsData = listIndiaRegions()
       setRegions(regionsData || [])
     }
     

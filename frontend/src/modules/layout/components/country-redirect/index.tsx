@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import { StoreRegion } from "@medusajs/types"
 import { motion, AnimatePresence } from "framer-motion"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import ReactCountryFlag from "react-country-flag"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
@@ -21,7 +22,7 @@ const CountryRedirect = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        const regionsData = await listRegions()
+        const regionsData = listIndiaRegions()
         setRegions(regionsData)
         
         // Create a map of country codes to region IDs

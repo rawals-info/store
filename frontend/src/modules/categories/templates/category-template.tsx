@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 
 import { listProducts } from "../../../lib/data/products"
 import { getRegion } from "../../../lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { SortOptions } from "../../store/components/refinement-list/sort-products"
 
 import CategoryHero from "../components/category-hero"
@@ -22,7 +23,7 @@ export default async function CategoryTemplate({
   sortBy,
   page,
 }: CategoryTemplateProps) {
-  const region = await getRegion(countryCode).catch(() => null)
+  const region = getIndiaRegion()
 
   if (!region) {
     return notFound()

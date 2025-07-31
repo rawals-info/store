@@ -5,6 +5,7 @@ import { Suspense } from "react"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { CategoryTemplate } from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
@@ -63,7 +64,7 @@ export async function generateStaticParams() {
     return []
   }
 
-  const regions = await listRegions()
+  const regions = listIndiaRegions()
 
   // Only generate the most popular categories to avoid too many pages
   return regions

@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { listCategories } from "@lib/data/categories"
 import CategorySection from "@modules/categories/components/category-section"
 import { notFound } from "next/navigation"
@@ -18,7 +19,7 @@ export default async function Categories(props: {
 }) {
   const { countryCode } = await props.params
   
-  const region = await getRegion(countryCode).catch(() => null)
+  const region = getIndiaRegion()
   const categories = await listCategories().catch(() => null)
 
   if (!categories) {

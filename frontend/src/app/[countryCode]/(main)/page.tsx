@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 import { listCollections } from "@lib/data/collections";
-import { getRegion } from "@lib/data/regions";
+import { getIndiaRegion } from "@lib/constants/india-region";
 import { getCachedCategories } from "@modules/home/components/categories"
 import { getHomepageProducts } from "@lib/data/products"
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper"
@@ -20,12 +20,14 @@ interface HomeProps {
 
 export default async function Home({ params }: HomeProps) {
   const { countryCode } = await params;
-  const [region, collectionsResp, categories, homepageProducts] = await Promise.all([
-    getRegion(countryCode),
+  const [collectionsResp, categories, homepageProducts] = await Promise.all([
     listCollections({ fields: "id, handle, title" }),
     getCachedCategories().catch(() => []),
     getHomepageProducts(countryCode).catch(() => ({ featuredProducts: [] })),
   ])
+
+  // Use hardcoded India region instead of API call
+  const region = getIndiaRegion()
 
   const { collections } = collectionsResp
   const { featuredProducts } = homepageProducts

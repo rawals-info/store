@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import ReactCountryFlag from "react-country-flag"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { DEFAULT_CURRENCY, DEFAULT_COUNTRY } from "@lib/config/defaults"
 
 const CurrencyDisplay = () => {
@@ -15,7 +16,7 @@ const CurrencyDisplay = () => {
   useEffect(() => {
     const fetchRegionData = async () => {
       try {
-        const regions = await listRegions()
+        const regions = listIndiaRegions()
         
         // Create a map of country codes to currencies
         const currencyMap: Record<string, string> = {}

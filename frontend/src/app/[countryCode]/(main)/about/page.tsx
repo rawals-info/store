@@ -1,6 +1,7 @@
 "use server"
 
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 
@@ -13,7 +14,7 @@ interface AboutPageProps {
 export default async function AboutPage(props: AboutPageProps) {
   const params = await props.params
   const countryCode = params.countryCode
-  const region = await getRegion(countryCode)
+  const region = getIndiaRegion()
 
   if (!region) {
     notFound()

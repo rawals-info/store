@@ -2,6 +2,7 @@
 
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import ProductPreview from "@modules/products/components/product-preview/server"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -21,7 +22,7 @@ type PaginatedProductsParams = {
 
 // Cached region fetch to prevent redundant requests
 const getCachedRegion = cache(async (countryCode: string) => {
-  return await getRegion(countryCode)
+  return getIndiaRegion()
 })
 
 // Pre-fetch data outside of the component with streaming support

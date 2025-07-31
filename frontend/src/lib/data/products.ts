@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { cache } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -23,7 +24,9 @@ const getProducts = cache(
       query: { ...queryParams, region_id: regionId },
       next: {
         tags: ["products"],
+        revalidate: 1800, // 30 minutes aggressive caching
       },
+      cache: "force-cache",
     });
   }
 );
@@ -43,7 +46,7 @@ export const listProducts = async ({
   nextPage: number | null
   queryParams?: HttpTypes.StoreProductParams
 }> => {
-  const region = regionId ? { id: regionId } : await getRegion(countryCode!)
+  const region = regionId ? { id: regionId } : getIndiaRegion()
   
   if (!region) {
     return {
@@ -217,38 +220,21 @@ export const getProductData = cache(
     relatedProducts: HttpTypes.StoreProduct[]
     region: HttpTypes.StoreRegion | null
   }> => {
-    // Kick off region lookup and a lightweight product skeleton fetch in parallel
-    const regionPromise = getRegion(countryCode)
+    // Use hardcoded India region instead of API call
+    const region = getIndiaRegion()
 
-    // Fetch product without region so we at least have a skeleton quickly
-    const productSkeletonPromise = sdk.client
+    // Fetch product with region-aware pricing directly
+    const detailedProduct = await sdk.client
       .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
-        query: { handle, limit: 1 },
+        query: { handle, limit: 1, region_id: region.id },
         next: {
-          revalidate: 300,
+          revalidate: 1800, // 30 minutes for product data
           tags: ["products", `product-handle-${handle}`],
         },
+        cache: "force-cache",
       })
       .then((res) => res.products?.[0] || null)
       .catch(() => null)
-
-    const [region, productSkeleton] = await Promise.all([regionPromise, productSkeletonPromise])
-
-    if (!region) {
-      // No region information – return skeleton as-is
-      return { product: productSkeleton, relatedProducts: [], region: null as any }
-    }
-
-    // Fetch region-aware pricing/details in parallel with related products lookup
-    const detailedProductPromise = sdk.client
-      .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
-        query: { handle, limit: 1, region_id: region.id },
-      })
-      .then((res) => res.products?.[0] || productSkeleton)
-      .catch(() => productSkeleton)
-
-    // Related products can be fetched lazily – keep cheap for now
-    const detailedProduct = await detailedProductPromise
 
     return {
       product: detailedProduct,
@@ -259,17 +245,15 @@ export const getProductData = cache(
 )
 
 export const getInitialProducts = cache(async (countryCode: string) => {
-  const region = await getRegion(countryCode)
+  const region = getIndiaRegion()
   const { products } = await getProducts({ limit: 10 }, region!.id)
   return products
 })
 
 export const getHomepageProducts = cache(async (countryCode: string) => {
-  // Fetch region and collection in parallel to reduce latency
-  const [region, featuredCollection] = await Promise.all([
-    getRegion(countryCode),
-    getCollectionByHandle("featured-products").catch(() => null),
-  ])
+  // Use hardcoded India region and fetch collection
+  const region = getIndiaRegion()
+  const featuredCollection = await getCollectionByHandle("featured-products").catch(() => null)
 
   if (!featuredCollection || !region) {
     return { featuredProducts: [] }

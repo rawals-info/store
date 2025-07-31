@@ -8,6 +8,7 @@ import CartDropdown from "@modules/layout/components/cart-dropdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import RegionSelector from "@modules/layout/components/region-selector"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { StoreRegion } from "@medusajs/types"
 // Currency switcher removed
 import { usePathname } from "next/navigation"
@@ -112,7 +113,7 @@ const AnimatedHeader = () => {
   // Fetch regions
   useEffect(() => {
     const fetchRegions = async () => {
-      const regionsData = await listRegions()
+      const regionsData = listIndiaRegions()
       setRegions(regionsData)
     }
     fetchRegions()

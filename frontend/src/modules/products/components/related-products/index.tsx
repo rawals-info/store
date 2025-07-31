@@ -1,5 +1,6 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "../../components/product-preview/server"
 
@@ -14,7 +15,7 @@ export default async function RelatedProducts({
 }: RelatedProductsProps) {
   try {
     // 1. Resolve the shopper's region up-front
-    const region = await getRegion(countryCode)
+    const region = getIndiaRegion()
 
     if (!region) {
       return null

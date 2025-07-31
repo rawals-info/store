@@ -8,6 +8,7 @@ import ProfilePassword from "@modules/account/components/profile-password"
 
 import { notFound } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { retrieveCustomer } from "@lib/data/customer"
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 
 export default async function Profile() {
   const customer = await retrieveCustomer()
-  const regions = await listRegions()
+  const regions = listIndiaRegions()
 
   if (!customer || !regions) {
     notFound()

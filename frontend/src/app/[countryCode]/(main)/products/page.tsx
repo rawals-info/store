@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { listProducts } from "@lib/data/products"
-import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { listCategories } from "@lib/data/categories"
 import { listTags } from "@lib/data/tags"
 import ProductPreview from "@modules/products/components/product-preview/server"
@@ -51,11 +51,8 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   // Get country code from params
   const countryCode = paramsData.countryCode
 
-  // Get region
-  const regionData = await getRegion(countryCode)
-  if (!regionData) {
-    notFound()
-  }
+  // Use hardcoded India region instead of API call
+  const regionData = getIndiaRegion()
 
   // Build query params for product API
   const queryParams: Record<string, any> = {}

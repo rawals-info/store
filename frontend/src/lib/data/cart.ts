@@ -16,6 +16,7 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { retryWithBackoff } from "@lib/utils/retry"
 import { withTimeout } from "@lib/utils/retry"
 import { randomUUID } from "crypto"
@@ -74,7 +75,7 @@ export async function retrieveCart(cartId?: string) {
 export async function getOrSetCart(countryCode: string) {
   // Fetch region and existing cart concurrently since they are independent
   const [region, existingCart] = await Promise.all([
-    getRegion(countryCode),
+    getIndiaRegion(),
     retrieveCart(),
   ])
 
@@ -174,7 +175,7 @@ export async function addToCart({
   // No cart yet → create one and include the requested item in the same request
   if (!existingCart) {
     const [region, authHeaders] = await Promise.all([
-      getRegion(countryCode),
+      getIndiaRegion(),
       getAuthHeaders(),
     ])
 
@@ -526,14 +527,13 @@ export async function submitPromotionForm(
 ) {
   const rawCode = formData.get("code") as string | null
   const code = rawCode?.trim().toUpperCase()
-
   if (!code) {
     return "Please enter a promotion code."
   }
-
   try {
     await applyPromotions([code])
     // Fetch updated cart to confirm promotion actually applied
+    const region = getIndiaRegion()
     const cart = await retrieveCart()
     const applied = cart?.promotions?.some((p) => p.code?.toUpperCase() === code)
     if (!applied) {
@@ -629,7 +629,7 @@ export async function placeOrder(cartId?: string) {
  */
 export async function updateRegion(countryCode: string, currentPath: string) {
   const cartId = await getCartId()
-  const region = await getRegion(countryCode)
+  const region = getIndiaRegion()
 
   if (!region) {
     throw new Error(`Region not found for country code: ${countryCode}`)

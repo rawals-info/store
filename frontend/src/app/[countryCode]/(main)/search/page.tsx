@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { searchProducts } from "@lib/data/search"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { listCategories } from "@lib/data/categories"
 import { listTags } from "@lib/data/tags"
 import { StoreRegion } from "@medusajs/types"
@@ -90,10 +91,8 @@ async function SearchContent({
       console.error("Error fetching tags:", err)
       return [] as any[]
     }),
-    getRegion(countryCode).catch((error) => {
-      console.error("Error fetching region:", error)
-      return null
-    }),
+    // Return hardcoded region as a resolved promise
+    Promise.resolve(getIndiaRegion())
   ]) as [Category[], any[], StoreRegion | null]
 
   const topCategories = categories.slice(0, 4)

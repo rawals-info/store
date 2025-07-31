@@ -7,6 +7,7 @@ import { updateRegion } from "@lib/data/cart"
 import ReactCountryFlag from "react-country-flag"
 import { motion, AnimatePresence } from "framer-motion"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 
 interface RegionSelectorProps {
   regions: StoreRegion[]
@@ -37,7 +38,7 @@ const RegionSelector: React.FC<RegionSelectorProps> = ({
   useEffect(() => {
     const refreshRegions = async () => {
       try {
-        const freshRegions = await listRegions()
+        const freshRegions = listIndiaRegions()
         if (freshRegions && freshRegions.length > 0) {
           setRegions(freshRegions)
         }

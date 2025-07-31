@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import ReactCountryFlag from "react-country-flag"
 import Link from "next/link"
 
@@ -21,7 +22,7 @@ const CurrencySwitcher = ({ variant = "header" }: CurrencySwitcherProps) => {
   useEffect(() => {
     const fetchRegionData = async () => {
       try {
-        const regions = await listRegions()
+        const regions = listIndiaRegions()
         
         // Create a map of currencies to country codes
         const currencyMap: Record<string, string[]> = {}

@@ -92,3 +92,33 @@ export function prefetchRoutes(routes: string[]) {
     })
   }
 } 
+
+// Prefetch critical homepage data
+export async function prefetchHomepageData(countryCode: string) {
+  if (typeof window === 'undefined') return
+  
+  const prefetchPromises = [
+    // Prefetch region data
+    fetch(`/api/regions?country=${countryCode}`),
+    // Prefetch featured products  
+    fetch(`/api/products?featured=true&country=${countryCode}&limit=8`),
+    // Prefetch categories
+    fetch(`/api/categories?limit=6`),
+  ]
+  
+  // Fire and forget - don't block rendering
+  Promise.allSettled(prefetchPromises).catch(() => {})
+}
+
+// Prefetch product page data on hover
+export async function prefetchProductData(handle: string, countryCode: string) {
+  if (typeof window === 'undefined') return
+  
+  const prefetchPromises = [
+    fetch(`/api/products/handle/${handle}?country=${countryCode}`),
+    // Prefetch related products
+    fetch(`/api/products/related/${handle}?country=${countryCode}&limit=4`),
+  ]
+  
+  Promise.allSettled(prefetchPromises).catch(() => {})
+} 

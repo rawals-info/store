@@ -3,6 +3,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import StoreTemplate from "@modules/store/templates"
 import { notFound } from "next/navigation"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 
 export const metadata: Metadata = {
   title: "Store",
@@ -23,7 +24,7 @@ export default async function StorePage({
   const countryCode = params.countryCode
   
   // Verify the region exists
-  const region = await getRegion(countryCode)
+  const region = getIndiaRegion()
   
   if (!region) {
     return notFound()

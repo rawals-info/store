@@ -2,6 +2,7 @@
 
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
+import { getIndiaRegion } from "@lib/constants/india-region"
 import { notFound } from "next/navigation"
 import CollectionPreview from "@modules/collections/components/collection-preview"
 
@@ -14,7 +15,7 @@ interface CollectionsPageProps {
 export default async function CollectionsPage(props: CollectionsPageProps) {
   const params = await props.params
   const countryCode = params.countryCode
-  const region = await getRegion(countryCode)
+  const region = getIndiaRegion()
 
   if (!region) {
     notFound()
