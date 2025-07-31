@@ -1,6 +1,8 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { COLLECTION_FIELDS } from "@lib/constants/api-fields"
+import { cache } from "react"
 import { HttpTypes } from "@medusajs/types"
 
 export const retrieveCollection = async (id: string) => {
@@ -19,27 +21,21 @@ export const retrieveCollection = async (id: string) => {
     .then(({ collection }) => collection)
 }
 
-export const listCollections = async (
-  queryParams: Record<string, string> = {}
-): Promise<{ collections: HttpTypes.StoreCollection[]; count: number }> => {
-  const next = {
-    revalidate: 60 * 10, // Revalidate every 10 minutes
-    tags: ['collections'], // Tag for cache invalidation
-  }
-
-  queryParams.limit = queryParams.limit || "100"
-  queryParams.offset = queryParams.offset || "0"
-
+export const listCollections = cache(async (query?: Record<string, any>) => {
   return sdk.client
-    .fetch<{ collections: HttpTypes.StoreCollection[]; count: number }>(
-      "/store/collections",
-      {
-        query: queryParams,
-        next,
-      }
-    )
-    .then(({ collections }) => ({ collections, count: collections.length }))
-}
+    .fetch<{ collections: HttpTypes.StoreCollection[] }>(`/store/collections`, {
+      method: "GET",
+      query: { 
+        ...query, 
+        fields: query?.fields || COLLECTION_FIELDS.LIST // Use optimized fields by default
+      },
+      next: {
+        tags: ["collections"],
+      },
+    })
+    .then(({ collections }) => ({ collections }))
+    .catch(() => ({ collections: [] }))
+})
 
 export const getCollectionByHandle = async (
   handle: string

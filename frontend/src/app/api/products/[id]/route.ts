@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import { PRODUCT_FIELDS } from "@lib/constants/api-fields"
 
 export const dynamic = "force-dynamic"
 export const fetchCache = "force-no-store"
@@ -11,14 +12,15 @@ export const fetchCache = "force-no-store"
  */
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  routeContext: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params
+    const { id } = await routeContext.params
     
     // Get the region ID from query params
     const { searchParams } = new URL(req.url)
     const regionId = searchParams.get("regionId")
+    const contextType = searchParams.get("context") || "detail" // detail, list, search, etc.
     
     if (!id) {
       return NextResponse.json(
@@ -34,6 +36,17 @@ export async function GET(
       )
     }
 
+    // Choose fields based on context
+    const getFieldsForContext = (contextType: string) => {
+      switch (contextType) {
+        case "list": return PRODUCT_FIELDS.LIST
+        case "search": return PRODUCT_FIELDS.SEARCH
+        case "cart": return PRODUCT_FIELDS.CART_ITEM
+        case "related": return PRODUCT_FIELDS.RELATED
+        default: return PRODUCT_FIELDS.DETAIL
+      }
+    }
+
     // Fetch the product with the region info
     const result = await sdk.client.fetch<{
       products: HttpTypes.StoreProduct[]
@@ -41,7 +54,8 @@ export async function GET(
       query: {
         id: [id],
         region_id: regionId,
-        limit: 1
+        limit: 1,
+        fields: getFieldsForContext(contextType)
       },
       cache: "no-store",
     }).catch(error => {

@@ -1,8 +1,8 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { getRegion } from "@lib/data/regions"
 import { getIndiaRegion } from "@lib/constants/india-region"
+import { PRODUCT_FIELDS } from "@lib/constants/api-fields"
 import { cache } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -14,14 +14,15 @@ import { getAuthHeaders, getCacheOptions } from "./cookies"
 const getProducts = cache(
   async (
     queryParams: Omit<HttpTypes.StoreProductParams, "region_id">,
-    regionId: string
+    regionId: string,
+    fields: string = PRODUCT_FIELDS.LIST
   ) => {
     return sdk.client.fetch<{
       products: HttpTypes.StoreProduct[];
       count: number;
     }>(`/store/products`, {
       method: "GET",
-      query: { ...queryParams, region_id: regionId },
+      query: { ...queryParams, region_id: regionId, fields },
       next: {
         tags: ["products"],
         revalidate: 1800, // 30 minutes aggressive caching
@@ -60,7 +61,8 @@ export const listProducts = async ({
 
   const { products, count } = await getProducts(
     { ...queryParams, limit, offset },
-    region.id
+    region.id,
+    PRODUCT_FIELDS.LIST // Use optimized fields for product listings
   )
 
   const nextPage = count > offset + limit ? pageParam + 1 : null
@@ -226,7 +228,12 @@ export const getProductData = cache(
     // Fetch product with region-aware pricing directly
     const detailedProduct = await sdk.client
       .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
-        query: { handle, limit: 1, region_id: region.id },
+        query: { 
+          handle, 
+          limit: 1, 
+          region_id: region.id,
+          fields: PRODUCT_FIELDS.DETAIL // Use detailed fields for product pages
+        },
         next: {
           revalidate: 1800, // 30 minutes for product data
           tags: ["products", `product-handle-${handle}`],

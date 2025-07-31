@@ -1,13 +1,27 @@
-import { NextResponse } from "next/server"
-import { retrieveCart } from "@lib/data/cart"
+import { NextRequest, NextResponse } from "next/server"
+import { retrieveCart, retrieveCartDropdown, retrieveCartCount } from "@lib/data/cart"
+import { CART_FIELDS } from "@lib/constants/api-fields"
 
 // Force dynamic behavior since this route uses cookies
 export const dynamic = "force-dynamic"
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Retrieve cart
-    const cart = await retrieveCart()
+    const { searchParams } = new URL(req.url)
+    const context = searchParams.get("context") || "full" // full, dropdown, count
+    
+    // Use optimized cart function based on context
+    let cart;
+    switch (context) {
+      case "dropdown":
+        cart = await retrieveCartDropdown()
+        break
+      case "count":
+        cart = await retrieveCartCount()
+        break
+      default:
+        cart = await retrieveCart()
+    }
     
     const response = NextResponse.json({ cart })
     
@@ -18,7 +32,10 @@ export async function GET() {
     
     return response
   } catch (error) {
-    console.error("Error fetching cart:", error)
-    return NextResponse.json({ cart: null }, { status: 500 })
+    console.error("Error retrieving cart:", error)
+    return NextResponse.json(
+      { error: "Failed to retrieve cart" },
+      { status: 500 }
+    )
   }
 } 

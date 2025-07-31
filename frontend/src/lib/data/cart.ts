@@ -3,6 +3,7 @@
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
+import { CART_FIELDS } from "@lib/constants/api-fields"
 import { scheduleRevalidate } from "@lib/utils/revalidate"
 import { scheduleRevalidates } from "@lib/utils/revalidate"
 import { redirect } from "next/navigation"
@@ -24,9 +25,10 @@ import { randomUUID } from "crypto"
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
  * @param cartId - optional - The ID of the cart to retrieve.
+ * @param fields - optional - Specific fields to retrieve (defaults to FULL)
  * @returns The cart object if found, or null if not found.
  */
-export async function retrieveCart(cartId?: string) {
+export async function retrieveCart(cartId?: string, fields: string = CART_FIELDS.FULL) {
   const id = cartId || (await getCartId())
 
   if (!id) {
@@ -50,8 +52,7 @@ export async function retrieveCart(cartId?: string) {
     .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
       method: "GET",
       query: {
-        fields:
-          "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name, +subtotal, +total, +discount_total, +shipping_subtotal, +shipping_total, +tax_total, +gift_card_total",
+        fields, // Use optimized fields based on context
       },
       headers,
       next,
@@ -70,6 +71,27 @@ export async function retrieveCart(cartId?: string) {
       return cart;
     })
     .catch(() => null)
+}
+
+/**
+ * Retrieve cart with minimal fields for cart count/badge
+ */
+export async function retrieveCartCount(cartId?: string) {
+  return retrieveCart(cartId, CART_FIELDS.COUNT)
+}
+
+/**
+ * Retrieve cart with essential fields for cart dropdown
+ */
+export async function retrieveCartDropdown(cartId?: string) {
+  return retrieveCart(cartId, CART_FIELDS.DROPDOWN)
+}
+
+/**
+ * Retrieve cart with full fields for cart page and checkout
+ */
+export async function retrieveCartFull(cartId?: string) {
+  return retrieveCart(cartId, CART_FIELDS.FULL)
 }
 
 export async function getOrSetCart(countryCode: string) {
