@@ -1,5 +1,7 @@
-import { listRegions } from "@lib/data/regions"
+import { cache } from "react"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import { getDefaultCountry } from "@lib/util/get-default-country"
+import { HttpTypes } from "@medusajs/types"
 
 /**
  * This module exposes DEFAULT_COUNTRY & DEFAULT_CURRENCY that are
@@ -19,7 +21,7 @@ export const hydrateDefaults = async () => {
   try {
     const country = await getDefaultCountry()
     DEFAULT_COUNTRY = country
-    const regions = await listRegions()
+    const regions = listIndiaRegions()
     const region = regions.find((r) =>
       r.countries?.some((c) => c.iso_2?.toLowerCase() === country)
     )
@@ -31,3 +33,28 @@ export const hydrateDefaults = async () => {
 
 export const getDefaultCurrency = () => DEFAULT_CURRENCY
 export const getDefaultCountrySync = () => DEFAULT_COUNTRY 
+
+/**
+ * Get default region and currency settings
+ */
+export const getDefaults = cache(async () => {
+  try {
+    const regions = listIndiaRegions()
+    
+    // Default to first region (India)
+    const defaultRegion = regions[0]
+    
+    return {
+      region: defaultRegion,
+      currency: defaultRegion?.currency_code || "inr",
+      country: defaultRegion?.countries?.[0]?.iso_2 || "in",
+    }
+  } catch (error) {
+    console.error("Error getting defaults:", error)
+    return {
+      region: null,
+      currency: "inr",
+      country: "in",
+    }
+  }
+}) 

@@ -97,8 +97,6 @@ export async function prefetchHomepageData(countryCode: string) {
   if (typeof window === 'undefined') return
   
   const prefetchPromises = [
-    // Prefetch region data
-    fetch(`/api/regions?country=${countryCode}`),
     // Prefetch featured products  
     fetch(`/api/products?featured=true&country=${countryCode}&limit=8`),
     // Prefetch categories

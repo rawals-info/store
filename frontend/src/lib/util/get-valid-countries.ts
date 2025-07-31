@@ -1,32 +1,19 @@
-import { listRegions } from "@lib/data/regions"
+import { cache } from "react"
+import { listIndiaRegions } from "@lib/constants/india-region"
 
 /**
- * Get all valid country codes from the backend
- * @returns Array of valid country codes
+ * Get a list of valid country codes from regions
  */
-export async function getValidCountries(): Promise<string[]> {
-  try {
-    const regions = await listRegions()
-    
-    // Extract all country codes from all regions
-    const countryCodes: string[] = []
-    
-    if (regions) {
-      regions.forEach(region => {
-        region.countries?.forEach(country => {
-          if (country.iso_2) {
-            countryCodes.push(country.iso_2.toLowerCase())
-          }
-        })
-      })
-    }
-    
-    return countryCodes
-  } catch (error) {
-    console.error("Error getting valid countries:", error)
-    return []
-  }
-}
+export const getValidCountries = cache(async (): Promise<string[]> => {
+  const regions = listIndiaRegions()
+  
+  const countries = regions
+    .flatMap((region) => region.countries || [])
+    .map((country) => country.iso_2)
+    .filter(Boolean) as string[]
+  
+  return countries
+})
 
 /**
  * Check if a country code is valid

@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getProductData } from "@lib/data/products"
+import { listIndiaRegions } from "@lib/constants/india-region"
 import ProductTemplate from "@modules/products/templates"
 import { Suspense } from "react"
 import SkeletonProductPage from "@modules/skeletons/templates/skeleton-product-page"
@@ -19,50 +20,29 @@ export const dynamic = "force-dynamic"
 export const revalidate = 300
 
 // NOTE: Disabled static params generation to speed up dev and avoid large API calls.
-/*
 export async function generateStaticParams() {
-  try {
-    const countryCodes = await listRegions().then((regions) =>
-      regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
-    )
+  const countryCodes = listIndiaRegions().flatMap(region =>
+    region.countries?.map(country => country.iso_2).filter(Boolean) || []
+  )
 
-    if (!countryCodes) {
-      return []
-    }
-
-    // For each country, fetch product handles in parallel
-    const countryProducts = await Promise.all(
-      countryCodes.map(async (country) => {
-        const { response } = await listProducts({
-          countryCode: country,
-          queryParams: { limit: 100, fields: "handle" },
-        })
-
-        return {
-          country,
-          products: response.products,
-        }
-      })
-    )
-
-    return countryProducts
-      .flatMap((countryData) =>
-        countryData.products.map((product) => ({
-          countryCode: countryData.country,
-          handle: product.handle,
-        }))
-      )
-      .filter((param) => param.handle)
-  } catch (error) {
-    console.error(
-      `Failed to generate static paths for product pages: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }.`
-    )
+  if (!countryCodes.length) {
     return []
   }
+
+  const { response } = await listProducts({ queryParams: { limit: 100 } })
+  const products = response.products
+
+  const staticParams = countryCodes
+    ?.map((countryCode) =>
+      products?.map((product) => ({
+        countryCode,
+        handle: product.handle,
+      }))
+    )
+    .flat()
+
+  return staticParams || []
 }
-*/
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { handle, countryCode } = await props.params

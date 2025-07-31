@@ -75,8 +75,20 @@ export async function POST(req: NextRequest) {
         try {
           // Use request deduplication to avoid multiple identical requests
           // with intelligent TTL based on request type
-          const ttl = path.includes('/regions') ? 10 * 60 * 1000 : // 10 minutes for regions
-                     path.includes('/products') ? 5 * 60 * 1000 : // 5 minutes for products
+          // Skip region calls entirely since we use hardcoded regions
+          if (path.includes('/regions')) {
+            return {
+              key,
+              indices,
+              result: {
+                error: "Region calls are disabled - use hardcoded regions instead",
+                path,
+                status: 400,
+              }
+            }
+          }
+          
+          const ttl = path.includes('/products') ? 5 * 60 * 1000 : // 5 minutes for products
                      60 * 1000 // 1 minute default for batch requests
           
           const response = await deduplicateRequest(
