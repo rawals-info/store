@@ -74,7 +74,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-serif-regular text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Authentic, handcrafted Petha—since 1870. Melt-in-the-mouth, fragrant bites steeped in Agra’s rich heritage.
+            Authentic, handcrafted Petha—since 2013. Melt-in-the-mouth, fragrant bites steeped in Agra’s rich heritage.
           </p>
           
           <div className="flex flex-col small:flex-row gap-6 justify-center mt-8">

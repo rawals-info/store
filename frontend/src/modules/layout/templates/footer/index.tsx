@@ -26,7 +26,7 @@ export default function Footer() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [companyName, setCompanyName] = useState("TAJ PETHA")
-  const [companyDescription, setCompanyDescription] = useState("Authentic Agra Petha crafted in small batches since 1870. Fragrant, melt-in-the-mouth bites steeped in heritage.")
+  const [companyDescription, setCompanyDescription] = useState("Authentic Agra Petha crafted in small batches since 2013. Fragrant, melt-in-the-mouth bites steeped in heritage.")
   const defaultSocial: { platform: string; href: string }[] = [
     { platform: "Instagram", href: "https://instagram.com" },
     { platform: "Facebook", href: "https://facebook.com" },
@@ -125,7 +125,7 @@ export default function Footer() {
               variants={itemVariants}
             >
               <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">📦</div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Nationwide Fresh Shipping</h3>
+              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Nationwide Fresh Delivery</h3>
               <p className="text-luxury-charcoal/80 text-sm">Vacuum-sealed & white-glove packaging for perfect delivery.</p>
             </motion.div>
           </motion.div>

@@ -162,7 +162,7 @@ const CartDropdown = () => {
         >
           <PopoverPanel
             static
-            className="cart-ivory-panel absolute top-[calc(100%+1px)] right-0 border border-luxury-gold/40 shadow-lg w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
+            className="cart-ivory-panel absolute top-[calc(100%+1px)] right-0 border border-luxury-gold/40 shadow-lg w-[75vw] max-w-[320px] sm:w-[380px] sm:max-w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
             style={{ backgroundColor: "#FFFAF2" }}
             data-testid="nav-cart-dropdown"
           >
@@ -174,7 +174,7 @@ const CartDropdown = () => {
             </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-auto max-h-[65vh] px-4 grid grid-cols-1 gap-y-8 no-scrollbar py-4">
+                <div className="overflow-y-auto max-h-[50vh] sm:max-h-[65vh] px-3 sm:px-4 grid grid-cols-1 gap-y-6 sm:gap-y-8 no-scrollbar py-3 sm:py-4">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")
@@ -183,13 +183,13 @@ const CartDropdown = () => {
                     })
                     .map((item) => (
                       <div
-                        className="grid grid-cols-[100px_1fr] gap-x-3 pb-4 border-b border-luxury-lightgold/20 last:border-0"
+                        className="grid grid-cols-[70px_1fr] sm:grid-cols-[100px_1fr] gap-x-2 sm:gap-x-3 pb-3 sm:pb-4 border-b border-luxury-lightgold/20 last:border-0"
                         key={item.id}
                         data-testid="cart-item"
                       >
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-[90px] overflow-hidden group"
+                          className="w-[60px] sm:w-[90px] overflow-hidden group"
                         >
                           <div className="relative">
                             <Thumbnail

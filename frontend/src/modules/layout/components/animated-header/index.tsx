@@ -13,6 +13,7 @@ import { StoreRegion } from "@medusajs/types"
 import { usePathname } from "next/navigation"
 import SearchBar from "@modules/search/components/search-bar"
 import CategoryDropdown from "@modules/layout/components/category-dropdown/index"
+import { X } from "@medusajs/icons"
 
 const AnimatedHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -21,15 +22,24 @@ const AnimatedHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
   const { scrollY } = useScroll()
   const pathname = usePathname()
   
+  // Promotional messages
+  const promoMessages = [
+    "🔥 LIMITED TIME: Use code SWEET20 for 20% OFF all Petha — ends midnight Sunday! 🔥",
+    "🎉 FLASH SALE: 15% off Combo Petha — CODE: COMBO15",
+    "🚚 Free shipping on orders over ₹1,000 — today only!",
+    "🍫 New: Chocolate Petha now available — use CHOCO10 for 10% off"
+  ]
+
   // Extract country code from pathname
   const countryCode = pathname?.split('/')[1] || 'us'
   
   // Check if we're on the homepage (root country path)
   const isHomePage = pathname?.split('/').length === 2
-  
+
   // Transform values based on scroll position with more subtle luxury animations
   const headerOpacity = useTransform(scrollY, [0, 50], [1, 0.98])
   const headerScale = useTransform(scrollY, [0, 50], [1, 0.99])
@@ -118,15 +128,72 @@ const AnimatedHeader = () => {
 
   return (
     <>
+      {/* Promotional Banner */}
+      <AnimatePresence>
+        {!bannerDismissed && (
+          <motion.div
+            className="fixed top-0 inset-x-0 z-[50] bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white h-10 flex items-center overflow-hidden border-b border-luxury-gold/30"
+            initial={{ y: -48, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -48, opacity: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+          >
+            {/* Subtle animated background pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-luxury-gold/5 to-transparent animate-pulse" />
+            
+            {/* Continuous marquee scroll */}
+            <div className="relative w-full overflow-hidden">
+              <motion.div
+                className="flex whitespace-nowrap"
+                animate={{ x: [0, -2000] }}
+                transition={{
+                  x: {
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    duration: 60,
+                    ease: "linear",
+                  },
+                }}
+              >
+                {/* Repeat messages multiple times for seamless loop */}
+                {[...Array(3)].map((_, repeatIndex) => (
+                  <div key={repeatIndex} className="flex">
+                    {promoMessages.map((message, index) => (
+                      <span
+                        key={`${repeatIndex}-${index}`}
+                        className="font-serif font-medium text-sm text-luxury-gold px-8 flex items-center"
+                      >
+                        {message}
+                        <span className="text-luxury-gold/40 mx-8">•</span>
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+            
+            {/* Close button */}
+            <button
+              onClick={() => setBannerDismissed(true)}
+              className="absolute right-2 p-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 z-10 border border-white/20"
+              aria-label="Dismiss banner"
+            >
+              <X width={12} height={12} className="text-white hover:text-luxury-gold transition-colors duration-200" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.header
         className={clx(
-          "fixed top-0 inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-visible",
+          "fixed inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-visible",
           {
             "border-b border-luxury-gold/10": isScrolled,
             "backdrop-blur-sm": isScrolled,
           }
         )}
         style={{
+          top: bannerDismissed ? 0 : 40,
           opacity: headerOpacity,
           scale: headerScale,
           boxShadow: headerShadow,
