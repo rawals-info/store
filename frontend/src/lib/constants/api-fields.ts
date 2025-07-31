@@ -9,7 +9,8 @@ export const PRODUCT_FIELDS = {
   LIST: "id,title,handle,thumbnail,status,*variants.prices",
   
   // Essential fields for product detail pages
-  DETAIL: "id,title,handle,description,thumbnail,images,status,weight,length,height,width,*variants,*variants.prices,*options,collection_id,*categories,tags,metadata",
+  // Include *images to fetch all related images
+  DETAIL: "id,title,handle,description,thumbnail,*images,status,weight,length,height,width,*variants,*variants.prices,*options,collection_id,*categories,tags,metadata",
   
   // Fields for search results
   SEARCH: "id,title,handle,thumbnail,status,*variants.prices",

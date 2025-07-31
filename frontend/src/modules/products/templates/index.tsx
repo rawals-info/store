@@ -44,7 +44,17 @@ export default function ProductTemplate({
             <Suspense fallback={
               <div className="aspect-[29/36] w-full bg-gray-100 animate-pulse rounded-lg"></div>
             }>
-              <ImageGallery images={product?.images || []} />
+              {/* If the product has no images array, fall back to its thumbnail so that the gallery is never empty */}
+              {(() => {
+                const galleryImages =
+                  product?.images && product.images.length > 0
+                    ? product.images
+                    : product.thumbnail
+                    ? [{ id: `${product.id}-thumbnail`, url: product.thumbnail }]
+                    : []
+
+                return <ImageGallery images={galleryImages} />
+              })()}
             </Suspense>
           </div>
           
