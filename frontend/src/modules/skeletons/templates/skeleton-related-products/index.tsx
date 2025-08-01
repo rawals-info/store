@@ -1,9 +1,14 @@
+"use client"
+
 import repeat from "@lib/util/repeat"
 import SkeletonProductPreview from "@modules/skeletons/components/skeleton-product-preview"
+// import removed: useEffect no longer needed
 
 const SkeletonRelatedProducts = () => {
+  
   return (
-    <div className="product-page-constraint">
+    <div className="product-page-constraint relative">
+      
       <div className="flex flex-col gap-8 items-center text-center mb-8">
         <div className="w-20 h-6 animate-pulse bg-gray-100"></div>
         <div className="flex flex-col gap-4 items-center text-center mb-16">
