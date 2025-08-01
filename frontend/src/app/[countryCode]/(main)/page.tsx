@@ -1,7 +1,10 @@
 import { Metadata } from "next";
-import { Suspense } from "react"
-import HomepageSkeleton from "@modules/skeletons/templates/homepage-skeleton"
-import HomepageDataWrapper from "@modules/home/components/homepage-data-wrapper"
+
+import { listCollections } from "@lib/data/collections";
+import { getIndiaRegion } from "@lib/constants/india-region";
+import { getCachedCategories } from "@modules/home/components/categories";
+import { getHomepageProducts } from "@lib/data/products";
+import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
 
 export const metadata: Metadata = {
   title: "Taj Petha | Authentic Agra Sweets",
@@ -15,11 +18,28 @@ interface HomeProps {
 }
 
 export default async function Home({ params }: HomeProps) {
-  const { countryCode } = await params;
-  
+  const { countryCode } = params;
+
+  const [collectionsResp, categories, homepageProducts] = await Promise.all([
+    listCollections({ fields: "id, handle, title" }),
+    getCachedCategories().catch(() => []),
+    getHomepageProducts(countryCode).catch(() => ({ featuredProducts: [] })),
+  ]);
+
+  const region = getIndiaRegion();
+  const { collections } = collectionsResp;
+  const { featuredProducts } = homepageProducts;
+
+  if (!collections || !region) {
+    return null;
+  }
+
   return (
-    <Suspense fallback={<HomepageSkeleton />}> 
-      <HomepageDataWrapper countryCode={countryCode} />
-    </Suspense>
+    <HomeClientWrapper
+      featuredProducts={featuredProducts}
+      categories={categories}
+      region={region}
+      countryCode={countryCode}
+    />
   );
 } 
