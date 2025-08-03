@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "Petha & Namkeen Blog | Traditional Recipes & Stories | Taj Petha",
@@ -259,7 +260,7 @@ export default function BlogPage() {
             Traditional Sweets & Snacks Blog
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Discover authentic recipes, health benefits, and fascinating stories about India's beloved petha and namkeen. 
+            Discover authentic recipes, health benefits, and fascinating stories about India&apos;s beloved petha and namkeen. 
             Expert insights from traditional sweet makers and food historians.
           </p>
         </div>
@@ -272,11 +273,12 @@ export default function BlogPage() {
               {featuredPosts.map((post) => (
                 <article key={post.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden bg-white rounded-2xl border border-gray-100">
                   <div className="aspect-video overflow-hidden">
-                    <img
+                    <Image
                       src={post.image}
                       alt={post.title}
+                      width={800}
+                      height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
                     />
                   </div>
                   <div className="p-6">
@@ -319,11 +321,12 @@ export default function BlogPage() {
             {regularPosts.map((post) => (
               <article key={post.id} className="group hover:shadow-lg transition-all duration-300 bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="aspect-video overflow-hidden">
-                  <img
+                  <Image
                     src={post.image}
                     alt={post.title}
+                    width={800}
+                    height={400}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
                   />
                 </div>
                 <div className="p-5">

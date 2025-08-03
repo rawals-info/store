@@ -165,9 +165,9 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
             Fresh {productType.charAt(0).toUpperCase() + productType.slice(1)} Delivery in{" "}
             <span className="text-luxury-gold">{city.name}</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
-            Order authentic Agra {productType} online in {city.name}. Hygienic preparation, traditional recipes, 
-            same-day dispatch. Free delivery above ₹500 across {city.name}.
+          <p className="text-gray-600 mb-8 text-lg">
+            Experience authentic Agra petha and fresh namkeen delivered fresh to your doorstep in {city.name}. 
+            We&apos;re committed to bringing you the finest traditional sweets with the same taste and quality you&apos;d get in Agra.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -320,7 +320,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-700 mb-4 italic">"{review.review}"</p>
+                <p className="text-gray-700 mb-4 italic">&ldquo;{review.review}&rdquo;</p>
                 <div className="text-sm text-gray-500">
                   <div className="font-medium">{review.name}</div>
                   <div>{review.location} • {new Date(review.date).toLocaleDateString('en-IN')}</div>

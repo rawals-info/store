@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 
 interface BlogPostProps {
   params: {
@@ -391,11 +392,12 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
         {/* Featured Image */}
         <div className="mb-8 aspect-video overflow-hidden rounded-2xl bg-gray-100">
-          <img
+          <Image
             src={post.image}
             alt={post.title}
+            width={800}
+            height={400}
             className="w-full h-full object-cover"
-            loading="lazy"
           />
         </div>
 
