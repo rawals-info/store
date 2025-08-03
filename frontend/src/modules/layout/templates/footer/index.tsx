@@ -214,6 +214,11 @@ export default function Footer() {
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink href="/blog" className="text-white hover:text-luxury-gold transition-colors duration-300">
+                    Blog
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <LocalizedClientLink href="/contact" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Contact
                   </LocalizedClientLink>

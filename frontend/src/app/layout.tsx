@@ -1,20 +1,290 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata, Viewport } from "next"
+import { GoogleAnalytics } from "@lib/analytics/google-analytics"
 import "styles/globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
+  title: {
+    default: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online",
+    template: "%s | Taj Petha - India's Premium Sweet Store"
+  },
+  description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic, traditional recipes, premium ingredients. Same-day dispatch across India. Trusted by 50,000+ customers since 2013.",
+  keywords: [
+    "best petha in India",
+    "authentic Agra petha online",
+    "fresh petha delivery India",
+    "hygienic Indian sweets",
+    "traditional namkeen online",
+    "Taj Petha",
+    "Agra sweets online",
+    "premium Indian sweets",
+    "fresh petha home delivery",
+    "best namkeen brand India"
+  ],
+  authors: [{ name: "Taj Petha", url: "https://tajpetha.in" }],
+  creator: "Taj Petha - India's Premium Sweet Store",
+  publisher: "Taj Petha",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: getBaseURL(),
+    title: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online",
+    description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic, traditional recipes, premium ingredients. Same-day dispatch across India.",
+    siteName: "Taj Petha",
+    images: [
+      {
+        url: "/hero_image.webp",
+        width: 1200,
+        height: 630,
+        alt: "Taj Petha - India's Best Authentic Agra Petha & Fresh Namkeen",
+        type: "image/webp",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online",
+    description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic, traditional recipes, premium ingredients. Same-day dispatch across India.",
+    images: ["/hero_image.webp"],
+    creator: "@tajpetha",
+    site: "@tajpetha",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: getBaseURL(),
+    languages: {
+      'en-IN': getBaseURL(),
+      'hi-IN': `${getBaseURL()}/hi`,
+    },
+  },
+  verification: {
+    google: "google-verification-code", // Add your Google Search Console verification code
+    other: {
+      'facebook-domain-verification': 'facebook-domain-verification-code',
+    },
+  },
+  category: 'food',
+  classification: 'Indian Sweets and Snacks',
 }
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#d4af37" },
+    { media: "(prefers-color-scheme: dark)", color: "#b8941f" },
+  ],
+}
+
+// Organization Schema for entire site
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${getBaseURL()}/#organization`,
+  "name": "Taj Petha",
+  "alternateName": ["Taj Petha Store", "India's Best Petha"],
+  "url": getBaseURL(),
+  "logo": {
+    "@type": "ImageObject",
+    "url": `${getBaseURL()}/logo.png`,
+    "width": "300",
+    "height": "100"
+  },
+  "image": `${getBaseURL()}/hero_image.webp`,
+  "description": "India's premier authentic Agra petha and fresh namkeen online store. Serving hygienic, traditional sweets made with premium ingredients since 2013.",
+  "foundingDate": "2013",
+  "founder": {
+    "@type": "Person",
+    "name": "Siddharth Rawal"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Sadar Bazaar",
+    "addressLocality": "Agra",
+    "addressRegion": "Uttar Pradesh",
+    "postalCode": "282001",
+    "addressCountry": "IN"
+  },
+  "contactPoint": [
+    {
+      "@type": "ContactPoint",
+      "telephone": "+91-92594-18994",
+      "contactType": "customer service",
+      "areaServed": "IN",
+      "availableLanguage": ["Hindi", "English"]
+    }
+  ],
+  "sameAs": [
+    "https://www.facebook.com/tajpetha",
+    "https://www.instagram.com/tajpetha",
+    "https://www.youtube.com/tajpetha"
+  ],
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${getBaseURL()}/search?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+
+// Website Schema
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${getBaseURL()}/#website`,
+  "url": getBaseURL(),
+  "name": "Taj Petha",
+  "description": "India's best authentic Agra petha and fresh namkeen online store",
+  "publisher": {
+    "@id": `${getBaseURL()}/#organization`
+  },
+  "potentialAction": [
+    {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${getBaseURL()}/search?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
+  ],
+  "inLanguage": "en-IN"
+}
+
+// LocalBusiness Schema
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": `${getBaseURL()}/#localbusiness`,
+  "name": "Taj Petha",
+  "image": `${getBaseURL()}/hero_image.webp`,
+  "description": "India's premier authentic Agra petha and fresh namkeen online store with same-day dispatch and hygienic preparation.",
+  "url": getBaseURL(),
+  "telephone": "+91-92594-18994",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Sadar Bazaar",
+    "addressLocality": "Agra",
+    "addressRegion": "Uttar Pradesh",
+    "postalCode": "282001",
+    "addressCountry": "IN"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "27.1767",
+    "longitude": "78.0081"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      "opens": "09:00",
+      "closes": "21:00"
+    }
+  ],
+  "servesCuisine": ["Indian Sweets", "Traditional Namkeen", "Agra Specialties"],
+  "priceRange": "₹₹",
+  "currenciesAccepted": "INR",
+  "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "2500",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "review": [
+    {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "5",
+        "bestRating": "5"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Priya Sharma"
+      },
+      "reviewBody": "Best petha I've ever tasted! Fresh, authentic, and delivered quickly. Highly recommended for genuine Agra taste.",
+      "datePublished": "2024-01-15"
+    }
+  ]
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mode="light">
+    <html lang="en-IN" data-mode="light">
+      <head>
+        {/* Enhanced Schema Markup */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessSchema),
+          }}
+        />
+        
+        {/* Preconnect to external domains */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* DNS Prefetch */}
+        <link rel="dns-prefetch" href="//www.google-analytics.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        
+        {/* Favicon and App Icons */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/manifest.json" />
+        
+        {/* Alternative Languages */}
+        <link rel="alternate" hrefLang="en-in" href={getBaseURL()} />
+        <link rel="alternate" hrefLang="hi-in" href={`${getBaseURL()}/hi`} />
+        <link rel="alternate" hrefLang="x-default" href={getBaseURL()} />
+      </head>
       <body suppressHydrationWarning={true}>
+        {/* Google Tag Manager (noscript) */}
+        <noscript dangerouslySetInnerHTML={{
+          __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NFH57XTD"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe>`
+        }} />
+        
+        {/* Analytics Scripts */}
+        <GoogleAnalytics />
+        
         <main className="relative">{props.children}</main>
       </body>
     </html>

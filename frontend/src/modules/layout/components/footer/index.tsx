@@ -105,6 +105,7 @@ const Footer = () => {
               {[
                 { href: "/products", label: "All Sweets" },
                 { href: "/collections", label: "Collections" },
+                { href: "/blog", label: "Blog & Recipes" },
                 { href: "/about", label: "Our Craftsmanship" },
                 { href: "/contact", label: "Contact" }
               ].map((link) => (
