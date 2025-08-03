@@ -1,81 +1,35 @@
-# Robots.txt for Taj Petha - India's Best Authentic Agra Petha & Fresh Namkeen Online Store
-# https://tajpetha.in
-
-# Allow all crawlers to access the site
+# *
 User-agent: *
 Allow: /
 Disallow: /checkout
-Disallow: /account/
+Disallow: /account/*
 Disallow: /cart
-Disallow: /admin/
-Disallow: /_next/
-Disallow: /api/
+Disallow: /admin/*
+Disallow: /_next/*
+Disallow: /api/*
 Disallow: /reset-password
 Disallow: /forgot-password
-Disallow: /*.json$
-Disallow: /*?*utm_*
-Disallow: /*?*ref=*
-Disallow: /*?*sid=*
 
-# Special rules for Googlebot
+# Googlebot
 User-agent: Googlebot
 Allow: /
 Disallow: /checkout
-Disallow: /account/
+Disallow: /account
 Disallow: /cart
-Disallow: /admin/
-Crawl-delay: 1
+Disallow: /admin
 
-# Special rules for Bingbot
+# Bingbot
 User-agent: Bingbot
 Allow: /
 Disallow: /checkout
-Disallow: /account/
+Disallow: /account
 Disallow: /cart
-Disallow: /admin/
-Crawl-delay: 2
+Disallow: /admin
 
-# Special rules for social media crawlers
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: LinkedInBot
-Allow: /
-
-User-agent: WhatsApp
-Allow: /
-
-# Block spam bots and scrapers
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
-# Allow important crawlers for monitoring and analytics
-User-agent: GTmetrix
-Allow: /
-
-User-agent: PageSpeed
-Allow: /
-
-# Sitemaps - Multiple sitemaps for better organization
-Sitemap: https://tajpetha.in/sitemap.xml
-Sitemap: https://tajpetha.in/sitemap-0.xml
-Sitemap: https://tajpetha.in/server-sitemap.xml
-Sitemap: https://tajpetha.in/blog-sitemap.xml
-
-# Host specification
+# Host
 Host: https://tajpetha.in
 
-# Crawl-delay for all other bots
-Crawl-delay: 10 
+# Sitemaps
+Sitemap: https://tajpetha.in/sitemap.xml
+Sitemap: https://tajpetha.in/server-sitemap.xml
+Sitemap: https://tajpetha.in/blog-sitemap.xml

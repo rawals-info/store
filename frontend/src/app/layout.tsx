@@ -254,6 +254,23 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/manifest.json" />
         
+        {/* Service Worker Registration */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                  .then(function(registration) {
+                    console.log('SW registered: ', registration);
+                  })
+                  .catch(function(registrationError) {
+                    console.log('SW registration failed: ', registrationError);
+                  });
+              });
+            }
+          `
+        }} />
+        
         {/* Hreflang tags for international SEO */}
         <link rel="alternate" hrefLang="en-in" href={baseUrl} />
         <link rel="alternate" hrefLang="hi-in" href={`${baseUrl}/hi`} />

@@ -23,6 +23,12 @@ module.exports = {
     // Static important pages
     const staticPages = [
       { loc: '/', priority: 1.0, changefreq: 'daily' },
+      { loc: '/in', priority: 1.0, changefreq: 'daily' },
+      { loc: '/in/products', priority: 0.9, changefreq: 'daily' },
+      { loc: '/in/categories', priority: 0.9, changefreq: 'weekly' },
+      { loc: '/in/collections', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/store', priority: 0.8, changefreq: 'daily' },
+      { loc: '/in/blog', priority: 0.9, changefreq: 'weekly' },
       { loc: '/about', priority: 0.9, changefreq: 'monthly' },
       { loc: '/contact', priority: 0.8, changefreq: 'monthly' },
       { loc: '/shipping', priority: 0.7, changefreq: 'monthly' },
@@ -32,25 +38,33 @@ module.exports = {
       { loc: '/faqs', priority: 0.8, changefreq: 'monthly' },
     ]
 
-    // Country-specific pages (focusing on India regions)
-    const countryPages = [
-      { loc: '/in', priority: 1.0, changefreq: 'daily' },
-      { loc: '/in/products', priority: 0.9, changefreq: 'daily' },
-      { loc: '/in/categories', priority: 0.9, changefreq: 'weekly' },
-      { loc: '/in/collections', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/store', priority: 0.8, changefreq: 'daily' },
+    // Blog posts
+    const blogPosts = [
+      { loc: '/in/blog/authentic-agra-petha-recipe', priority: 0.8, changefreq: 'monthly' },
+      { loc: '/in/blog/health-benefits-petha-namkeen', priority: 0.8, changefreq: 'monthly' },
+      { loc: '/in/blog/history-agra-petha-heritage', priority: 0.7, changefreq: 'monthly' },
+      { loc: '/in/blog/seasonal-namkeen-guide', priority: 0.7, changefreq: 'monthly' },
+      { loc: '/in/blog/preservation-techniques-traditional-sweets', priority: 0.7, changefreq: 'monthly' },
     ]
 
-    // SEO Landing pages for major cities
+    // SEO City Landing pages
     const cityPages = [
-      { loc: '/petha-delivery-delhi', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/agra-petha-mumbai', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/fresh-petha-bangalore', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/namkeen-delivery-hyderabad', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/petha-online-chennai', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/agra-sweets-pune', priority: 0.7, changefreq: 'weekly' },
-      { loc: '/petha-delivery-kolkata', priority: 0.7, changefreq: 'weekly' },
-      { loc: '/fresh-namkeen-ahmedabad', priority: 0.7, changefreq: 'weekly' },
+      { loc: '/in/city/delhi', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/mumbai', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/bangalore', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/hyderabad', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/chennai', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/pune', priority: 0.7, changefreq: 'weekly' },
+      { loc: '/in/city/kolkata', priority: 0.7, changefreq: 'weekly' },
+      { loc: '/in/city/ahmedabad', priority: 0.7, changefreq: 'weekly' },
+    ]
+
+    // Product category pages (these will be dynamically generated)
+    const categoryPages = [
+      { loc: '/in/categories/petha', priority: 0.9, changefreq: 'daily' },
+      { loc: '/in/categories/namkeen', priority: 0.9, changefreq: 'daily' },
+      { loc: '/in/categories/traditional-sweets', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/categories/gift-boxes', priority: 0.8, changefreq: 'weekly' },
     ]
 
     return [
@@ -60,13 +74,19 @@ module.exports = {
         changefreq: page.changefreq,
         lastmod: new Date().toISOString(),
       })),
-      ...countryPages.map(page => ({
+      ...blogPosts.map(page => ({
         loc: page.loc,
         priority: page.priority,
         changefreq: page.changefreq,
         lastmod: new Date().toISOString(),
       })),
       ...cityPages.map(page => ({
+        loc: page.loc,
+        priority: page.priority,
+        changefreq: page.changefreq,
+        lastmod: new Date().toISOString(),
+      })),
+      ...categoryPages.map(page => ({
         loc: page.loc,
         priority: page.priority,
         changefreq: page.changefreq,
@@ -95,10 +115,9 @@ module.exports = {
     ],
     additionalSitemaps: [
       'https://tajpetha.in/server-sitemap.xml', // For dynamic products/categories
-      'https://tajpetha.in/blog-sitemap.xml',   // For blog posts (when implemented)
+      'https://tajpetha.in/blog-sitemap.xml',   // For blog posts
     ],
     // Add crawl delay for different bots
-    crawlDelay: 10,
     host: 'https://tajpetha.in',
   },
 

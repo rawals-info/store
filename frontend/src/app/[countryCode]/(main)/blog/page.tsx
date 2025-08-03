@@ -21,6 +21,8 @@ export const metadata: Metadata = {
     description: "Explore authentic recipes, health benefits, and fascinating stories about India's beloved petha and namkeen. Expert insights from traditional sweet makers.",
     url: "https://tajpetha.in/blog",
     type: "website",
+    locale: "en_IN",
+    siteName: "Taj Petha",
     images: [
       {
         url: "/blog-hero-image.webp",
