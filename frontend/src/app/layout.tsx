@@ -232,9 +232,33 @@ const localBusinessSchema = {
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {
+  const baseUrl = getBaseURL()
   return (
     <html lang="en-IN" data-mode="light">
       <head>
+        {/* Preload critical resources to reduce HTTP requests */}
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" />
+        <link rel="preload" href="/hero_image.webp" as="image" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+        
+        {/* Critical DNS prefetch */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//www.google-analytics.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        
+        {/* Optimized favicon and app icons */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/manifest.json" />
+        
+        {/* Hreflang tags for international SEO */}
+        <link rel="alternate" hrefLang="en-in" href={baseUrl} />
+        <link rel="alternate" hrefLang="hi-in" href={`${baseUrl}/hi`} />
+        <link rel="alternate" hrefLang="x-default" href={baseUrl} />
+        
         {/* Enhanced Schema Markup */}
         <script
           type="application/ld+json"
@@ -254,26 +278,6 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        
-        {/* Preconnect to external domains */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* DNS Prefetch */}
-        <link rel="dns-prefetch" href="//www.google-analytics.com" />
-        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-        
-        {/* Favicon and App Icons */}
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/manifest.json" />
-        
-        {/* Alternative Languages */}
-        <link rel="alternate" hrefLang="en-in" href={getBaseURL()} />
-        <link rel="alternate" hrefLang="hi-in" href={`${getBaseURL()}/hi`} />
-        <link rel="alternate" hrefLang="x-default" href={getBaseURL()} />
       </head>
       <body suppressHydrationWarning={true}>
         {/* Google Tag Manager (noscript) */}

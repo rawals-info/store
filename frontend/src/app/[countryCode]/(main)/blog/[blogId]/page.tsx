@@ -211,13 +211,24 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
     }
   }
 
+  // Optimize title length (under 60 chars)
+  const optimizedTitle = post.title.length > 50 
+    ? `${post.title.substring(0, 47)}... | Taj Petha` 
+    : `${post.title} | Taj Petha`
+
+  // Optimize description length (under 160 chars)
+  const optimizedDescription = post.excerpt.length > 155 
+    ? `${post.excerpt.substring(0, 152)}...` 
+    : post.excerpt
+
   return {
-    title: `${post.title} | Taj Petha Blog`,
-    description: post.excerpt,
+    title: optimizedTitle,
+    description: optimizedDescription,
     keywords: post.tags,
     openGraph: {
-      title: post.title,
-      description: post.excerpt,
+      title: post.title.length > 55 ? post.title.substring(0, 55) + "..." : post.title,
+      description: optimizedDescription,
+      url: `https://tajpetha.in/blog/${blogId}`,
       type: "article",
       publishedTime: post.publishDate,
       authors: [post.author],
@@ -231,6 +242,12 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
           alt: post.title
         }
       ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: optimizedTitle,
+      description: optimizedDescription,
+      images: [post.image],
     },
     alternates: {
       canonical: `https://tajpetha.in/blog/${blogId}`

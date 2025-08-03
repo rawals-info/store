@@ -2,8 +2,8 @@ import { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Petha & Namkeen Blog | Traditional Recipes, Health Benefits & Stories | Taj Petha",
-  description: "Discover authentic Agra petha recipes, health benefits of traditional Indian sweets, namkeen preparation methods, and fascinating stories from India's sweet heritage. Expert insights from Taj Petha.",
+  title: "Petha & Namkeen Blog | Traditional Recipes & Stories | Taj Petha",
+  description: "Discover authentic Agra petha recipes, health benefits of Indian sweets, traditional namkeen methods, and heritage stories from Taj Petha experts.",
   keywords: [
     "petha recipes blog",
     "namkeen health benefits",
@@ -17,8 +17,9 @@ export const metadata: Metadata = {
     "traditional sweet preservation"
   ],
   openGraph: {
-    title: "Petha & Namkeen Blog - Traditional Recipes & Stories | Taj Petha",
+    title: "Petha & Namkeen Blog - Traditional Recipes & Stories",
     description: "Explore authentic recipes, health benefits, and fascinating stories about India's beloved petha and namkeen. Expert insights from traditional sweet makers.",
+    url: "https://tajpetha.in/blog",
     type: "website",
     images: [
       {
@@ -28,6 +29,12 @@ export const metadata: Metadata = {
         alt: "Traditional Petha Making Process - Taj Petha Blog"
       }
     ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Petha & Namkeen Blog | Traditional Recipes & Stories",
+    description: "Discover authentic recipes, health benefits, and heritage stories about India's beloved petha and namkeen from Taj Petha experts.",
+    images: ["/blog-hero-image.webp"],
   },
   alternates: {
     canonical: "https://tajpetha.in/blog"
@@ -58,7 +65,7 @@ const blogPosts = [
 6. Add cardamom for authentic flavor
 
 The key to perfect petha lies in the quality of ash gourd and the precise sugar syrup consistency. Traditional makers test the syrup by dropping a small amount in water - it should form a soft ball when ready.`,
-    author: "Master Chef Raghunath",
+    author: "Sid",
     publishDate: "2024-01-20",
     readTime: "8 min read",
     category: "Traditional Recipes",
@@ -87,7 +94,7 @@ The key to perfect petha lies in the quality of ash gourd and the precise sugar 
 
 **Traditional vs Modern Preparation:**
 Traditional methods using pure ingredients offer better nutritional value compared to mass-produced alternatives. Taj Petha maintains these traditional standards.`,
-    author: "Dr. Priya Sharma, Nutritionist",
+    author: "Dr. Vivek Sharma, Nutritionist",
     publishDate: "2024-01-18",
     readTime: "6 min read",
     category: "Health & Nutrition",
@@ -115,7 +122,7 @@ From simple ash gourd preparations to the variety we see today - kesar petha, ch
 
 **Modern Revival:**
 Today's artisans like Taj Petha preserve these ancient recipes while adapting to modern hygiene and packaging standards.`,
-    author: "Historian Rajesh Kumar",
+    author: "Ankit Singh",
     publishDate: "2024-01-15",
     readTime: "10 min read",
     category: "Heritage & Culture",
@@ -152,7 +159,7 @@ Today's artisans like Taj Petha preserve these ancient recipes while adapting to
 - Gift-worthy presentations
 - Traditional family recipes
 - Celebration-specific varieties`,
-    author: "Chef Meera Agarwal",
+    author: "Siddharth Rawal",
     publishDate: "2024-01-12",
     readTime: "7 min read",
     category: "Seasonal Cooking",
@@ -184,7 +191,7 @@ Today's artisans combine traditional wisdom with modern hygiene standards to cre
 
 **Taj Petha's Approach:**
 We use time-tested preservation methods combined with modern packaging to ensure our products reach you with maximum freshness and traditional taste.`,
-    author: "Traditional Food Expert Suresh Gupta",
+    author: "Siddharth Rawal",
     publishDate: "2024-01-10",
     readTime: "9 min read",
     category: "Food Science",

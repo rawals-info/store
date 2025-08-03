@@ -2,99 +2,46 @@ const checkEnvVariables = require("./check-env-variables")
 
 checkEnvVariables()
 
-/**
- * @type {import('next').NextConfig}
- */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion']
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  compress: true,
+  
   images: {
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 3600,
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-testing.s3.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-testing.s3.us-east-1.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "**.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "loremflickr.com",
-      },
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-      },
-      {
-        protocol: "https",
-        hostname: "**.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-production-de80.up.railway.app",
-      },
-    ],
+    domains: ['localhost', 'tajpetha.in', 'picsum.photos'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  experimental: {
-    scrollRestoration: true,
-    webpackBuildWorker: false,
-    optimizeCss: true,
-    optimizePackageImports: ['@medusajs/ui', 'framer-motion', 'lucide-react'],
-  },
+
   async headers() {
     return [
+      // Security headers
       {
-        source: '/:path*',
+        source: '/(.*)',
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
             value: 'on'
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'SAMEORIGIN'
           },
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
           },
           {
             key: 'Referrer-Policy',
@@ -102,80 +49,51 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
+            value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()'
+          }
+        ]
+      },
+      // Image caching headers
+      {
+        source: '/(.*)\\.(jpg|jpeg|png|webp|avif|ico|svg)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, s-maxage=31536000, immutable'
           },
           {
-            key: 'Surrogate-Control',
-            value: 'public, max-age=3600'
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=60, stale-while-revalidate=300'
+            key: 'Expires',
+            value: new Date(Date.now() + 31536000000).toUTCString()
           }
         ]
       },
+      // Static assets caching
       {
-        source: '/(.*).(jpg|jpeg|png|webp|avif|ico|svg)',
+        source: '/(.*)\\.(js|css|woff|woff2|ttf|eot)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'public, max-age=31536000, s-maxage=31536000, immutable'
           }
         ]
       },
+      // API routes
       {
-        source: '/(.*).(js|css)',
+        source: '/api/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'public, max-age=300, s-maxage=300'
           }
         ]
       },
+      // City pages with SEO headers
       {
-        source: '/api/:path*',
+        source: '/city/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=60, stale-while-revalidate=300'
-          }
-        ]
-      },
-      {
-        source: '/categories/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=300, stale-while-revalidate=600'
-          }
-        ]
-      },
-      {
-        source: '/products/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=300, stale-while-revalidate=600'
-          }
-        ]
-      },
-      // SEO-specific headers for better crawling
-      {
-        source: '/(sitemap.xml|robots.txt|manifest.json)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=3600, must-revalidate'
-          }
-        ]
-      },
-      // Headers for city landing pages
-      {
-        source: '/(petha-delivery-|agra-petha-|fresh-petha-|namkeen-delivery-)(.+)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=1800, stale-while-revalidate=3600'
+            value: 'public, max-age=3600, s-maxage=3600'
           },
           {
             key: 'X-Robots-Tag',
@@ -185,138 +103,70 @@ const nextConfig = {
       }
     ]
   },
-  // Enhanced redirects for SEO
+
   async redirects() {
     return [
-      // Redirect common misspellings and variations
+      // SEO redirects for common misspellings
       {
         source: '/petha',
-        destination: '/in/products?category=petha',
+        destination: '/in/categories/petha',
         permanent: true,
       },
       {
         source: '/namkeen',
-        destination: '/in/products?category=namkeen',
-        permanent: true,
-      },
-      {
-        source: '/sweets',
-        destination: '/in/products',
+        destination: '/in/categories/namkeen',
         permanent: true,
       },
       {
         source: '/agra-petha',
-        destination: '/in/products?category=petha',
-        permanent: true,
-      },
-      // Redirect old URLs if any
-      {
-        source: '/shop',
-        destination: '/in/store',
-        permanent: true,
-      },
-      {
-        source: '/products',
-        destination: '/in/products',
+        destination: '/in/categories/petha',
         permanent: true,
       }
     ]
   },
-  // Enhanced rewrites for SEO-friendly URLs
+
   async rewrites() {
     return [
-      // City-specific landing pages
+      // SEO-friendly rewrites
       {
-        source: '/petha-delivery-delhi',
-        destination: '/in/city/delhi?product=petha',
+        source: '/city/:city',
+        destination: '/in/city/:city'
       },
       {
-        source: '/agra-petha-mumbai',
-        destination: '/in/city/mumbai?product=petha',
-      },
-      {
-        source: '/fresh-petha-bangalore',
-        destination: '/in/city/bangalore?product=petha',
-      },
-      {
-        source: '/namkeen-delivery-hyderabad',
-        destination: '/in/city/hyderabad?product=namkeen',
-      },
-      {
-        source: '/petha-online-chennai',
-        destination: '/in/city/chennai?product=petha',
-      },
-      {
-        source: '/agra-sweets-pune',
-        destination: '/in/city/pune?product=sweets',
-      },
-      {
-        source: '/petha-delivery-kolkata',
-        destination: '/in/city/kolkata?product=petha',
-      },
-      {
-        source: '/fresh-namkeen-ahmedabad',
-        destination: '/in/city/ahmedabad?product=namkeen',
-      },
-      // SEO-friendly product URLs
-      {
-        source: '/best-petha-india',
-        destination: '/in/products?featured=true&category=petha',
-      },
-      {
-        source: '/authentic-agra-petha',
-        destination: '/in/products?authentic=true&category=petha',
-      },
-      {
-        source: '/fresh-namkeen-online',
-        destination: '/in/products?fresh=true&category=namkeen',
+        source: '/product/:slug',
+        destination: '/in/products/:slug'
       }
     ]
   },
-  staticPageGenerationTimeout: 300,
-  onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: 10,
-  },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
-  },
-  generateEtags: true,
-  poweredByHeader: false,
-  // Enhanced compression for better performance
-  compress: true,
-  // Webpack optimizations for SEO
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Add bundle analyzer in development
+
+  webpack: (config, { dev, isServer }) => {
+    // Optimize bundle for SEO-critical resources
     if (!dev && !isServer) {
-      config.plugins.push(
-        new webpack.DefinePlugin({
-          'process.env.BUILD_ID': JSON.stringify(buildId),
-        })
-      )
-    }
-    
-    // Optimize for SEO-critical resources
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        ...config.optimization.splitChunks,
+      config.optimization.splitChunks = {
+        chunks: 'all',
         cacheGroups: {
-          ...config.optimization.splitChunks.cacheGroups,
+          default: false,
+          vendors: false,
+          // SEO-critical chunk
           seo: {
             name: 'seo',
-            test: /[\\/]node_modules[\\/](next-seo|next-sitemap)[\\/]/,
             chunks: 'all',
-            priority: 30,
+            test: /[\\/]node_modules[\\/](@medusajs|next)[\\/]/,
+            priority: 10,
+            enforce: true,
           },
-        },
-      },
+          // UI components chunk
+          ui: {
+            name: 'ui',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](framer-motion|lucide-react)[\\/]/,
+            priority: 5,
+          }
+        }
+      }
     }
-
     return config
-  },
+  }
 }
 
 module.exports = nextConfig

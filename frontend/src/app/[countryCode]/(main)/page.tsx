@@ -7,8 +7,8 @@ import { getHomepageProducts } from "@lib/data/products";
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
 
 export const metadata: Metadata = {
-  title: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online Store",
-  description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. ✅ Hygienic preparation ✅ Traditional recipes ✅ Premium ingredients ✅ Same-day dispatch across India ✅ 50,000+ happy customers since 2013. Free shipping on orders above ₹500!",
+  title: "Taj Petha | India's Best Authentic Agra Petha & Namkeen Online Store",
+  description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. ✅ Hygienic preparation ✅ Traditional recipes ✅ Same-day dispatch ✅ Free shipping ₹500+",
   keywords: [
     "best petha in India",
     "authentic Agra petha online",
@@ -24,8 +24,9 @@ export const metadata: Metadata = {
     "hygienic sweet shop online India"
   ],
   openGraph: {
-    title: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online",
-    description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, premium ingredients. Same-day dispatch across India!",
+    title: "Taj Petha | India's Best Authentic Agra Petha & Namkeen Online",
+    description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch across India!",
+    url: "https://tajpetha.in",
     images: [
       {
         url: "/hero_image.webp",
@@ -39,8 +40,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online",
-    description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, premium ingredients. Same-day dispatch!",
+    title: "Taj Petha | India's Best Authentic Agra Petha & Namkeen Online",
+    description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch!",
     images: ["/hero_image.webp"],
   },
   alternates: {
