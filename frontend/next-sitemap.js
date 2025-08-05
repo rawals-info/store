@@ -13,8 +13,8 @@ const excludedPaths = [
 module.exports = {
   siteUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://tajpetha.in',
   generateRobotsTxt: true,
-  generateIndexSitemap: true,
-  exclude: excludedPaths.concat(["/sitemap.xml", "/server-sitemap.xml"]),
+  generateIndexSitemap: false, // Disable index sitemap to avoid conflicts
+  exclude: excludedPaths,
   
   // Generate multiple sitemaps for better SEO organization
   additionalPaths: async (config) => {
@@ -113,11 +113,7 @@ module.exports = {
         disallow: ['/checkout', '/account', '/cart', '/admin'],
       }
     ],
-    additionalSitemaps: [
-      'https://tajpetha.in/server-sitemap.xml', // For dynamic products/categories
-      'https://tajpetha.in/blog-sitemap.xml',   // For blog posts
-    ],
-    // Add crawl delay for different bots
+    // Remove problematic additional sitemaps that were causing HTML errors
     host: 'https://tajpetha.in',
   },
 
