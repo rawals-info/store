@@ -14,11 +14,6 @@ const nextConfig = {
     optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion']
   },
   compress: true,
-  i18n: {
-    locales: ['in'],
-    defaultLocale: 'in',
-    localeDetection: false,
-  },
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
