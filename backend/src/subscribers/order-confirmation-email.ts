@@ -83,7 +83,7 @@ export default async function orderConfirmationEmail({
 
     <div class="highlight-box">
       <p><strong>🎯 Your Sweet Order Summary</strong></p>
-      <p>Each item is lovingly handcrafted using our traditional family recipes, ensuring you receive the authentic taste of Agra's finest sweets.</p>
+      <p>Each item is lovingly Hand-Made using our traditional family recipes, ensuring you receive the authentic taste of Agra's finest sweets.</p>
     </div>
 
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin: 24px 0;">

@@ -59,7 +59,7 @@ export default function Hero() {
         <motion.div variants={fadeIn} className="mb-4 md:mb-6">
           <Heading level="h1" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 font-serif leading-tight">
             <span className="luxury-gold block sm:inline">Exquisite Pethas</span>{" "}
-            <span className="block sm:inline">Handicrafts</span>
+            <span className="block sm:inline">Hand-Made</span>
           </Heading>
         </motion.div>
         

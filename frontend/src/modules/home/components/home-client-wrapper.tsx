@@ -207,7 +207,7 @@ export default function HomeClientWrapper({
           
           <motion.div variants={fadeIn} className="mb-6 md:mb-8">
             <Text className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-white">
-              Authentic, Handcrafted Petha—Since 2013
+              Authentic, Hand-Made Petha—Since 2013
             </Text>
           </motion.div>
           

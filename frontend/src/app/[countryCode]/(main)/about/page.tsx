@@ -88,7 +88,7 @@ export default async function AboutPage(props: AboutPageProps) {
             </div>
             <h3 className="font-display text-xl text-luxury-charcoal mb-2">Authentic Agra Heritage</h3>
             <p className="text-serif-regular text-luxury-charcoal/80">
-              Handcrafted in the heart of Agra using recipes perfected over centuries, our pethas capture the city's royal legacy and Mughal flavors.
+              Hand-Made in the heart of Agra using recipes perfected over centuries, our pethas capture the city's royal legacy and Mughal flavors.
             </p>
           </div>
 

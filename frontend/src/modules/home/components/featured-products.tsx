@@ -49,7 +49,7 @@ export default async function FeaturedProducts({
             </Heading>
             <div className="h-px w-24 bg-luxury-gold mx-auto mb-6"></div>
             <Text className="text-serif-regular text-luxury-charcoal/80 max-w-xl mx-auto">
-              Discover our handcrafted Agra pethas, each one a testament to generations of sweet-making tradition and timeless flavor.
+              Discover our Hand-Made Agra pethas, each one a testament to generations of sweet-making tradition and timeless flavor.
             </Text>
           </ScrollReveal>
         </div>

@@ -159,7 +159,7 @@ const ProductTabs = ({ product, activeTab, setActiveTab }: ProductTabsProps) => 
       details.push({
         title: "Features",
         items: [
-          "Handcrafted with traditional recipes",
+          "Hand-Made with traditional recipes",
           "Authentic Agra taste",
           "Long shelf life",
           "Carefully packaged for freshness"

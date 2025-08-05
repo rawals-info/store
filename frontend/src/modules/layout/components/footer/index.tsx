@@ -38,7 +38,7 @@ const Footer = () => {
             The Art of <span className="text-luxury-gold">Petha Craftsmanship</span>
           </Heading>
           <Text className="text-luxury-charcoal/80 text-base-regular leading-relaxed max-w-2xl mx-auto">
-            Each piece in our collection is meticulously handcrafted by master sweet makers who have perfected their craft over generations. 
+            Each piece in our collection is meticulously Hand-Made by master sweet makers who have perfected their craft over generations. 
             From the initial selection of the finest ash gourd to the final crystallization, our commitment to excellence and attention to detail 
             ensures that every petha is a delightful treat worthy of your palate.
           </Text>
@@ -54,7 +54,7 @@ const Footer = () => {
           >
             <Heading level="h3" className="text-xl mb-4 font-display text-luxury-gold">Taj Petha</Heading>
             <Text className="text-luxury-charcoal/80 mb-6 leading-relaxed">
-              Exquisite handcrafted Agra pethas that transform moments into expressions of authentic sweet tradition.
+              Exquisite Hand-Made Agra pethas that transform moments into expressions of authentic sweet tradition.
             </Text>
             <div className="flex space-x-5">
               <motion.a 

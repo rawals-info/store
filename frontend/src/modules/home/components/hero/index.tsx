@@ -74,7 +74,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-serif-regular text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Authentic, handcrafted Petha—since 2013. Melt-in-the-mouth, fragrant bites steeped in Agra’s rich heritage.
+            Authentic, Hand-Made Petha—since 2013. Melt-in-the-mouth, fragrant bites steeped in Agra’s rich heritage.
           </p>
           
           <div className="flex flex-col small:flex-row gap-6 justify-center mt-8">
@@ -111,7 +111,7 @@ const Hero = () => {
             <h2 className="font-display text-3xl mb-4">Exquisite Collections</h2>
             <div className="h-px w-24 bg-luxury-gold mx-auto"></div>
             <p className="text-serif-regular text-luxury-charcoal/80 mt-6 max-w-xl mx-auto">
-              Discover our handcrafted authentic Agra pethas, each piece telling a story of traditional recipes and heritage
+              Discover our Hand-Made authentic Agra pethas, each piece telling a story of traditional recipes and heritage
             </p>
           </div>
           

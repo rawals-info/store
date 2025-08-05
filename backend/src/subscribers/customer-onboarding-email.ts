@@ -25,14 +25,14 @@ export default async function customerOnboardingEmail({
     
     <div class="highlight-box">
       <p><strong>🌟 You've Discovered Something Special!</strong></p>
-      <p>Our family has been perfecting the art of sweet-making for decades, using the same traditional recipes and techniques that made Agra famous for its pethas. Each sweet is handcrafted with love, ensuring you experience the true taste of our heritage.</p>
+      <p>Our family has been perfecting the art of sweet-making for decades, using the same traditional recipes and techniques that made Agra famous for its pethas. Each sweet is Hand-Made with love, ensuring you experience the true taste of our heritage.</p>
     </div>
     
     <p><strong>What Makes Taj Petha Special:</strong></p>
     <ul style="margin: 16px 0; padding-left: 20px;">
       <li style="margin: 8px 0;">🏺 <strong>Traditional Recipes:</strong> Passed down through generations of master sweet makers</li>
       <li style="margin: 8px 0;">🌿 <strong>Premium Ingredients:</strong> Only the finest ash gourd, pure sugar, and authentic spices</li>
-      <li style="margin: 8px 0;">👨‍🍳 <strong>Handcrafted Excellence:</strong> Each piece lovingly made by experienced artisans</li>
+      <li style="margin: 8px 0;">👨‍🍳 <strong>Hand-Made Excellence:</strong> Each piece lovingly made by experienced artisans</li>
       <li style="margin: 8px 0;">📦 <strong>Fresh Delivery:</strong> Packed with care to preserve taste and texture</li>
     </ul>
     

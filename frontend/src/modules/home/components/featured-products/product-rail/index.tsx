@@ -42,7 +42,7 @@ export default async function ProductRail({
           <div className="h-px w-24 bg-luxury-gold mx-auto"></div>
           <p className="text-serif-regular text-luxury-charcoal/80 mt-6 max-w-lg mx-auto">
             {collection.metadata?.description as string || 
-             "Discover our handcrafted authentic Agra pethas, each one a masterpiece of traditional recipes and sweet artistry"}
+             "Discover our Hand-Made authentic Agra pethas, each one a masterpiece of traditional recipes and sweet artistry"}
           </p>
         </div>
         

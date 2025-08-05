@@ -98,25 +98,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           title: `${similarCategory.name} | Taj Petha`,
           description: 'description' in similarCategory && similarCategory.description 
             ? similarCategory.description 
-            : `Browse our exclusive ${similarCategory.name.toLowerCase()} collection of authentic Agra pethas, handcrafted with traditional recipes.`,
+            : `Browse our exclusive ${similarCategory.name.toLowerCase()} collection of authentic Agra pethas, Hand-Made with traditional recipes.`,
         };
       }
       
       return {
         title: "Category | Taj Petha",
-        description: "Browse our exclusive collection of authentic Agra pethas, handcrafted with traditional recipes passed down through generations.",
+        description: "Browse our exclusive collection of authentic Agra pethas, Hand-Made with traditional recipes passed down through generations.",
       };
     }
 
     return {
       title: `${categoryObj.name} | Taj Petha`,
-      description: categoryObj.description || `Browse our exclusive ${categoryObj.name.toLowerCase()} collection of authentic Agra pethas, handcrafted with traditional recipes.`,
+      description: categoryObj.description || `Browse our exclusive ${categoryObj.name.toLowerCase()} collection of authentic Agra pethas, Hand-Made with traditional recipes.`,
     }
   } catch (error) {
     console.error("Error generating metadata:", error);
     return {
       title: "Category | Taj Petha",
-      description: "Browse our exclusive collection of authentic Agra pethas, handcrafted with traditional recipes passed down through generations.",
+      description: "Browse our exclusive collection of authentic Agra pethas, Hand-Made with traditional recipes passed down through generations.",
     }
   }
 }

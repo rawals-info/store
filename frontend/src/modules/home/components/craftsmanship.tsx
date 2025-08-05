@@ -34,7 +34,7 @@ export default function Craftsmanship() {
             
             <ScrollReveal delay={0.1}>
               <Text className="mb-4">
-                Each piece in our collection is handcrafted by master sweet makers with decades of experience working with the finest ingredients from around the region.
+                Each piece in our collection is Hand-Made by master sweet makers with decades of experience working with the finest ingredients from around the region.
               </Text>
             </ScrollReveal>
             
