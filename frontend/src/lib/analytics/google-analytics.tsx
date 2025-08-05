@@ -267,16 +267,20 @@ export function usePageView() {
 
 // Google Analytics Script Component
 export function GoogleAnalytics() {
+  const isProd = process.env.NODE_ENV === 'production'
+  if (!isProd) {
+    return null
+  }
   return (
     <>
       {/* Google Analytics */}
       <Script
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
       />
       <Script
         id="google-analytics"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -331,7 +335,7 @@ export function GoogleAnalytics() {
       {/* Google Tag Manager */}
       <Script
         id="google-tag-manager"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -346,7 +350,7 @@ export function GoogleAnalytics() {
       {/* Facebook Pixel */}
       <Script
         id="facebook-pixel"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             !function(f,b,e,v,n,t,s)
@@ -366,7 +370,7 @@ export function GoogleAnalytics() {
       {/* Microsoft Clarity for user behavior analytics */}
       <Script
         id="microsoft-clarity"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             (function(c,l,a,r,i,t,y){
@@ -381,7 +385,7 @@ export function GoogleAnalytics() {
       {/* Hotjar for heatmaps and user recordings */}
       <Script
         id="hotjar"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             (function(h,o,t,j,a,r){

@@ -105,8 +105,8 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "Poppins",
-          "Inter",
+          "var(--font-poppins)",
+          "var(--font-inter)",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
@@ -116,13 +116,13 @@ module.exports = {
           "sans-serif",
         ],
         serif: [
-          "Poppins",
+          "var(--font-dm-serif)",
           "Georgia",
           "Times New Roman",
           "serif",
         ],
         display: [
-          "DM Serif Display",
+          "var(--font-playfair)",
           "serif",
         ],
       },

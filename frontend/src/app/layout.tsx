@@ -2,6 +2,12 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata, Viewport } from "next"
 import { GoogleAnalytics } from "@lib/analytics/google-analytics"
 import "styles/globals.css"
+import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
+
+const poppins = Poppins({ subsets: ["latin"], weight: ["300","400","500","600","700"], display: "swap", variable: "--font-poppins" })
+const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: "normal", display: "swap", variable: "--font-dm-serif" })
+const interFont = Inter({ subsets: ["latin"], weight: ["400","500","600","700"], display: "swap", variable: "--font-inter" })
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400","500","600","700"], display: "swap", variable: "--font-playfair" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -234,16 +240,12 @@ const localBusinessSchema = {
 export default function RootLayout(props: { children: React.ReactNode }) {
   const baseUrl = getBaseURL()
   return (
-    <html lang="en-IN" data-mode="light">
+    <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable}`}>
       <head>
         {/* Preload critical resources to reduce HTTP requests */}
-        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" />
         <link rel="preload" href="/hero_image.webp" as="image" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
         
-        {/* Critical DNS prefetch */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         
