@@ -353,9 +353,9 @@ export default function HomeClientWrapper({
                 {Array(totalProductPages).fill(0).map((_, i) => (
                   <button
                     key={`dot-${i}`}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      currentProductIndex === i ? 'bg-luxury-gold w-4' : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
+                    className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                      currentProductIndex === i ? 'bg-luxury-gold' : 'bg-gray-300 hover:bg-gray-400'
+                    } p-2`}
                     onClick={() => {
                       setCurrentProductIndex(i);
                       setProductAutoRotate(false);

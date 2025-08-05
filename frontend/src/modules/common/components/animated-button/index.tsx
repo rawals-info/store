@@ -27,7 +27,7 @@ const AnimatedButton = ({
   const variantClasses = {
     primary: "bg-ui-bg-base text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-subtle",
     secondary: "bg-ui-bg-subtle text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-base",
-    gold: "bg-luxury-gold text-luxury-ivory border border-luxury-gold/80 hover:bg-luxury-gold/90 shadow-luxury-sm",
+    gold: "bg-luxury-gold text-luxury-charcoal border border-luxury-gold/80 hover:bg-luxury-gold/90 shadow-luxury-sm",
     outline: "bg-transparent text-luxury-charcoal border border-luxury-gold/40 hover:border-luxury-gold hover:bg-luxury-ivory",
     transparent: "bg-transparent text-luxury-charcoal hover:text-luxury-gold",
   }

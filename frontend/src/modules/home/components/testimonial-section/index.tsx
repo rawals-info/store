@@ -146,11 +146,11 @@ export default function TestimonialSection() {
                     setIsAnimating(false)
                   }, 500)
                 }}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                className={`w-4 h-4 rounded-full transition-all duration-300 ${
                   index === currentIndex 
-                    ? 'bg-luxury-gold w-8' 
+                    ? 'bg-luxury-gold' 
                     : 'bg-luxury-gold/30 hover:bg-luxury-gold/50'
-                }`}
+                } p-2`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />
             ))}

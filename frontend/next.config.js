@@ -102,6 +102,16 @@ const nextConfig = {
           }
         ]
       },
+      // Image optimization cache (/_next/image)
+      {
+        source: '/_next/image',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, s-maxage=31536000, immutable'
+          }
+        ]
+      },
       // Image caching headers
       {
         source: '/(.*)\\.(jpg|jpeg|png|webp|avif|ico|svg)',
