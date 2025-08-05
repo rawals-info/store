@@ -156,7 +156,8 @@ export const generateLocalBusinessSchema = () => {
 
 export const generateProductSchema = (
   product: HttpTypes.StoreProduct,
-  region: HttpTypes.StoreRegion
+  region: HttpTypes.StoreRegion,
+  reviewData?: { average_rating: number; count: number }
 ) => {
   const baseUrl = getBaseURL()
   const productPrice = product.variants?.[0]?.calculated_price
@@ -164,6 +165,10 @@ export const generateProductSchema = (
     variant.inventory_quantity && variant.inventory_quantity > 0
   )
   const productCategory = product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"
+
+  // Use dynamic review data if available, otherwise fall back to defaults
+  const ratingValue = reviewData?.average_rating || 4.7
+  const reviewCount = reviewData?.count || 89
 
   return {
     "@context": "https://schema.org",
@@ -190,18 +195,41 @@ export const generateProductSchema = (
       "priceCurrency": region?.currency_code?.toUpperCase() || "INR",
       "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "seller": {
+        "@type": "Organization",
+        "name": "Taj Petha",
         "@id": `${baseUrl}/#organization`
       },
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      "itemCondition": "https://schema.org/NewCondition"
+      "itemCondition": "https://schema.org/NewCondition",
+      "url": `${baseUrl}/in/products/${product.handle}`
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.7",
-      "reviewCount": "89",
+      "ratingValue": ratingValue.toString(),
+      "reviewCount": reviewCount.toString(),
       "bestRating": "5",
       "worstRating": "1"
-    }
+    },
+    // Add additional properties for better SEO
+    "identifier": {
+      "@type": "PropertyValue",
+      "name": "SKU",
+      "value": product.variants?.[0]?.sku || `TAJ-${product.id}`
+    },
+    "weight": product.weight ? `${product.weight}g` : undefined,
+    "material": "Premium ingredients with traditional recipe",
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "Freshness",
+        "value": "Made fresh daily"
+      },
+      {
+        "@type": "PropertyValue", 
+        "name": "Packaging",
+        "value": "Hygienic packaging"
+      }
+    ]
   }
 }
 
