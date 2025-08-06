@@ -82,6 +82,17 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
             "@type": "Product",
             "name": `Fresh ${productType.charAt(0).toUpperCase() + productType.slice(1)}`,
             "description": `Authentic Agra ${productType} delivered fresh to ${city.name}`
+            ,
+            // Added direct Offer to fulfil Google Product Snippet requirements
+            "offers": {
+              "@type": "Offer",
+              "price": "199",
+              "priceCurrency": "INR",
+              "availability": "https://schema.org/InStock",
+              "seller": {
+                "@id": `https://tajpetha.in/#organization`
+              }
+            }
           },
           "priceRange": "₹₹",
           "areaServed": city.name,

@@ -125,7 +125,17 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             "@type": "Brand",
             "name": "Taj Petha"
           },
-          "category": product.category || "Indian Sweets"
+          "category": product.category || "Indian Sweets",
+          // Ensure each Product has a direct Offer for rich-result eligibility
+          "offers": {
+            "@type": "Offer",
+            "price": product.price || "199",
+            "priceCurrency": "INR",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@id": `${baseUrl}/#organization`
+            }
+          }
         },
         "price": product.price || "199",
         "priceCurrency": "INR",
