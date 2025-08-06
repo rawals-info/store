@@ -1,6 +1,7 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata, Viewport } from "next"
 import { GoogleAnalytics } from "@lib/analytics/google-analytics"
+import Script from "next/script";
 import "styles/globals.css"
 import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
 import CanonicalLink from "@modules/common/components/canonical-link"
@@ -252,6 +253,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        {/* Preconnect to third-party domains for quicker TLS */}
+        <link rel="preconnect" href="https://connect.facebook.net" />
+        <link rel="preconnect" href="https://static.hotjar.com" />
         
         {/* Optimized favicon and app icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -276,6 +280,16 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             }
           `
         }} />
+
+        {/* Marketing / analytics scripts deferred until load */}
+        <Script
+          src="https://connect.facebook.net/en_US/fbevents.js"
+          strategy="lazyOnload"
+        />
+        <Script
+          src="https://static.hotjar.com/c/hotjar-3507234.js?sv=6"
+          strategy="lazyOnload"
+        />
         
         {/* Hreflang tags for international SEO */}
         <link rel="alternate" hrefLang="en-in" href={baseUrl} />

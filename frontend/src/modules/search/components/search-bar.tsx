@@ -171,7 +171,7 @@ const SearchBar = ({
         <button
           type="button"
           onClick={clearSearch}
-          className="absolute right-8 text-luxury-charcoal/50 hover:text-luxury-gold transition-colors"
+          className="absolute right-8 text-luxury-charcoal/50 hover:text-luxury-gold transition-colors p-2"
         >
           <XMark className="w-4 h-4" />
           <span className="sr-only">Clear search</span>
@@ -180,7 +180,7 @@ const SearchBar = ({
       <button
         type="submit"
         className={clx(
-          "absolute right-0 transition-colors",
+          "absolute right-0 transition-colors p-2",
           isHomePage && !isScrolled ? "text-white/70 hover:text-white" : "text-white/70 hover:text-luxury-gold"
         )}
       >

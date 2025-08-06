@@ -10,7 +10,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizeCss: true,
+    //optimizeCss: true,
     optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion']
   },
   compress: true,
