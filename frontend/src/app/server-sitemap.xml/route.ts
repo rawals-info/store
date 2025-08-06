@@ -1,3 +1,5 @@
+import { sdk } from "@lib/config"
+
 export async function GET() {
   // Base site URL (production fallback)
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://tajpetha.in'
@@ -12,13 +14,14 @@ export async function GET() {
   }
 
   try {
-    // Fetch up to 10 000 products – adjust if you expect more
-    const resp = await fetch(`${apiBase}/store/products?limit=10000&fields=handle`, {
-      // Cache for 6 h to avoid hammering the API
+    const data = await sdk.client.fetch<{
+      products: Array<{ handle: string }>
+    }>(`/store/products`, {
+      query: { limit: 10000, fields: "handle" },
       next: { revalidate: 60 * 60 * 6 },
+      cache: "force-cache",
     })
 
-    const data = await resp.json()
     const products: Array<{ handle: string }> = data?.products || []
 
     let urls = products
