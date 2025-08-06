@@ -15,21 +15,21 @@ export async function GET() {
 
   try {
     const data = await sdk.client.fetch<{
-      products: Array<{ handle: string }>
+      products: Array<{ handle: string; updated_at?: string }>
     }>(`/store/products`, {
-      query: { limit: 10000, fields: "handle" },
+      query: { limit: 10000, fields: "handle,updated_at" },
       next: { revalidate: 60 * 60 * 6 },
       cache: "force-cache",
     })
 
-    const products: Array<{ handle: string }> = data?.products || []
+    const products: Array<{ handle: string; updated_at?: string }> = data?.products || []
 
     let urls = products
       .filter((p) => p?.handle)
-      .map(
-        (p) =>
-          `<url><loc>${`${baseUrl}/in/products/${p.handle}`}</loc><changefreq>daily</changefreq><priority>0.8</priority></url>`
-      )
+      .map((p) => {
+        const lastmod = p.updated_at || new Date().toISOString()
+        return `<url><loc>${`${baseUrl}/in/products/${p.handle}`}</loc><lastmod>${lastmod}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
+      })
       .join("\n")
 
     // Fallback: sitemap must contain at least one <url> element or Google will error
