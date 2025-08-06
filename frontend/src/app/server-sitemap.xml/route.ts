@@ -21,13 +21,19 @@ export async function GET() {
     const data = await resp.json()
     const products: Array<{ handle: string }> = data?.products || []
 
-    const urls = products
+    let urls = products
       .filter((p) => p?.handle)
       .map(
         (p) =>
           `<url><loc>${`${baseUrl}/in/products/${p.handle}`}</loc><changefreq>daily</changefreq><priority>0.8</priority></url>`
       )
-      .join('\n')
+      .join("\n")
+
+    // Fallback: sitemap must contain at least one <url> element or Google will error
+    if (!urls) {
+      console.warn("[sitemap] No product handles found – falling back to homepage entry")
+      urls = `<url><loc>${baseUrl}</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`
+    }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`
 
