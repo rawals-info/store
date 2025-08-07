@@ -100,7 +100,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         
         {/* Main description with refined typography */}
         <div className="space-y-4">
-          <div className="text-serif-italic text-base leading-relaxed text-luxury-charcoal whitespace-pre-line" data-testid="product-description">
+          <div className="text-base leading-relaxed text-luxury-charcoal whitespace-pre-line" data-testid="product-description">
             <ReactMarkdown
               components={{
                 strong: ({ node, ...props }) => (
@@ -126,7 +126,15 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                 {bulletPoints.map((point, i) => (
                   <li key={i} className="flex items-start">
                     <span className="text-luxury-gold mr-2 mt-1">•</span>
-                    <span className="text-luxury-charcoal/80 text-sm leading-relaxed">{point}</span>
+                    <ReactMarkdown
+                      components={{
+                        p: ({node, ...props}) => <span className="text-luxury-charcoal/80 text-sm leading-relaxed" {...props} />, 
+                        strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+                        em: ({node, ...props}) => <em className="italic" {...props} />
+                      }}
+                    >
+                      {point}
+                    </ReactMarkdown>
                   </li>
                 ))}
               </ul>
