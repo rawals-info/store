@@ -128,6 +128,11 @@ export default async function ProductTemplate({
               <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
               <meta itemProp="availability" content={product.variants?.some(v => v.inventory_quantity && v.inventory_quantity > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
               <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />
+              {/* Added price validity date */}
+              <meta itemProp="priceValidUntil" content={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} />
+              {/* Link references for return policy and shipping details */}
+              <link itemProp="hasMerchantReturnPolicy" href="/returns" />
+              <link itemProp="shippingDetails" href="/shipping" />
               <div itemProp="seller" itemScope itemType="https://schema.org/Organization">
                 <meta itemProp="name" content="Taj Petha" />
               </div>
