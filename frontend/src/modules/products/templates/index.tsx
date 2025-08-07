@@ -8,7 +8,8 @@ import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import ProductReviews from "../components/product-reviews"
 import { generateProductSchema, generateBreadcrumbSchema } from "@lib/seo"
-import { getProductReviewSummary } from "@lib/data/products"
+import { getProductReviewSummary, getProductReviews } from "@lib/data/products"
+import type { StoreProductReview } from "types/global"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -34,21 +35,26 @@ export default async function ProductTemplate({
     return notFound()
   }
 
-  // Fetch review data for schema
+  // Fetch review data and list for schema
   let reviewData = { average_rating: 4.7, count: 89 }
+  let reviewList: StoreProductReview[] = []
   try {
-    const reviews = await getProductReviewSummary(product.id)
+    // Summary
+    const summary = await getProductReviewSummary(product.id)
     reviewData = {
-      average_rating: typeof reviews.average_rating === 'number' ? reviews.average_rating : 4.7,
-      count: typeof reviews.count === 'number' ? reviews.count : 89
+      average_rating: typeof summary.average_rating === 'number' ? summary.average_rating : 4.7,
+      count: typeof summary.count === 'number' ? summary.count : 89
     }
+
+    // Fetch first 3 reviews for schema markup
+    const { reviews } = await getProductReviews({ productId: product.id, limit: 3, offset: 0 })
+    reviewList = reviews || []
   } catch (error) {
-    console.log("Could not fetch review data, using defaults")
-    // reviewData already set to defaults above
+    console.log("Could not fetch reviews, using defaults")
   }
 
-  // Generate product schema for SEO with dynamic review data
-  const productSchema = generateProductSchema(product, region, reviewData)
+  // Generate product schema for SEO with dynamic review data & real reviews
+  const productSchema = generateProductSchema(product, region, reviewData, reviewList)
   
   // Generate breadcrumb schema
   const breadcrumbs = [

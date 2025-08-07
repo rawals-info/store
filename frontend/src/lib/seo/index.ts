@@ -29,10 +29,10 @@ export const SEO_CONSTANTS = {
     phone: "+91-92594-18994",
     email: "orders@tajpetha.in",
     address: {
-      streetAddress: "Sadar Bazaar",
+      streetAddress: "Pratap Nagar",
       addressLocality: "Agra",
       addressRegion: "Uttar Pradesh",
-      postalCode: "282001",
+      postalCode: "282010",
       addressCountry: "IN"
     },
     geo: {
@@ -157,7 +157,8 @@ export const generateLocalBusinessSchema = () => {
 export const generateProductSchema = (
   product: HttpTypes.StoreProduct,
   region: HttpTypes.StoreRegion,
-  reviewData?: { average_rating: number; count: number }
+  reviewData?: { average_rating: number; count: number },
+  reviews?: import("../../types/global").StoreProductReview[]
 ) => {
   const baseUrl = getBaseURL()
   const productPrice = product.variants?.[0]?.calculated_price
@@ -249,24 +250,27 @@ export const generateProductSchema = (
       "bestRating": "5",
       "worstRating": "1"
     },
-    // Add review array to enrich schema
-    "review": [
-      {
-        "@type": "Review",
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": ratingValue.toString(),
-          "bestRating": "5",
-          "worstRating": "1"
-        },
-        "author": {
-          "@type": "Organization",
-          "name": "Verified Buyer"
-        },
-        "reviewBody": `Customers love our ${product.title} for its authentic taste and premium quality.`,
-        "datePublished": new Date().toISOString().split('T')[0]
-      }
-    ],
+    // Add review array if provided
+    ...(reviews && reviews.length > 0
+      ? {
+          "review": reviews.slice(0, 10).map(r => ({
+            "@type": "Review",
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": r.rating.toString(),
+              "bestRating": "5",
+              "worstRating": "1"
+            },
+            "author": {
+              "@type": "Person",
+              "name": `${r.first_name} ${r.last_name}`.trim() || "Anonymous"
+            },
+            "name": r.title || `${product.title} review`,
+            "reviewBody": r.content,
+            "datePublished": new Date().toISOString().split('T')[0]
+          }))
+        }
+      : {}),
     // Add additional properties for better SEO
     "identifier": {
       "@type": "PropertyValue",
