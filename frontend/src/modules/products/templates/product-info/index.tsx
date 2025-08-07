@@ -1,13 +1,18 @@
 import { HttpTypes } from "@medusajs/types"
 import { Heading } from "@medusajs/ui"
+import { Star, StarSolid } from "@medusajs/icons"
 import ReactMarkdown from "react-markdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
+  reviewData?: {
+    average_rating: number
+    count: number
+  }
 }
 
-const ProductInfo = ({ product }: ProductInfoProps) => {
+const ProductInfo = ({ product, reviewData }: ProductInfoProps) => {
   // Extract features and materials from product description if they exist
   const descriptionLines = product.description?.split('\n') || []
   // Identify bullet‐style lines that start with "* " or "- " or the unicode bullet "• "
@@ -30,6 +35,18 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const isFeatured = product.tags?.some(tag => 
     tag.value?.toLowerCase().includes("featured")
   )
+
+  const renderStars = (rating: number, size = "w-4 h-4") => {
+    return Array.from({ length: 5 }).map((_, index) => (
+      <span key={index}>
+        {index < Math.round(rating) ? (
+          <StarSolid className={`text-luxury-gold ${size}`} />
+        ) : (
+          <Star className={`text-luxury-gold/30 ${size}`} />
+        )}
+      </span>
+    ))
+  }
 
   return (
     <div id="product-info" className="px-1">
@@ -62,7 +79,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         </div>
         
         {/* Product title with luxury styling */}
-        <div className="space-y-2">
+        <div className="space-y-4">
           <Heading
             level="h1"
             className="font-display text-3xl md:text-4xl leading-tight text-luxury-charcoal"
@@ -70,6 +87,33 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           >
             {product.title}
           </Heading>
+          
+          {/* Average Rating Display - Only show if reviews exist */}
+          {reviewData && reviewData.count > 0 && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1">
+                  {renderStars(reviewData.average_rating)}
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-semibold text-luxury-charcoal">
+                    {reviewData.average_rating.toFixed(1)}
+                  </span>
+                  <span className="text-luxury-charcoal/60">
+                    ({reviewData.count} review{reviewData.count !== 1 ? 's' : ''})
+                  </span>
+                </div>
+              </div>
+              
+              {/* Quick link to reviews */}
+              <a 
+                href="#customer-reviews" 
+                className="text-xs text-luxury-gold hover:text-luxury-gold/80 transition-colors w-fit"
+              >
+                Read customer reviews →
+              </a>
+            </div>
+          )}
           
           {/* Product badges */}
           <div className="flex gap-3 mt-2">
@@ -84,7 +128,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             
             <span className="bg-luxury-ivory border border-luxury-gold/60 px-3 py-1 text-luxury-charcoal text-[11px] uppercase tracking-wider font-medium inline-flex items-center">
               <svg className="w-3 h-3 mr-1.5 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 113 0v3m0 0V11"></path>
               </svg>
               Freshly Made
             </span>

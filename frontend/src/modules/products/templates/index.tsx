@@ -8,7 +8,7 @@ import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import ProductReviews from "../components/product-reviews"
 import { generateProductSchema, generateBreadcrumbSchema } from "@lib/seo"
-import { getProductReviews } from "@lib/data/products"
+import { getProductReviewSummary } from "@lib/data/products"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -37,7 +37,7 @@ export default async function ProductTemplate({
   // Fetch review data for schema
   let reviewData = { average_rating: 4.7, count: 89 }
   try {
-    const reviews = await getProductReviews({ productId: product.id, limit: 1 })
+    const reviews = await getProductReviewSummary(product.id)
     reviewData = {
       average_rating: typeof reviews.average_rating === 'number' ? reviews.average_rating : 4.7,
       count: typeof reviews.count === 'number' ? reviews.count : 89
@@ -115,7 +115,7 @@ export default async function ProductTemplate({
           
           {/* Right column - Product info and actions */}
           <div className="flex-1">
-            <ProductInfo product={product} />
+            <ProductInfo product={product} reviewData={reviewData} />
             
             <div 
               className="mt-8 pt-4 border-t border-luxury-gold/20"

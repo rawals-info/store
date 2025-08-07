@@ -310,6 +310,37 @@ export const getProductReviews = async ({
   })
 }
 
+export const getProductReviewSummary = async (productId: string) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const next = {
+    ...(await getCacheOptions(`product-review-summary-${productId}`)),
+  }
+
+  try {
+    return await sdk.client.fetch<{
+      average_rating: number
+      count: number
+    }>(`/store/products/${productId}/reviews`, {
+      headers,
+      query: {
+        limit: 1, // We only need the summary data
+        offset: 0,
+      },
+      next,
+      cache: "force-cache",
+    })
+  } catch (error) {
+    // Return default values if no reviews or error
+    return {
+      average_rating: 0,
+      count: 0
+    }
+  }
+}
+
 export const addProductReview = async (input: {
   title?: string
   content: string

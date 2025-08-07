@@ -1,0 +1,9 @@
+scripts/review-script/*
+.env*
+.github/*
+.yarn/*
+.yarnrc.yml
+.yarnrc.yaml
+.yarnrc
+.yarnrc.yaml
+.yarnrc.yml

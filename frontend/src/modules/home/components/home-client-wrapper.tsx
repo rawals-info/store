@@ -12,6 +12,7 @@ import ProductPrice from "@modules/products/components/product-price"
 import Features from "./features"
 import { HttpTypes } from "@medusajs/types"
 import CategoryCarousel from "./category-carousel"
+import ProductPreviewRating from "@modules/products/components/product-preview/rating-client"
 
 type HomeClientWrapperProps = {
   featuredProducts: any[]
@@ -301,6 +302,11 @@ export default function HomeClientWrapper({
                               <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold text-luxury-charcoal transition-colors mb-1">
                                 <h3 className="font-serif text-xl line-clamp-1">{product.title}</h3>
                               </Link>
+                              
+                              {/* Add Reviews Rating */}
+                              <div className="flex justify-center mb-2">
+                                <ProductPreviewRating productId={product.id} />
+                              </div>
                               
                               <div className="text-luxury-charcoal/90">
                                 {product.variants && product.variants[0] ? (

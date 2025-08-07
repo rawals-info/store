@@ -4,13 +4,72 @@ import { HttpTypes } from "@medusajs/types"
 import { Text } from "@medusajs/ui"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import Thumbnail from "../thumbnail"
+import { getProductReviewSummary } from "@lib/data/products"
 
 type ProductCardProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   index?: number
+}
+
+// Client-side rating component
+const ProductRating = ({ productId }: { productId: string }) => {
+  const [reviewData, setReviewData] = useState<{ average_rating: number; count: number } | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    getProductReviewSummary(productId)
+      .then(setReviewData)
+      .finally(() => setIsLoading(false))
+  }, [productId])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center space-x-2 pt-1">
+        <div className="flex items-center space-x-1">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="w-3 h-3 bg-gray-200 rounded animate-pulse"></div>
+          ))}
+        </div>
+        <span className="text-xs text-gray-400">Loading...</span>
+      </div>
+    )
+  }
+
+  if (!reviewData || reviewData.count === 0) {
+    return (
+      <div className="flex items-center space-x-2 pt-1">
+        <span className="text-xs text-gray-500">No reviews yet</span>
+      </div>
+    )
+  }
+
+  const { average_rating, count } = reviewData
+  const roundedRating = Math.round(average_rating)
+
+  return (
+    <div className="flex items-center space-x-2 pt-1" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+      <div className="flex items-center space-x-1">
+        {[...Array(5)].map((_, i) => (
+          <svg
+            key={i}
+            className={`w-3 h-3 ${i < roundedRating ? 'text-yellow-400' : 'text-gray-300'}`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </div>
+      <span className="text-xs text-gray-500">
+        <span itemProp="ratingValue">{average_rating.toFixed(1)}</span> (<span itemProp="reviewCount">{count}</span> review{count !== 1 ? 's' : ''})
+      </span>
+      <meta itemProp="bestRating" content="5" />
+      <meta itemProp="worstRating" content="1" />
+    </div>
+  )
 }
 
 const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) => {
@@ -24,7 +83,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
     ? `${product.description.slice(0, 120)}...` 
     : `Authentic ${product.title} from Taj Petha. Premium quality ${productCategory.toLowerCase()} made with traditional recipes and hygienic preparation.`
 
-  // Product schema markup for rich snippets
+  // Product schema markup for rich snippets - will be updated with real review data
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -51,14 +110,8 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
       },
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
       "itemCondition": "https://schema.org/NewCondition"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.7",
-      "reviewCount": "89",
-      "bestRating": "5",
-      "worstRating": "1"
     }
+    // Note: aggregateRating will be added dynamically when we have real review data
   }
 
   // Animation variants for better UX
@@ -218,26 +271,8 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
               </div>
             </div>
 
-            {/* Rating and Reviews (if available) */}
-            <div className="flex items-center space-x-2 pt-1" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
-              <div className="flex items-center space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className={`w-3 h-3 ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <span className="text-xs text-gray-500">
-                <span itemProp="ratingValue">4.7</span> (<span itemProp="reviewCount">89</span> reviews)
-              </span>
-              <meta itemProp="bestRating" content="5" />
-              <meta itemProp="worstRating" content="1" />
-            </div>
+            {/* Rating and Reviews - Now Dynamic */}
+            <ProductRating productId={product.id} />
 
             {/* Additional product features */}
             <div className="flex flex-wrap gap-1 pt-2">

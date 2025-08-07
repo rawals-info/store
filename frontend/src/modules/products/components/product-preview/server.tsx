@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import Link from "next/link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import ProductPreviewRating from "./rating-client"
 
 export default function ProductPreview({
   product,
@@ -131,6 +132,9 @@ export default function ProductPreview({
               )}
             </div>
           </div>
+
+          {/* Add Reviews Rating */}
+          <ProductPreviewRating productId={product.id} />
 
           <div className="h-px bg-luxury-gold/20 w-full my-2"></div>
 
