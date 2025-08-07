@@ -27,6 +27,12 @@ const AnimatedHeader = () => {
   const { scrollY } = useScroll()
   const pathname = usePathname()
   
+  // Check localStorage for banner dismissal state on mount
+  useEffect(() => {
+    const dismissed = localStorage.getItem('promotional-banner-dismissed') === 'true'
+    setBannerDismissed(dismissed)
+  }, [])
+  
   // Promotional messages
   const promoMessages = [
     "🔥 LIMITED TIME: Use code SWEET20 for 20% OFF all Petha — ends midnight Sunday! 🔥",
@@ -34,6 +40,22 @@ const AnimatedHeader = () => {
     "🚚 Free shipping on orders over ₹1,000 — today only!",
     "🍫 New: Chocolate Petha now available — use CHOCO10 for 10% off"
   ]
+
+  // Function to handle banner dismissal
+  const handleBannerDismiss = () => {
+    setBannerDismissed(true)
+    localStorage.setItem('promotional-banner-dismissed', 'true')
+    // Dispatch custom event to notify layout immediately
+    window.dispatchEvent(new CustomEvent('bannerDismissed'))
+  }
+
+  // Function to show banner again
+  const handleShowBanner = () => {
+    setBannerDismissed(false)
+    localStorage.removeItem('promotional-banner-dismissed')
+    // Dispatch custom event to notify layout immediately
+    window.dispatchEvent(new CustomEvent('bannerShown'))
+  }
 
   // Extract country code from pathname
   const countryCode = pathname?.split('/')[1] || 'us'
@@ -175,13 +197,52 @@ const AnimatedHeader = () => {
             
             {/* Close button */}
             <button
-              onClick={() => setBannerDismissed(true)}
+              onClick={handleBannerDismiss}
               className="absolute right-2 p-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 z-10 border border-white/20"
               aria-label="Dismiss banner"
             >
               <X width={12} height={12} className="text-white hover:text-luxury-gold transition-colors duration-200" />
             </button>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Show Banner Button - appears when banner is dismissed */}
+      <AnimatePresence>
+        {bannerDismissed && (
+          <motion.button
+            onClick={handleShowBanner}
+            className="fixed top-1 left-1/2 transform -translate-x-1/2 z-[45] bg-luxury-gold hover:bg-luxury-gold/90 text-white text-xs px-2 py-1 rounded-full shadow-lg transition-all duration-200 flex items-center gap-1 border border-luxury-gold/30 hover:border-luxury-gold"
+            initial={{ y: -20, opacity: 0, scale: 0.8 }}
+            animate={{ 
+              y: 0, 
+              opacity: 1, 
+              scale: 1,
+              boxShadow: [
+                "0 2px 15px rgba(212, 175, 55, 0.3)",
+                "0 2px 25px rgba(212, 175, 55, 0.5)",
+                "0 2px 15px rgba(212, 175, 55, 0.3)"
+              ]
+            }}
+            exit={{ y: -20, opacity: 0, scale: 0.8 }}
+            transition={{ 
+              duration: 0.3, 
+              ease: [0.25, 1, 0.5, 1],
+              boxShadow: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Show promotional banner again"
+          >
+            <svg width={8} height={8} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5V19M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="font-medium text-xs hidden sm:inline">Offers</span>
+          </motion.button>
         )}
       </AnimatePresence>
 
