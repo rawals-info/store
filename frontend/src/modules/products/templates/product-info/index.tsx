@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
-import { Heading, Text } from "@medusajs/ui"
+import { Heading } from "@medusajs/ui"
+import ReactMarkdown from "react-markdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ProductInfoProps = {
@@ -9,8 +10,16 @@ type ProductInfoProps = {
 const ProductInfo = ({ product }: ProductInfoProps) => {
   // Extract features and materials from product description if they exist
   const descriptionLines = product.description?.split('\n') || []
-  const mainDescription = descriptionLines.filter(line => !line.startsWith('• ') && line.trim() !== '').join('\n')
-  const bulletPoints = descriptionLines.filter(line => line.startsWith('• ')).map(line => line.replace('• ', ''))
+  // Identify bullet‐style lines that start with "* " or "- " or the unicode bullet "• "
+  const bulletLineRegex = /^([*\-]|•)\s+/
+
+  const bulletPoints = descriptionLines
+    .filter((line) => bulletLineRegex.test(line))
+    .map((line) => line.replace(bulletLineRegex, ""))
+
+  const mainDescription = descriptionLines
+    .filter((line) => !bulletLineRegex.test(line) && line.trim() !== "")
+    .join("\n")
   
   // Check if product has specific tags
   const isLimitedEdition = product.tags?.some(tag => 
@@ -91,12 +100,23 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         
         {/* Main description with refined typography */}
         <div className="space-y-4">
-          <Text
-            className="text-serif-italic text-base leading-relaxed text-luxury-charcoal whitespace-pre-line"
-            data-testid="product-description"
-          >
-            {mainDescription}
-          </Text>
+          <div className="text-serif-italic text-base leading-relaxed text-luxury-charcoal whitespace-pre-line" data-testid="product-description">
+            <ReactMarkdown
+              components={{
+                strong: ({ node, ...props }) => (
+                  <strong className="font-semibold" {...props} />
+                ),
+                em: ({ node, ...props }) => (
+                  <em className="italic" {...props} />
+                ),
+                li: ({ node, ...props }) => (
+                  <li className="list-disc ml-5 text-luxury-charcoal/80 text-sm leading-relaxed" {...props} />
+                ),
+              }}
+            >
+              {mainDescription}
+            </ReactMarkdown>
+          </div>
           
           {/* Feature bullet points if they exist */}
           {bulletPoints.length > 0 && (
