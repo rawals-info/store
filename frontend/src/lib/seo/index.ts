@@ -187,6 +187,45 @@ export const generateProductSchema = (
   // Format priceValidUntil properly (30 days from now)
   const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
+  // Build additionalProperty from metadata (optional)
+  const metadata: Record<string, any> | undefined = (product as any)?.metadata
+  const additionalProperty: Array<any> = [
+    {
+      "@type": "PropertyValue",
+      "name": "Freshness",
+      "value": "Made fresh daily"
+    },
+    {
+      "@type": "PropertyValue", 
+      "name": "Packaging",
+      "value": "Hygienic packaging"
+    }
+  ]
+
+  if (metadata && typeof metadata === 'object') {
+    const mdMap: Array<{ key: string; name: string }> = [
+      { key: 'shelf_life', name: 'Shelf life' },
+      { key: 'ingredients', name: 'Ingredients' },
+      { key: 'packaging', name: 'Packaging' },
+      { key: 'origin', name: 'Origin' },
+      { key: 'storage', name: 'Storage instructions' },
+      { key: 'serving', name: 'Serving suggestions' },
+      { key: 'weight_grams', name: 'Weight (g)' },
+      { key: 'flavor', name: 'Flavor' },
+    ]
+
+    for (const { key, name } of mdMap) {
+      const val = (metadata as any)[key]
+      if (val !== undefined && val !== null && String(val).trim() !== '') {
+        additionalProperty.push({
+          "@type": "PropertyValue",
+          "name": name,
+          "value": String(val)
+        })
+      }
+    }
+  }
+
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -300,18 +339,7 @@ export const generateProductSchema = (
     },
     ...(product.weight ? { "weight": `${product.weight}g` } : {}),
     "material": "Premium ingredients with traditional recipe",
-    "additionalProperty": [
-      {
-        "@type": "PropertyValue",
-        "name": "Freshness",
-        "value": "Made fresh daily"
-      },
-      {
-        "@type": "PropertyValue", 
-        "name": "Packaging",
-        "value": "Hygienic packaging"
-      }
-    ]
+    "additionalProperty": additionalProperty
   }
 
   return productSchema
