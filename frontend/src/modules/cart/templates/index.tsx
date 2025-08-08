@@ -4,6 +4,7 @@ import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
+import { ProductTrustBadges } from "@components/TrustBadges"
 
 const CartTemplate = ({
   cart,
@@ -35,6 +36,9 @@ const CartTemplate = ({
                       <div className="h-0.5 w-full gold-gradient mb-4"></div>
                       <Summary cart={cart as any} />
                     </div>
+                    
+                    {/* Trust Badges for Cart */}
+                    <ProductTrustBadges />
                   </>
                 )}
               </div>

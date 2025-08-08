@@ -12,6 +12,7 @@ import { getProductReviewSummary, getProductReviews } from "@lib/data/products"
 import type { StoreProductReview } from "types/global"
 import FaqAccordion from "@components/FaqAccordion"
 import { getProductFaqs } from "@lib/faq/select"
+import { ProductTrustBadges } from "@components/TrustBadges"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -205,6 +206,9 @@ export default async function ProductTemplate({
               {/* Directly render ProductActions without an extra server fetch */}
               <ProductActions product={product} region={region} />
             </div>
+            
+            {/* Trust Badges */}
+            <ProductTrustBadges className="mt-6" />
             
             {/* Craftmanship note */}
             {isLimitedEdition && (

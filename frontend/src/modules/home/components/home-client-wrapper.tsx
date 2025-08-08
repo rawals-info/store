@@ -13,6 +13,7 @@ import Features from "./features"
 import { HttpTypes } from "@medusajs/types"
 import CategoryCarousel from "./category-carousel"
 import ProductPreviewRating from "@modules/products/components/product-preview/rating-client"
+import TrustBadges from "@components/TrustBadges"
 
 type HomeClientWrapperProps = {
   featuredProducts: any[]
@@ -38,10 +39,9 @@ export default function HomeClientWrapper({
   const [autoRotate, setAutoRotate] = useState(true)
   const autoRotateRef = useRef<NodeJS.Timeout | null>(null)
   
-  // State for products carousel
+  // State for products carousel - changed to rotate one by one
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
   const [productsPerView, setProductsPerView] = useState(4)
-  const [totalProductPages, setTotalProductPages] = useState(1)
   const [productAutoRotate, setProductAutoRotate] = useState(true)
   const productAutoRotateRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -81,12 +81,15 @@ export default function HomeClientWrapper({
     }
   }, [autoRotate, parentCategories.length])
   
-  // Auto-rotate products
+  // Auto-rotate products - now one by one
   useEffect(() => {
-    if (productAutoRotate && totalProductPages > 1) {
+    if (productAutoRotate && featuredProducts.length > productsPerView) {
       productAutoRotateRef.current = setInterval(() => {
-        setCurrentProductIndex((prev) => (prev + 1) % totalProductPages)
-      }, 5000)
+        setCurrentProductIndex((prev) => {
+          const maxIndex = featuredProducts.length - productsPerView
+          return prev >= maxIndex ? 0 : prev + 1
+        })
+      }, 2500) // Faster rotation since we're moving one at a time
     }
     
     return () => {
@@ -94,7 +97,7 @@ export default function HomeClientWrapper({
         clearInterval(productAutoRotateRef.current)
       }
     }
-  }, [productAutoRotate, totalProductPages])
+  }, [productAutoRotate, featuredProducts.length, productsPerView])
   
   // Calculate products per view based on screen size
   useEffect(() => {
@@ -120,12 +123,13 @@ export default function HomeClientWrapper({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
   
-  // Calculate total product pages
+  // Reset currentProductIndex when productsPerView changes
   useEffect(() => {
-    if (featuredProducts.length > 0) {
-      setTotalProductPages(Math.ceil(featuredProducts.length / productsPerView))
+    const maxIndex = Math.max(0, featuredProducts.length - productsPerView)
+    if (currentProductIndex > maxIndex) {
+      setCurrentProductIndex(maxIndex)
     }
-  }, [featuredProducts.length, productsPerView])
+  }, [productsPerView, featuredProducts.length, currentProductIndex])
   
   // Pause auto-rotation when user interacts with categories
   const handleNavigation = (index: number) => {
@@ -155,7 +159,7 @@ export default function HomeClientWrapper({
   
   // Handle product carousel navigation
   const handlePrevProduct = () => {
-    setCurrentProductIndex((prev) => (prev === 0 ? totalProductPages - 1 : prev - 1))
+    setCurrentProductIndex((prev) => (prev === 0 ? featuredProducts.length - productsPerView : prev - 1))
     setProductAutoRotate(false)
     if (productAutoRotateRef.current) {
       clearInterval(productAutoRotateRef.current)
@@ -164,7 +168,10 @@ export default function HomeClientWrapper({
   }
   
   const handleNextProduct = () => {
-    setCurrentProductIndex((prev) => (prev + 1) % totalProductPages)
+    setCurrentProductIndex((prev) => {
+      const maxIndex = featuredProducts.length - productsPerView
+      return prev >= maxIndex ? 0 : prev + 1
+    })
     setProductAutoRotate(false)
     if (productAutoRotateRef.current) {
       clearInterval(productAutoRotateRef.current)
@@ -233,6 +240,13 @@ export default function HomeClientWrapper({
         </motion.div>
       </motion.section>
       
+      {/* Trust Badges Section */}
+      <section className="py-12 bg-white border-b border-luxury-gold/10">
+        <div className="max-w-7xl mx-auto px-4">
+          <TrustBadges variant="compact" showAll={false} />
+        </div>
+      </section>
+      
       {/* Featured Products Section - CAROUSEL */}
       <section className="py-16 bg-luxury-ivory w-full">
         <div className="max-w-7xl mx-auto px-4 w-full box-border">
@@ -251,90 +265,79 @@ export default function HomeClientWrapper({
             <div className="overflow-hidden">
               <div 
                 className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(-${currentProductIndex * 100}%)` }}
+                style={{ transform: `translateX(-${(currentProductIndex * 100) / productsPerView}%)` }}
               >
-                {Array(totalProductPages).fill(0).map((_, pageIndex) => {
-                  const startIdx = pageIndex * productsPerView;
-                  const itemsToShow = featuredProducts.slice(startIdx, startIdx + productsPerView);
-                  
-                  return (
-                    <div 
-                      key={`product-page-${pageIndex}`} 
-                      className="min-w-full"
-                    >
-                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {itemsToShow.map((product, idx) => (
-                          <div 
-                            key={`${product.id}-${idx}`} 
-                            className="group transition-all duration-500 hover:-translate-y-1"
-                          >
-                            <div className="relative aspect-square overflow-hidden rounded-lg mb-4">
-                              {product.thumbnail ? (
-                                <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
-                                  <Image
-                                    src={product.thumbnail}
-                                    alt={product.title}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                    className="object-cover"
-                                    onError={(e) => {
-                                      // @ts-ignore - TypeScript doesn't know about currentTarget
-                                      e.currentTarget.src = fallbackImage;
-                                    }}
-                                  />
-                                </div>
-                              ) : (
-                                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                  <span className="text-gray-400">No image available</span>
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
-                              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <Link href={`/${countryCode}/products/${product.handle}`}>
-                                  <AnimatedButton variant="gold" size="small" className="w-full">
-                                    View Details
-                                  </AnimatedButton>
-                                </Link>
-                              </div>
-                            </div>
-                            
-                            <div className="text-center">
-                              <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold text-luxury-charcoal transition-colors mb-1">
-                                <h3 className="font-serif text-xl line-clamp-1">{product.title}</h3>
-                              </Link>
-                              
-                              {/* Add Reviews Rating */}
-                              <div className="flex justify-center mb-2">
-                                <ProductPreviewRating productId={product.id} />
-                              </div>
-                              
-                              <div className="text-luxury-charcoal/90">
-                                {product.variants && product.variants[0] ? (
-                                  <ProductPrice 
-                                    product={product}
-                                    variantId={product.variants[0]?.id} 
-                                  />
-                                ) : (
-                                  <span>Price not available</span>
-                                )}
-                              </div>
-                            </div>
+                {featuredProducts.map((product, idx) => (
+                  <div 
+                    key={`${product.id}-${idx}`} 
+                    className="group transition-all duration-500 hover:-translate-y-1"
+                    style={{ minWidth: `${100 / productsPerView}%` }}
+                  >
+                    <div className="px-3">
+                      <div className="relative aspect-square overflow-hidden rounded-lg mb-4">
+                        {product.thumbnail ? (
+                          <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
+                            <Image
+                              src={product.thumbnail}
+                              alt={product.title}
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                              className="object-cover"
+                              onError={(e) => {
+                                // @ts-ignore - TypeScript doesn't know about currentTarget
+                                e.currentTarget.src = fallbackImage;
+                              }}
+                            />
                           </div>
-                        ))}
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <span className="text-gray-400">No image available</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <Link href={`/${countryCode}/products/${product.handle}`}>
+                            <AnimatedButton variant="gold" size="small" className="w-full">
+                              View Details
+                            </AnimatedButton>
+                          </Link>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold text-luxury-charcoal transition-colors mb-1">
+                          <h3 className="font-serif text-xl line-clamp-1">{product.title}</h3>
+                        </Link>
+                        
+                        {/* Add Reviews Rating */}
+                        <div className="flex justify-center mb-2">
+                          <ProductPreviewRating productId={product.id} />
+                        </div>
+                        
+                        <div className="text-luxury-charcoal/90">
+                          {product.variants && product.variants[0] ? (
+                            <ProductPrice 
+                              product={product}
+                              variantId={product.variants[0]?.id} 
+                            />
+                          ) : (
+                            <span>Price not available</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
             
-            {/* Navigation buttons - only show if we have more than one page */}
-            {totalProductPages > 1 && (
+            {/* Navigation buttons - only show if we have more products than visible */}
+            {featuredProducts.length > productsPerView && (
               <>
                 <button 
                   onClick={handlePrevProduct}
                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 lg:-translate-x-6 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
-                  aria-label="Previous products"
+                  aria-label="Previous product"
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -344,7 +347,7 @@ export default function HomeClientWrapper({
                 <button 
                   onClick={handleNextProduct}
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 lg:translate-x-6 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
-                  aria-label="Next products"
+                  aria-label="Next product"
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -353,15 +356,15 @@ export default function HomeClientWrapper({
               </>
             )}
             
-            {/* Pagination dots */}
-            {totalProductPages > 1 && (
+            {/* Pagination dots - show dots for each possible starting position */}
+            {featuredProducts.length > productsPerView && (
               <div className="flex justify-center mt-8 gap-2">
-                {Array(totalProductPages).fill(0).map((_, i) => (
+                {Array(Math.max(0, featuredProducts.length - productsPerView + 1)).fill(0).map((_, i) => (
                   <button
                     key={`dot-${i}`}
-                    className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                      currentProductIndex === i ? 'bg-luxury-gold' : 'bg-gray-300 hover:bg-gray-400'
-                    } p-2`}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      currentProductIndex === i ? 'bg-luxury-gold scale-125' : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
                     onClick={() => {
                       setCurrentProductIndex(i);
                       setProductAutoRotate(false);
@@ -370,7 +373,7 @@ export default function HomeClientWrapper({
                       }
                       setTimeout(() => setProductAutoRotate(true), 10000);
                     }}
-                    aria-label={`Go to product page ${i + 1}`}
+                    aria-label={`Go to product position ${i + 1}`}
                   />
                 ))}
               </div>
