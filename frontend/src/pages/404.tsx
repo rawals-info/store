@@ -1,14 +1,5 @@
 import Link from "next/link"
-import { Metadata } from "next"
-import { ArrowUpRightMini } from "@medusajs/icons"
 import { Home, Package, User, Mail, ArrowLeft } from "lucide-react"
-import InteractiveLink from "@modules/common/components/interactive-link"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-
-export const metadata: Metadata = {
-  title: "404 - Page Not Found",
-  description: "The page you're looking for doesn't exist",
-}
 
 export default function Page404() {
   return (
@@ -25,7 +16,7 @@ export default function Page404() {
                 Page Not Found
               </h2>
               <p className="text-luxury-ivory/80 text-base sm:text-lg max-w-md">
-                The page you're looking for seems to have wandered off into the digital void.
+                The page you're looking for seems to have wandered off like a sweet lost in the bazaar.
               </p>
             </div>
           </div>
@@ -40,10 +31,10 @@ export default function Page404() {
             description="Back to homepage"
           />
           <NavigationCard
-            href="/products"
+            href="/in/products"
             icon={<Package size={24} />}
-            title="Shop"
-            description="Browse products"
+            title="Shop Petha"
+            description="Browse our sweets"
           />
           <NavigationCard
             href="/account"
@@ -61,7 +52,7 @@ export default function Page404() {
 
         {/* Main Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-          <LocalizedClientLink
+          <Link
             href="/"
             className="group flex items-center gap-2 bg-luxury-gold hover:bg-luxury-gold-600 text-black font-medium px-6 py-3 rounded-soft transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-luxury-gold/20"
           >
@@ -70,14 +61,14 @@ export default function Page404() {
               className="transition-transform group-hover:-translate-x-1" 
             />
             Go Home
-          </LocalizedClientLink>
+          </Link>
           
-          <InteractiveLink 
-            href="/products"
-            className="text-luxury-gold hover:text-luxury-gold-400 font-medium"
+          <Link 
+            href="/in/products"
+            className="text-luxury-gold hover:text-luxury-gold-400 font-medium transition-colors duration-200"
           >
             Continue Shopping
-          </InteractiveLink>
+          </Link>
         </div>
 
         {/* Decorative Elements */}
@@ -106,7 +97,7 @@ interface NavigationCardProps {
 
 function NavigationCard({ href, icon, title, description }: NavigationCardProps) {
   return (
-    <LocalizedClientLink
+    <Link
       href={href}
       className="group bg-black/40 backdrop-blur-sm border border-luxury-charcoal/30 rounded-base p-6 hover:border-luxury-gold/40 hover:bg-black/60 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-luxury-gold/10"
     >
@@ -121,6 +112,6 @@ function NavigationCard({ href, icon, title, description }: NavigationCardProps)
           {description}
         </p>
       </div>
-    </LocalizedClientLink>
+    </Link>
   )
-}
+} 
