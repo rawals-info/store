@@ -53,6 +53,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       return notFound()
     }
 
+    // SEO: Fixed canonical URL structure for better indexing
+    const canonical = `https://tajpetha.in/${countryCode}/products/${product.handle}`
+
     return {
       title: `${product.title} | Taj Petha`,
       description:
@@ -65,9 +68,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
           `Discover the delicious ${product.title}, an authentic Agra petha sweet from our premium collection.`,
         images: product.thumbnail ? [product.thumbnail] : [],
         type: "website",
+        url: canonical,
       },
       twitter: {
         card: "summary_large_image",
+      },
+      alternates: {
+        canonical,
       },
     }
   } catch (error) {

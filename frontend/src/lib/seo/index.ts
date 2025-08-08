@@ -171,7 +171,23 @@ export const generateProductSchema = (
   const ratingValue = reviewData?.average_rating || 4.7
   const reviewCount = reviewData?.count || 89
 
-  return {
+  // Calculate price properly - handle both number and object types
+  let finalPrice = "199.00"
+  if (productPrice) {
+    if (typeof productPrice === 'number') {
+      finalPrice = (productPrice / 100).toFixed(2)
+    } else if (productPrice.calculated_amount) {
+      const amount = typeof productPrice.calculated_amount === 'number' 
+        ? productPrice.calculated_amount 
+        : Number(productPrice.calculated_amount)
+      finalPrice = (amount / 100).toFixed(2)
+    }
+  }
+
+  // Format priceValidUntil properly (30 days from now)
+  const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+  const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${baseUrl}/in/products/${product.handle}#product`,
@@ -192,17 +208,17 @@ export const generateProductSchema = (
     "category": productCategory,
     "offers": {
       "@type": "Offer",
-      "price": productPrice && typeof productPrice === 'number' ? (productPrice / 100).toFixed(2) : "199.00",
+      "price": finalPrice,
       "priceCurrency": region?.currency_code?.toUpperCase() || "INR",
       "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "priceValidUntil": priceValidUntil,
+      "itemCondition": "https://schema.org/NewCondition",
+      "url": `${baseUrl}/in/products/${product.handle}`,
       "seller": {
         "@type": "Organization",
         "name": "Taj Petha",
         "@id": `${baseUrl}/#organization`
       },
-      "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      "itemCondition": "https://schema.org/NewCondition",
-      "url": `${baseUrl}/in/products/${product.handle}`,
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "url": `${baseUrl}/returns`,
@@ -245,12 +261,12 @@ export const generateProductSchema = (
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": ratingValue.toString(),
+      "ratingValue": ratingValue.toFixed(1),
       "reviewCount": reviewCount.toString(),
       "bestRating": "5",
       "worstRating": "1"
     },
-    // Add review array if provided
+    // Add review array with proper itemReviewed if provided
     ...(reviews && reviews.length > 0
       ? {
           "review": reviews.slice(0, 10).map(r => ({
@@ -267,7 +283,12 @@ export const generateProductSchema = (
             },
             "name": r.title || `${product.title} review`,
             "reviewBody": r.content,
-            "datePublished": new Date().toISOString().split('T')[0]
+            "datePublished": new Date().toISOString().split('T')[0],
+            "itemReviewed": {
+              "@type": "Product",
+              "@id": `${baseUrl}/in/products/${product.handle}#product`,
+              "name": product.title
+            }
           }))
         }
       : {}),
@@ -277,7 +298,7 @@ export const generateProductSchema = (
       "name": "SKU",
       "value": product.variants?.[0]?.sku || `TAJ-${product.id}`
     },
-    "weight": product.weight ? `${product.weight}g` : undefined,
+    ...(product.weight ? { "weight": `${product.weight}g` } : {}),
     "material": "Premium ingredients with traditional recipe",
     "additionalProperty": [
       {
@@ -292,6 +313,8 @@ export const generateProductSchema = (
       }
     ]
   }
+
+  return productSchema
 }
 
 export const generateBreadcrumbSchema = (breadcrumbs: Array<{name: string, url: string}>) => {

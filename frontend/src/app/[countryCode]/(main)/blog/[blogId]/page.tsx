@@ -202,7 +202,7 @@ Learn how to store your petha and namkeen at home to maintain their quality and 
 ]
 
 export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
-  const { blogId } = await params
+  const { blogId, countryCode } = await params
   const post = blogPosts.find(p => p.id === blogId)
   
   if (!post) {
@@ -222,6 +222,8 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
     ? `${post.excerpt.substring(0, 152)}...` 
     : post.excerpt
 
+  const canonical = `https://tajpetha.in/${countryCode}/blog/${blogId}`
+
   return {
     title: optimizedTitle,
     description: optimizedDescription,
@@ -229,7 +231,7 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
     openGraph: {
       title: post.title.length > 55 ? post.title.substring(0, 55) + "..." : post.title,
       description: optimizedDescription,
-      url: `https://tajpetha.in/blog/${blogId}`,
+      url: canonical,
       type: "article",
       publishedTime: post.publishDate,
       authors: [post.author],
@@ -251,13 +253,13 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
       images: [post.image],
     },
     alternates: {
-      canonical: `https://tajpetha.in/blog/${blogId}`
+      canonical,
     }
   }
 }
 
 export default async function BlogPost({ params }: BlogPostProps) {
-  const { blogId } = await params
+  const { blogId, countryCode } = await params
   const post = blogPosts.find(p => p.id === blogId)
   
   if (!post) {
@@ -268,7 +270,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "@id": `https://tajpetha.in/blog/${blogId}`,
+    "@id": `https://tajpetha.in/${countryCode}/blog/${blogId}`,
     "headline": post.title,
     "description": post.excerpt,
     "image": post.image,
@@ -288,7 +290,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://tajpetha.in/blog/${blogId}`
+      "@id": `https://tajpetha.in/${countryCode}/blog/${blogId}`
     },
     "articleSection": post.category,
     "keywords": post.tags.join(", "),
@@ -312,13 +314,13 @@ export default async function BlogPost({ params }: BlogPostProps) {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://tajpetha.in/blog"
+        "item": `https://tajpetha.in/${countryCode}/blog`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.title,
-        "item": `https://tajpetha.in/blog/${blogId}`
+        "item": `https://tajpetha.in/${countryCode}/blog/${blogId}`
       }
     ]
   }
@@ -350,7 +352,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
             </li>
             <li className="text-gray-300">/</li>
             <li>
-              <Link href="/blog" className="hover:text-luxury-gold transition-colors">
+              <Link href={`/${countryCode}/blog`} className="hover:text-luxury-gold transition-colors">
                 Blog
               </Link>
             </li>
@@ -478,7 +480,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
             Experience the traditional flavors mentioned in this article with our premium collection.
           </p>
           <Link
-            href="/in/products"
+            href={`/${countryCode}/products`}
             className="inline-block bg-white text-luxury-gold px-8 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
           >
             Shop Now
@@ -488,7 +490,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
         {/* Back to Blog */}
         <div className="mt-8 text-center">
           <Link
-            href="/blog"
+            href={`/${countryCode}/blog`}
             className="inline-flex items-center text-luxury-gold font-medium hover:underline"
           >
             ← Back to All Articles

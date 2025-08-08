@@ -14,7 +14,7 @@ interface CityPageProps {
 }
 
 export async function generateMetadata({ params, searchParams }: CityPageProps): Promise<Metadata> {
-  const { citySlug } = params
+  const { citySlug, countryCode } = params
   const productType = searchParams.product || "petha"
   
   const cityMetadata = generateCityPageMetadata(citySlug, productType)
@@ -26,6 +26,8 @@ export async function generateMetadata({ params, searchParams }: CityPageProps):
     }
   }
 
+  const canonical = `https://tajpetha.in/${countryCode}/city/${citySlug}`
+
   return {
     title: cityMetadata.title,
     description: cityMetadata.description,
@@ -34,6 +36,7 @@ export async function generateMetadata({ params, searchParams }: CityPageProps):
       title: cityMetadata.title,
       description: cityMetadata.description,
       type: "website",
+      url: canonical,
       images: [
         {
           url: `/city-images/${citySlug}-petha-delivery.webp`,
@@ -44,13 +47,13 @@ export async function generateMetadata({ params, searchParams }: CityPageProps):
       ]
     },
     alternates: {
-      canonical: `https://tajpetha.in${cityMetadata.canonical}`
+      canonical,
     }
   }
 }
 
 export default function CityPage({ params, searchParams }: CityPageProps) {
-  const { citySlug } = params
+  const { citySlug, countryCode } = params
   const productType = searchParams.product || "petha"
   
   const city = MAJOR_INDIAN_CITIES.find(c => c.slug === citySlug)
@@ -63,10 +66,10 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
   const citySchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "@id": `https://tajpetha.in/city/${citySlug}#localbusiness`,
+    "@id": `https://tajpetha.in/${countryCode}/city/${citySlug}#localbusiness`,
     "name": `Taj Petha - ${city.name}`,
     "description": `Fresh ${productType} delivery in ${city.name}. Authentic Agra sweets delivered to your doorstep with same-day dispatch and hygienic packaging.`,
-    "url": `https://tajpetha.in/city/${citySlug}`,
+    "url": `https://tajpetha.in/${countryCode}/city/${citySlug}`,
     "areaServed": {
       "@type": "City",
       "name": city.name,

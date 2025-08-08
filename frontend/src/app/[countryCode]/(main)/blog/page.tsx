@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Petha & Namkeen Blog - Traditional Recipes & Stories",
     description: "Explore authentic recipes, health benefits, and fascinating stories about India's beloved petha and namkeen. Expert insights from traditional sweet makers.",
-    url: "https://tajpetha.in/blog",
+    url: "https://tajpetha.in/in/blog",
     type: "website",
     locale: "en_IN",
     siteName: "Taj Petha",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     images: ["/blog-hero-image.webp"],
   },
   alternates: {
-    canonical: "https://tajpetha.in/blog"
+    canonical: "https://tajpetha.in/in/blog"
   }
 }
 
@@ -208,20 +208,20 @@ We use time-tested preservation methods combined with modern packaging to ensure
 const blogListSchema = {
   "@context": "https://schema.org",
   "@type": "Blog",
-  "@id": "https://tajpetha.in/blog#blog",
+  "@id": "https://tajpetha.in/in/blog#blog",
   "name": "Taj Petha Blog - Traditional Indian Sweets & Snacks",
   "description": "Expert insights on traditional petha recipes, namkeen preparation, health benefits, and India's rich sweet heritage from Taj Petha masters.",
-  "url": "https://tajpetha.in/blog",
+  "url": "https://tajpetha.in/in/blog",
   "publisher": {
     "@id": "https://tajpetha.in/#organization"
   },
   "inLanguage": "en-IN",
   "blogPost": blogPosts.map(post => ({
     "@type": "BlogPosting",
-    "@id": `https://tajpetha.in/blog/${post.id}`,
+    "@id": `https://tajpetha.in/in/blog/${post.id}`,
     "headline": post.title,
     "description": post.excerpt,
-    "url": `https://tajpetha.in/blog/${post.id}`,
+    "url": `https://tajpetha.in/in/blog/${post.id}`,
     "datePublished": post.publishDate,
     "dateModified": post.publishDate,
     "author": {

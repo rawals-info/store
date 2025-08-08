@@ -4,7 +4,6 @@ import { GoogleAnalytics } from "@lib/analytics/google-analytics"
 import Script from "next/script";
 import "styles/globals.css"
 import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
-import CanonicalLink from "@modules/common/components/canonical-link"
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["300","400","500","600","700"], display: "swap", variable: "--font-poppins" })
 const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: "normal", display: "swap", variable: "--font-dm-serif" })
@@ -74,13 +73,14 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: getBaseURL(),
-    languages: {
-      'en-IN': getBaseURL(),
-      'hi-IN': `${getBaseURL()}/hi`,
-    },
-  },
+  // Remove global canonical to avoid overriding per-page canonicals
+  // alternates: {
+  //   canonical: getBaseURL(),
+  //   languages: {
+  //     'en-IN': getBaseURL(),
+  //     'hi-IN': `${getBaseURL()}/hi`,
+  //   },
+  // },
   verification: {
     google: "google-verification-code", // Add your Google Search Console verification code
     other: {
@@ -244,9 +244,6 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable}`}>
       <head>
-        {/* Dynamic canonical link */}
-        <CanonicalLink baseUrl={baseUrl} />
-
         {/* Preload critical resources to reduce HTTP requests */}
         <link rel="preload" href="/hero_image.webp" as="image" />
         

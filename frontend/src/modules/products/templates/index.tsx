@@ -7,9 +7,11 @@ import ProductActions from "@modules/products/components/product-actions"
 import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import ProductReviews from "../components/product-reviews"
-import { generateProductSchema, generateBreadcrumbSchema } from "@lib/seo"
+import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema } from "@lib/seo"
 import { getProductReviewSummary, getProductReviews } from "@lib/data/products"
 import type { StoreProductReview } from "types/global"
+import FaqAccordion from "@components/FaqAccordion"
+import { getProductFaqs } from "@lib/faq/select"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -65,6 +67,12 @@ export default async function ProductTemplate({
   ]
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs)
 
+  // Build FAQs for this product based on category/collection
+  const faqs = getProductFaqs(product)
+  const faqJsonLd = generateFAQSchema(
+    faqs.map((f) => ({ question: f.question, answer: typeof f.answer === "string" ? f.answer : "" }))
+  )
+
   return (
     <>
       {/* SEO Schema Markup for Product */}
@@ -74,12 +82,18 @@ export default async function ProductTemplate({
           __html: JSON.stringify(productSchema),
         }}
       />
-      
       {/* Breadcrumb Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(breadcrumbSchema),
+        }}
+      />
+      {/* FAQ Schema for rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
         }}
       />
       
@@ -94,6 +108,19 @@ export default async function ProductTemplate({
         <meta itemProp="description" content={product.description || `Authentic ${product.title} from Taj Petha`} />
         <meta itemProp="sku" content={product.variants?.[0]?.sku || `TAJ-${product.id}`} />
         <meta itemProp="url" content={`/${countryCode}/products/${product.handle}`} />
+        
+        {/* Add product images as microdata */}
+        {product.images?.map((img, index) => (
+          <meta key={index} itemProp="image" content={img.url} />
+        )) || (product.thumbnail && <meta itemProp="image" content={product.thumbnail} />)}
+        
+        {/* Brand information */}
+        <div itemProp="brand" itemScope itemType="https://schema.org/Brand" style={{ display: 'none' }}>
+          <meta itemProp="name" content="Taj Petha" />
+        </div>
+        
+        {/* Category information */}
+        <meta itemProp="category" content={product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"} />
         
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           {/* Left column - Image gallery */}
@@ -111,9 +138,7 @@ export default async function ProductTemplate({
                     : []
 
                 return (
-                  <div itemProp="image">
-                    <ImageGallery images={galleryImages} />
-                  </div>
+                  <ImageGallery images={galleryImages} />
                 )
               })()}
             </Suspense>
@@ -129,18 +154,52 @@ export default async function ProductTemplate({
               itemScope 
               itemType="https://schema.org/Offer"
             >
-              {/* Hidden offer metadata */}
-              <meta itemProp="price" content={product.variants?.[0]?.calculated_price && typeof product.variants[0].calculated_price === 'number' ? (product.variants[0].calculated_price / 100).toFixed(2) : "199.00"} />
+              {/* Complete offer metadata */}
+              <meta
+                itemProp="price"
+                content={(function () {
+                  const v = product.variants?.[0]?.calculated_price as any
+                  const amount = typeof v === "number" ? v : v?.calculated_amount
+                  return typeof amount === "number" ? (amount / 100).toFixed(2) : "199.00"
+                })()}
+              />
               <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
               <meta itemProp="availability" content={product.variants?.some(v => v.inventory_quantity && v.inventory_quantity > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
               <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />
               {/* Added price validity date */}
               <meta itemProp="priceValidUntil" content={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} />
-              {/* Link references for return policy and shipping details */}
-              <link itemProp="hasMerchantReturnPolicy" href="/returns" />
-              <link itemProp="shippingDetails" href="/shipping" />
-              <div itemProp="seller" itemScope itemType="https://schema.org/Organization">
+              <meta itemProp="url" content={`/${countryCode}/products/${product.handle}`} />
+              
+              {/* Seller information */}
+              <div itemProp="seller" itemScope itemType="https://schema.org/Organization" style={{ display: 'none' }}>
                 <meta itemProp="name" content="Taj Petha" />
+              </div>
+              
+              {/* Return policy information */}
+              <div itemProp="hasMerchantReturnPolicy" itemScope itemType="https://schema.org/MerchantReturnPolicy" style={{ display: 'none' }}>
+                <meta itemProp="returnPolicyCategory" content="https://schema.org/RefundTypeExchangeOrStoreCredit" />
+                <meta itemProp="merchantReturnDays" content="7" />
+                <link itemProp="url" href="/returns" />
+              </div>
+              
+              {/* Shipping details */}
+              <div itemProp="shippingDetails" itemScope itemType="https://schema.org/OfferShippingDetails" style={{ display: 'none' }}>
+                <div itemProp="shippingRate" itemScope itemType="https://schema.org/MonetaryAmount">
+                  <meta itemProp="value" content="0.00" />
+                  <meta itemProp="currency" content={region?.currency_code?.toUpperCase() || "INR"} />
+                </div>
+                <div itemProp="deliveryTime" itemScope itemType="https://schema.org/ShippingDeliveryTime">
+                  <div itemProp="handlingTime" itemScope itemType="https://schema.org/QuantitativeValue">
+                    <meta itemProp="minValue" content="0" />
+                    <meta itemProp="maxValue" content="1" />
+                    <meta itemProp="unitCode" content="d" />
+                  </div>
+                  <div itemProp="transitTime" itemScope itemType="https://schema.org/QuantitativeValue">
+                    <meta itemProp="minValue" content="1" />
+                    <meta itemProp="maxValue" content="4" />
+                    <meta itemProp="unitCode" content="d" />
+                  </div>
+                </div>
               </div>
               
               {/* Directly render ProductActions without an extra server fetch */}
@@ -159,6 +218,13 @@ export default async function ProductTemplate({
         </div>
       </div>
 
+      {/* Product FAQs */}
+      <section className="content-container my-10">
+        <h2 className="font-display text-2xl lg:text-3xl text-luxury-charcoal mb-4">Frequently Asked Questions</h2>
+        <div className="h-px w-24 bg-luxury-gold mb-6"></div>
+        <FaqAccordion faqs={faqs} />
+      </section>
+
       <div 
         className="content-container my-16 small:my-32"
         itemProp="aggregateRating" 
@@ -170,6 +236,30 @@ export default async function ProductTemplate({
         <meta itemProp="reviewCount" content={reviewData.count.toString()} />
         <meta itemProp="bestRating" content="5" />
         <meta itemProp="worstRating" content="1" />
+        
+        {/* Add individual reviews as microdata if they exist */}
+        {reviewList && reviewList.length > 0 && (
+          <div style={{ display: 'none' }}>
+            {reviewList.slice(0, 5).map((review, index) => (
+              <div key={index} itemProp="review" itemScope itemType="https://schema.org/Review">
+                <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                  <meta itemProp="ratingValue" content={review.rating.toString()} />
+                  <meta itemProp="bestRating" content="5" />
+                  <meta itemProp="worstRating" content="1" />
+                </div>
+                <div itemProp="author" itemScope itemType="https://schema.org/Person">
+                  <meta itemProp="name" content={`${review.first_name} ${review.last_name}`.trim() || "Anonymous"} />
+                </div>
+                <meta itemProp="name" content={review.title || `${product.title} review`} />
+                <meta itemProp="reviewBody" content={review.content} />
+                <meta itemProp="datePublished" content={new Date().toISOString().split('T')[0]} />
+                <div itemProp="itemReviewed" itemScope itemType="https://schema.org/Product">
+                  <meta itemProp="name" content={product.title} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         
         <ProductReviews productId={product.id} />
       </div>
