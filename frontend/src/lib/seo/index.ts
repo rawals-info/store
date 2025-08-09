@@ -260,16 +260,9 @@ export const generateProductSchema = (
       },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
-        "url": `${baseUrl}/returns`,
-        "returnPolicyCategory": "https://schema.org/RefundTypeExchangeOrStoreCredit",
-        "merchantReturnDays": 7,
-        "returnShippingFeesAmount": {
-          "@type": "MonetaryAmount",
-          "currency": region?.currency_code?.toUpperCase() || "INR",
-          "value": "0.00"
-        },
-        "inStoreReturnsOffered": false
+        "merchantReturnLink": `${baseUrl}/returns`
       },
+
       "shippingDetails": {
         "@type": "OfferShippingDetails",
         "shippingRate": {
