@@ -29,8 +29,8 @@ export default function Footer() {
   const [companyName, setCompanyName] = useState("TAJ PETHA")
   const [companyDescription, setCompanyDescription] = useState("Authentic Agra Petha crafted in small batches since 2013. Fragrant, melt-in-the-mouth bites steeped in heritage.")
   const defaultSocial: { platform: string; href: string }[] = [
-    { platform: "Instagram", href: "https://instagram.com" },
-    { platform: "Facebook", href: "https://facebook.com" },
+    { platform: "Instagram", href: "https://www.instagram.com/tajpethaagra" },
+    { platform: "Facebook", href: "https://facebook.com/tajpethaagra" },
   ]
   const [socialLinks, setSocialLinks] = useState<{ platform: string; href: string }[]>(defaultSocial)
 

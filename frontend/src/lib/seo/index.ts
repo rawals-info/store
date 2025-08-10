@@ -79,10 +79,10 @@ export const generateOrganizationSchema = () => {
       }
     ],
     "sameAs": [
-      "https://www.facebook.com/tajpetha",
-      "https://www.instagram.com/tajpetha",
-      "https://www.youtube.com/tajpetha",
-      "https://twitter.com/tajpetha"
+      "https://www.facebook.com/tajpethaagra",
+      "https://www.instagram.com/tajpethaagra",
+      "https://www.youtube.com/tajpethaagra",
+      "https://twitter.com/tajpethaagra"
     ]
   }
 }

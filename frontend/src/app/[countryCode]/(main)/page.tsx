@@ -6,6 +6,7 @@ import { getCachedCategories } from "@modules/home/components/categories";
 import { getHomepageProducts } from "@lib/data/products";
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
 import Link from "next/link"
+import { MAJOR_INDIAN_CITIES } from "@lib/seo"
 
 export const metadata: Metadata = {
   title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
@@ -308,6 +309,38 @@ export default async function Home({ params }: HomeProps) {
           </div>
         </section>
       )}
+
+      {/* Major Cities we deliver to (SEO: give inlinks to city pages) */}
+      <section className="py-10 bg-luxury-ivory">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-xl font-serif text-luxury-charcoal mb-4">Fresh Petha Delivery in Major Cities</h2>
+          <div className="flex flex-wrap gap-3">
+            {MAJOR_INDIAN_CITIES.slice(0, 16).map((c) => (
+              <Link
+                key={c.slug}
+                href={`/${countryCode}/city/${c.slug}`}
+                className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline"
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* From our blog (SEO: add canonical inlinks to articles) */}
+      <section className="py-10 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-xl font-serif text-luxury-charcoal mb-4">From Our Blog</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/${countryCode}/blog/authentic-agra-petha-recipe`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Authentic Agra Petha Recipe</Link>
+            <Link href={`/${countryCode}/blog/health-benefits-petha-namkeen`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Health Benefits of Petha & Namkeen</Link>
+            <Link href={`/${countryCode}/blog/history-agra-petha-heritage`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">History of Agra Petha</Link>
+            <Link href={`/${countryCode}/blog/seasonal-namkeen-guide`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Seasonal Namkeen Guide</Link>
+            <Link href={`/${countryCode}/blog/preservation-techniques-traditional-sweets`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Traditional Preservation Techniques</Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 } 

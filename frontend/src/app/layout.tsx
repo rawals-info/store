@@ -141,9 +141,9 @@ const organizationSchema = {
     }
   ],
   "sameAs": [
-    "https://www.facebook.com/tajpetha",
-    "https://www.instagram.com/tajpetha",
-    "https://www.youtube.com/tajpetha"
+    "https://www.facebook.com/tajpethaagra",
+    "https://www.instagram.com/tajpethaagra",
+    "https://www.youtube.com/tajpethaagra"
   ],
   "potentialAction": {
     "@type": "SearchAction",
@@ -287,10 +287,6 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           src="https://static.hotjar.com/c/hotjar-3507234.js?sv=6"
           strategy="lazyOnload"
         />
-        
-        {/* Hreflang tags for international SEO */}
-        <link rel="alternate" hrefLang="en-in" href={`${baseUrl}/in`} />
-        <link rel="alternate" hrefLang="x-default" href={`${baseUrl}/in`} />
         
         {/* Enhanced Schema Markup */}
         <script
