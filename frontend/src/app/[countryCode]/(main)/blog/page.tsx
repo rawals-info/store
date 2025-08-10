@@ -376,6 +376,17 @@ export default function BlogPage() {
             </button>
           </div>
         </section>
+
+        {/* Quick product links for readers */}
+        <section className="mt-12">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Shop Our Bestsellers</h3>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/in/products/dry-petha" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dry Petha</Link>
+            <Link href="/in/products/chocolate-petha" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Chocolate Petha</Link>
+            <Link href="/in/products/dalmoth" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dalmoth</Link>
+            <Link href="/in/products/combo-dalmoth-petha" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Combo Dalmoth Petha</Link>
+          </div>
+        </section>
       </div>
     </>
   )

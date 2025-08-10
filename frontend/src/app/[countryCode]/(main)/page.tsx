@@ -5,6 +5,7 @@ import { getIndiaRegion } from "@lib/constants/india-region";
 import { getCachedCategories } from "@modules/home/components/categories";
 import { getHomepageProducts } from "@lib/data/products";
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
@@ -287,6 +288,26 @@ export default async function Home({ params }: HomeProps) {
         region={region}
         countryCode={countryCode}
       />
+      
+      {/* Quick links to all products (SEO: reduce orphans) */}
+      {featuredProducts && featuredProducts.length > 0 && (
+        <section className="py-10 bg-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-xl font-serif text-luxury-charcoal mb-4">Explore All Products</h2>
+            <div className="flex flex-wrap gap-3">
+              {featuredProducts.slice(0, 50).map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/${countryCode}/products/${p.handle}`}
+                  className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline"
+                >
+                  {p.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 } 

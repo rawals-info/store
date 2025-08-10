@@ -139,11 +139,31 @@ export default async function CategoryPage({
   }
 
   return (
-    <CategoryTemplate
-      category={category}
-      sortBy={sortBy}
-      page={page}
-      countryCode={paramsData.countryCode}
-    />
+    <>
+      <CategoryTemplate
+        category={category}
+        sortBy={sortBy}
+        page={page}
+        countryCode={paramsData.countryCode}
+      />
+
+      {/* Compact product links for SEO internal linking */}
+      {category?.products && category.products.length > 0 && (
+        <section className="content-container py-8">
+          <h2 className="text-lg font-serif text-luxury-charcoal mb-3">Popular in {category.name}</h2>
+          <div className="flex flex-wrap gap-3">
+            {category.products.slice(0, 40).map((p: any) => (
+              <a
+                key={p.id}
+                href={`/${paramsData.countryCode}/products/${p.handle}`}
+                className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline"
+              >
+                {p.title}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
   )
 }

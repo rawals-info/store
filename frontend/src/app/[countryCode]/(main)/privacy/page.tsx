@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       <div className="max-w-3xl mx-auto text-luxury-charcoal text-base md:text-lg space-y-12">
         <section>
           <p className="mb-4">
-            Taj Petha ("we," "us," or "our") operates the website <strong><a href="http://www.tajpetha.in" className="text-luxury-gold hover:text-luxury-darkgold">www.tajpetha.in</a></strong> (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you visit our Service. By accessing or using the Service, you acknowledge that you have read, understood, and agree to the practices described in this policy.
+            Taj Petha ("we," "us," or "our") operates the website <strong><a href="https://www.tajpetha.in" className="text-luxury-gold hover:text-luxury-darkgold">www.tajpetha.in</a></strong> (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you visit our Service. By accessing or using the Service, you acknowledge that you have read, understood, and agree to the practices described in this policy.
           </p>
         </section>
 
