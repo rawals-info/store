@@ -289,9 +289,8 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         />
         
         {/* Hreflang tags for international SEO */}
-        <link rel="alternate" hrefLang="en-in" href={baseUrl} />
-        <link rel="alternate" hrefLang="hi-in" href={`${baseUrl}/hi`} />
-        <link rel="alternate" hrefLang="x-default" href={baseUrl} />
+        <link rel="alternate" hrefLang="en-in" href={`${baseUrl}/in`} />
+        <link rel="alternate" hrefLang="x-default" href={`${baseUrl}/in`} />
         
         {/* Enhanced Schema Markup */}
         <script

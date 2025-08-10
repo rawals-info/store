@@ -170,6 +170,17 @@ const nextConfig = {
         destination: '/in',
         permanent: true,    
       },
+      // Redirect Hindi placeholder paths to /in to fix 404s
+      {
+        source: '/hi',
+        destination: '/in',
+        permanent: true,
+      },
+      {
+        source: '/in/hi',
+        destination: '/in',
+        permanent: true,
+      },
       {
         source: '/petha',
         destination: '/in/categories/petha',
