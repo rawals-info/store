@@ -257,9 +257,8 @@ export default async function ProductTemplate({
                 <meta itemProp="name" content={review.title || `${product.title} review`} />
                 <meta itemProp="reviewBody" content={review.content} />
                 <meta itemProp="datePublished" content={new Date().toISOString().split('T')[0]} />
-                <div itemProp="itemReviewed" itemScope itemType="https://schema.org/Product">
-                  <meta itemProp="name" content={product.title} />
-                </div>
+                {/* Avoid creating a separate Product itemscope which can be flagged as missing offers/ratings */}
+                <meta itemProp="itemReviewed" content={product.title} />
               </div>
             ))}
           </div>
