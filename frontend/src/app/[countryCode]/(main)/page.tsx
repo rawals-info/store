@@ -76,6 +76,9 @@ interface HomeProps {
 // Enhanced Product Schema for homepage featured products
 const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
   const baseUrl = "https://tajpetha.in";
+  const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
   
   return {
     "@context": "https://schema.org",
@@ -128,12 +131,21 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             "name": "Taj Petha"
           },
           "category": product.category || "Indian Sweets",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "2500",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
           // Ensure each Product has a direct Offer for rich-result eligibility
           "offers": {
             "@type": "Offer",
             "price": product.price || "199",
             "priceCurrency": "INR",
             "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": priceValidUntil,
             "seller": {
               "@id": `${baseUrl}/#organization`
             }

@@ -259,6 +259,8 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
                 )}
                 <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
                 <meta itemProp="availability" content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
+                <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />
+                <meta itemProp="priceValidUntil" content={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} />
                 <span className="text-xs text-gray-500">Free delivery above ₹500</span>
               </div>
 
