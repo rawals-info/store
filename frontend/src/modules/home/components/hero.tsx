@@ -6,7 +6,7 @@ import { useRef } from "react"
 import Image from "next/image"
 import AnimatedButton from "@modules/common/components/animated-button"
 import { staggerContainer, fadeIn } from "@lib/util/animations"
-import Link from "next/link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default function Hero() {
   const heroRef = useRef(null)
@@ -70,16 +70,16 @@ export default function Hero() {
         </motion.div>
         
         <motion.div variants={fadeIn} className="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Link href="/products" className="w-full sm:w-auto">
+          <LocalizedClientLink href="/products" className="w-full sm:w-auto">
             <AnimatedButton variant="gold" size="large" className="w-full sm:w-auto">
               Browse Collection
             </AnimatedButton>
-          </Link>
-          <Link href="/about" className="w-full sm:w-auto">
+          </LocalizedClientLink>
+          <LocalizedClientLink href="/about" className="w-full sm:w-auto">
             <AnimatedButton variant="outline" size="large" className="w-full sm:w-auto">
               Our Heritage
             </AnimatedButton>
-          </Link>
+          </LocalizedClientLink>
         </motion.div>
       </div>
       

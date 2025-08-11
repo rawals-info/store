@@ -22,20 +22,20 @@ module.exports = {
     
     // Static important pages
     const staticPages = [
-      { loc: '/', priority: 1.0, changefreq: 'daily' },
+      // Remove root '/' to avoid canonical alternates; use '/in' as the main homepage
       { loc: '/in', priority: 1.0, changefreq: 'daily' },
       { loc: '/in/products', priority: 0.9, changefreq: 'daily' },
       { loc: '/in/categories', priority: 0.9, changefreq: 'weekly' },
       { loc: '/in/collections', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/store', priority: 0.8, changefreq: 'daily' },
       { loc: '/in/blog', priority: 0.9, changefreq: 'weekly' },
-      { loc: '/about', priority: 0.9, changefreq: 'monthly' },
-      { loc: '/contact', priority: 0.8, changefreq: 'monthly' },
-      { loc: '/shipping', priority: 0.7, changefreq: 'monthly' },
-      { loc: '/terms', priority: 0.6, changefreq: 'yearly' },
-      { loc: '/privacy', priority: 0.6, changefreq: 'yearly' },
-      { loc: '/returns', priority: 0.7, changefreq: 'monthly' },
-      { loc: '/faqs', priority: 0.8, changefreq: 'monthly' },
+      { loc: '/in/about', priority: 0.9, changefreq: 'monthly' },
+      { loc: '/in/contact', priority: 0.8, changefreq: 'monthly' },
+      { loc: '/in/shipping', priority: 0.7, changefreq: 'monthly' },
+      { loc: '/in/terms', priority: 0.6, changefreq: 'yearly' },
+      { loc: '/in/privacy', priority: 0.6, changefreq: 'yearly' },
+      { loc: '/in/returns', priority: 0.7, changefreq: 'monthly' },
+      { loc: '/in/faqs', priority: 0.8, changefreq: 'monthly' },
     ]
 
     // Blog posts
@@ -123,8 +123,8 @@ module.exports = {
     let priority = 0.7
     let changefreq = 'weekly'
 
-    // Homepage gets highest priority
-    if (path === '/') {
+    // Main homepage is '/in'
+    if (path === '/in') {
       priority = 1.0
       changefreq = 'daily'
     }
@@ -149,12 +149,12 @@ module.exports = {
       changefreq = 'weekly'
     }
     // Static informational pages
-    else if (['/about', '/contact', '/shipping', '/faqs'].includes(path)) {
+    else if (['/in/about', '/in/contact', '/in/shipping', '/in/faqs'].includes(path)) {
       priority = 0.7
       changefreq = 'monthly'
     }
     // Legal pages
-    else if (['/terms', '/privacy', '/returns'].includes(path)) {
+    else if (['/in/terms', '/in/privacy', '/in/returns'].includes(path)) {
       priority = 0.5
       changefreq = 'yearly'
     }

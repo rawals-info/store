@@ -200,7 +200,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
               Order {productType.charAt(0).toUpperCase() + productType.slice(1)} Now
             </Link>
             <Link
-              href="/contact"
+              href={`/${countryCode}/contact`}
               className="border-2 border-luxury-gold text-luxury-gold px-8 py-4 rounded-xl font-semibold text-lg hover:bg-luxury-gold hover:text-white transition-colors"
             >
               Call for Express Delivery
@@ -369,7 +369,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
               Browse {productType.charAt(0).toUpperCase() + productType.slice(1)} Collection
             </Link>
             <Link
-              href="/contact"
+              href={`/${countryCode}/contact`}
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-luxury-gold transition-colors"
             >
               Call +91-92594-18994

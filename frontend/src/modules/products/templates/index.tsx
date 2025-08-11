@@ -180,7 +180,7 @@ export default async function ProductTemplate({
               <div itemProp="hasMerchantReturnPolicy" itemScope itemType="https://schema.org/MerchantReturnPolicy" style={{ display: 'none' }}>
                 <meta itemProp="returnPolicyCategory" content="https://schema.org/RefundTypeExchangeOrStoreCredit" />
                 <meta itemProp="merchantReturnDays" content="7" />
-                <link itemProp="url" href="/returns" />
+                <link itemProp="url" href={`/${countryCode}/returns`} />
               </div>
               
               {/* Shipping details */}

@@ -7,7 +7,7 @@ import { getCollectionByHandle, listCollections } from "@lib/data/collections"
 import ProductPreview from "@modules/products/components/product-preview/server"
 import ScrollReveal from "@modules/common/components/scroll-reveal"
 import AnimatedButton from "@modules/common/components/animated-button"
-import Link from "next/link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 import { notFound } from "next/navigation"
 
@@ -73,11 +73,11 @@ export default async function FeaturedProducts({
         )}
         
         <ScrollReveal delay={0.5} className="mt-16 text-center">
-          <Link href="/products">
+          <LocalizedClientLink href="/products">
             <AnimatedButton variant="gold" size="large">
               Explore Full Collection
             </AnimatedButton>
-          </Link>
+          </LocalizedClientLink>
         </ScrollReveal>
       </div>
     </section>
