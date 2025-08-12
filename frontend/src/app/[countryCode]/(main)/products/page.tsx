@@ -11,6 +11,13 @@ import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import { sdk } from "@lib/config"
 import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://tajpetha.in/in/products",
+  },
+}
 
 type SearchParams = {
   sortBy?: string

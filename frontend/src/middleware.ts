@@ -111,6 +111,13 @@ export async function middleware(request: NextRequest) {
     if (isPreviewing) {
       return NextResponse.next();
     }
+
+    // Strip empty ?q parameters to avoid duplicate-URL crawl noise
+    if (request.nextUrl.searchParams.has("q") && (request.nextUrl.searchParams.get("q") ?? "") === "") {
+      const cleanUrl = new URL(request.url)
+      cleanUrl.searchParams.delete("q")
+      return NextResponse.redirect(cleanUrl, 308)
+    }
     
     // Get country data from backend (cached)
     const { validCountries, defaultCountry } = await getCountryData()
