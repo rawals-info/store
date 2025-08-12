@@ -83,6 +83,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Product",
+            "@id": `https://tajpetha.in/${countryCode}/products/${productType}`,
             "name": `Fresh ${productType.charAt(0).toUpperCase() + productType.slice(1)}`,
             "description": `Authentic Agra ${productType} delivered fresh to ${city.name}`
             ,
@@ -101,6 +102,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
               "availability": "https://schema.org/InStock",
               "itemCondition": "https://schema.org/NewCondition",
               "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              "url": `https://tajpetha.in/${countryCode}/products/${productType}`,
               "seller": {
                 "@id": `https://tajpetha.in/#organization`
               }

@@ -123,9 +123,11 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Product",
+          "@id": `${baseUrl}/in/products/${product.handle}#product`,
           "name": product.title || `Premium ${product.category || 'Petha'}`,
           "description": product.description || `Authentic ${product.category || 'Agra petha'} made with traditional recipes and premium ingredients`,
           "image": product.thumbnail || `${baseUrl}/placeholder-image.jpg`,
+          "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
           "brand": {
             "@type": "Brand",
             "name": "Taj Petha"
@@ -146,6 +148,7 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             "availability": "https://schema.org/InStock",
             "itemCondition": "https://schema.org/NewCondition",
             "priceValidUntil": priceValidUntil,
+            "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
             "seller": {
               "@id": `${baseUrl}/#organization`
             }
