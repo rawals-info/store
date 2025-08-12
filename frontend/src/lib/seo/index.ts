@@ -95,6 +95,11 @@ export const generateWebsiteSchema = () => {
     "@id": `${baseUrl}/#website`,
     "url": baseUrl,
     "name": SEO_CONSTANTS.siteName,
+    "alternateName": [
+      "Taj Petha Store",
+      "Taj Petha Official",
+      "Taj Petha India"
+    ],
     "description": SEO_CONSTANTS.defaultDescription,
     "publisher": {
       "@id": `${baseUrl}/#organization`

@@ -246,6 +246,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <head>
         {/* Preload critical resources to reduce HTTP requests */}
         <link rel="preload" href="/hero_image.webp" as="image" />
+        <meta property="og:site_name" content="Taj Petha" />
         
         {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
