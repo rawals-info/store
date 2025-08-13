@@ -17,6 +17,8 @@ import {
   Input,
   Select,
   Button,
+  DropdownMenu,
+  type CheckboxCheckedState,
 } from "@medusajs/ui"
 import { toast } from "react-hot-toast"
 import { sdk } from "../../lib/sdk"
@@ -262,10 +264,11 @@ const ReviewsContent: React.FC = () => {
                       <DropdownMenu.CheckboxItem
                         key={p.id}
                         checked={checked}
-                        onCheckedChange={(isChecked) => {
+                        onCheckedChange={(isChecked: CheckboxCheckedState) => {
+                          const shouldCheck = isChecked === true
                           setProductIds((prev) => {
-                            if (isChecked && !prev.includes(p.id)) return [...prev, p.id]
-                            if (!isChecked) return prev.filter((id) => id !== p.id)
+                            if (shouldCheck && !prev.includes(p.id)) return [...prev, p.id]
+                            if (!shouldCheck) return prev.filter((id) => id !== p.id)
                             return prev
                           })
                         }}
