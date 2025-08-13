@@ -13,6 +13,8 @@ export const GetAdminReviewsSchema = createFindParams().merge(
     status: z.enum(["pending", "approved", "rejected"]).optional(),
     // Filter by exact product id
     product_id: z.string().optional(),
+    // Filter by multiple product ids
+    product_ids: z.array(z.string()).optional(),
   })
 )
 
@@ -22,7 +24,7 @@ export const GET = async (
 ) => {
   const query = req.scope.resolve("query")
 
-  const { product, status, product_id } = (req as any).validatedQuery ?? {}
+  const { product, status, product_id, product_ids } = (req as any).validatedQuery ?? {}
 
   // If product name filter is provided, first resolve matching product IDs
   let productIdFilter: Record<string, unknown> | undefined
@@ -49,15 +51,14 @@ export const GET = async (
     productIdFilter = { product_id: { $in: productIds } }
   }
 
-  // Merge our custom filters with any incoming filters from queryConfig
-  const mergedQueryConfig = {
-    ...req.queryConfig,
-    filters: {
-      ...(req.queryConfig?.filters || {}),
-      ...(status ? { status } : {}),
-      ...(product_id ? { product_id } : {}),
-      ...(productIdFilter || {}),
-    },
+  // Build filters object
+  const baseFilters = (req as any).queryConfig?.filters || {}
+  const filters = {
+    ...baseFilters,
+    ...(status ? { status } : {}),
+    ...(product_id ? { product_id } : {}),
+    ...(Array.isArray(product_ids) && product_ids.length ? { product_id: { $in: product_ids } } : {}),
+    ...(productIdFilter || {}),
   }
 
   const { 
@@ -69,7 +70,10 @@ export const GET = async (
     },
   } = await query.graph({
     entity: "review",
-    ...mergedQueryConfig,
+    fields: (req as any).queryConfig?.fields,
+    filters,
+    pagination: (req as any).queryConfig?.pagination,
+    withDeleted: (req as any).queryConfig?.withDeleted,
   })
 
   res.json({ 

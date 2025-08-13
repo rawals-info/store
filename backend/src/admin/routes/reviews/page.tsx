@@ -141,7 +141,7 @@ const ReviewsContent: React.FC = () => {
 
   const [productInput, setProductInput] = useState("")
   const [product, setProduct] = useState("")
-  const [productId, setProductId] = useState<string>("")
+  const [productIds, setProductIds] = useState<string[]>([])
   const [status, setStatus] = useState<"pending" | "approved" | "rejected" | "all">("all")
 
   useEffect(() => {
@@ -152,7 +152,7 @@ const ReviewsContent: React.FC = () => {
   // Reset pagination when filters change
   useEffect(() => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }))
-  }, [product, productId, status])
+  }, [product, productIds, status])
 
   const offset = useMemo(() => pagination.pageIndex * pagination.pageSize, [pagination])
 
@@ -162,14 +162,14 @@ const ReviewsContent: React.FC = () => {
     limit: number
     offset: number
   }>({
-    queryKey: ["reviews", offset, pagination.pageSize, product, productId, status],
+    queryKey: ["reviews", offset, pagination.pageSize, product, productIds, status],
     queryFn: () => {
       const queryParams = {
         offset: pagination.pageIndex * pagination.pageSize,
         limit: pagination.pageSize,
         order: "-created_at",
         ...(product ? { product } : {}),
-        ...(productId ? { product_id: productId } : {}),
+        ...(productIds.length ? { product_ids: productIds } : {}),
         ...(status !== "all" ? { status } : {}),
       }
       console.log("Query params:", queryParams)
@@ -240,23 +240,42 @@ const ReviewsContent: React.FC = () => {
                   <Select.Item value="rejected">Rejected</Select.Item>
                 </Select.Content>
               </Select>
-              <Select
-                size="small"
-                value={productId || "all"}
-                onValueChange={(value) => setProductId(value === "all" ? "" : value)}
-              >
-                <Select.Trigger className="w-64">
-                  <Select.Value />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="all">All products</Select.Item>
-                  {(productOptions?.products || []).map((p) => (
-                    <Select.Item key={p.id} value={p.id}>
-                      {p.title}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select>
+              <DropdownMenu>
+                <DropdownMenu.Trigger asChild>
+                  <Button size="small" variant="secondary">
+                    {productIds.length ? `${productIds.length} products` : "All products"}
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content className="w-64">
+                  <DropdownMenu.CheckboxItem
+                    checked={productIds.length === 0}
+                    onCheckedChange={(checked) => {
+                      if (checked) setProductIds([])
+                    }}
+                  >
+                    All products
+                  </DropdownMenu.CheckboxItem>
+                  <DropdownMenu.Separator />
+                  {(productOptions?.products || []).map((p) => {
+                    const checked = productIds.includes(p.id)
+                    return (
+                      <DropdownMenu.CheckboxItem
+                        key={p.id}
+                        checked={checked}
+                        onCheckedChange={(isChecked) => {
+                          setProductIds((prev) => {
+                            if (isChecked && !prev.includes(p.id)) return [...prev, p.id]
+                            if (!isChecked) return prev.filter((id) => id !== p.id)
+                            return prev
+                          })
+                        }}
+                      >
+                        {p.title}
+                      </DropdownMenu.CheckboxItem>
+                    )
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu>
               <Select
                 size="small"
                 value={String(pagination.pageSize)}
