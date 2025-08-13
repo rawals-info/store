@@ -196,22 +196,24 @@ const nextConfig = {
         source: '/agra-petha',
         destination: '/in/categories/petha',
         permanent: true,
+      },
+      // Consolidate duplicate URLs by redirecting to country-scoped paths
+      {
+        source: '/city/:city',
+        destination: '/in/city/:city',
+        permanent: true,
+      },
+      {
+        source: '/product/:slug',
+        destination: '/in/products/:slug',
+        permanent: true,
       }
     ]
   },
 
   async rewrites() {
-    return [
-      // SEO-friendly rewrites
-      {
-        source: '/city/:city',
-        destination: '/in/city/:city'
-      },
-      {
-        source: '/product/:slug',
-        destination: '/in/products/:slug'
-      }
-    ]
+    // No rewrites that change visible URLs; use redirects above to avoid duplicate content.
+    return []
   },
 
   webpack: (config, { dev, isServer }) => {

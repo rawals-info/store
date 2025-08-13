@@ -102,6 +102,15 @@ export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl
 
+    // 1) Host normalization: force apex domain (no www)
+    const currentHost = request.nextUrl.hostname
+    if (currentHost && currentHost.toLowerCase().startsWith('www.')) {
+      const apexHost = currentHost.replace(/^www\./i, '')
+      const url = new URL(request.url)
+      url.hostname = apexHost
+      return NextResponse.redirect(url, 308)
+    }
+
     // Check if the URL has Builder.io preview parameters
     const isPreviewing =
       request.nextUrl.searchParams.has("builder.preview") ||
@@ -207,7 +216,8 @@ export async function middleware(request: NextRequest) {
     const queryString = request.nextUrl.search ? request.nextUrl.search : ""
     const redirectUrl = `${request.nextUrl.origin}/${preferredCountry}${redirectPath}${queryString}`
 
-    response = NextResponse.redirect(redirectUrl, 307)
+    // Use permanent 308 to consolidate SEO signals on country-scoped URLs
+    response = NextResponse.redirect(redirectUrl, 308)
 
     // Set cache ID cookie
     response.cookies.set("_medusa_cache_id", crypto.randomUUID(), {
