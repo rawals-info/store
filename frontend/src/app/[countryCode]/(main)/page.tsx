@@ -119,7 +119,7 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Taj Petha Product Catalog",
-      "itemListElement": featuredProducts?.slice(0, 5).map((product, index) => ({
+      "itemListElement": featuredProducts?.map((product, index) => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Product",
