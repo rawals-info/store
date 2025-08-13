@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 // import { Link } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { defineRouteConfig } from "@medusajs/admin-sdk"
@@ -14,6 +14,9 @@ import {
   StatusBadge,
   Toaster,
   DataTablePaginationState,
+  Input,
+  Select,
+  Button,
 } from "@medusajs/ui"
 import { toast } from "react-hot-toast"
 import { sdk } from "../../lib/sdk"
@@ -126,17 +129,32 @@ const useCommands = (refetch: () => void) => [
   }),
 ]
 
-const limit = 15
+const DEFAULT_PAGE_SIZE = 50
 
 const ReviewsContent: React.FC = () => {
   const [pagination, setPagination] = useState<DataTablePaginationState>({
-    pageSize: limit,
+    pageSize: DEFAULT_PAGE_SIZE,
     pageIndex: 0,
   })
 
   const [rowSelection, setRowSelection] = useState<DataTableRowSelectionState>({})
 
-  const offset = useMemo(() => pagination.pageIndex * limit, [pagination])
+  const [productInput, setProductInput] = useState("")
+  const [product, setProduct] = useState("")
+  const [productId, setProductId] = useState<string>("")
+  const [status, setStatus] = useState<"pending" | "approved" | "rejected" | "all">("all")
+
+  useEffect(() => {
+    const id = setTimeout(() => setProduct(productInput), 400)
+    return () => clearTimeout(id)
+  }, [productInput])
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
+  }, [product, productId, status])
+
+  const offset = useMemo(() => pagination.pageIndex * pagination.pageSize, [pagination])
 
   const { data, isLoading, refetch } = useQuery<{
     reviews: Review[]
@@ -144,13 +162,32 @@ const ReviewsContent: React.FC = () => {
     limit: number
     offset: number
   }>({
-    queryKey: ["reviews", offset, limit],
+    queryKey: ["reviews", offset, pagination.pageSize, product, productId, status],
+    queryFn: () => {
+      const queryParams = {
+        offset: pagination.pageIndex * pagination.pageSize,
+        limit: pagination.pageSize,
+        order: "-created_at",
+        ...(product ? { product } : {}),
+        ...(productId ? { product_id: productId } : {}),
+        ...(status !== "all" ? { status } : {}),
+      }
+      console.log("Query params:", queryParams)
+      return sdk.client.fetch("/admin/reviews", {
+        query: queryParams,
+      })
+    },
+  })
+
+  // Load product options for dropdown
+  const { data: productOptions } = useQuery<{ products: Array<{ id: string; title: string }> }>({
+    queryKey: ["review-product-options"],
     queryFn: () =>
-      sdk.client.fetch("/admin/reviews", {
+      sdk.client.fetch("/admin/products", {
         query: {
-          offset: pagination.pageIndex * pagination.pageSize,
-          limit: pagination.pageSize,
-          order: "-created_at",
+          limit: 200,
+          fields: "id,title",
+          order: "title",
         },
       }),
   })
@@ -179,6 +216,81 @@ const ReviewsContent: React.FC = () => {
         <DataTable instance={table}>
           <DataTable.Toolbar className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
             <Heading>Reviews</Heading>
+            <div className="flex w-full items-center gap-2 md:w-auto">
+              <Input
+                size="small"
+                type="text"
+                value={productInput}
+                onChange={(e) => setProductInput(e.target.value)}
+                placeholder="Filter by product name"
+                className="w-full md:w-72"
+              />
+              <Select
+                size="small"
+                value={status}
+                onValueChange={(value) => setStatus(value as any)}
+              >
+                <Select.Trigger className="w-48">
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">All statuses</Select.Item>
+                  <Select.Item value="approved">Approved</Select.Item>
+                  <Select.Item value="pending">Pending</Select.Item>
+                  <Select.Item value="rejected">Rejected</Select.Item>
+                </Select.Content>
+              </Select>
+              <Select
+                size="small"
+                value={productId || "all"}
+                onValueChange={(value) => setProductId(value === "all" ? "" : value)}
+              >
+                <Select.Trigger className="w-64">
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">All products</Select.Item>
+                  {(productOptions?.products || []).map((p) => (
+                    <Select.Item key={p.id} value={p.id}>
+                      {p.title}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
+              <Select
+                size="small"
+                value={String(pagination.pageSize)}
+                onValueChange={(value) =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    pageIndex: 0,
+                    pageSize: parseInt(value, 10),
+                  }))
+                }
+              >
+                <Select.Trigger className="w-24">
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="15">15</Select.Item>
+                  <Select.Item value="50">50</Select.Item>
+                  <Select.Item value="100">100</Select.Item>
+                </Select.Content>
+              </Select>
+              {(product || status !== "all") && (
+                <Button
+                  size="small"
+                  variant="secondary"
+                  onClick={() => {
+                    setProductInput("")
+                    setProduct("")
+                    setStatus("all")
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
           </DataTable.Toolbar>
           <DataTable.Table />
           <DataTable.Pagination />
