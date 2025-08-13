@@ -5,6 +5,7 @@ checkEnvVariables()
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   eslint: {
     // Disable ESLint during builds to prevent non-critical issues from blocking deployment
     ignoreDuringBuilds: true,

@@ -13,6 +13,17 @@ interface CityPageProps {
   }
 }
 
+// This page is fully static based on known city list; pre-generate for speed and SEO
+export const dynamic = 'force-static'
+export const revalidate = 86400 // daily revalidation is enough for static content
+
+export async function generateStaticParams() {
+  const countries = ["in"]
+  return countries.flatMap((countryCode) =>
+    MAJOR_INDIAN_CITIES.map((c) => ({ countryCode, citySlug: c.slug }))
+  )
+}
+
 export async function generateMetadata({ params, searchParams }: CityPageProps): Promise<Metadata> {
   const { citySlug, countryCode } = params
   const productType = searchParams.product || "petha"

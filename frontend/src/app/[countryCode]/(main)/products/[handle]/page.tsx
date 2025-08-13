@@ -12,11 +12,8 @@ type Props = {
 }
 
 // Set dynamic rendering options for this page
-export const dynamic = "force-dynamic"
-// Use default fetch caching so region list is cached for 60s on the server
-// (still dynamic thanks to force-dynamic)
-// export const fetchCache = "force-no-store"
-// Cache the product page for 5 minutes to balance freshness with performance.
+// Let products be statically generated with ISR for faster loads and better crawl
+export const dynamic = "force-static"
 export const revalidate = 300
 
 // NOTE: Disabled static params generation to speed up dev and avoid large API calls.

@@ -122,7 +122,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               fill
               sizes="(max-width: 768px) 25vw, 10vw"
               className="object-cover"
-              loading="eager"
+              loading="lazy"
               quality={60}
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="

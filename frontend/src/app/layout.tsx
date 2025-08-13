@@ -251,9 +251,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-        {/* Preconnect to third-party domains for quicker TLS */}
-        <link rel="preconnect" href="https://connect.facebook.net" />
-        <link rel="preconnect" href="https://static.hotjar.com" />
+        {/* Preconnects removed to avoid unnecessary 3rd-party warmups unless scripts are used */}
         
         {/* Optimized favicon and app icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -279,15 +277,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           `
         }} />
 
-        {/* Marketing / analytics scripts deferred until load */}
-        <Script
-          src="https://connect.facebook.net/en_US/fbevents.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          src="https://static.hotjar.com/c/hotjar-3507234.js?sv=6"
-          strategy="lazyOnload"
-        />
+        {/* External analytics scripts are loaded centrally in GoogleAnalytics component */}
         
         {/* Enhanced Schema Markup */}
         <script

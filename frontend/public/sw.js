@@ -1,12 +1,14 @@
 // Service Worker for Taj Petha - Optimized for SEO and Performance
 const CACHE_NAME = 'taj-petha-v1';
 const urlsToCache = [
-  '/',
+  '/in',
   '/manifest.json',
   '/hero_image.webp',
   '/logo.png',
   '/favicon.ico',
-  // Add critical CSS and JS files
+  '/in/products',
+  '/in/categories',
+  '/in/collections',
 ];
 
 // Install service worker and cache resources
