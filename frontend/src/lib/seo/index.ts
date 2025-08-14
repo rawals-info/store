@@ -267,40 +267,43 @@ export const generateProductSchema = (
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "merchantReturnLink": `${baseUrl}/${countryCode}/returns`,
-        "returnPolicyCategory": "https://schema.org/RefundTypeExchangeOrStoreCredit",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
         "merchantReturnDays": 7,
         "returnMethod": "https://schema.org/ReturnByMail",
         "returnFees": "https://schema.org/FreeReturn",
+        "refundType": "https://schema.org/StoreCreditRefund",
         "inStoreReturnsOffered": false
       },
 
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": "0.00",
-          "currency": region?.currency_code?.toUpperCase() || "INR"
-        },
-        "deliveryTime": {
-          "@type": "ShippingDeliveryTime",
-          "handlingTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 0,
-            "maxValue": 1,
-            "unitCode": "d"
+      "shippingDetails": [
+        {
+          "@type": "OfferShippingDetails",
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "IN"
           },
-          "transitTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 4,
-            "unitCode": "d"
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0.00",
+            "currency": region?.currency_code?.toUpperCase() || "INR"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 0,
+              "maxValue": 1,
+              "unitCode": "d"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 1,
+              "maxValue": 4,
+              "unitCode": "d"
+            }
           }
-        },
-        "shippingDestination": {
-          "@type": "DefinedRegion",
-          "addressCountry": "IN"
         }
-      }
+      ]
     },
     "aggregateRating": {
       "@type": "AggregateRating",

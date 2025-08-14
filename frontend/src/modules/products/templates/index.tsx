@@ -178,13 +178,19 @@ export default async function ProductTemplate({
               
               {/* Return policy information */}
               <div itemProp="hasMerchantReturnPolicy" itemScope itemType="https://schema.org/MerchantReturnPolicy" style={{ display: 'none' }}>
-                <meta itemProp="returnPolicyCategory" content="https://schema.org/RefundTypeExchangeOrStoreCredit" />
+                <meta itemProp="returnPolicyCategory" content="https://schema.org/MerchantReturnFiniteReturnWindow" />
                 <meta itemProp="merchantReturnDays" content="7" />
+                <meta itemProp="refundType" content="https://schema.org/StoreCreditRefund" />
+                <meta itemProp="returnMethod" content="https://schema.org/ReturnByMail" />
+                <meta itemProp="returnFees" content="https://schema.org/FreeReturn" />
                 <link itemProp="url" href={`/${countryCode}/returns`} />
               </div>
               
               {/* Shipping details */}
               <div itemProp="shippingDetails" itemScope itemType="https://schema.org/OfferShippingDetails" style={{ display: 'none' }}>
+                <div itemProp="shippingDestination" itemScope itemType="https://schema.org/DefinedRegion">
+                  <meta itemProp="addressCountry" content="IN" />
+                </div>
                 <div itemProp="shippingRate" itemScope itemType="https://schema.org/MonetaryAmount">
                   <meta itemProp="value" content="0.00" />
                   <meta itemProp="currency" content={region?.currency_code?.toUpperCase() || "INR"} />
