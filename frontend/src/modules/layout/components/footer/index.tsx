@@ -103,6 +103,8 @@ const Footer = () => {
             <Heading level="h3" className="text-xl mb-5 font-display text-luxury-gold">Shop</Heading>
             <ul className="space-y-3">
               {[
+                { href: "/store", label: "Store" },
+                { href: "/categories", label: "Categories" },
                 { href: "/products", label: "All Sweets" },
                 { href: "/collections", label: "Collections" },
                 { href: "/blog", label: "Blog & Recipes" },
