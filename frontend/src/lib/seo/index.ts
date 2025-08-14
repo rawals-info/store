@@ -162,6 +162,7 @@ export const generateLocalBusinessSchema = () => {
 export const generateProductSchema = (
   product: HttpTypes.StoreProduct,
   region: HttpTypes.StoreRegion,
+  countryCode: string,
   reviewData?: { average_rating: number; count: number },
   reviews?: import("../../types/global").StoreProductReview[]
 ) => {
@@ -234,11 +235,11 @@ export const generateProductSchema = (
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "@id": `${baseUrl}/in/products/${product.handle}#product`,
+    "@id": `${baseUrl}/${countryCode}/products/${product.handle}#product`,
     "name": product.title,
     "description": product.description || `Authentic ${product.title} from Taj Petha. Premium quality ${productCategory.toLowerCase()} made with traditional recipes and hygienic preparation.`,
     "image": product.images?.map(img => img.url) || [product.thumbnail] || [`${baseUrl}/placeholder-image.jpg`],
-    "url": `${baseUrl}/in/products/${product.handle}`,
+    "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
     "sku": product.variants?.[0]?.sku || `TAJ-${product.id}`,
     "brand": {
       "@type": "Brand",
@@ -257,7 +258,7 @@ export const generateProductSchema = (
       "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "priceValidUntil": priceValidUntil,
       "itemCondition": "https://schema.org/NewCondition",
-      "url": `${baseUrl}/in/products/${product.handle}`,
+      "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
       "seller": {
         "@type": "Organization",
         "name": "Taj Petha",
@@ -265,7 +266,12 @@ export const generateProductSchema = (
       },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
-        "merchantReturnLink": `${baseUrl}/returns`
+        "merchantReturnLink": `${baseUrl}/${countryCode}/returns`,
+        "returnPolicyCategory": "https://schema.org/RefundTypeExchangeOrStoreCredit",
+        "merchantReturnDays": 7,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn",
+        "inStoreReturnsOffered": false
       },
 
       "shippingDetails": {
@@ -290,7 +296,7 @@ export const generateProductSchema = (
             "unitCode": "d"
           }
         },
-        "shipsTo": {
+        "shippingDestination": {
           "@type": "DefinedRegion",
           "addressCountry": "IN"
         }
@@ -323,7 +329,7 @@ export const generateProductSchema = (
             "datePublished": new Date().toISOString().split('T')[0],
             "itemReviewed": {
               "@type": "Product",
-              "@id": `${baseUrl}/in/products/${product.handle}#product`,
+              "@id": `${baseUrl}/${countryCode}/products/${product.handle}#product`,
               "name": product.title
             }
           }))

@@ -57,7 +57,7 @@ export default async function ProductTemplate({
   }
 
   // Generate product schema for SEO with dynamic review data & real reviews
-  const productSchema = generateProductSchema(product, region, reviewData, reviewList)
+  const productSchema = generateProductSchema(product, region, countryCode, reviewData, reviewList)
   
   // Generate breadcrumb schema
   const breadcrumbs = [
