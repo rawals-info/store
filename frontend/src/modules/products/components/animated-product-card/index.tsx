@@ -156,6 +156,11 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
       },
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
       "itemCondition": "https://schema.org/NewCondition",
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": priceMajorUnits,
+        "priceCurrency": region?.currency_code?.toUpperCase() || "INR"
+      },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "merchantReturnLink": `${baseUrl}/in/returns`,

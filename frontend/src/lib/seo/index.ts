@@ -304,6 +304,11 @@ export const generateProductSchema = (
         "name": "Taj Petha",
         "@id": `${baseUrl}/#organization`
       },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": finalPrice,
+        "priceCurrency": region?.currency_code?.toUpperCase() || "INR"
+      },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "merchantReturnLink": `${baseUrl}/${countryCode}/returns`,

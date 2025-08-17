@@ -202,6 +202,29 @@ export default async function ProductTemplate({
                   return (Number(minor) / 100).toFixed(2)
                 })()}
               />
+              <meta
+                itemProp="priceSpecification"
+                content={(function () {
+                  const wantedCurrency = (region?.currency_code || 'INR').toUpperCase()
+                  const variants = Array.isArray(product.variants) ? product.variants : []
+                  const amounts: number[] = []
+                  for (const v of variants as any[]) {
+                    const cp = v?.calculated_price
+                    if (cp && cp.currency_code && cp.currency_code.toUpperCase() === wantedCurrency && cp.calculated_amount !== undefined) {
+                      const amt = Number(cp.calculated_amount)
+                      if (!Number.isNaN(amt)) amounts.push(amt)
+                      continue
+                    }
+                    const matchInPrices = (v?.prices || []).find((p: any) => p?.currency_code && p.currency_code.toUpperCase() === wantedCurrency)
+                    if (matchInPrices && matchInPrices.amount !== undefined) {
+                      const amt = Number(matchInPrices.amount)
+                      if (!Number.isNaN(amt)) amounts.push(amt)
+                    }
+                  }
+                  const best = amounts.length > 0 ? Math.min(...amounts) : 0
+                  return JSON.stringify({ "@type": "PriceSpecification", price: (best/100).toFixed(2), priceCurrency: wantedCurrency })
+                })()}
+              />
               <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
               <meta itemProp="availability" content={product.variants?.some(v => v.inventory_quantity && v.inventory_quantity > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
               <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />
