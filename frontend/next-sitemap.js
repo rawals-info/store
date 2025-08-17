@@ -14,7 +14,18 @@ module.exports = {
   siteUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://tajpetha.in',
   generateRobotsTxt: true,
   generateIndexSitemap: false, // Disable index sitemap to avoid conflicts
-  exclude: excludedPaths,
+  // Exclude non-country-scoped root paths that cause redirects and dilute indexing
+  exclude: [
+    ...excludedPaths,
+    '/',
+    '/about',
+    '/contact',
+    '/shipping',
+    '/terms',
+    '/privacy',
+    '/returns',
+    '/faqs',
+  ],
   
   // Generate multiple sitemaps for better SEO organization
   additionalPaths: async (config) => {
