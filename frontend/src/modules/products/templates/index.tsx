@@ -45,8 +45,8 @@ export default async function ProductTemplate({
     // Summary
     const summary = await getProductReviewSummary(product.id)
     reviewData = {
-      average_rating: typeof summary.average_rating === 'number' ? summary.average_rating : 4.7,
-      count: typeof summary.count === 'number' ? summary.count : 89
+      average_rating: typeof summary.average_rating === 'number' ? summary.average_rating : 0,
+      count: typeof summary.count === 'number' ? summary.count : 0
     }
 
     // Fetch first 3 reviews for schema markup
@@ -296,18 +296,22 @@ export default async function ProductTemplate({
         <FaqAccordion faqs={faqs} />
       </section>
 
-      <div 
-        className="content-container my-16 small:my-32"
-        itemProp="aggregateRating" 
-        itemScope 
-        itemType="https://schema.org/AggregateRating"
-      >
-        {/* Use dynamic rating metadata */}
-        <meta itemProp="ratingValue" content={(typeof reviewData.average_rating === 'number' && reviewData.average_rating > 0 ? reviewData.average_rating : 0).toFixed(1)} />
-        <meta itemProp="reviewCount" content={String(typeof reviewData.count === 'number' && reviewData.count >= 0 ? reviewData.count : 0)} />
-        <meta itemProp="bestRating" content="5" />
-        <meta itemProp="worstRating" content="1" />
-        
+      {/* Only include AggregateRating microdata when real review data exists */}
+      {reviewData.count > 0 && reviewData.average_rating > 0 && (
+        <div 
+          className="sr-only"
+          itemProp="aggregateRating" 
+          itemScope 
+          itemType="https://schema.org/AggregateRating"
+        >
+          <meta itemProp="ratingValue" content={reviewData.average_rating.toFixed(1)} />
+          <meta itemProp="reviewCount" content={String(reviewData.count)} />
+          <meta itemProp="bestRating" content="5" />
+          <meta itemProp="worstRating" content="1" />
+        </div>
+      )}
+
+      <div className="content-container my-16 small:my-32">
         <ProductReviews productId={product.id} />
       </div>
       

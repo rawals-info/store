@@ -212,9 +212,9 @@ export const generateProductSchema = (
   const productCategory = product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"
   const primaryVariant = product.variants?.[0]
 
-  // Use dynamic review data if available, otherwise fall back to defaults
-  const ratingValue = reviewData?.average_rating || 4.7
-  const reviewCount = reviewData?.count || 89
+  // Use dynamic review data if available; avoid fake defaults that can trigger warnings
+  const ratingValue = typeof reviewData?.average_rating === 'number' ? reviewData.average_rating : 0
+  const reviewCount = typeof reviewData?.count === 'number' ? reviewData.count : 0
 
   // Convert to major units for schema.org price
   const finalPrice = typeof amountMinorUnits === 'number' && !Number.isNaN(amountMinorUnits)
@@ -351,13 +351,17 @@ export const generateProductSchema = (
         }
       ]
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": ratingValue.toFixed(1),
-      "reviewCount": reviewCount.toString(),
-      "bestRating": "5",
-      "worstRating": "1"
-    },
+    ...(reviewCount > 0 && ratingValue > 0
+      ? {
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": ratingValue.toFixed(1),
+            "reviewCount": reviewCount.toString(),
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        }
+      : {}),
     // Add review array with proper itemReviewed if provided
     ...(reviews && reviews.length > 0
       ? {

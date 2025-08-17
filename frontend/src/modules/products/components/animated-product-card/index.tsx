@@ -129,70 +129,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
     ? `${product.description.slice(0, 120)}...` 
     : `Authentic ${product.title} from Taj Petha. Premium quality ${productCategory.toLowerCase()} made with traditional recipes and hygienic preparation.`
 
-  // Product schema markup for rich snippets - will be updated with real review data
-  const productSchema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "@id": `${baseUrl}/in/products/${product.handle}#product`,
-    "name": product.title,
-    "description": seoDescription,
-    "image": [toAbsoluteUrl(product.thumbnail || "/placeholder-image.jpg")],
-    "url": `${baseUrl}/in/products/${product.handle}`,
-    "sku": product.variants?.[0]?.sku || `TAJ-${product.id}`,
-    "brand": {
-      "@type": "Brand",
-      "name": "Taj Petha",
-      "url": baseUrl
-    },
-    "category": productCategory,
-    "offers": {
-      "@type": "Offer",
-      "price": priceMajorUnits,
-      "priceCurrency": region?.currency_code?.toUpperCase() || "INR",
-      "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "Taj Petha"
-      },
-      "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-      "itemCondition": "https://schema.org/NewCondition",
-      "priceSpecification": {
-        "@type": "PriceSpecification",
-        "price": priceMajorUnits,
-        "priceCurrency": region?.currency_code?.toUpperCase() || "INR"
-      },
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "merchantReturnLink": `${baseUrl}/in/returns`,
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 7,
-        "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/FreeReturn",
-        "refundType": "https://schema.org/StoreCreditRefund",
-        "inStoreReturnsOffered": false
-      },
-      "shippingDetails": [
-        {
-          "@type": "OfferShippingDetails",
-          "shippingDestination": {
-            "@type": "DefinedRegion",
-            "addressCountry": "IN"
-          },
-          "shippingRate": {
-            "@type": "MonetaryAmount",
-            "value": "0.00",
-            "currency": region?.currency_code?.toUpperCase() || "INR"
-          },
-          "deliveryTime": {
-            "@type": "ShippingDeliveryTime",
-            "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 1, "unitCode": "d" },
-            "transitTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 4, "unitCode": "d" }
-          }
-        }
-      ]
-    }
-    // Note: aggregateRating will be added dynamically when we have real review data
-  }
+  // Listing cards do not emit Product structured data to avoid duplicate/partial markup on list pages
 
   // Animation variants for better UX
   const cardVariants = {
@@ -233,22 +170,12 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
 
   return (
     <>
-      {/* Product Schema Markup */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productSchema),
-        }}
-      />
-      
       <motion.article
         variants={cardVariants}
         initial="hidden"
         animate="visible"
         whileHover="hover"
         className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
-        itemScope
-        itemType="https://schema.org/Product"
       >
         <Link href={`/in/products/${product.handle}`} className="block" aria-label={`View ${product.title} details`}>
           {/* Product Image Container */}
@@ -293,7 +220,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
           <div className="p-4 space-y-3">
             {/* Category and Collection */}
             <div className="flex items-center justify-between text-sm">
-              <span className="text-luxury-gold font-medium" itemProp="category">
+              <span className="text-luxury-gold font-medium">
                 {productCategory}
               </span>
               {product.collection && (
@@ -306,7 +233,6 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
             {/* Product Title */}
             <h3 
               className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2 group-hover:text-luxury-gold transition-colors duration-200"
-              itemProp="name"
             >
               {product.title}
             </h3>
@@ -315,20 +241,17 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
             {product.description && (
               <p 
                 className="text-gray-600 text-sm line-clamp-2 leading-relaxed"
-                itemProp="description"
               >
                 {seoDescription}
               </p>
             )}
 
             {/* Pricing Information */}
-            <div className="flex items-center justify-between pt-2" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+            <div className="flex items-center justify-between pt-2">
               <div className="flex flex-col">
                 {productPrice && typeof productPrice === 'number' && (
                   <span 
                     className="text-xl font-bold text-gray-900"
-                    itemProp="price"
-                    content={(productPrice / 100).toFixed(2)}
                   >
                     {new Intl.NumberFormat('en-IN', {
                       style: 'currency',
@@ -337,10 +260,6 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
                     }).format(productPrice / 100)}
                   </span>
                 )}
-                <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
-                <meta itemProp="availability" content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
-                <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />
-                <meta itemProp="priceValidUntil" content={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} />
                 <span className="text-xs text-gray-500">Free delivery above ₹500</span>
               </div>
 
@@ -353,7 +272,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
               </div>
             </div>
 
-            {/* Rating and Reviews - Now Dynamic */}
+            {/* Rating and Reviews - visual only on listing cards */}
             <ProductRating productId={product.id} />
 
             {/* Additional product features */}
@@ -371,16 +290,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
           </div>
         </Link>
 
-        {/* Hidden SEO content */}
-        <div className="sr-only">
-          <span itemProp="brand" itemScope itemType="https://schema.org/Brand">
-            <span itemProp="name">Taj Petha</span>
-          </span>
-          <span itemProp="manufacturer" itemScope itemType="https://schema.org/Organization">
-            <span itemProp="name">Taj Petha</span>
-          </span>
-          <span itemProp="sku">{product.variants?.[0]?.sku || `TAJ-${product.id}`}</span>
-        </div>
+        {/* No hidden structured data on listing cards */}
       </motion.article>
     </>
   )
