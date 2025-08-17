@@ -148,14 +148,7 @@ export const generateLocalBusinessSchema = () => {
     "servesCuisine": ["Indian Sweets", "Traditional Namkeen", "Agra Specialties"],
     "priceRange": "₹₹",
     "currenciesAccepted": "INR",
-    "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "2500",
-      "bestRating": "5",
-      "worstRating": "1"
-    }
+    "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"]
   }
 }
 
@@ -167,28 +160,66 @@ export const generateProductSchema = (
   reviews?: import("../../types/global").StoreProductReview[]
 ) => {
   const baseUrl = getBaseURL()
-  const productPrice = product.variants?.[0]?.calculated_price
+  const toAbsoluteUrl = (url: string) =>
+    url && (url.startsWith("http://") || url.startsWith("https://"))
+      ? url
+      : `${baseUrl}${url?.startsWith("/") ? "" : "/"}${url || ""}`
+  // Determine the most accurate price in region currency from variants
+  const findBestVariantAmountMinorUnits = () => {
+    const variants = Array.isArray(product.variants) ? product.variants : []
+    const wantedCurrency = (region?.currency_code || "INR").toUpperCase()
+
+    // Collect amounts that match the wanted currency exactly
+    const matchingAmounts: number[] = []
+    for (const v of variants as any[]) {
+      const cp = v?.calculated_price
+      if (cp && cp.currency_code && cp.currency_code.toUpperCase() === wantedCurrency) {
+        const amt = Number(cp.calculated_amount)
+        if (!Number.isNaN(amt)) matchingAmounts.push(amt)
+        continue
+      }
+      const prices = v?.prices || []
+      const matchInPrices = prices.find((p: any) => p?.currency_code && p.currency_code.toUpperCase() === wantedCurrency)
+      if (matchInPrices && matchInPrices.amount !== undefined) {
+        const amt = Number(matchInPrices.amount)
+        if (!Number.isNaN(amt)) matchingAmounts.push(amt)
+      }
+    }
+
+    if (matchingAmounts.length > 0) {
+      return Math.min(...matchingAmounts)
+    }
+
+    // Fallback: any calculated_amount across variants regardless of currency
+    const anyAmounts: number[] = []
+    for (const v of variants as any[]) {
+      const cp = v?.calculated_price
+      if (cp && cp.calculated_amount !== undefined) {
+        const amt = Number(cp.calculated_amount)
+        if (!Number.isNaN(amt)) anyAmounts.push(amt)
+      } else if (Array.isArray(v?.prices) && v.prices.length > 0) {
+        const amt = Number(v.prices[0]?.amount)
+        if (!Number.isNaN(amt)) anyAmounts.push(amt)
+      }
+    }
+    return anyAmounts.length > 0 ? Math.min(...anyAmounts) : null
+  }
+
+  const amountMinorUnits = findBestVariantAmountMinorUnits()
   const isInStock = product.variants?.some(variant => 
     variant.inventory_quantity && variant.inventory_quantity > 0
   )
   const productCategory = product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"
+  const primaryVariant = product.variants?.[0]
 
   // Use dynamic review data if available, otherwise fall back to defaults
   const ratingValue = reviewData?.average_rating || 4.7
   const reviewCount = reviewData?.count || 89
 
-  // Calculate price properly - handle both number and object types
-  let finalPrice = "199.00"
-  if (productPrice) {
-    if (typeof productPrice === 'number') {
-      finalPrice = (productPrice / 100).toFixed(2)
-    } else if (productPrice.calculated_amount) {
-      const amount = typeof productPrice.calculated_amount === 'number' 
-        ? productPrice.calculated_amount 
-        : Number(productPrice.calculated_amount)
-      finalPrice = (amount / 100).toFixed(2)
-    }
-  }
+  // Convert to major units for schema.org price
+  const finalPrice = typeof amountMinorUnits === 'number' && !Number.isNaN(amountMinorUnits)
+    ? (Number(amountMinorUnits) / 100).toFixed(2)
+    : "0.00"
 
   // Format priceValidUntil properly (30 days from now)
   const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -232,15 +263,24 @@ export const generateProductSchema = (
     }
   }
 
+  const rawImages: string[] = (product.images?.map(img => img.url) || (product.thumbnail ? [product.thumbnail] : [])) as string[]
+  const imageUrls: string[] = (rawImages && rawImages.length > 0)
+    ? rawImages.map(toAbsoluteUrl)
+    : [`${baseUrl}/placeholder-image.jpg`]
+
+  const sku = primaryVariant?.sku || `TAJ-${product.id}`
+
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${baseUrl}/${countryCode}/products/${product.handle}#product`,
     "name": product.title,
     "description": product.description || `Authentic ${product.title} from Taj Petha. Premium quality ${productCategory.toLowerCase()} made with traditional recipes and hygienic preparation.`,
-    "image": product.images?.map(img => img.url) || [product.thumbnail] || [`${baseUrl}/placeholder-image.jpg`],
+    "image": imageUrls,
     "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
-    "sku": product.variants?.[0]?.sku || `TAJ-${product.id}`,
+    "sku": sku,
+    ...(primaryVariant?.barcode ? { "gtin": String(primaryVariant.barcode) } : {}),
+    "mpn": sku,
     "brand": {
       "@type": "Brand",
       "name": "Taj Petha",
@@ -267,6 +307,7 @@ export const generateProductSchema = (
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "merchantReturnLink": `${baseUrl}/${countryCode}/returns`,
+        "url": `${baseUrl}/${countryCode}/returns`,
         "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
         "merchantReturnDays": 7,
         "returnMethod": "https://schema.org/ReturnByMail",

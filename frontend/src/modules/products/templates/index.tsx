@@ -7,7 +7,7 @@ import ProductActions from "@modules/products/components/product-actions"
 import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import ProductReviews from "../components/product-reviews"
-import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema } from "@lib/seo"
+import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema, getBaseURL } from "@lib/seo"
 import { getProductReviewSummary, getProductReviews } from "@lib/data/products"
 import type { StoreProductReview } from "types/global"
 import FaqAccordion from "@components/FaqAccordion"
@@ -39,7 +39,7 @@ export default async function ProductTemplate({
   }
 
   // Fetch review data and list for schema
-  let reviewData = { average_rating: 4.7, count: 89 }
+  let reviewData = { average_rating: 0, count: 0 }
   let reviewList: StoreProductReview[] = []
   try {
     // Summary
@@ -53,7 +53,7 @@ export default async function ProductTemplate({
     const { reviews } = await getProductReviews({ productId: product.id, limit: 3, offset: 0 })
     reviewList = reviews || []
   } catch (error) {
-    console.log("Could not fetch reviews, using defaults")
+    console.log("Could not fetch reviews; proceeding without defaults")
   }
 
   // Generate product schema for SEO with dynamic review data & real reviews
@@ -110,10 +110,19 @@ export default async function ProductTemplate({
         <meta itemProp="sku" content={product.variants?.[0]?.sku || `TAJ-${product.id}`} />
         <meta itemProp="url" content={`/${countryCode}/products/${product.handle}`} />
         
-        {/* Add product images as microdata */}
-        {product.images?.map((img, index) => (
-          <meta key={index} itemProp="image" content={img.url} />
-        )) || (product.thumbnail && <meta itemProp="image" content={product.thumbnail} />)}
+        {/* Add product images as microdata with absolute URLs */}
+        {(() => {
+          const baseUrl = getBaseURL()
+          const toAbsolute = (url: string) => {
+            if (!url) return ""
+            if (url.startsWith("http://") || url.startsWith("https://")) return url
+            return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`
+          }
+          const urls = (product.images?.map((i) => i.url) || (product.thumbnail ? [product.thumbnail] : [])).map(toAbsolute)
+          return urls.map((u, index) => (
+            <meta key={index} itemProp="image" content={u} />
+          ))
+        })()}
         
         {/* Brand information */}
         <div itemProp="brand" itemScope itemType="https://schema.org/Brand" style={{ display: 'none' }}>
@@ -159,9 +168,38 @@ export default async function ProductTemplate({
               <meta
                 itemProp="price"
                 content={(function () {
-                  const v = product.variants?.[0]?.calculated_price as any
-                  const amount = typeof v === "number" ? v : v?.calculated_amount
-                  return typeof amount === "number" ? (amount / 100).toFixed(2) : "199.00"
+                  const wantedCurrency = (region?.currency_code || 'INR').toUpperCase()
+                  const variants = Array.isArray(product.variants) ? product.variants : []
+                  const amounts: number[] = []
+                  for (const v of variants as any[]) {
+                    const cp = v?.calculated_price
+                    if (cp && cp.currency_code && cp.currency_code.toUpperCase() === wantedCurrency && cp.calculated_amount !== undefined) {
+                      const amt = Number(cp.calculated_amount)
+                      if (!Number.isNaN(amt)) amounts.push(amt)
+                      continue
+                    }
+                    const matchInPrices = (v?.prices || []).find((p: any) => p?.currency_code && p.currency_code.toUpperCase() === wantedCurrency)
+                    if (matchInPrices && matchInPrices.amount !== undefined) {
+                      const amt = Number(matchInPrices.amount)
+                      if (!Number.isNaN(amt)) amounts.push(amt)
+                    }
+                  }
+                  const best = amounts.length > 0 ? Math.min(...amounts) : null
+                  const minor = best !== null ? best : (function () {
+                    const any: number[] = []
+                    for (const v of variants as any[]) {
+                      const cp = v?.calculated_price
+                      if (cp && cp.calculated_amount !== undefined) {
+                        const amt = Number(cp.calculated_amount)
+                        if (!Number.isNaN(amt)) any.push(amt)
+                      } else if (Array.isArray(v?.prices) && v.prices.length > 0) {
+                        const amt = Number(v.prices[0]?.amount)
+                        if (!Number.isNaN(amt)) any.push(amt)
+                      }
+                    }
+                    return any.length > 0 ? Math.min(...any) : 0
+                  })()
+                  return (Number(minor) / 100).toFixed(2)
                 })()}
               />
               <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
@@ -242,8 +280,8 @@ export default async function ProductTemplate({
         itemType="https://schema.org/AggregateRating"
       >
         {/* Use dynamic rating metadata */}
-        <meta itemProp="ratingValue" content={reviewData.average_rating.toFixed(1)} />
-        <meta itemProp="reviewCount" content={reviewData.count.toString()} />
+        <meta itemProp="ratingValue" content={(typeof reviewData.average_rating === 'number' && reviewData.average_rating > 0 ? reviewData.average_rating : 0).toFixed(1)} />
+        <meta itemProp="reviewCount" content={String(typeof reviewData.count === 'number' && reviewData.count >= 0 ? reviewData.count : 0)} />
         <meta itemProp="bestRating" content="5" />
         <meta itemProp="worstRating" content="1" />
         
