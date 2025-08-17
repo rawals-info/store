@@ -133,17 +133,10 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             "name": "Taj Petha"
           },
           "category": product.category || "Indian Sweets",
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "2500",
-            "bestRating": "5",
-            "worstRating": "1"
-          },
           // Ensure each Product has a direct Offer for rich-result eligibility
           "offers": {
             "@type": "Offer",
-            "price": product.price || "199",
+            "price": "",
             "priceCurrency": "INR",
             "availability": "https://schema.org/InStock",
             "itemCondition": "https://schema.org/NewCondition",
@@ -154,7 +147,7 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             }
           }
         },
-        "price": product.price || "199",
+        "price": "",
         "priceCurrency": "INR",
         "availability": "https://schema.org/InStock",
         "seller": {

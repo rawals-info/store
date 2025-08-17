@@ -214,29 +214,7 @@ const localBusinessSchema = {
   "priceRange": "₹₹",
   "currenciesAccepted": "INR",
   "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"],
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "reviewCount": "2500",
-    "bestRating": "5",
-    "worstRating": "1"
-  },
-  "review": [
-    {
-      "@type": "Review",
-      "reviewRating": {
-        "@type": "Rating",
-        "ratingValue": "5",
-        "bestRating": "5"
-      },
-      "author": {
-        "@type": "Person",
-        "name": "Priya Sharma"
-      },
-      "reviewBody": "Best petha I've ever tasted! Fresh, authentic, and delivered quickly. Highly recommended for genuine Agra taste.",
-      "datePublished": "2024-01-15"
-    }
-  ]
+  // Removed site-level fixed ratings/reviews to avoid misleading structured data
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {

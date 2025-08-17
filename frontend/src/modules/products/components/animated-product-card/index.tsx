@@ -7,6 +7,7 @@ import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import Thumbnail from "../thumbnail"
 import { getProductReviewSummary } from "@lib/data/products"
+import { getBaseURL } from "@lib/seo"
 
 type ProductCardProps = {
   product: HttpTypes.StoreProduct
@@ -77,6 +78,51 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
   const productPrice = product.variants?.[0]?.calculated_price
   const isInStock = product.variants?.some(variant => variant.inventory_quantity && variant.inventory_quantity > 0)
   const productCategory = product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"
+  const baseUrl = getBaseURL()
+
+  const toAbsoluteUrl = (url: string) =>
+    url && (url.startsWith("http://") || url.startsWith("https://"))
+      ? url
+      : `${baseUrl}${url?.startsWith("/") ? "" : "/"}${url || ""}`
+
+  // Determine real lowest price in current region currency (minor units)
+  const findBestVariantAmountMinorUnits = () => {
+    const variants = Array.isArray(product.variants) ? product.variants : []
+    const wantedCurrency = (region?.currency_code || "INR").toUpperCase()
+
+    const matchingAmounts: number[] = []
+    for (const v of variants as any[]) {
+      const cp = v?.calculated_price
+      if (cp && cp.currency_code && cp.currency_code.toUpperCase() === wantedCurrency && cp.calculated_amount !== undefined) {
+        const amt = Number(cp.calculated_amount)
+        if (!Number.isNaN(amt)) matchingAmounts.push(amt)
+        continue
+      }
+      const prices = v?.prices || []
+      const matchInPrices = prices.find((p: any) => p?.currency_code && p.currency_code.toUpperCase() === wantedCurrency)
+      if (matchInPrices && matchInPrices.amount !== undefined) {
+        const amt = Number(matchInPrices.amount)
+        if (!Number.isNaN(amt)) matchingAmounts.push(amt)
+      }
+    }
+
+    if (matchingAmounts.length > 0) return Math.min(...matchingAmounts)
+
+    const anyAmounts: number[] = []
+    for (const v of variants as any[]) {
+      const cp = v?.calculated_price
+      if (cp && cp.calculated_amount !== undefined) {
+        const amt = Number(cp.calculated_amount)
+        if (!Number.isNaN(amt)) anyAmounts.push(amt)
+      } else if (Array.isArray(v?.prices) && v.prices.length > 0) {
+        const amt = Number(v.prices[0]?.amount)
+        if (!Number.isNaN(amt)) anyAmounts.push(amt)
+      }
+    }
+    return anyAmounts.length > 0 ? Math.min(...anyAmounts) : 0
+  }
+  const amountMinorUnits = findBestVariantAmountMinorUnits()
+  const priceMajorUnits = (Number(amountMinorUnits) / 100).toFixed(2)
   
   // Generate SEO-optimized product description
   const seoDescription = product.description 
@@ -87,21 +133,21 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "@id": `https://tajpetha.in/in/products/${product.handle}#product`,
+    "@id": `${baseUrl}/in/products/${product.handle}#product`,
     "name": product.title,
     "description": seoDescription,
-    "image": product.thumbnail ? [product.thumbnail] : ["/placeholder-image.jpg"],
-    "url": `/in/products/${product.handle}`,
+    "image": [toAbsoluteUrl(product.thumbnail || "/placeholder-image.jpg")],
+    "url": `${baseUrl}/in/products/${product.handle}`,
     "sku": product.variants?.[0]?.sku || `TAJ-${product.id}`,
     "brand": {
       "@type": "Brand",
       "name": "Taj Petha",
-      "url": "https://tajpetha.in"
+      "url": baseUrl
     },
     "category": productCategory,
     "offers": {
       "@type": "Offer",
-      "price": productPrice && typeof productPrice === 'number' ? (productPrice / 100).toFixed(2) : "199.00",
+      "price": priceMajorUnits,
       "priceCurrency": region?.currency_code?.toUpperCase() || "INR",
       "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "seller": {
@@ -109,7 +155,36 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
         "name": "Taj Petha"
       },
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-      "itemCondition": "https://schema.org/NewCondition"
+      "itemCondition": "https://schema.org/NewCondition",
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "merchantReturnLink": `${baseUrl}/in/returns`,
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 7,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn",
+        "refundType": "https://schema.org/StoreCreditRefund",
+        "inStoreReturnsOffered": false
+      },
+      "shippingDetails": [
+        {
+          "@type": "OfferShippingDetails",
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "IN"
+          },
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0.00",
+            "currency": region?.currency_code?.toUpperCase() || "INR"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 1, "unitCode": "d" },
+            "transitTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 4, "unitCode": "d" }
+          }
+        }
+      ]
     }
     // Note: aggregateRating will be added dynamically when we have real review data
   }

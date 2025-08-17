@@ -98,17 +98,11 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
             "name": `Fresh ${productType.charAt(0).toUpperCase() + productType.slice(1)}`,
             "description": `Authentic Agra ${productType} delivered fresh to ${city.name}`
             ,
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "reviewCount": "2500",
-              "bestRating": "5",
-              "worstRating": "1"
-            },
+            // Remove fake aggregateRating to avoid misleading data
             // Added direct Offer to fulfil Google Product Snippet requirements
             "offers": {
               "@type": "Offer",
-              "price": "199",
+              "price": "",
               "priceCurrency": "INR",
               "availability": "https://schema.org/InStock",
               "itemCondition": "https://schema.org/NewCondition",
