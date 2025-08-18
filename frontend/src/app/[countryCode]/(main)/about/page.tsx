@@ -1,6 +1,7 @@
 "use server"
 
 import { getRegion } from "@lib/data/regions"
+import type { Metadata } from "next"
 import { getIndiaRegion } from "@lib/constants/india-region"
 import Image from "next/image"
 import { notFound } from "next/navigation"
@@ -284,3 +285,14 @@ export default async function AboutPage(props: AboutPageProps) {
     </div>
   )
 } 
+
+export async function generateMetadata({ params }: AboutPageProps): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    title: "About Taj Petha | Authentic Agra Petha Since 2013",
+    description: "Learn about Taj Petha's heritage, quality standards, and mission to deliver authentic Agra petha across India.",
+    alternates: {
+      canonical: `https://tajpetha.in/${countryCode}/about`,
+    },
+  }
+}

@@ -2,45 +2,49 @@ import { Metadata } from "next"
 import Link from "next/link"
 import Image from "next/image"
 
-export const metadata: Metadata = {
-  title: "Petha & Namkeen Blog | Traditional Recipes & Stories | Taj Petha",
-  description: "Discover authentic Agra petha recipes, health benefits of Indian sweets, traditional namkeen methods, and heritage stories from Taj Petha experts.",
-  keywords: [
-    "petha recipes blog",
-    "namkeen health benefits",
-    "agra petha history",
-    "traditional indian sweets blog",
-    "authentic petha preparation",
-    "namkeen recipes",
-    "indian sweet making techniques",
-    "petha nutrition facts",
-    "agra food heritage",
-    "traditional sweet preservation"
-  ],
-  openGraph: {
-    title: "Petha & Namkeen Blog - Traditional Recipes & Stories",
-    description: "Explore authentic recipes, health benefits, and fascinating stories about India's beloved petha and namkeen. Expert insights from traditional sweet makers.",
-    url: "https://tajpetha.in/in/blog",
-    type: "website",
-    locale: "en_IN",
-    siteName: "Taj Petha",
-    images: [
-      {
-        url: "/blog-hero-image.webp",
-        width: 1200,
-        height: 630,
-        alt: "Traditional Petha Making Process - Taj Petha Blog"
-      }
-    ]
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Petha & Namkeen Blog | Traditional Recipes & Stories",
-    description: "Discover authentic recipes, health benefits, and heritage stories about India's beloved petha and namkeen from Taj Petha experts.",
-    images: ["/blog-hero-image.webp"],
-  },
-  alternates: {
-    canonical: "https://tajpetha.in/in/blog"
+export async function generateMetadata({ params }: { params: { countryCode: string } }): Promise<Metadata> {
+  const { countryCode } = await params
+  const canonical = `https://tajpetha.in/${countryCode}/blog`
+  return {
+    title: "Petha & Namkeen Blog | Traditional Recipes & Stories | Taj Petha",
+    description: "Discover authentic Agra petha recipes, health benefits of Indian sweets, traditional namkeen methods, and heritage stories from Taj Petha experts.",
+    keywords: [
+      "petha recipes blog",
+      "namkeen health benefits",
+      "agra petha history",
+      "traditional indian sweets blog",
+      "authentic petha preparation",
+      "namkeen recipes",
+      "indian sweet making techniques",
+      "petha nutrition facts",
+      "agra food heritage",
+      "traditional sweet preservation"
+    ],
+    openGraph: {
+      title: "Petha & Namkeen Blog - Traditional Recipes & Stories",
+      description: "Explore authentic recipes, health benefits, and fascinating stories about India's beloved petha and namkeen. Expert insights from traditional sweet makers.",
+      url: canonical,
+      type: "website",
+      locale: "en_IN",
+      siteName: "Taj Petha",
+      images: [
+        {
+          url: "/blog-hero-image.webp",
+          width: 1200,
+          height: 630,
+          alt: "Traditional Petha Making Process - Taj Petha Blog"
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Petha & Namkeen Blog | Traditional Recipes & Stories",
+      description: "Discover authentic recipes, health benefits, and heritage stories about India's beloved petha and namkeen from Taj Petha experts.",
+      images: ["/blog-hero-image.webp"],
+    },
+    alternates: {
+      canonical,
+    }
   }
 }
 
@@ -239,7 +243,8 @@ const blogListSchema = {
   }))
 }
 
-export default function BlogPage() {
+export default function BlogPage({ params }: { params: { countryCode: string } }) {
+  const { countryCode } = params
   const featuredPosts = blogPosts.filter(post => post.featured)
   const regularPosts = blogPosts.filter(post => !post.featured)
 
@@ -289,7 +294,7 @@ export default function BlogPage() {
                       <span>{post.readTime}</span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-luxury-gold transition-colors">
-                      <Link href={`/blog/${post.id}`}>
+                      <Link href={`/${countryCode}/blog/${post.id}`}>
                         {post.title}
                       </Link>
                     </h3>
@@ -301,7 +306,7 @@ export default function BlogPage() {
                         <span>{new Date(post.publishDate).toLocaleDateString('en-IN')}</span>
                       </div>
                       <Link 
-                        href={`/blog/${post.id}`}
+                        href={`/${countryCode}/blog/${post.id}`}
                         className="text-luxury-gold font-medium hover:underline"
                       >
                         Read More →
@@ -337,7 +342,7 @@ export default function BlogPage() {
                     <span>{post.readTime}</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-luxury-gold transition-colors">
-                    <Link href={`/blog/${post.id}`}>
+                    <Link href={`/${countryCode}/blog/${post.id}`}>
                       {post.title}
                     </Link>
                   </h3>
@@ -347,7 +352,7 @@ export default function BlogPage() {
                       <span>By {post.author}</span>
                     </div>
                     <Link 
-                      href={`/blog/${post.id}`}
+                      href={`/${countryCode}/blog/${post.id}`}
                       className="text-luxury-gold font-medium hover:underline text-sm"
                     >
                       Read More →
@@ -381,10 +386,10 @@ export default function BlogPage() {
         <section className="mt-12">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">Shop Our Bestsellers</h3>
           <div className="flex flex-wrap gap-3">
-            <Link href="/in/products/dry-petha" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dry Petha</Link>
-            <Link href="/in/products/chocolate-petha" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Chocolate Petha</Link>
-            <Link href="/in/products/dalmoth" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dalmoth</Link>
-            <Link href="/in/products/combo-dalmoth-petha" className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Combo Dalmoth Petha</Link>
+            <Link href={`/${countryCode}/products/dry-petha`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dry Petha</Link>
+            <Link href={`/${countryCode}/products/chocolate-petha`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Chocolate Petha</Link>
+            <Link href={`/${countryCode}/products/dalmoth`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dalmoth</Link>
+            <Link href={`/${countryCode}/products/combo-dalmoth-petha`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Combo Dalmoth Petha</Link>
           </div>
         </section>
       </div>

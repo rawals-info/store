@@ -346,7 +346,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
         <nav className="mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-sm text-gray-500">
             <li>
-              <Link href="/" className="hover:text-luxury-gold transition-colors">
+              <Link href={`/${countryCode}`} className="hover:text-luxury-gold transition-colors">
                 Home
               </Link>
             </li>
