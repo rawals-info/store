@@ -306,6 +306,42 @@ export default async function ProductTemplate({
             )}
           </div>
         </div>
+
+        {/* Only include AggregateRating microdata when real review data exists */}
+        {reviewData.count > 0 && reviewData.average_rating > 0 && (
+          <div 
+            className="sr-only"
+            itemProp="aggregateRating" 
+            itemScope 
+            itemType="https://schema.org/AggregateRating"
+          >
+            <meta itemProp="ratingValue" content={reviewData.average_rating.toFixed(1)} />
+            <meta itemProp="reviewCount" content={String(reviewData.count)} />
+            <meta itemProp="bestRating" content="5" />
+            <meta itemProp="worstRating" content="1" />
+          </div>
+        )}
+
+        {/* Attach reviews directly to the Product item (sibling of AggregateRating) */}
+        {reviewList && reviewList.length > 0 && (
+          <div style={{ display: 'none' }}>
+            {reviewList.slice(0, 5).map((review, index) => (
+              <div key={index} itemProp="review" itemScope itemType="https://schema.org/Review">
+                <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                  <meta itemProp="ratingValue" content={review.rating.toString()} />
+                  <meta itemProp="bestRating" content="5" />
+                  <meta itemProp="worstRating" content="1" />
+                </div>
+                <div itemProp="author" itemScope itemType="https://schema.org/Person">
+                  <meta itemProp="name" content={`${review.first_name} ${review.last_name}`.trim() || "Anonymous"} />
+                </div>
+                <meta itemProp="name" content={review.title || `${product.title} review`} />
+                <meta itemProp="reviewBody" content={review.content} />
+                <meta itemProp="datePublished" content={new Date().toISOString().split('T')[0]} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Product FAQs */}
@@ -315,45 +351,9 @@ export default async function ProductTemplate({
         <FaqAccordion faqs={faqs} />
       </section>
 
-      {/* Only include AggregateRating microdata when real review data exists */}
-      {reviewData.count > 0 && reviewData.average_rating > 0 && (
-        <div 
-          className="sr-only"
-          itemProp="aggregateRating" 
-          itemScope 
-          itemType="https://schema.org/AggregateRating"
-        >
-          <meta itemProp="ratingValue" content={reviewData.average_rating.toFixed(1)} />
-          <meta itemProp="reviewCount" content={String(reviewData.count)} />
-          <meta itemProp="bestRating" content="5" />
-          <meta itemProp="worstRating" content="1" />
-        </div>
-      )}
-
       <div className="content-container my-16 small:my-32">
         <ProductReviews productId={product.id} />
       </div>
-      
-      {/* Attach reviews directly to the Product item (sibling of AggregateRating), not to AggregateRating */}
-      {reviewList && reviewList.length > 0 && (
-        <div style={{ display: 'none' }}>
-          {reviewList.slice(0, 5).map((review, index) => (
-            <div key={index} itemProp="review" itemScope itemType="https://schema.org/Review">
-              <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
-                <meta itemProp="ratingValue" content={review.rating.toString()} />
-                <meta itemProp="bestRating" content="5" />
-                <meta itemProp="worstRating" content="1" />
-              </div>
-              <div itemProp="author" itemScope itemType="https://schema.org/Person">
-                <meta itemProp="name" content={`${review.first_name} ${review.last_name}`.trim() || "Anonymous"} />
-              </div>
-              <meta itemProp="name" content={review.title || `${product.title} review`} />
-              <meta itemProp="reviewBody" content={review.content} />
-              <meta itemProp="datePublished" content={new Date().toISOString().split('T')[0]} />
-            </div>
-          ))}
-        </div>
-      )}
       
       <div className="bg-luxury-cream/10 py-16">
         <div
