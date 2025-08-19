@@ -102,7 +102,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
             // Added direct Offer to fulfil Google Product Snippet requirements
             "offers": {
               "@type": "Offer",
-              "price": "",
+              "price": "0.00",
               "priceCurrency": "INR",
               "availability": "https://schema.org/InStock",
               "itemCondition": "https://schema.org/NewCondition",
@@ -110,6 +110,11 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
               "url": `https://tajpetha.in/${countryCode}/products/${productType}`,
               "seller": {
                 "@id": `https://tajpetha.in/#organization`
+              },
+              "priceSpecification": {
+                "@type": "PriceSpecification",
+                "price": "0.00",
+                "priceCurrency": "INR"
               }
             }
           },

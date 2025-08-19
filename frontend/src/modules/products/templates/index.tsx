@@ -202,9 +202,8 @@ export default async function ProductTemplate({
                   return (Number(minor) / 100).toFixed(2)
                 })()}
               />
-              <meta
-                itemProp="priceSpecification"
-                content={(function () {
+              <div itemProp="priceSpecification" itemScope itemType="https://schema.org/PriceSpecification" style={{ display: 'none' }}>
+                {(() => {
                   const wantedCurrency = (region?.currency_code || 'INR').toUpperCase()
                   const variants = Array.isArray(product.variants) ? product.variants : []
                   const amounts: number[] = []
@@ -221,10 +220,30 @@ export default async function ProductTemplate({
                       if (!Number.isNaN(amt)) amounts.push(amt)
                     }
                   }
-                  const best = amounts.length > 0 ? Math.min(...amounts) : 0
-                  return JSON.stringify({ "@type": "PriceSpecification", price: (best/100).toFixed(2), priceCurrency: wantedCurrency })
+                  const best = amounts.length > 0 ? Math.min(...amounts) : null
+                  const minor = best !== null ? best : (function () {
+                    const any: number[] = []
+                    for (const v of variants as any[]) {
+                      const cp = v?.calculated_price
+                      if (cp && cp.calculated_amount !== undefined) {
+                        const amt = Number(cp.calculated_amount)
+                        if (!Number.isNaN(amt)) any.push(amt)
+                      } else if (Array.isArray(v?.prices) && v.prices.length > 0) {
+                        const amt = Number(v.prices[0]?.amount)
+                        if (!Number.isNaN(amt)) any.push(amt)
+                      }
+                    }
+                    return any.length > 0 ? Math.min(...any) : 0
+                  })()
+                  const price = (Number(minor) / 100).toFixed(2)
+                  return (
+                    <>
+                      <meta itemProp="price" content={price} />
+                      <meta itemProp="priceCurrency" content={wantedCurrency} />
+                    </>
+                  )
                 })()}
-              />
+              </div>
               <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
               <meta itemProp="availability" content={product.variants?.some(v => v.inventory_quantity && v.inventory_quantity > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
               <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />

@@ -80,6 +80,48 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
     .toISOString()
     .split('T')[0]
   
+  // Determine price (major units) for a product using its variants
+  const computeProductPrice = (product: any): string => {
+    try {
+      const wantedCurrency = 'INR'
+      const variants = Array.isArray(product?.variants) ? product.variants : []
+      const amounts: number[] = []
+      for (const v of variants as any[]) {
+        const cp = v?.calculated_price
+        if (cp && cp.currency_code && String(cp.currency_code).toUpperCase() === wantedCurrency && cp.calculated_amount !== undefined) {
+          const amt = Number(cp.calculated_amount)
+          if (!Number.isNaN(amt)) amounts.push(amt)
+          continue
+        }
+        const matchInPrices = (v?.prices || []).find((p: any) => p?.currency_code && String(p.currency_code).toUpperCase() === wantedCurrency)
+        if (matchInPrices && matchInPrices.amount !== undefined) {
+          const amt = Number(matchInPrices.amount)
+          if (!Number.isNaN(amt)) amounts.push(amt)
+        }
+      }
+      let minorUnits: number | null = null
+      if (amounts.length > 0) {
+        minorUnits = Math.min(...amounts)
+      } else {
+        const anyAmounts: number[] = []
+        for (const v of variants as any[]) {
+          const cp = v?.calculated_price
+          if (cp && cp.calculated_amount !== undefined) {
+            const amt = Number(cp.calculated_amount)
+            if (!Number.isNaN(amt)) anyAmounts.push(amt)
+          } else if (Array.isArray(v?.prices) && v.prices.length > 0) {
+            const amt = Number(v.prices[0]?.amount)
+            if (!Number.isNaN(amt)) anyAmounts.push(amt)
+          }
+        }
+        if (anyAmounts.length > 0) minorUnits = Math.min(...anyAmounts)
+      }
+      return typeof minorUnits === 'number' ? (minorUnits / 100).toFixed(2) : '0.00'
+    } catch {
+      return '0.00'
+    }
+  }
+  
   return {
     "@context": "https://schema.org",
     "@type": "Store",
@@ -136,7 +178,7 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
           // Ensure each Product has a direct Offer for rich-result eligibility
           "offers": {
             "@type": "Offer",
-            "price": "",
+            "price": computeProductPrice(product),
             "priceCurrency": "INR",
             "availability": "https://schema.org/InStock",
             "itemCondition": "https://schema.org/NewCondition",
@@ -144,10 +186,15 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
             "seller": {
               "@id": `${baseUrl}/#organization`
+            },
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": computeProductPrice(product),
+              "priceCurrency": "INR"
             }
           }
         },
-        "price": "",
+        "price": computeProductPrice(product),
         "priceCurrency": "INR",
         "availability": "https://schema.org/InStock",
         "seller": {
