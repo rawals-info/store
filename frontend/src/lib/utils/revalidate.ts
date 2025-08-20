@@ -21,11 +21,12 @@ export function scheduleRevalidate(tag: string, delay = 75) {
       // is invoked during an RSC render.
       revalidateTag(tag)
     } catch (err: any) {
-      if (
-        process.env.NODE_ENV !== "production" &&
-        err instanceof Error &&
-        err.message?.includes("used \"revalidateTag\" during render")
-      ) {
+      const isDev = process.env.NODE_ENV !== "production"
+      const message: string | undefined = err instanceof Error ? err.message : undefined
+      const isDuringRender = Boolean(
+        message && message.includes('used "revalidateTag') && message.includes('during render')
+      )
+      if (isDev && isDuringRender) {
         // Ignore — calling revalidateTag during a server render is unsupported,
         // but not fatal. Let the next mutation-triggered revalidation handle it.
         if (process.env.NEXT_PUBLIC_DEBUG_REVALIDATE === "true") {

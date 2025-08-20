@@ -17,7 +17,7 @@ export default async function Cart() {
   const [cart, customer] = await parallelFetch([
     async () => {
       try {
-        return await retrieveCart()
+        return await retrieveCart(undefined, undefined as any, { fresh: true })
       } catch (error) {
         console.error(error)
         return null

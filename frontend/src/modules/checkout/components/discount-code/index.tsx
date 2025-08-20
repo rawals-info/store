@@ -4,7 +4,7 @@ import { Badge, Heading, Input, Label, Text, Tooltip } from "@medusajs/ui"
 import React, { useActionState } from "react";
 import { useRouter } from "next/navigation"
 
-import { applyPromotions, submitPromotionForm } from "@lib/data/cart"
+import { applyPromotions, submitPromotionForm, removePromotion } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { InformationCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
@@ -29,15 +29,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
 
   const { items = [], promotions = [] } = cart
   const removePromotionCode = async (code: string) => {
-    const remainingPromotions = promotions.filter(
-      (promotion) => promotion.code !== code
-    )
-
-    await applyPromotions(
-      remainingPromotions
-        .filter((p) => p.code !== undefined)
-        .map((p) => p.code!)
-    )
+    await removePromotion(code)
+    router.refresh()
   }
 
   const addPromotionCode = async (formData: FormData) => {

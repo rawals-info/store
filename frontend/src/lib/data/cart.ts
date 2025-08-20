@@ -28,7 +28,11 @@ import { randomUUID } from "crypto"
  * @param fields - optional - Specific fields to retrieve (defaults to FULL)
  * @returns The cart object if found, or null if not found.
  */
-export async function retrieveCart(cartId?: string, fields: string = CART_FIELDS.FULL) {
+export async function retrieveCart(
+  cartId?: string,
+  fields: string = CART_FIELDS.FULL,
+  options?: { fresh?: boolean }
+) {
   const id = cartId || (await getCartId())
 
   if (!id) {
@@ -43,10 +47,9 @@ export async function retrieveCart(cartId?: string, fields: string = CART_FIELDS
   // request bypasses any cached response, preventing issues where the
   // checkout page shows an empty cart even though items have just been
   // added.
-  const next = {
-    revalidate: 30, // Use smart caching with 30s TTL
-    tags: ["cart", `cart-${id}`],
-  }
+  const next = options?.fresh
+    ? { revalidate: 0, tags: ["cart", `cart-${id}`] }
+    : { revalidate: 30, tags: ["cart", `cart-${id}`] }
 
   return await sdk.client
     .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
@@ -56,7 +59,7 @@ export async function retrieveCart(cartId?: string, fields: string = CART_FIELDS
       },
       headers,
       next,
-    })
+    }, options?.fresh ? { cache: "no-store" } : undefined)
     .then(({ cart }) => {
       // Mark cart items and variants to help identify them in price calculations
       if (cart && cart.items) {
@@ -495,7 +498,12 @@ export async function applyPromotions(codes: string[]) {
         getCacheTag("carts"),
         getCacheTag("fulfillment")
       ])
-      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
+      scheduleRevalidates([
+        cartCacheTag,
+        fulfillmentCacheTag,
+        "cart",
+        `cart-${cartId}`,
+      ], 0)
     })
     .catch(medusaError)
 }
@@ -554,9 +562,8 @@ export async function submitPromotionForm(
   }
   try {
     await applyPromotions([code])
-    // Fetch updated cart to confirm promotion actually applied
-    const region = getIndiaRegion()
-    const cart = await retrieveCart()
+    // Fetch updated cart fresh to confirm promotion actually applied
+    const cart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
     const applied = cart?.promotions?.some((p) => p.code?.toUpperCase() === code)
     if (!applied) {
       return "Invalid or ineligible promotion code."
@@ -564,6 +571,15 @@ export async function submitPromotionForm(
   } catch (e: any) {
     return e.message
   }
+}
+
+export async function removePromotion(codeToRemove: string) {
+  const cart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
+  const remaining = (cart?.promotions || [])
+    .filter((p) => p.code && p.code.toUpperCase() !== codeToRemove.toUpperCase())
+    .map((p) => p.code!)
+
+  await applyPromotions(remaining)
 }
 
 /**
