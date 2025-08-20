@@ -8,7 +8,7 @@ import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
 import Link from "next/link"
 import { MAJOR_INDIAN_CITIES } from "@lib/seo"
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
   description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. ✅ Hygienic ✅ Traditional recipes ✅ Same-day dispatch ✅ Free shipping ₹500+",
   keywords: [
@@ -46,9 +46,6 @@ export const metadata: Metadata = {
     description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch!",
     images: ["/hero_image.webp"],
   },
-  alternates: {
-    canonical: "https://tajpetha.in/in",
-  },
   other: {
     "geo.region": "IN-UP",
     "geo.placename": "Agra",
@@ -65,7 +62,17 @@ export const metadata: Metadata = {
     "distribution": "Global",
     "revisit-after": "1 days",
   }
-};
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    ...baseMetadata,
+    alternates: {
+      canonical: `https://tajpetha.in/${countryCode}`,
+    },
+  }
+}
 
 interface HomeProps {
   params: {

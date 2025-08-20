@@ -3,6 +3,8 @@ import { listOrders } from "@lib/data/orders"
 import OrderOverview from "@modules/account/components/order-overview"
 import TransferRequestForm from "@modules/account/components/transfer-request-form"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "Orders",
   description: "View your orders",

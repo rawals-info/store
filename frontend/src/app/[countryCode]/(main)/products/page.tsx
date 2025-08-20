@@ -13,10 +13,13 @@ import { sdk } from "@lib/config"
 import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
 import type { Metadata } from "next"
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://tajpetha.in/in/products",
-  },
+export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    alternates: {
+      canonical: `https://tajpetha.in/${countryCode}/products`,
+    },
+  }
 }
 
 type SearchParams = {
@@ -82,13 +85,20 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   }
 
   // Fetch products
-  const { response } = await listProducts({
-    regionId: regionData.id,
-    queryParams,
-  })
-
-  const products = response.products
-  const productCount = response.count
+  let products: any[] = []
+  let productCount = 0
+  try {
+    const { response } = await listProducts({
+      regionId: regionData.id,
+      queryParams,
+    })
+    products = response.products
+    productCount = response.count
+  } catch (e) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("ProductsPage: listProducts failed", e)
+    }
+  }
 
   // Fetch categories and tags concurrently to reduce overall TTFB
   let categories: HttpTypes.StoreProductCategory[] = []

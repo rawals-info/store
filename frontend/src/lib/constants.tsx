@@ -1,4 +1,5 @@
 import React from "react"
+import Image from "next/image"
 import { CreditCard } from "@medusajs/icons"
 
 import Ideal from "@modules/common/icons/ideal"
@@ -32,11 +33,11 @@ export const paymentInfoMap: Record<
   },
   pp_razorpay_razorpay: {
     title: "Razorpay-UPI/Card",
-    icon: <img src="/razorpay.svg" alt="Razorpay" className="h-4 inline" />,
+    icon: <Image src="/razorpay.svg" alt="Razorpay" width={56} height={16} className="inline" />,
   },
   razorpay: {
     title: "Razorpay-UPI/Card",
-    icon: <img src="/razorpay.svg" alt="Razorpay" className="h-4 inline" />,
+    icon: <Image src="/razorpay.svg" alt="Razorpay" width={56} height={16} className="inline" />,
   },
   // Add more payment providers here
 }

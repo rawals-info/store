@@ -7,6 +7,9 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
+// Cart reads cookies for cart id and auth, so mark route dynamic to avoid static prerender errors
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "Cart | Taj Petha",
   description: "View your cart and proceed to checkout",

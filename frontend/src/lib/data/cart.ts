@@ -59,7 +59,8 @@ export async function retrieveCart(
       },
       headers,
       next,
-    }, options?.fresh ? { cache: "no-store" } : undefined)
+      ...(options?.fresh ? { cache: "no-store" } : {}),
+    })
     .then(({ cart }) => {
       // Mark cart items and variants to help identify them in price calculations
       if (cart && cart.items) {

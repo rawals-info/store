@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useState, useEffect, useRef, useCallback } from "react"
+import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
 import { MagnifyingGlass, XMark } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
@@ -234,7 +235,7 @@ const SearchBar = ({
                     }}
                   >
                     {product.thumbnail && (
-                      <img src={product.thumbnail} alt={product.title} className="w-10 h-10 object-cover rounded" />
+                      <Image src={product.thumbnail} alt={product.title} width={40} height={40} className="object-cover rounded" />
                     )}
                     <span className="text-sm text-luxury-charcoal break-words whitespace-normal">
                       {product.title}

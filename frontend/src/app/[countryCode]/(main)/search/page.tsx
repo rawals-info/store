@@ -101,7 +101,9 @@ async function SearchContent({
     return (
       <div className="py-10">
         <div className="content-container">
-          <SearchResultsHeader query="" count={0} />
+          <Suspense fallback={<div className="h-10 w-full bg-luxury-ivory/50 animate-pulse rounded" />}> 
+            <SearchResultsHeader query="" count={0} />
+          </Suspense>
           <div className="flex flex-col items-center text-center py-12">
             <h2 className="text-base-regular font-semibold mb-2">No search query</h2>
             <p className="text-small-regular text-gray-700 mb-6">
@@ -244,7 +246,9 @@ async function SearchContent({
 
           {/* Main section */}
           <div>
-            <SearchResultsHeader query={query} count={count} />
+            <Suspense fallback={<div className="h-10 w-full bg-luxury-ivory/50 animate-pulse rounded" />}> 
+              <SearchResultsHeader query={query} count={count} />
+            </Suspense>
 
             {count > 0 ? (
               <>

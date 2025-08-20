@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { clx } from "@medusajs/ui"
 import CartButton from "@modules/layout/components/cart-button"
@@ -397,11 +397,13 @@ const AnimatedHeader = () => {
             <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
               {/* Search Bar - Added to desktop view */}
               <div className="hidden small:block w-1/2 ml-8">
-                <SearchBar
-                  isHomePage={isHomePage}
-                  isScrolled={isScrolled}
-                  autoSearch={true}
-                />
+                <Suspense fallback={<div className="h-9 w-full bg-white/10 rounded" />}> 
+                  <SearchBar
+                    isHomePage={isHomePage}
+                    isScrolled={isScrolled}
+                    autoSearch={true}
+                  />
+                </Suspense>
               </div>
               
               <div className="hidden small:flex items-center gap-x-6">
@@ -488,7 +490,9 @@ const AnimatedHeader = () => {
                 </svg>
               </button>
             </div>
-            <SearchBar autoSearch={true} autoFocus={true} useCharcoal={true} />
+            <Suspense fallback={<div className="h-9 w-full bg-luxury-cream/40 rounded" />}> 
+              <SearchBar autoSearch={true} autoFocus={true} useCharcoal={true} />
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>

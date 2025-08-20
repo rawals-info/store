@@ -5,8 +5,10 @@ import PrefetchProvider from "@modules/layout/components/prefetch-provider"
 import { listIndiaRegions } from "@lib/constants/india-region"
 import { dataFetchingConfig } from "@lib/config"
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 60
+// Keep layout static by default for better caching; dynamic behavior is handled in
+// server actions and API routes. If a section requires per-request cookies, isolate
+// it in a small client component instead of forcing the whole layout dynamic.
+export const revalidate = 300
 
 // Skip static generation for account pages
 // This is necessary because account pages use cookies and server-side data

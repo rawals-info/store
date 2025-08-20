@@ -59,11 +59,21 @@ export const listProducts = async ({
   const limit = queryParams?.limit || 12
   const offset = (pageParam - 1) * limit
 
-  const { products, count } = await getProducts(
-    { ...queryParams, limit, offset },
-    region.id,
-    PRODUCT_FIELDS.LIST // Use optimized fields for product listings
-  )
+  let products: HttpTypes.StoreProduct[] = []
+  let count = 0
+  try {
+    const res = await getProducts(
+      { ...queryParams, limit, offset },
+      region.id,
+      PRODUCT_FIELDS.LIST // Use optimized fields for product listings
+    )
+    products = res.products
+    count = res.count
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("listProducts: failed to fetch products", err)
+    }
+  }
 
   const nextPage = count > offset + limit ? pageParam + 1 : null
 
