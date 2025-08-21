@@ -199,7 +199,7 @@ export default async function ProductTemplate({
                     }
                     return any.length > 0 ? Math.min(...any) : 0
                   })()
-                  return (Number(minor) / 100).toFixed(2)
+                  return Number(minor).toFixed(2)
                 })()}
               />
               <div itemProp="priceSpecification" itemScope itemType="https://schema.org/PriceSpecification" style={{ display: 'none' }}>
@@ -235,7 +235,7 @@ export default async function ProductTemplate({
                     }
                     return any.length > 0 ? Math.min(...any) : 0
                   })()
-                  const price = (Number(minor) / 100).toFixed(2)
+                  const price = Number(minor).toFixed(2)
                   return (
                     <>
                       <meta itemProp="price" content={price} />
