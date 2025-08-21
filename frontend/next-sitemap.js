@@ -70,8 +70,11 @@ module.exports = {
         disallow: ['/checkout', '/account', '/cart', '/admin'],
       }
     ],
-    // Remove problematic additional sitemaps that were causing HTML errors
+    // Primary host and sitemaps list
     host: 'https://tajpetha.in',
+    additionalSitemaps: [
+      'https://tajpetha.in/server-sitemap.xml'
+    ],
   },
 
   // Transform function to modify URLs

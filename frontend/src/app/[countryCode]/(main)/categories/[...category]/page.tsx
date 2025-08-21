@@ -140,6 +140,31 @@ export default async function CategoryPage({
 
   return (
     <>
+      {/* ItemList JSON-LD for category listings */}
+      {(() => {
+        try {
+          const items = (category?.products || []).slice(0, 60).map((p: any, idx: number) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            url: `https://tajpetha.in/${paramsData.countryCode}/products/${p.handle}`,
+            name: p.title,
+          }))
+          const itemList = {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            itemListElement: items,
+          }
+          return (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }}
+            />
+          )
+        } catch {
+          return null
+        }
+      })()}
+
       <CategoryTemplate
         category={category}
         sortBy={sortBy}

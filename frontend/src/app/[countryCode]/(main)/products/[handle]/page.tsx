@@ -73,7 +73,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     if (product.thumbnail) imageCandidates.push(product.thumbnail)
     if (ogImage) imageCandidates.push(ogImage)
     if (product.images?.length) imageCandidates.push(...product.images.map((i) => i.url))
-    const images = Array.from(new Set(imageCandidates)).slice(0, 4)
+    // Ensure absolute URLs for social previews
+    const toAbsolute = (url: string) =>
+      url && (url.startsWith("http://") || url.startsWith("https://"))
+        ? url
+        : `https://tajpetha.in${url?.startsWith("/") ? "" : "/"}${url || ""}`
+    const images = Array.from(new Set(imageCandidates)).slice(0, 4).map(toAbsolute)
 
     const keywords: string[] = [
       ...(seoKeywords || []),
