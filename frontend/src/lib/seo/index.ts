@@ -218,7 +218,7 @@ export const generateProductSchema = (
 
   // Convert to major units for schema.org price
   const finalPrice = typeof amountMinorUnits === 'number' && !Number.isNaN(amountMinorUnits)
-    ? (Number(amountMinorUnits) / 100).toFixed(2)
+    ? Number(amountMinorUnits).toFixed(2)
     : "0.00"
 
   // Format priceValidUntil properly (30 days from now)
