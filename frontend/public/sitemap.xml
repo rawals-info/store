@@ -1,49 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://tajpetha.in/twitter-image.jpg</loc><lastmod>2025-08-20T18:03:05.554Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/opengraph-image.jpg</loc><lastmod>2025-08-20T18:03:05.554Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/forgot-password</loc><lastmod>2025-08-20T18:03:05.554Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/forgot-password/in/forgot-password"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/forgot-password/in/forgot-password"/></url>
-<url><loc>https://tajpetha.in/in/about</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.9</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/about/in/about"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/about/in/about"/></url>
-<url><loc>https://tajpetha.in/in/blog</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.9</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/blog/in/blog"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/blog/in/blog"/></url>
-<url><loc>https://tajpetha.in/in/categories</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.9</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/categories/in/categories"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/categories/in/categories"/></url>
-<url><loc>https://tajpetha.in/in/collections</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/collections/in/collections"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/collections/in/collections"/></url>
-<url><loc>https://tajpetha.in/in/reset-password</loc><lastmod>2025-08-20T18:03:05.554Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/reset-password/in/reset-password"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/reset-password/in/reset-password"/></url>
-<url><loc>https://tajpetha.in/in/contact</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/contact/in/contact"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/contact/in/contact"/></url>
-<url><loc>https://tajpetha.in/in/faqs</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/faqs/in/faqs"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/faqs/in/faqs"/></url>
-<url><loc>https://tajpetha.in/in/privacy</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>yearly</changefreq><priority>0.6</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/privacy/in/privacy"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/privacy/in/privacy"/></url>
-<url><loc>https://tajpetha.in/in</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>1</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/in"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/in"/></url>
-<url><loc>https://tajpetha.in/in/returns</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.7</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/returns/in/returns"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/returns/in/returns"/></url>
-<url><loc>https://tajpetha.in/in/shipping</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.7</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/shipping/in/shipping"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/shipping/in/shipping"/></url>
-<url><loc>https://tajpetha.in/in/search/chess-redirect</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/search/chess-redirect/in/search/chess-redirect"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/search/chess-redirect/in/search/chess-redirect"/></url>
-<url><loc>https://tajpetha.in/in/terms</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>yearly</changefreq><priority>0.6</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/terms/in/terms"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/terms/in/terms"/></url>
-<url><loc>https://tajpetha.in/in/products/chocolate-petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/chocolate-petha/in/products/chocolate-petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/chocolate-petha/in/products/chocolate-petha"/></url>
-<url><loc>https://tajpetha.in/in/products/combo</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/combo/in/products/combo"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/combo/in/products/combo"/></url>
-<url><loc>https://tajpetha.in/in/products/dalmoth</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/dalmoth/in/products/dalmoth"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/dalmoth/in/products/dalmoth"/></url>
-<url><loc>https://tajpetha.in/in/products/dry-petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/dry-petha/in/products/dry-petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/dry-petha/in/products/dry-petha"/></url>
-<url><loc>https://tajpetha.in/in/products/kesar-angoori-petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/kesar-angoori-petha/in/products/kesar-angoori-petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/kesar-angoori-petha/in/products/kesar-angoori-petha"/></url>
-<url><loc>https://tajpetha.in/in/products/kesar-dry-petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/kesar-dry-petha/in/products/kesar-dry-petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/kesar-dry-petha/in/products/kesar-dry-petha"/></url>
-<url><loc>https://tajpetha.in/in/products/lal-petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/lal-petha/in/products/lal-petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/lal-petha/in/products/lal-petha"/></url>
-<url><loc>https://tajpetha.in/in/products/masala-peanuts</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/masala-peanuts/in/products/masala-peanuts"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/masala-peanuts/in/products/masala-peanuts"/></url>
-<url><loc>https://tajpetha.in/in/products/pan-petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/products/pan-petha/in/products/pan-petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/products/pan-petha/in/products/pan-petha"/></url>
-<url><loc>https://tajpetha.in/in/collections/featured-products</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/collections/featured-products/in/collections/featured-products"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/collections/featured-products/in/collections/featured-products"/></url>
-<url><loc>https://tajpetha.in/in/categories/combo1</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.9</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/categories/combo1/in/categories/combo1"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/categories/combo1/in/categories/combo1"/></url>
-<url><loc>https://tajpetha.in/in/categories/namkeen</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.9</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/categories/namkeen/in/categories/namkeen"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/categories/namkeen/in/categories/namkeen"/></url>
-<url><loc>https://tajpetha.in/in/categories/petha</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.9</priority><xhtml:link rel="alternate" hreflang="en-IN" href="https://tajpetha.in/in/categories/petha/in/categories/petha"/><xhtml:link rel="alternate" hreflang="x-default" href="https://tajpetha.in/in/categories/petha/in/categories/petha"/></url>
-<url><loc>https://tajpetha.in/in/products</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
-<url><loc>https://tajpetha.in/in/store</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/blog/authentic-agra-petha-recipe</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/blog/health-benefits-petha-namkeen</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/blog/history-agra-petha-heritage</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/blog/seasonal-namkeen-guide</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/blog/preservation-techniques-traditional-sweets</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/city/delhi</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/city/mumbai</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/city/bangalore</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/city/hyderabad</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/city/chennai</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/city/pune</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/city/kolkata</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/city/ahmedabad</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>https://tajpetha.in/in/categories/traditional-sweets</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-<url><loc>https://tajpetha.in/in/categories/gift-boxes</loc><lastmod>2025-08-20T18:03:05.555Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://tajpetha.in/in</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/products</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/categories</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/collections</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/returns</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/shipping</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tajpetha.in/in/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

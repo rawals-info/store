@@ -20,7 +20,7 @@ export default function TermsPage() {
         <section>
           <h2 className="font-display text-2xl text-luxury-charcoal mb-4">1. Introduction</h2>
           <p className="mb-4">
-            Welcome to <strong><a href="https://www.tajpetha.in" className="text-luxury-gold hover:text-luxury-darkgold">www.tajpetha.in</a></strong> (the "Website"), operated by Taj Petha ("we," "us," or "our"). These Terms & Conditions govern your use of our Website and any purchases you make. By accessing the Website, placing an order, or using our services, you agree to be bound by these Terms. Please read them carefully before proceeding with any order.
+            Welcome to <strong><a href="https://tajpetha.in" className="text-luxury-gold hover:text-luxury-darkgold">tajpetha.in</a></strong> (the "Website"), operated by Taj Petha ("we," "us," or "our"). These Terms & Conditions govern your use of our Website and any purchases you make. By accessing the Website, placing an order, or using our services, you agree to be bound by these Terms. Please read them carefully before proceeding with any order.
           </p>
         </section>
 
@@ -203,7 +203,7 @@ export default function TermsPage() {
             </li>
             <li className="flex items-center">
               <span className="text-luxury-gold mr-3 text-xl">🌐</span>
-              <span><span className="font-semibold">Website:</span> <a href="https://www.tajpetha.in" className="text-luxury-gold underline hover:text-luxury-darkgold">www.tajpetha.in</a></span>
+              <span><span className="font-semibold">Website:</span> <a href="https://tajpetha.in" className="text-luxury-gold underline hover:text-luxury-darkgold">tajpetha.in</a></span>
             </li>
             <li className="flex items-center">
               <span className="text-luxury-gold mr-3 text-xl">📞</span>
