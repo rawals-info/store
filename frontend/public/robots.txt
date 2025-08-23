@@ -32,3 +32,4 @@ Host: https://tajpetha.in
 # Sitemaps
 Sitemap: https://tajpetha.in/sitemap.xml
 Sitemap: https://tajpetha.in/server-sitemap.xml
+Sitemap: https://tajpetha.in/blog-sitemap.xml

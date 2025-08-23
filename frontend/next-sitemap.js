@@ -73,7 +73,8 @@ module.exports = {
     // Primary host and sitemaps list
     host: 'https://tajpetha.in',
     additionalSitemaps: [
-      'https://tajpetha.in/server-sitemap.xml'
+      'https://tajpetha.in/server-sitemap.xml',
+      'https://tajpetha.in/blog-sitemap.xml'
     ],
   },
 
