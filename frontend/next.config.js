@@ -167,7 +167,7 @@ const nextConfig = {
     return [
       // Force www to apex to avoid duplicate host indexing
       {
-        source: 'https://www.tajpetha.in/:path*',
+        source: '/:path*',
         has: [
           { type: 'host', value: 'www.tajpetha.in' }
         ],
