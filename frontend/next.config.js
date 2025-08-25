@@ -165,11 +165,26 @@ const nextConfig = {
 
   async redirects() {
     return [
+      // Force www to apex to avoid duplicate host indexing
+      {
+        source: 'https://www.tajpetha.in/:path*',
+        has: [
+          { type: 'host', value: 'www.tajpetha.in' }
+        ],
+        destination: 'https://tajpetha.in/:path*',
+        permanent: true,
+      },
       // SEO redirects for common misspellings
       {
         source: '/',
         destination: '/in',
         permanent: true,    
+      },
+      // Fix rare stray `/$` path crawled by bots
+      {
+        source: '/$',
+        destination: '/in',
+        permanent: true,
       },
       // Redirect Hindi placeholder paths to /in to fix 404s
       {
