@@ -42,16 +42,27 @@ export default async function ProductTemplate({
   let reviewData = { average_rating: 0, count: 0 }
   let reviewList: StoreProductReview[] = []
   try {
-    // Summary
-    const summary = await getProductReviewSummary(product.id)
-    reviewData = {
-      average_rating: typeof summary.average_rating === 'number' ? summary.average_rating : 0,
-      count: typeof summary.count === 'number' ? summary.count : 0
+    // Prefer the reviews endpoint that also returns summary fields to avoid
+    // incompatibilities between different backends.
+    const reviewsResponse = await getProductReviews({ productId: product.id, limit: 3, offset: 0 })
+
+    // Some backends include average_rating/count at the top level; fall back to
+    // computing from the returned reviews if needed.
+    const avg = (reviewsResponse as any).average_rating
+    const cnt = (reviewsResponse as any).count
+
+    if (typeof avg === 'number' && typeof cnt === 'number') {
+      reviewData = { average_rating: avg, count: cnt }
+    } else {
+      const list = (reviewsResponse as any).reviews || []
+      const computedCount = Array.isArray(list) ? list.length : 0
+      const computedAvg = computedCount > 0
+        ? list.reduce((sum: number, r: any) => sum + (Number(r.rating) || 0), 0) / computedCount
+        : 0
+      reviewData = { average_rating: computedAvg, count: computedCount }
     }
 
-    // Fetch first 3 reviews for schema markup
-    const { reviews } = await getProductReviews({ productId: product.id, limit: 3, offset: 0 })
-    reviewList = reviews || []
+    reviewList = (reviewsResponse as any).reviews || []
   } catch (error) {
     console.log("Could not fetch reviews; proceeding without defaults")
   }
@@ -258,6 +269,7 @@ export default async function ProductTemplate({
               
               {/* Return policy information */}
               <div itemProp="hasMerchantReturnPolicy" itemScope itemType="https://schema.org/MerchantReturnPolicy" style={{ display: 'none' }}>
+                <meta itemProp="applicableCountry" content="IN" />
                 <meta itemProp="returnPolicyCategory" content="https://schema.org/MerchantReturnFiniteReturnWindow" />
                 <meta itemProp="merchantReturnDays" content="7" />
                 <meta itemProp="refundType" content="https://schema.org/StoreCreditRefund" />

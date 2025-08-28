@@ -206,9 +206,16 @@ export const generateProductSchema = (
   }
 
   const amountMinorUnits = findBestVariantAmountMinorUnits()
-  const isInStock = product.variants?.some(variant => 
-    variant.inventory_quantity && variant.inventory_quantity > 0
-  )
+  // Align stock logic with storefront/cart behavior:
+  // In stock if ANY variant either doesn't manage inventory, allows backorder,
+  // or has a positive inventory quantity.
+  const isInStock = (product.variants || []).some((variant: any) => {
+    if (!variant) return false
+    if (variant.allow_backorder) return true
+    if (variant.manage_inventory === false) return true
+    const qty = typeof variant.inventory_quantity === 'number' ? variant.inventory_quantity : 0
+    return qty > 0
+  })
   const productCategory = product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"
   const primaryVariant = product.variants?.[0]
 
@@ -311,6 +318,7 @@ export const generateProductSchema = (
       },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
+        "applicableCountry": "IN",
         "merchantReturnLink": `${baseUrl}/${countryCode}/returns`,
         "url": `${baseUrl}/${countryCode}/returns`,
         "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
