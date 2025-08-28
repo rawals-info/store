@@ -9,6 +9,7 @@ export async function generateMetadata({ params }: { params: { countryCode: stri
   return {
     title: "Petha & Namkeen Blog | Traditional Recipes & Stories | Taj Petha",
     description: "Discover authentic Agra petha recipes, health benefits of Indian sweets, traditional namkeen methods, and heritage stories from Taj Petha experts.",
+    robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
     keywords: [
       "petha recipes blog",
       "namkeen health benefits",

@@ -102,6 +102,30 @@ export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl
 
+    // Allowlisted public routes that should NOT trigger geo/country redirects.
+    // These are served as 200s via internal rewrites to `/in/...` so that
+    // Google doesn't see a redirect when crawling canonical, country-less URLs.
+    const COUNTRYLESS_ALLOWLIST: RegExp[] = [
+      /^\/$/,
+      /^\/about(\/|$)/,
+      /^\/contact(\/|$)/,
+      /^\/shipping(\/|$)/,
+      /^\/terms(\/|$)/,
+      /^\/privacy(\/|$)/,
+      /^\/returns(\/|$)/,
+      /^\/faqs(\/|$)/,
+      /^\/collections(\/|$)/,
+      /^\/categories(\/|$)/,
+      /^\/products\/[A-Za-z0-9-_]+(\/|$)/,
+      /^\/city\/[A-Za-z0-9-_]+(\/|$)/,
+      /^\/petha(\/|$)/,
+      /^\/namkeen(\/|$)/,
+      /^\/agra-petha(\/|$)/,
+    ]
+    if (COUNTRYLESS_ALLOWLIST.some((re) => re.test(pathname))) {
+      return NextResponse.next()
+    }
+
     // 1) Host normalization: force apex domain (no www)
     const currentHost = request.nextUrl.hostname
     if (currentHost && currentHost.toLowerCase().startsWith('www.')) {

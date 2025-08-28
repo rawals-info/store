@@ -68,6 +68,13 @@ export async function generateMetadata({ params }: { params: Promise<{ countryCo
   const { countryCode } = await params
   return {
     ...baseMetadata,
+    robots: {
+      index: true,
+      follow: true,
+      "max-image-preview": 'large',
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
     alternates: {
       canonical: `https://tajpetha.in/${countryCode}`,
     },

@@ -42,6 +42,14 @@ module.exports = {
       { loc: '/in/terms', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/privacy', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/returns', priority: 0.7, changefreq: 'monthly' },
+      // Frequently crawled but not indexed — explicitly include to boost signals
+      { loc: '/in/store', priority: 0.8, changefreq: 'daily' },
+      { loc: '/in/city/delhi', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/mumbai', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/bangalore', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/categories/gift-boxes', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/categories/traditional-sweets', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/blog/seasonal-namkeen-guide', priority: 0.7, changefreq: 'monthly' },
     ]
 
     return basePaths.map(p => ({

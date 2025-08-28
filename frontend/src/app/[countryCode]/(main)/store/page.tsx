@@ -8,6 +8,7 @@ import { getIndiaRegion } from "@lib/constants/india-region"
 export const metadata: Metadata = {
   title: "Store",
   description: "Explore our exclusive collection of authentic Agra petha sweets.",
+  robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
 }
 
 // Segment config should be a constant, not a function

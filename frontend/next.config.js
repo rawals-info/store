@@ -123,6 +123,10 @@ const nextConfig = {
           {
             key: 'Expires',
             value: new Date(Date.now() + 31536000000).toUTCString()
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow'
           }
         ]
       },
@@ -133,6 +137,10 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, s-maxage=31536000, immutable'
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow'
           }
         ]
       },
@@ -156,7 +164,7 @@ const nextConfig = {
           },
           {
             key: 'X-Robots-Tag',
-            value: 'index, follow'
+            value: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
           }
         ]
       }
@@ -174,61 +182,42 @@ const nextConfig = {
         destination: 'https://tajpetha.in/:path*',
         permanent: true,
       },
-      // SEO redirects for common misspellings
-      {
-        source: '/',
-        destination: '/in',
-        permanent: true,    
-      },
-      // Fix rare stray `/$` path crawled by bots
-      {
-        source: '/$',
-        destination: '/in',
-        permanent: true,
-      },
-      // Redirect Hindi placeholder paths to /in to fix 404s
-      {
-        source: '/hi',
-        destination: '/in',
-        permanent: true,
-      },
-      {
-        source: '/in/hi',
-        destination: '/in',
-        permanent: true,
-      },
-      {
-        source: '/petha',
-        destination: '/in/categories/petha',
-        permanent: true,
-      },
-      {
-        source: '/namkeen',
-        destination: '/in/categories/namkeen',
-        permanent: true,
-      },
-      {
-        source: '/agra-petha',
-        destination: '/in/categories/petha',
-        permanent: true,
-      },
-      // Consolidate duplicate URLs by redirecting to country-scoped paths
-      {
-        source: '/city/:city',
-        destination: '/in/city/:city',
-        permanent: true,
-      },
-      {
-        source: '/product/:slug',
-        destination: '/in/products/:slug',
-        permanent: true,
-      }
     ]
   },
 
   async rewrites() {
-    // No rewrites that change visible URLs; use redirects above to avoid duplicate content.
-    return []
+    // Serve core pages at non-country paths as 200s by internally routing to /in/... paths.
+    return [
+      // Home
+      { source: '/', destination: '/in' },
+      { source: '/hi', destination: '/in' },
+      { source: '/in/hi', destination: '/in' },
+
+      // Static informational pages
+      { source: '/about', destination: '/in/about' },
+      { source: '/contact', destination: '/in/contact' },
+      { source: '/shipping', destination: '/in/shipping' },
+      { source: '/terms', destination: '/in/terms' },
+      { source: '/privacy', destination: '/in/privacy' },
+      { source: '/returns', destination: '/in/returns' },
+      { source: '/faqs', destination: '/in/faqs' },
+
+      // Collections and categories
+      { source: '/collections', destination: '/in/collections' },
+      { source: '/categories', destination: '/in/categories' },
+      { source: '/categories/:slug', destination: '/in/categories/:slug' },
+
+      // Products
+      { source: '/products/:slug', destination: '/in/products/:slug' },
+
+      // City landing pages
+      { source: '/city/:city', destination: '/in/city/:city' },
+
+      // Common marketing aliases
+      { source: '/petha', destination: '/in/categories/petha' },
+      { source: '/namkeen', destination: '/in/categories/namkeen' },
+      { source: '/agra-petha', destination: '/in/categories/petha' },
+    ]
   },
 
   webpack: (config, { dev, isServer }) => {
