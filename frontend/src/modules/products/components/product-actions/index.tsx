@@ -466,9 +466,43 @@ export default function ProductActions({
           )}
         </div>
 
-        {/* Only show the variant info section if there's more than one variant */}
-        {selectedVariant && product.variants && product.variants.length > 1 && (
-          <ProductVariantInfo variant={selectedVariant} product={product} />
+        {/* Show variant info for both single and multiple variants */}
+        {selectedVariant && (
+          <div className="mt-4">
+            {/* Variant Display Box */}
+            <div className="bg-luxury-cream/30 border border-luxury-gold/30 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-luxury-gold rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm text-luxury-charcoal/70 mb-1">Selected Variant:</p>
+                  <p className="font-medium text-luxury-charcoal">
+                    {selectedVariant.title && selectedVariant.title !== "Default Variant" 
+                      ? selectedVariant.title
+                      : "Standard Variant"
+                    }
+                  </p>
+                  {selectedVariant.sku && (
+                    <p className="text-xs text-luxury-charcoal/60 mt-1">
+                      SKU: {selectedVariant.sku}
+                    </p>
+                  )}
+                </div>
+                {/* Variant options display */}
+                {selectedVariant.options && selectedVariant.options.length > 0 && (
+                  <div className="text-right">
+                    <div className="space-y-1">
+                      {selectedVariant.options.map((option, index) => (
+                        <div key={index} className="text-sm">
+                          <span className="text-luxury-charcoal/60">{(option as any).title || "Option"}:</span>
+                          <span className="ml-2 font-medium text-luxury-charcoal">{option.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
 
         <div className="mt-4">
@@ -532,8 +566,8 @@ export default function ProductActions({
         </div>
       </div>
 
-      {/* Only show MobileActions when there are multiple variants */}
-      {product.variants && product.variants.length > 1 && (
+      {/* Show MobileActions for all products with variants */}
+      {product.variants && product.variants.length > 0 && (
         <MobileActions
           product={product}
           options={options}

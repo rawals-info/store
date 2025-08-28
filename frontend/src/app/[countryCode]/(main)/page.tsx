@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { listCollections } from "@lib/data/collections";
 import { getIndiaRegion } from "@lib/constants/india-region";
 import { getCachedCategories } from "@modules/home/components/categories";
-import { getHomepageProducts } from "@lib/data/products";
+import { getHomepageProducts, getProductReviewSummary, getProductReviews } from "@lib/data/products";
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
 import Link from "next/link"
 import { MAJOR_INDIAN_CITIES } from "@lib/seo"
@@ -88,7 +88,11 @@ interface HomeProps {
 }
 
 // Enhanced Product Schema for homepage featured products
-const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
+const createHomepageSchema = (
+  featuredProducts: any[],
+  countryCode: string,
+  reviewDataById: Record<string, { average_rating: number; count: number; review?: { rating: number; content: string; author: string; date: string } }>
+) => {
   const baseUrl = "https://tajpetha.in";
   const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -189,6 +193,39 @@ const createHomepageSchema = (featuredProducts: any[], countryCode: string) => {
             "name": "Taj Petha"
           },
           "category": product.category || "Indian Sweets",
+          ...(function () {
+            const summary = reviewDataById[product.id]
+            if (!summary || !(summary.count > 0)) return {}
+            const agg: any = {
+              "@type": "AggregateRating",
+              "ratingValue": summary.average_rating.toFixed(2),
+              "reviewCount": String(summary.count),
+              "bestRating": "5",
+              "worstRating": "1",
+            }
+            const rev = summary.review
+            return {
+              "aggregateRating": agg,
+              ...(rev
+                ? {
+                    "review": [
+                      {
+                        "@type": "Review",
+                        "reviewRating": {
+                          "@type": "Rating",
+                          "ratingValue": String(rev.rating),
+                          "bestRating": "5",
+                          "worstRating": "1",
+                        },
+                        "author": { "@type": "Person", "name": rev.author },
+                        "reviewBody": rev.content,
+                        "datePublished": rev.date,
+                      },
+                    ],
+                  }
+                : {}),
+            }
+          })(),
           // Ensure each Product has a direct Offer for rich-result eligibility
           "offers": {
             "@type": "Offer",
@@ -333,8 +370,30 @@ export default async function Home({ params }: HomeProps) {
     return null;
   }
 
-  // Generate dynamic schema based on actual products
-  const homepageSchema = createHomepageSchema(featuredProducts, countryCode);
+  // Pull lightweight review summaries for the first few featured products to satisfy GSC product snippet enhancements on homepage entities
+  const reviewDataById: Record<string, { average_rating: number; count: number; review?: { rating: number; content: string; author: string; date: string } }> = {}
+  try {
+    for (const p of (featuredProducts || []).slice(0, 8)) {
+      try {
+        const summary = await getProductReviewSummary(p.id)
+        const reviewsResp = await getProductReviews({ productId: p.id, limit: 1, offset: 0 })
+        const list: any[] = (reviewsResp as any).reviews || []
+        reviewDataById[p.id] = {
+          average_rating: typeof summary?.average_rating === 'number' ? summary.average_rating : (typeof (reviewsResp as any).average_rating === 'number' ? (reviewsResp as any).average_rating : 0),
+          count: typeof summary?.count === 'number' ? summary.count : (typeof (reviewsResp as any).count === 'number' ? (reviewsResp as any).count : (Array.isArray(list) ? list.length : 0)),
+          review: list && list.length > 0 ? {
+            rating: Number(list[0]?.rating) || 0,
+            content: String(list[0]?.content || ''),
+            author: `${list[0]?.first_name || ''} ${list[0]?.last_name || ''}`.trim() || 'Customer',
+            date: new Date(list[0]?.created_at || Date.now()).toISOString().split('T')[0],
+          } : undefined,
+        }
+      } catch {}
+    }
+  } catch {}
+
+  // Generate dynamic schema based on actual products (with review data)
+  const homepageSchema = createHomepageSchema(featuredProducts, countryCode, reviewDataById);
 
   return (
     <>
