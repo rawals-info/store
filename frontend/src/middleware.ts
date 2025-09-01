@@ -102,27 +102,18 @@ export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl
 
-    // Allowlisted public routes that should NOT trigger geo/country redirects.
-    // These are served as 200s via internal rewrites to `/in/...` so that
-    // Google doesn't see a redirect when crawling canonical, country-less URLs.
-    const COUNTRYLESS_ALLOWLIST: RegExp[] = [
-      /^\/$/,
-      /^\/about(\/|$)/,
-      /^\/contact(\/|$)/,
-      /^\/shipping(\/|$)/,
-      /^\/terms(\/|$)/,
-      /^\/privacy(\/|$)/,
-      /^\/returns(\/|$)/,
-      /^\/faqs(\/|$)/,
-      /^\/collections(\/|$)/,
-      /^\/categories(\/|$)/,
-      /^\/products\/[A-Za-z0-9-_]+(\/|$)/,
-      /^\/city\/[A-Za-z0-9-_]+(\/|$)/,
-      /^\/petha(\/|$)/,
-      /^\/namkeen(\/|$)/,
-      /^\/agra-petha(\/|$)/,
+    // Skip middleware for paths that should be handled by next.config.js redirects
+    // Let next.config.js redirects handle non-country paths like /about → /in/about
+    const skipPaths = [
+      /^\/api\//,
+      /^\/\_next\//,
+      /^\/favicon\.ico$/,
+      /^\/sitemap\.xml$/,
+      /^\/robots\.txt$/,
+      /^\/server-sitemap\.xml$/,
+      /^\/blog-sitemap\.xml$/,
     ]
-    if (COUNTRYLESS_ALLOWLIST.some((re) => re.test(pathname))) {
+    if (skipPaths.some((re) => re.test(pathname))) {
       return NextResponse.next()
     }
 

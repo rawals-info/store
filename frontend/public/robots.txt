@@ -9,6 +9,7 @@ Disallow: /_next/*
 Disallow: /api/*
 Disallow: /reset-password
 Disallow: /forgot-password
+Disallow: /payment-icons/*
 
 # Googlebot
 User-agent: Googlebot

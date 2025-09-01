@@ -274,7 +274,7 @@ export default function Footer() {
               <FontAwesomeIcon icon={faCcVisa} />
               <FontAwesomeIcon icon={faCcMastercard} />
               <FontAwesomeIcon icon={faCcAmex} />
-              <Image src="/upi.svg" alt="UPI" width={48} height={24} />
+              <Image src="/payment-icons/upi.svg" alt="UPI" width={48} height={24} />
             </div>
           </div>
         </div>

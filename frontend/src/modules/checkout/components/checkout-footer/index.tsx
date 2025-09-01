@@ -26,10 +26,10 @@ const CheckoutFooter = () => {
         <div className="flex flex-col items-center md:items-start">
           <h3 className="text-sm font-medium text-luxury-charcoal mb-4">Secure Payment Methods</h3>
           <div className="flex items-center gap-x-3">
-            <Image src="/visa.svg" alt="Visa" width={56} height={32} />
-            <Image src="/mastercard.svg" alt="Mastercard" width={56} height={32} />
+            <Image src="/payment-icons/visa.svg" alt="Visa" width={56} height={32} />
+            <Image src="/payment-icons/mastercard.svg" alt="Mastercard" width={56} height={32} />
             <Image src="/amex.svg" alt="American Express" width={56} height={32} />
-            <Image src="/paypal.svg" alt="PayPal" width={56} height={32} />
+            <Image src="/payment-icons/paypal.svg" alt="PayPal" width={56} height={32} />
           </div>
         </div>
         

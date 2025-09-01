@@ -112,9 +112,9 @@ const nextConfig = {
           }
         ]
       },
-      // Image caching headers
+      // Image caching headers (non-SVG images don't need indexing)
       {
-        source: '/(.*)\\.(jpg|jpeg|png|webp|avif|ico|svg)',
+        source: '/(.*)\\.(jpg|jpeg|png|webp|avif|ico)',
         headers: [
           {
             key: 'Cache-Control',
@@ -127,6 +127,20 @@ const nextConfig = {
           {
             key: 'X-Robots-Tag',
             value: 'noindex, nofollow'
+          }
+        ]
+      },
+      // SVG caching headers (without noindex since some SVGs might be content)
+      {
+        source: '/(.*)\\.(svg)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, s-maxage=31536000, immutable'
+          },
+          {
+            key: 'Expires',
+            value: new Date(Date.now() + 31536000000).toUTCString()
           }
         ]
       },
@@ -182,41 +196,37 @@ const nextConfig = {
         destination: 'https://tajpetha.in/:path*',
         permanent: true,
       },
+      // Redirect non-country paths to canonical /in paths to fix GSC issues
+      { source: '/about', destination: '/in/about', permanent: true },
+      { source: '/contact', destination: '/in/contact', permanent: true },
+      { source: '/shipping', destination: '/in/shipping', permanent: true },
+      { source: '/terms', destination: '/in/terms', permanent: true },
+      { source: '/privacy', destination: '/in/privacy', permanent: true },
+      { source: '/returns', destination: '/in/returns', permanent: true },
+      { source: '/faqs', destination: '/in/faqs', permanent: true },
+      { source: '/collections', destination: '/in/collections', permanent: true },
+      { source: '/categories', destination: '/in/categories', permanent: true },
+      { source: '/categories/:slug', destination: '/in/categories/:slug', permanent: true },
+      { source: '/products/:slug', destination: '/in/products/:slug', permanent: true },
+      { source: '/city/:city', destination: '/in/city/:city', permanent: true },
+      // Marketing aliases
+      { source: '/petha', destination: '/in/categories/petha', permanent: true },
+      { source: '/namkeen', destination: '/in/categories/namkeen', permanent: true },
+      { source: '/agra-petha', destination: '/in/categories/petha', permanent: true },
+      
+      // Fix soft 404: redirect /store to /products (both with and without country code)
+      { source: '/store', destination: '/in/products', permanent: true },
+      { source: '/in/store', destination: '/in/products', permanent: true },
     ]
   },
 
   async rewrites() {
-    // Serve core pages at non-country paths as 200s by internally routing to /in/... paths.
+    // Keep only essential rewrites that don't cause SEO conflicts
     return [
-      // Home
+      // Home page rewrite (keep this as it's the main entry point)
       { source: '/', destination: '/in' },
       { source: '/hi', destination: '/in' },
       { source: '/in/hi', destination: '/in' },
-
-      // Static informational pages
-      { source: '/about', destination: '/in/about' },
-      { source: '/contact', destination: '/in/contact' },
-      { source: '/shipping', destination: '/in/shipping' },
-      { source: '/terms', destination: '/in/terms' },
-      { source: '/privacy', destination: '/in/privacy' },
-      { source: '/returns', destination: '/in/returns' },
-      { source: '/faqs', destination: '/in/faqs' },
-
-      // Collections and categories
-      { source: '/collections', destination: '/in/collections' },
-      { source: '/categories', destination: '/in/categories' },
-      { source: '/categories/:slug', destination: '/in/categories/:slug' },
-
-      // Products
-      { source: '/products/:slug', destination: '/in/products/:slug' },
-
-      // City landing pages
-      { source: '/city/:city', destination: '/in/city/:city' },
-
-      // Common marketing aliases
-      { source: '/petha', destination: '/in/categories/petha' },
-      { source: '/namkeen', destination: '/in/categories/namkeen' },
-      { source: '/agra-petha', destination: '/in/categories/petha' },
     ]
   },
 

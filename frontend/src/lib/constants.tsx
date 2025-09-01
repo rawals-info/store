@@ -33,11 +33,11 @@ export const paymentInfoMap: Record<
   },
   pp_razorpay_razorpay: {
     title: "Razorpay-UPI/Card",
-    icon: <Image src="/razorpay.svg" alt="Razorpay" width={56} height={16} className="inline" />,
+    icon: <Image src="/payment-icons/razorpay.svg" alt="Razorpay" width={56} height={16} className="inline" />,
   },
   razorpay: {
     title: "Razorpay-UPI/Card",
-    icon: <Image src="/razorpay.svg" alt="Razorpay" width={56} height={16} className="inline" />,
+    icon: <Image src="/payment-icons/razorpay.svg" alt="Razorpay" width={56} height={16} className="inline" />,
   },
   // Add more payment providers here
 }
