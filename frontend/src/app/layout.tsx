@@ -1,6 +1,8 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata, Viewport } from "next"
 import { GoogleAnalytics } from "@lib/analytics/google-analytics"
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 import Script from "next/script";
 import "styles/globals.css"
 import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
@@ -286,6 +288,10 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         
         {/* Analytics Scripts */}
         <GoogleAnalytics />
+        
+        {/* Vercel Analytics and Speed Insights */}
+        <Analytics />
+        <SpeedInsights />
         
         <main className="relative">{props.children}</main>
       </body>
