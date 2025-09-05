@@ -160,40 +160,55 @@ export function getProductPrice({
       return null
     }
 
-    // First try to find variants with prices array
-    const variantsWithPricesArray = product.variants.filter((v: any) => 
-      v.prices && v.prices.length > 0
-    )
-    
-    // If we have variants with prices array, use those
-    if (variantsWithPricesArray.length > 0) {
-      // Find the cheapest variant based on the first price in the prices array
-      const cheapestVariant = variantsWithPricesArray.reduce((cheapest: any, current: any) => {
-        const cheapestPrice = cheapest.prices[0]?.amount || Number.MAX_VALUE
-        const currentPrice = current.prices[0]?.amount || Number.MAX_VALUE
-        return currentPrice < cheapestPrice ? current : cheapest
-      }, variantsWithPricesArray[0])
+    // Get all variants with valid pricing data
+    const validVariants = product.variants.filter((v: any) => {
+      // Check if variant has calculated_price
+      const hasCalculatedPrice = v.calculated_price && 
+        (typeof v.calculated_price.calculated_amount === 'number' && v.calculated_price.calculated_amount > 0)
       
-      return getPricesForVariant(cheapestVariant)
-    }
-    
-    // Fallback to calculated_price if no prices array is available
-    const variantsWithCalculatedPrice = product.variants.filter((v: any) => 
-      v.calculated_price && (typeof v.calculated_price.calculated_amount === 'number' || v.calculated_price.calculated_amount)
-    )
-    
-    // If no variants have calculated_price either, return the first variant
-    if (variantsWithCalculatedPrice.length === 0) {
+      // Check if variant has prices array
+      const hasPricesArray = v.prices && v.prices.length > 0 && 
+        v.prices.some((p: any) => p.amount && Number(p.amount) > 0)
+      
+      return hasCalculatedPrice || hasPricesArray
+    })
+
+    if (validVariants.length === 0) {
+      // If no valid variants, return first variant as fallback
       return getPricesForVariant(product.variants[0])
     }
 
-    // Find the cheapest variant based on calculated_price
-    const cheapestVariant: any = variantsWithCalculatedPrice
-      .sort((a: any, b: any) => {
-        const aAmount = Number(a.calculated_price.calculated_amount) || 0
-        const bAmount = Number(b.calculated_price.calculated_amount) || 0
-        return aAmount - bAmount
-      })[0]
+    // Find the cheapest variant by comparing all possible price sources
+    const cheapestVariant = validVariants.reduce((cheapest: any, current: any) => {
+      let cheapestAmount = Number.MAX_VALUE
+      let currentAmount = Number.MAX_VALUE
+
+      // Get price for cheapest variant
+      if (cheapest.calculated_price?.calculated_amount) {
+        cheapestAmount = Number(cheapest.calculated_price.calculated_amount)
+      } else if (cheapest.prices?.length > 0) {
+        // Find the lowest price in the prices array
+        const lowestPrice = cheapest.prices.reduce((min: any, price: any) => {
+          const amount = Number(price.amount) || Number.MAX_VALUE
+          return amount < min ? amount : min
+        }, Number.MAX_VALUE)
+        cheapestAmount = lowestPrice
+      }
+
+      // Get price for current variant  
+      if (current.calculated_price?.calculated_amount) {
+        currentAmount = Number(current.calculated_price.calculated_amount)
+      } else if (current.prices?.length > 0) {
+        // Find the lowest price in the prices array
+        const lowestPrice = current.prices.reduce((min: any, price: any) => {
+          const amount = Number(price.amount) || Number.MAX_VALUE
+          return amount < min ? amount : min
+        }, Number.MAX_VALUE)
+        currentAmount = lowestPrice
+      }
+
+      return currentAmount < cheapestAmount ? current : cheapest
+    }, validVariants[0])
 
     return getPricesForVariant(cheapestVariant)
   }

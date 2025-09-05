@@ -8,31 +8,37 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 
-// Helper function to safely get product price
+// Helper function to safely get cheapest product price
 const getProductPrice = (product: HttpTypes.StoreProduct): number => {
   if (!product.variants || product.variants.length === 0) {
     return 0
   }
   
-  // Try to get price from variants
-  const variant = product.variants[0] as any
+  // Find the cheapest variant
+  let cheapestPrice = Number.MAX_VALUE
   
-  // First check if we have prices array
-  if (variant.prices && variant.prices.length > 0) {
-    const price = variant.prices[0]
-    // Prices in the prices array are in cents, convert to dollars
-    return price.amount ? price.amount / 100 : 0
+  for (const variant of product.variants as any[]) {
+    let variantPrice = 0
+    
+    // First check if we have calculated_price
+    if (variant.calculated_price?.calculated_amount) {
+      variantPrice = typeof variant.calculated_price.calculated_amount === 'number' 
+        ? variant.calculated_price.calculated_amount 
+        : 0
+    }
+    // Then check if we have prices array
+    else if (variant.prices && variant.prices.length > 0) {
+      const price = variant.prices[0]
+      // Prices in the prices array are in cents, convert to dollars
+      variantPrice = price.amount ? price.amount / 100 : 0
+    }
+    
+    if (variantPrice > 0 && variantPrice < cheapestPrice) {
+      cheapestPrice = variantPrice
+    }
   }
   
-  // Then check if we have calculated_price
-  if (variant.calculated_price?.calculated_amount) {
-    // calculated_price is already in dollars
-    return typeof variant.calculated_price.calculated_amount === 'number' 
-      ? variant.calculated_price.calculated_amount 
-      : 0
-  }
-  
-  return 0
+  return cheapestPrice === Number.MAX_VALUE ? 0 : cheapestPrice
 }
 
 interface ProductsContentProps {
