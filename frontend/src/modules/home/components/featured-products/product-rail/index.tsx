@@ -20,7 +20,7 @@ export default async function ProductRail({
     // Cast to any to allow collection_id field not present in official typings
     queryParams: {
       collection_id: collection.id,
-      fields: "*variants.calculated_price",
+      fields: "id,title,handle,description,thumbnail,*images,status,weight,length,height,width,*variants,*variants.prices,*variants.options,*options,*options.values,collection_id,*categories,tags,metadata",
     } as any,
   })
 

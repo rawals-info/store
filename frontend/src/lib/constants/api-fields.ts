@@ -6,20 +6,20 @@
 // Product fields for different contexts
 export const PRODUCT_FIELDS = {
   // Minimal fields for product listings (cards, grids)
-  LIST: "id,title,handle,thumbnail,status,*variants.prices",
+  LIST: "id,title,handle,thumbnail,status,*variants,*variants.prices,*variants.calculated_price",
   
   // Essential fields for product detail pages
   // Include *images to fetch all related images
   DETAIL: "id,title,handle,description,thumbnail,*images,status,weight,length,height,width,*variants,*variants.prices,*variants.options,*options,*options.values,collection_id,*categories,tags,metadata",
   
   // Fields for search results
-  SEARCH: "id,title,handle,thumbnail,status,*variants.prices",
+  SEARCH: "id,title,handle,thumbnail,status,*variants,*variants.prices,*variants.calculated_price",
   
   // Fields for cart items (minimal for performance)
-  CART_ITEM: "id,title,handle,thumbnail,*variants.prices",
+  CART_ITEM: "id,title,handle,thumbnail,*variants,*variants.prices,*variants.calculated_price",
   
   // Fields for related products
-  RELATED: "id,title,handle,thumbnail,status,*variants.prices",
+  RELATED: "id,title,handle,thumbnail,status,*variants,*variants.prices,*variants.calculated_price",
 } as const
 
 // Cart fields for different contexts

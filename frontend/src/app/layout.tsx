@@ -221,6 +221,8 @@ const localBusinessSchema = {
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   const baseUrl = getBaseURL()
+  const enableServiceWorker = process.env.NEXT_PUBLIC_ENABLE_SW === 'true'
+  const isProd = process.env.NODE_ENV === 'production'
   return (
     <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable}`}>
       <head>
@@ -240,20 +242,36 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/manifest.json" />
         
-        {/* Service Worker Registration */}
+        {/* Service Worker Registration (gated by env + prod) */}
         <script dangerouslySetInnerHTML={{
           __html: `
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                  .then(function(registration) {
-                    console.log('SW registered: ', registration);
-                  })
-                  .catch(function(registrationError) {
-                    console.log('SW registration failed: ', registrationError);
+            (function() {
+              var enableSW = ${enableServiceWorker && isProd ? 'true' : 'false'};
+              if ('serviceWorker' in navigator) {
+                if (enableSW) {
+                  window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('/sw.js')
+                      .then(function (registration) {
+                        console.log('[SW] registered', registration.scope);
+                      })
+                      .catch(function (err) {
+                        console.warn('[SW] registration failed', err);
+                      });
                   });
-              });
-            }
+                } else {
+                  // Ensure any previously installed SW is removed and stale caches are cleared
+                  navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    regs.forEach(function (r) { r.unregister(); });
+                  });
+                  if (window.caches && caches.keys) {
+                    caches.keys().then(function (keys) {
+                      keys.filter(function (k) { return k.indexOf('taj-petha') === 0; })
+                        .forEach(function (k) { caches.delete(k); });
+                    });
+                  }
+                }
+              }
+            })();
           `
         }} />
 
