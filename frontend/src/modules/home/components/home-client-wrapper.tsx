@@ -318,7 +318,6 @@ export default function HomeClientWrapper({
                           {product.variants && product.variants[0] ? (
                             <ProductPrice 
                               product={product}
-                              variantId={product.variants[0]?.id} 
                             />
                           ) : (
                             <span>Price not available</span>
