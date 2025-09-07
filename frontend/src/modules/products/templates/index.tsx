@@ -256,7 +256,22 @@ export default async function ProductTemplate({
                 })()}
               </div>
               <meta itemProp="priceCurrency" content={region?.currency_code?.toUpperCase() || "INR"} />
-              <meta itemProp="availability" content={product.variants?.some(v => v.inventory_quantity && v.inventory_quantity > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
+              {(() => {
+                const variants = Array.isArray(product.variants) ? product.variants : []
+                const isInStock = variants.some((v: any) => {
+                  if (!v) return false
+                  if (v.allow_backorder) return true
+                  if (v.manage_inventory === false) return true
+                  const qty = typeof v.inventory_quantity === 'number' ? v.inventory_quantity : 0
+                  return qty > 0
+                })
+                return (
+                  <meta
+                    itemProp="availability"
+                    content={isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
+                  />
+                )
+              })()}
               <meta itemProp="itemCondition" content="https://schema.org/NewCondition" />
               {/* Added price validity date */}
               <meta itemProp="priceValidUntil" content={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} />
