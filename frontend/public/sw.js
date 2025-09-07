@@ -1,6 +1,6 @@
 // Service Worker for Taj Petha - safer caching strategy
 // Version bump to invalidate previous caches
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const RUNTIME_CACHE = `taj-petha-runtime-${CACHE_VERSION}`;
 const STATIC_CACHE = `taj-petha-static-${CACHE_VERSION}`;
 
@@ -56,26 +56,25 @@ self.addEventListener('fetch', (event) => {
 
   // Avoid caching Next.js data routes and APIs
   const url = new URL(request.url);
-  if (url.pathname.startsWith('/_next/data') || url.pathname.startsWith('/api/')) {
+  // Completely bypass Next.js internals so headers and caching are handled by the platform/CDN
+  if (
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/api/')
+  ) {
     return; // let the network handle it
   }
 
-  // Network-first for navigation (HTML) to prevent stale pages
+  // Always network for navigation (do not cache HTML) to avoid stale HTML referencing old chunks
   if (isNavigationRequest(request)) {
     event.respondWith(
       fetch(request)
-        .then((networkResponse) => {
-          const copy = networkResponse.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
-          return networkResponse;
-        })
         .catch(() => caches.match(request))
     );
     return;
   }
 
-  // For static assets with cache-busting hashes, use cache-first
-  if (/\.(?:js|css|woff2?|ttf|eot|png|jpg|jpeg|gif|svg|webp)$/i.test(url.pathname)) {
+  // For first-party images and fonts (excluding Next internals), use cache-first
+  if (/\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot)$/i.test(url.pathname)) {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
