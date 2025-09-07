@@ -168,6 +168,13 @@ const nextConfig = {
           }
         ]
       },
+      // Ensure service worker is always fetched fresh
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        ]
+      },
       // City pages with SEO headers
       {
         source: '/city/(.*)',

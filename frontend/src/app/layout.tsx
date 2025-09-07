@@ -250,9 +250,19 @@ export default function RootLayout(props: { children: React.ReactNode }) {
               if ('serviceWorker' in navigator) {
                 if (enableSW) {
                   window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('/sw.js')
+                    // Use buildId param to force updates when a new deployment happens
+                    var buildId = (window.__NEXT_DATA__ && window.__NEXT_DATA__.buildId) || Date.now();
+                    var swUrl = '/sw.js?build=' + encodeURIComponent(buildId);
+                    navigator.serviceWorker.register(swUrl)
                       .then(function (registration) {
                         console.log('[SW] registered', registration.scope);
+                        // Proactively check for updates on first load and when tab becomes visible
+                        try { registration.update(); } catch (e) {}
+                        document.addEventListener('visibilitychange', function() {
+                          if (document.visibilityState === 'visible') {
+                            try { registration.update(); } catch (e) {}
+                          }
+                        });
                       })
                       .catch(function (err) {
                         console.warn('[SW] registration failed', err);
