@@ -1,0 +1,130 @@
+
+> medusa-next@1.0.3 build
+> NODE_ENV=production next build
+
+   ▲ Next.js 15.3.4
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./src/app/[countryCode]/(main)/contact/page.tsx
+Error:   [31mx[0m The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+    ,-[[36;1;4m/home/sid/petha_store/frontend/src/app/[countryCode]/(main)/contact/page.tsx[0m:13:1]
+ [2m10[0m |     alternates: { canonical: `https://tajpetha.in/${countryCode}/contact` },
+ [2m11[0m |   }
+ [2m12[0m | }
+ [2m13[0m | "use client"
+    : [35;1m^^^^^^^^^^^^[0m
+ [2m14[0m | 
+ [2m15[0m | import { useState } from "react"
+ [2m15[0m | import { Button } from "@medusajs/ui"
+    `----
+  [31mx[0m You're importing a component that needs `useState`. This React hook only works in a client component. To fix, mark the file (or its parent) with the `"use client"` directive.
+  [31m|[0m
+  [31m|[0m  Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+  [31m|[0m
+
+    ,-[[36;1;4m/home/sid/petha_store/frontend/src/app/[countryCode]/(main)/contact/page.tsx[0m:15:1]
+ [2m12[0m | }
+ [2m13[0m | "use client"
+ [2m14[0m | 
+ [2m15[0m | import { useState } from "react"
+    : [35;1m         ^^^^^^^^[0m
+ [2m16[0m | import { Button } from "@medusajs/ui"
+ [2m17[0m | 
+ [2m17[0m | interface ContactPageProps {
+    `----
+
+Import trace for requested module:
+./src/app/[countryCode]/(main)/contact/page.tsx
+
+./src/app/[countryCode]/(main)/returns/page.tsx
+Error:   [31mx[0m "metadata" and "generateMetadata" cannot be exported at the same time, please keep one of them. Read more: https://nextjs.org/docs/app/api-reference/file-conventions/metadata
+  [31m|[0m
+
+    ,-[[36;1;4m/home/sid/petha_store/frontend/src/app/[countryCode]/(main)/returns/page.tsx[0m:5:1]
+ [2m 2[0m | 
+ [2m 3[0m | export const dynamic = 'force-static'
+ [2m 4[0m | 
+ [2m 5[0m | export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+    : [35;1m                      ^^^^^^^^^^^^^^^^[0m
+ [2m 6[0m |   const { countryCode } = await params
+ [2m 7[0m |   return {
+ [2m 8[0m |     title: "Returns & Refunds | Taj Petha",
+ [2m 9[0m |     description: "Learn about Taj Petha's returns and refunds policy for perishable products and transit damages.",
+ [2m10[0m |     alternates: { canonical: `https://tajpetha.in/${countryCode}/returns` },
+ [2m11[0m |   }
+ [2m12[0m | }
+ [2m13[0m | import type { Metadata } from "next"
+ [2m14[0m | 
+ [2m15[0m | export const metadata: Metadata = {
+    : [33;1m             ^^^^^^^^[0m
+ [2m16[0m |   title: "Returns & Exchanges Policy | Taj Petha",
+ [2m17[0m |   description: "Read our returns and exchanges policy for Taj Petha. Learn about eligibility, documentation requirements, and how to submit a claim.",
+ [2m18[0m | }
+    `----
+
+Import trace for requested module:
+./src/app/[countryCode]/(main)/returns/page.tsx
+
+./src/app/[countryCode]/(main)/shipping/page.tsx
+Error:   [31mx[0m "metadata" and "generateMetadata" cannot be exported at the same time, please keep one of them. Read more: https://nextjs.org/docs/app/api-reference/file-conventions/metadata
+  [31m|[0m
+
+    ,-[[36;1;4m/home/sid/petha_store/frontend/src/app/[countryCode]/(main)/shipping/page.tsx[0m:5:1]
+ [2m 2[0m | 
+ [2m 3[0m | export const dynamic = 'force-static'
+ [2m 4[0m | 
+ [2m 5[0m | export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+    : [35;1m                      ^^^^^^^^^^^^^^^^[0m
+ [2m 6[0m |   const { countryCode } = await params
+ [2m 7[0m |   return {
+ [2m 8[0m |     title: "Shipping Policy | Taj Petha",
+ [2m 9[0m |     description: "Read about shipping times, coverage, and free delivery thresholds for Taj Petha orders in India.",
+ [2m10[0m |     alternates: { canonical: `https://tajpetha.in/${countryCode}/shipping` },
+ [2m11[0m |   }
+ [2m12[0m | }
+ [2m13[0m | import type { Metadata } from "next"
+ [2m14[0m | 
+ [2m15[0m | export const metadata: Metadata = {
+    : [33;1m             ^^^^^^^^[0m
+ [2m16[0m |   title: "Shipping & Delivery | Taj Petha",
+ [2m17[0m |   description: "Learn about our shipping, delivery, and refund policies for Taj Petha. We ensure your Agra pethas arrive fresh and intact.",
+ [2m18[0m | }
+    `----
+
+Import trace for requested module:
+./src/app/[countryCode]/(main)/shipping/page.tsx
+
+./src/app/[countryCode]/(main)/terms/page.tsx
+Error:   [31mx[0m "metadata" and "generateMetadata" cannot be exported at the same time, please keep one of them. Read more: https://nextjs.org/docs/app/api-reference/file-conventions/metadata
+  [31m|[0m
+
+    ,-[[36;1;4m/home/sid/petha_store/frontend/src/app/[countryCode]/(main)/terms/page.tsx[0m:5:1]
+ [2m 2[0m | 
+ [2m 3[0m | export const dynamic = 'force-static'
+ [2m 4[0m | 
+ [2m 5[0m | export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+    : [35;1m                      ^^^^^^^^^^^^^^^^[0m
+ [2m 6[0m |   const { countryCode } = await params
+ [2m 7[0m |   return {
+ [2m 8[0m |     title: "Terms & Conditions | Taj Petha",
+ [2m 9[0m |     description: "Read our terms and conditions for Taj Petha. Learn about your rights and responsibilities when ordering our delicious Agra pethas.",
+ [2m10[0m |     alternates: { canonical: `https://tajpetha.in/${countryCode}/terms` },
+ [2m11[0m |   }
+ [2m12[0m | }
+ [2m13[0m | import type { Metadata } from "next"
+ [2m14[0m | 
+ [2m15[0m | export const metadata: Metadata = {
+    : [33;1m             ^^^^^^^^[0m
+ [2m16[0m |   title: "Terms & Conditions | Taj Petha",
+ [2m17[0m |   description: "Read our terms and conditions for Taj Petha. Learn about your rights and responsibilities when ordering our delicious Agra pethas.",
+ [2m18[0m |   robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
+    `----
+
+Import trace for requested module:
+./src/app/[countryCode]/(main)/terms/page.tsx
+
+
+> Build failed because of webpack errors

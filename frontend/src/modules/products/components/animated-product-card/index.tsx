@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Text } from "@medusajs/ui"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import React, { useEffect, useState } from "react"
 import Thumbnail from "../thumbnail"
 import { getProductReviewSummary } from "@lib/data/products"
@@ -177,7 +178,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
         whileHover="hover"
         className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
       >
-        <Link href={`/in/products/${product.handle}`} className="block" aria-label={`View ${product.title} details`}>
+        <LocalizedClientLink href={`/products/${product.handle}`} className="block" aria-label={`View ${product.title} details`}>
           {/* Product Image Container */}
           <div className="relative aspect-square overflow-hidden bg-gray-50">
             {!isInStock && (
@@ -288,7 +289,7 @@ const AnimatedProductCard = ({ product, region, index = 0 }: ProductCardProps) =
               </span>
             </div>
           </div>
-        </Link>
+        </LocalizedClientLink>
 
         {/* No hidden structured data on listing cards */}
       </motion.article>

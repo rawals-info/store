@@ -206,7 +206,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href={`/in/products?category=${productType}`}
+              href={`/${countryCode}/products?category=${productType}`}
               className="bg-luxury-gold text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-yellow-600 transition-colors"
             >
               Order {productType.charAt(0).toUpperCase() + productType.slice(1)} Now
@@ -308,7 +308,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
               Each product is crafted with care and delivered fresh to {city.name}.
             </p>
             <Link
-              href={`/in/products?category=${productType}`}
+              href={`/${countryCode}/products?category=${productType}`}
               className="inline-block bg-luxury-gold text-white px-12 py-4 rounded-xl font-bold text-lg hover:bg-yellow-600 transition-colors shadow-lg"
             >
               Browse All {productType.charAt(0).toUpperCase() + productType.slice(1)} Products
@@ -375,7 +375,7 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href={`/in/products?category=${productType}`}
+              href={`/${countryCode}/products?category=${productType}`}
               className="bg-white text-luxury-gold px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
             >
               Browse {productType.charAt(0).toUpperCase() + productType.slice(1)} Collection

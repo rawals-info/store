@@ -1,9 +1,4 @@
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Shipping & Delivery | Taj Petha",
-  description: "Learn about our shipping, delivery, and refund policies for Taj Petha. We ensure your Agra pethas arrive fresh and intact.",
-}
+export const dynamic = 'force-static'
 
 export default function ShippingPage() {
   return (

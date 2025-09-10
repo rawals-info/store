@@ -78,7 +78,7 @@ const Hero = () => {
           </p>
           
           <div className="flex flex-col small:flex-row gap-6 justify-center mt-8">
-            <Link href="/products" passHref>
+            <Link href="/in/products" passHref>
               <Button
                 className="luxury-btn px-8 py-4 text-base"
                 variant="secondary"
@@ -86,7 +86,7 @@ const Hero = () => {
                 Shop Our Signature Petha
               </Button>
             </Link>
-            <Link href="/products?flavors" passHref>
+            <Link href="/in/products?flavors" passHref>
               <Button
                 className="luxury-btn-outline px-8 py-4 text-base hover:bg-transparent hover:text-luxury-gold border-2"
                 variant="secondary"
@@ -141,7 +141,7 @@ const Hero = () => {
               <div className="text-center">
                 <h3 className="font-display text-xl mb-2">Taj Mahal & Monuments</h3>
                 <p className="text-serif-italic text-sm text-luxury-charcoal/80 mb-5">Timeless recreations of world heritage</p>
-                <Link href="/categories/monuments" className="text-luxury-gold uppercase text-xs tracking-wider font-medium hover:opacity-80 transition-opacity">
+                <Link href="/in/categories/monuments" className="text-luxury-gold uppercase text-xs tracking-wider font-medium hover:opacity-80 transition-opacity">
                   Explore Collection
                 </Link>
               </div>
@@ -172,7 +172,7 @@ const Hero = () => {
               <div className="text-center">
                 <h3 className="font-display text-xl mb-2">Spiritual Artifacts</h3>
                 <p className="text-serif-italic text-sm text-luxury-charcoal/80 mb-5">Sacred art with meticulous detail</p>
-                <Link href="/categories/sculptures" className="text-luxury-gold uppercase text-xs tracking-wider font-medium hover:opacity-80 transition-opacity">
+                <Link href="/in/categories/sculptures" className="text-luxury-gold uppercase text-xs tracking-wider font-medium hover:opacity-80 transition-opacity">
                   Explore Collection
                 </Link>
               </div>
@@ -203,7 +203,7 @@ const Hero = () => {
               <div className="text-center">
                 <h3 className="font-display text-xl mb-2">Functional Artwork</h3>
                 <p className="text-serif-italic text-sm text-luxury-charcoal/80 mb-5">Where art meets everyday luxury</p>
-                <Link href="/categories/tables" className="text-luxury-gold uppercase text-xs tracking-wider font-medium hover:opacity-80 transition-opacity">
+                <Link href="/in/categories/tables" className="text-luxury-gold uppercase text-xs tracking-wider font-medium hover:opacity-80 transition-opacity">
                   Explore Collection
                 </Link>
               </div>

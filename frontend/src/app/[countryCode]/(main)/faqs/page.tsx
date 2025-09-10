@@ -1,10 +1,19 @@
 import FaqAccordion from "@components/FaqAccordion"
+import type { Metadata } from "next"
 
-export const metadata = {
-  title: "FAQs | Taj Petha",
-  description:
-    "Frequently asked questions about Taj Petha's authentic Agra pethas. Learn about our products, shipping, storage, and more.",
+export const dynamic = 'force-static'
+
+export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    title: "FAQs | Taj Petha",
+    description: "Frequently asked questions about Taj Petha's authentic Agra pethas. Learn about our products, shipping, storage, and more.",
+    alternates: {
+      canonical: `https://tajpetha.in/${countryCode}/faqs`,
+    },
+  }
 }
+
 
 const faqs = [
   {

@@ -1,9 +1,4 @@
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Returns & Exchanges Policy | Taj Petha",
-  description: "Read our returns and exchanges policy for Taj Petha. Learn about eligibility, documentation requirements, and how to submit a claim.",
-}
+export const dynamic = 'force-static'
 
 export default function ReturnsPage() {
   return (

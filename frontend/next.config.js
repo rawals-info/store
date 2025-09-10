@@ -144,6 +144,14 @@ const nextConfig = {
           }
         ]
       },
+      // Explicitly prevent indexing of internal payment icon SVGs
+      {
+        source: '/payment-icons/(.*)\\.(svg)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, s-maxage=31536000, immutable' },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' }
+        ]
+      },
       // Static assets caching
       {
         source: '/(.*)\\.(js|css|woff|woff2|ttf|eot)',

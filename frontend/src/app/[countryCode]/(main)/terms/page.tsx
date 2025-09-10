@@ -1,10 +1,4 @@
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Terms & Conditions | Taj Petha",
-  description: "Read our terms and conditions for Taj Petha. Learn about your rights and responsibilities when ordering our delicious Agra pethas.",
-  robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
-}
+export const dynamic = 'force-static'
 
 export default function TermsPage() {
   return (

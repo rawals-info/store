@@ -1,9 +1,17 @@
 import type { Metadata } from "next"
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Taj Petha",
-  description: "Read our privacy policy for Taj Petha. Learn how we collect, use, and protect your personal information when you visit our website.",
-  robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
+export const dynamic = 'force-static'
+
+export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    title: "Privacy Policy | Taj Petha",
+    description: "Read our privacy policy for Taj Petha. Learn how we collect, use, and protect your personal information when you visit our website.",
+    robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
+    alternates: {
+      canonical: `https://tajpetha.in/${countryCode}/privacy`,
+    },
+  }
 }
 
 export default function PrivacyPage() {
