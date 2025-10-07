@@ -43,7 +43,7 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
                       alt={category.displayName}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      unoptimized
                     />
                     <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300"></div>
                   </div>

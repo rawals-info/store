@@ -190,11 +190,11 @@ export default function Footer() {
                     Namkeen
                   </LocalizedClientLink>
                 </li>
-                <li>
+                {/* <li>
                   <LocalizedClientLink href="/categories/combo" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Combo
                   </LocalizedClientLink>
-                </li>
+                </li> */}
                 <li>
                   <LocalizedClientLink href="/categories/gift-basket" className="text-white hover:text-luxury-gold transition-colors duration-300">
                     Gift Basket

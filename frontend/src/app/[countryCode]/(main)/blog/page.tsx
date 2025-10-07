@@ -231,7 +231,7 @@ export default function BlogPage({ params }: { params: { countryCode: string } }
             <Link href={`/${countryCode}/products/dry-petha`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dry Petha</Link>
             <Link href={`/${countryCode}/products/chocolate-petha`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Chocolate Petha</Link>
             <Link href={`/${countryCode}/products/dalmoth`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Dalmoth</Link>
-            <Link href={`/${countryCode}/products/combo`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Combo Dalmoth Petha</Link>
+            {/* <Link href={`/${countryCode}/products/combo`} className="text-sm text-gray-700 hover:text-luxury-gold underline-offset-2 hover:underline">Combo Dalmoth Petha</Link> */}
           </div>
         </section>
       </div>

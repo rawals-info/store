@@ -72,28 +72,28 @@ export const CATEGORY_FAQS: Record<string, QA[]> = {
     },
   ],
 
-  combo1: [
-    {
-      question: "What’s included in the combo?",
-      answer:
-        "Carefully curated petha and namkeen combinations for gifting and personal use. Exact items are listed on the product page under ‘In the Box’.",
-    },
-    {
-      question: "Is it suitable for gifting?",
-      answer:
-        "Absolutely. Combos are packed securely with protective cushioning and can include a personalized message on request.",
-    },
-    {
-      question: "How soon can a gift combo be delivered?",
-      answer:
-        "Same‑day dispatch for orders placed before noon, with expedited shipping options at checkout for faster delivery.",
-    },
-    {
-      question: "How should I store the contents?",
-      answer:
-        "Keep petha refrigerated after opening and namkeen sealed in a cool, dry place. Refer to each pack for detailed instructions.",
-    },
-  ],
+  // combo1: [ // commented out
+  //   {
+  //     question: "What's included in the combo?",
+  //     answer:
+  //       "Carefully curated petha and namkeen combinations for gifting and personal use. Exact items are listed on the product page under 'In the Box'.",
+  //   },
+  //   {
+  //     question: "Is it suitable for gifting?",
+  //     answer:
+  //       "Absolutely. Combos are packed securely with protective cushioning and can include a personalized message on request.",
+  //   },
+  //   {
+  //     question: "How soon can a gift combo be delivered?",
+  //     answer:
+  //       "Same‑day dispatch for orders placed before noon, with expedited shipping options at checkout for faster delivery.",
+  //   },
+  //   {
+  //     question: "How should I store the contents?",
+  //     answer:
+  //       "Keep petha refrigerated after opening and namkeen sealed in a cool, dry place. Refer to each pack for detailed instructions.",
+  //   },
+  // ],
 
   // Fallback FAQs used when no specific category/collection match is found
   default: [

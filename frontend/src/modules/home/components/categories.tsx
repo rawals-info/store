@@ -36,7 +36,7 @@ export const getCachedCategories = cache(async () => {
 const Categories = async () => {
   // Fetch categories and keep only the four main parent categories we want to feature
   const allCategories = await getCachedCategories()
-  const displayHandles = ["petha", "namkeen", "dalmoth", "combo1"]
+  const displayHandles = ["petha", "namkeen", "dalmoth"] // "combo1" commented out
   const categories = allCategories.filter((cat) => {
     if (cat.parent_category) return false // skip children
     const handle = (cat.handle || "").replace(/^\//, "") // normalize leading slash

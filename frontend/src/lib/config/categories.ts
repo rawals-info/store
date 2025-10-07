@@ -17,23 +17,23 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   petha: {
     displayName: "Petha",
     handle: "petha",
-    imageSrc: "/categories/petha.png",
+    imageSrc: "/images/petha.png",
   },
   namkeen: {
     displayName: "Namkeen",
     handle: "namkeen",
-    imageSrc: "/categories/namkeen.png",
+    imageSrc: "/images/namkeen.png",
   },
   dalmoth: {
     displayName: "Dalmoth",
     handle: "dalmoth",
-    imageSrc: "/categories/dalmoth.png",
+    imageSrc: "/images/dalmoth.png",
   },
-  combo: {
-    displayName: "Combo (Petha + Dalmoth)",
-    handle: "combo1",
-    imageSrc: "/categories/combo.png",
-  },
+  // combo: {
+  //   displayName: "Combo (Petha + Dalmoth)",
+  //   handle: "combo1",
+  //   imageSrc: "/images/combo.png",
+  // },
 }
 
 /**
