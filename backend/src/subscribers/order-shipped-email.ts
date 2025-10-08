@@ -10,13 +10,23 @@ export default async function orderShippedEmail({
 }: SubscriberArgs<{ order_id: string }>) {
   const orderId = event.data.order_id
 
+  console.log(`📦 [ShippingEmail] Processing order ${orderId}`)
+
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   const order: any = await orderService.retrieveOrder(orderId, {
-    relations: ["shipping_address", "fulfillments"],
+    select: [
+      "id",
+      "display_id",
+      "email",
+      "created_at",
+    ],
+    relations: ["shipping_address"],
   })
 
-  // @ts-ignore
-  const tracking = order.fulfillments?.[0]?.tracking_numbers?.[0]
+  console.log(`📧 [ShippingEmail] Sending shipping notification to ${order.email}`)
+
+  // For now, we don't have tracking info - can be added later when fulfillment is created
+  const tracking = null
 
   const body = `
     <p>Dear ${order.shipping_address?.first_name ?? order.email},</p>
@@ -63,6 +73,8 @@ export default async function orderShippedEmail({
     subject: `Your Sweet Order #${order.display_id} Has Shipped! 🚚🍯 - Taj Petha`,
     html: buildLuxuryTemplate("Your Sweets Are On The Way!", body),
   })
+
+  console.log(`✅ [ShippingEmail] Shipping notification sent successfully to ${order.email}`)
 }
 
 export const config: SubscriberConfig = {
