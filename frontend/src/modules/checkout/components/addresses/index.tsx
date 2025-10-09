@@ -77,7 +77,14 @@ const Addresses = ({
       errors["email"] = "Please enter a valid email address"
     }
     
-    // Postal code format validation could be added here
+    // Validate phone format - must be +91 followed by exactly 10 digits
+    const phone = formData.get("shipping_address.phone") as string
+    if (phone) {
+      // Check if it matches +91 followed by exactly 10 digits
+      if (!/^\+91\d{10}$/.test(phone)) {
+        errors["shipping_address.phone"] = "Phone must be +91 followed by exactly 10 digits"
+      }
+    }
     
     return errors
   }
@@ -152,8 +159,32 @@ const Addresses = ({
     city: shipping_address?.city || "",
     postal_code: shipping_address?.postal_code || "",
     province: shipping_address?.province || "",
-    phone: shipping_address?.phone || "",
+    phone: shipping_address?.phone || "+91",
   })
+
+  // Format phone number to ensure +91 prefix and max 10 digits
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digit characters except +
+    let cleaned = value.replace(/[^\d+]/g, "")
+    
+    // If doesn't start with +91, add it
+    if (!cleaned.startsWith("+91")) {
+      // If starts with 91, add +
+      if (cleaned.startsWith("91")) {
+        cleaned = "+" + cleaned
+      } else if (cleaned.startsWith("+")) {
+        cleaned = "+91" + cleaned.substring(1)
+      } else {
+        // Just digits, add +91
+        cleaned = "+91" + cleaned
+      }
+    }
+    
+    // Limit to +91 followed by max 10 digits
+    const prefix = "+91"
+    const digits = cleaned.substring(3).replace(/\D/g, "").substring(0, 10)
+    return prefix + digits
+  }
 
   return (
     <div>
@@ -210,19 +241,31 @@ const Addresses = ({
               errors={formErrors}
               onChange={handleFieldChange}
             />
-            <Input
-              label="Phone"
-              name="shipping_address.phone"
-              autoComplete="tel"
-              value={autoFields.phone ?? ""}
-              required
-              className="luxury-input"
-              errors={formErrors}
-              onChange={(e) => {
-                handleFieldChange(e)
-                setAutoFields({ ...autoFields, phone: e.target.value })
-              }}
-            />
+            <div className="relative">
+              <Input
+                label="Phone (+91 XXXXXXXXXX)"
+                name="shipping_address.phone"
+                autoComplete="tel"
+                type="tel"
+                value={autoFields.phone ?? "+91"}
+                required
+                className="luxury-input"
+                errors={formErrors}
+                onChange={(e) => {
+                  const formatted = formatPhoneNumber(e.target.value)
+                  handleFieldChange({
+                    ...e,
+                    target: { ...e.target, value: formatted }
+                  })
+                  setAutoFields({ ...autoFields, phone: formatted })
+                }}
+              />
+              {autoFields.phone && autoFields.phone.length > 3 && (
+                <div className="text-xs text-luxury-charcoal/60 mt-1">
+                  {autoFields.phone.length - 3}/10 digits
+                </div>
+              )}
+            </div>
 
             <Input
               label="Company (optional)"
