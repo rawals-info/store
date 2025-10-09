@@ -80,15 +80,28 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     const autocomplete = new window.google.maps.places.Autocomplete(
       inputRef.current,
       {
-        fields: ["address_components", "formatted_address"],
+        fields: ["address_components", "formatted_address", "place_id"],
         types: ["address"],
         componentRestrictions: { country: "in" },
       }
     )
 
+    // Prevent form submission on Enter key
+    const input = inputRef.current
+    const preventSubmit = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && document.querySelector(".pac-container:not(.pac-hidden)")) {
+        e.preventDefault()
+      }
+    }
+    input.addEventListener("keydown", preventSubmit)
+
     autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace()
-      if (!place.address_components) return
+      
+      // If no address components, the user might have just pressed Enter without selecting
+      if (!place.address_components) {
+        return
+      }
 
       const components = place.address_components as Array<any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -134,14 +147,27 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           country_code: country ? country.toLowerCase() : "",
           ...d,
         } as PlaceDetails
+        
+        // Immediately trigger onChange to sync the input value with React state
+        if (inputRef.current && onChange) {
+          const syntheticEvent = {
+            target: {
+              name: name ?? "",
+              value: merged.address_1,
+            },
+          } as React.ChangeEvent<HTMLInputElement>
+          onChange(syntheticEvent)
+        }
+        
+        // Call onSelect with all the address details
         onSelect(merged)
       }
 
-      // Initial emit with what we have
-      emitDetails({})
-
-      // If postal code missing, run an extra reverse-geocode to try and fetch it
-      if (!postal_code && window.google?.maps?.Geocoder) {
+      // If postal code is present, emit immediately
+      if (postal_code) {
+        emitDetails({})
+      } else if (window.google?.maps?.Geocoder) {
+        // If postal code missing, run an extra reverse-geocode to try and fetch it
         const geocoder = new window.google.maps.Geocoder()
         geocoder.geocode({ placeId: place.place_id }, (results: any, status: any) => {
           if (status === "OK" && results && results[0]) {
@@ -156,16 +182,24 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               province: stateComp ? stateComp.long_name : province,
               city: cityComp ? cityComp.long_name : city,
             })
+          } else {
+            // Even if geocoding fails, emit what we have
+            emitDetails({})
           }
         })
+      } else {
+        // No geocoder available, emit what we have
+        emitDetails({})
       }
     })
 
     return () => {
       // Cleanup listeners when component unmounts
+      input.removeEventListener("keydown", preventSubmit)
       autocomplete.unbindAll()
     }
-  }, [scriptLoaded, onSelect])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scriptLoaded])
 
   return (
     <Input

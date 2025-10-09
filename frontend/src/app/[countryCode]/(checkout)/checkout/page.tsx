@@ -4,14 +4,15 @@ import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import CheckoutSkeleton from "@modules/skeletons/templates/checkout-skeleton"
 import { Metadata } from "next"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 import { Suspense } from "react"
 import "./checkout.css"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 
-// Enhanced timeout settings for checkout
-const CHECKOUT_TIMEOUT = 3500 // 3.5 seconds timeout
+// Force dynamic rendering - always fetch fresh data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: "Checkout | Taj Petha",

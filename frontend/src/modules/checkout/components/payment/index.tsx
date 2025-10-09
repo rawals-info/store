@@ -59,40 +59,44 @@ const Payment = ({
 
   const handleSubmit = async () => {
     setIsLoading(true)
-    let success = true
+    setError(null)
 
-    if (!paidByGiftcard) {
-      if (!isStripe && !selectedPaymentMethod) {
-        setError("Please select a payment method")
-        success = false
+    try {
+      // Validate payment method is selected
+      if (!paidByGiftcard) {
+        if (!isStripe && !selectedPaymentMethod) {
+          setError("Please select a payment method")
+          setIsLoading(false)
+          return
+        }
       }
-    }
 
-    if (!success) {
-      setIsLoading(false)
-      return
-    }
-
-    // Make sure we initialize the payment session before moving to review
-    if (selectedPaymentMethod) {
-      try {
-        await initiatePaymentSession(cart, {
+      // Initialize the payment session and wait for response
+      if (selectedPaymentMethod) {
+        const response = await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
 
-        // Notify the rest of the app that the cart has changed so any
-        // listeners (e.g. useCart) can refetch the latest state immediately.
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("cartUpdated"))
+        // Verify we got a valid payment session back
+        if (!response?.payment_collection?.payment_sessions?.length) {
+          throw new Error("Failed to initialize payment session")
         }
-      } catch (err: any) {
-        setError(err.message)
-        setIsLoading(false)
-        return
-      }
-    }
 
-    router.push(pathname + "?step=review")
+        // Notify listeners that cart has been updated
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("cartUpdated", {
+            detail: { payment_collection: response.payment_collection }
+          }))
+        }
+      }
+
+      // Navigate to review - the server will provide fresh cart data
+      router.push(pathname + "?step=review")
+    } catch (err: any) {
+      console.error("Payment initialization error:", err)
+      setError(err.message || "Failed to initialize payment. Please try again.")
+      setIsLoading(false)
+    }
   }
 
   const handleEdit = () => {

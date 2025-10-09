@@ -17,13 +17,14 @@ export interface CheckoutInitialData {
 /**
  * Fetch cart, customer, shipping options and payment providers in one consolidated server action.
  * Returns empty arrays for shipping/payment if cart is missing.
+ * Always fetches fresh data to ensure checkout has latest cart state.
  */
 export async function getCheckoutInitialData(): Promise<CheckoutInitialData> {
   const [cart, customer] = await parallelFetch<[
     HttpTypes.StoreCart | null,
     HttpTypes.StoreCustomer | null
   ]>([
-    () => retrieveCart(),
+    () => retrieveCart(undefined, undefined as any, { fresh: true }),
     () => retrieveCustomer(),
   ], { suppressErrors: true })
 

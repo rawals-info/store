@@ -2,11 +2,10 @@
 
 import { isManual, isStripe, isPaypal, isRazorpay } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
-import { useCart } from "@lib/hooks/use-cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import ErrorMessage from "../error-message"
 import { RazorpayPaymentButton } from "./razorpay-payment-button"
 
@@ -21,36 +20,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   "data-testid": dataTestId,
   className,
 }) => {
-  const { cart: liveCart, refetch: refetchCart } = useCart()
-
-  // Fetch the latest cart when the component mounts (e.g. right after the user
-  // lands on the review step) so we don't rely on potentially stale cached data.
-  useEffect(() => {
-    refetchCart()
-    // We only want to run this once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Listen for explicit cart update events to make sure we use the freshest data
-  useEffect(() => {
-    const handleCartUpdated = () => {
-      // Force‐refresh the cart bypassing any cache
-      refetchCart()
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("cartUpdated", handleCartUpdated)
-    }
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("cartUpdated", handleCartUpdated)
-      }
-    }
-  }, [refetchCart])
-
-  // Fallback to the prop passed from the server on first render.
-  const cart = liveCart ?? initialCart
+  // Use the cart prop directly - it comes fresh from the server on each page load
+  const cart = initialCart
 
   const notReady =
     !cart ||
