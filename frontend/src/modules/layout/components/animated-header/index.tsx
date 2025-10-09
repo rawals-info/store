@@ -36,8 +36,7 @@ const AnimatedHeader = () => {
   // Promotional messages
   const promoMessages = [
     "🔥 LIMITED TIME: Use code SWEET20 for 20% OFF all Petha — ends midnight Sunday! 🔥",
-    // "🎉 FLASH SALE: 15% off Combo Petha — CODE: COMBO15",
-    "🚚 Free shipping on orders over ₹1,000 — today only!",
+    "🎉 SPECIAL OFFER: Use code PETHA12 for exclusive discounts on premium Petha! 🎉",
     "🍫 New: Chocolate Petha now available — use CHOCO10 for 10% off"
   ]
 
