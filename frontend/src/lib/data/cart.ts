@@ -233,15 +233,21 @@ export async function addToCart({
       // Persist cart ID for subsequent requests
       await setCartId(newCart.id)
 
-      const cartCacheTag = await getCacheTag("carts")
-      // Also revalidate the generic and specific cart tags used by RSC fetches
-      scheduleRevalidates([
-        cartCacheTag,
-        "cart",
-        `cart-${newCart.id}`,
-      ])
+    const cartCacheTag = await getCacheTag("carts")
+    // Also revalidate the generic and specific cart tags used by RSC fetches
+    scheduleRevalidates([
+      cartCacheTag,
+      "cart",
+      `cart-${newCart.id}`,
+    ])
+    
+    // ✅ Invalidate client-side cart cache
+    if (typeof window !== 'undefined') {
+      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
+      invalidateCartCache()
+    }
 
-      return { success: true, cart: newCart }
+    return { success: true, cart: newCart }
     } catch (error) {
       return {
         success: false,
@@ -276,6 +282,12 @@ export async function addToCart({
       "cart",
       `cart-${existingCart.id}`,
     ])
+    
+    // ✅ Invalidate client-side cart cache
+    if (typeof window !== 'undefined') {
+      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
+      invalidateCartCache()
+    }
 
     return { success: true, cart: result.cart }
   } catch (error) {
@@ -386,6 +398,12 @@ export async function updateLineItem({
         getCacheTag("fulfillment")
       ])
       scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
+      
+      // ✅ Invalidate client-side cart cache
+      if (typeof window !== 'undefined') {
+        const { invalidateCartCache } = await import("@lib/hooks/use-cart")
+        invalidateCartCache()
+      }
     })
     .catch(medusaError)
 }
@@ -418,6 +436,12 @@ export async function deleteLineItem(lineId: string) {
         getCacheTag("fulfillment")
       ])
       scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
+      
+      // ✅ Invalidate client-side cart cache
+      if (typeof window !== 'undefined') {
+        const { invalidateCartCache } = await import("@lib/hooks/use-cart")
+        invalidateCartCache()
+      }
     })
     .catch(medusaError)
 }

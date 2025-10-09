@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react"
 import LoadingSpinner from "@modules/common/components/loading-spinner"
 import PageTransition from "@modules/common/components/page-transition"
+import ErrorBoundary from "@modules/common/components/error-boundary"
 import { usePathname } from "next/navigation"
 import { clx } from "@medusajs/ui"
 
@@ -19,6 +20,8 @@ export default function MainLayout({
 
   // Check banner visibility state
   useEffect(() => {
+    if (typeof window === 'undefined') return // ✅ SSR safety
+    
     const checkBannerState = () => {
       const dismissed = localStorage.getItem('promotional-banner-dismissed') === 'true'
       setBannerVisible(!dismissed)
@@ -55,27 +58,29 @@ export default function MainLayout({
   }, [])
 
   return (
-    <div
-      className={clx(
-        isHomePage ? "w-full overflow-x-hidden" : "content-container overflow-x-hidden",
-        // Add top padding for banner space (40px banner height) only when banner is visible
-        {
-          "pt-10": bannerVisible, // This is equivalent to 40px for the banner
-          "pb-6 sm:pb-10": !isHomePage, // Only bottom padding for non-home pages
-        }
-      )}
-    >
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <LoadingSpinner size="large" />
-          </div>
-        }
+    <ErrorBoundary>
+      <div
+        className={clx(
+          isHomePage ? "w-full overflow-x-hidden" : "content-container overflow-x-hidden",
+          // Add top padding for banner space (40px banner height) only when banner is visible
+          {
+            "pt-10": bannerVisible, // This is equivalent to 40px for the banner
+            "pb-6 sm:pb-10": !isHomePage, // Only bottom padding for non-home pages
+          }
+        )}
       >
-        <PageTransition className="min-h-[calc(100vh-200px)]">
-          {children}
-        </PageTransition>
-      </Suspense>
-    </div>
+          <Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+              <LoadingSpinner size="large" />
+            </div>
+          }
+        >
+          <PageTransition className="min-h-[calc(100vh-200px)]">
+            {children}
+          </PageTransition>
+        </Suspense>
+      </div>
+    </ErrorBoundary>
   )
 }

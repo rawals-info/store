@@ -6,10 +6,11 @@ import { Fragment, useMemo } from "react"
 import Radio from "@modules/common/components/radio"
 import compareAddresses from "@lib/util/compare-addresses"
 import { HttpTypes } from "@medusajs/types"
+import type { AddressData } from "types/address"
 
 type AddressSelectProps = {
   addresses: HttpTypes.StoreCustomerAddress[]
-  addressInput: HttpTypes.StoreCartAddress | null
+  addressInput: Partial<AddressData> | null
   onSelect: (
     address: HttpTypes.StoreCartAddress | undefined,
     email?: string

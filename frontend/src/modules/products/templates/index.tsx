@@ -6,7 +6,6 @@ import dynamic from "next/dynamic"
 import ProductActions from "@modules/products/components/product-actions"
 import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
-import ProductReviews from "../components/product-reviews"
 import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema, getBaseURL } from "@lib/seo"
 import { getProductReviewSummary, getProductReviews } from "@lib/data/products"
 import type { StoreProductReview } from "types/global"
@@ -20,8 +19,11 @@ type ProductTemplateProps = {
   countryCode: string
 }
 
-// Dynamically load the gallery; keep SSR so it renders on the server and avoids the forbidden ssr:false flag.
+// ✅ Code splitting: Dynamically load heavy components
 const ImageGallery = dynamic(() => import("@modules/products/components/image-gallery"))
+const ProductReviews = dynamic(() => import("../components/product-reviews"), {
+  loading: () => <div className="h-48 flex items-center justify-center text-luxury-charcoal/60">Loading reviews...</div>,
+})
 
 export default async function ProductTemplate({
   product,

@@ -29,6 +29,7 @@ const AnimatedHeader = () => {
   
   // Check localStorage for banner dismissal state on mount
   useEffect(() => {
+    if (typeof window === 'undefined') return // ✅ SSR safety
     const dismissed = localStorage.getItem('promotional-banner-dismissed') === 'true'
     setBannerDismissed(dismissed)
   }, [])
@@ -43,17 +44,21 @@ const AnimatedHeader = () => {
   // Function to handle banner dismissal
   const handleBannerDismiss = () => {
     setBannerDismissed(true)
-    localStorage.setItem('promotional-banner-dismissed', 'true')
-    // Dispatch custom event to notify layout immediately
-    window.dispatchEvent(new CustomEvent('bannerDismissed'))
+    if (typeof window !== 'undefined') { // ✅ SSR safety
+      localStorage.setItem('promotional-banner-dismissed', 'true')
+      // Dispatch custom event to notify layout immediately
+      window.dispatchEvent(new CustomEvent('bannerDismissed'))
+    }
   }
 
   // Function to show banner again
   const handleShowBanner = () => {
     setBannerDismissed(false)
-    localStorage.removeItem('promotional-banner-dismissed')
-    // Dispatch custom event to notify layout immediately
-    window.dispatchEvent(new CustomEvent('bannerShown'))
+    if (typeof window !== 'undefined') { // ✅ SSR safety
+      localStorage.removeItem('promotional-banner-dismissed')
+      // Dispatch custom event to notify layout immediately
+      window.dispatchEvent(new CustomEvent('bannerShown'))
+    }
   }
 
   // Extract country code from pathname

@@ -52,6 +52,8 @@ const ProductTabs = ({ product, activeTab, setActiveTab }: ProductTabsProps) => 
   
   // Listen for variant changes from localStorage (set by product-actions component)
   useEffect(() => {
+    if (typeof window === 'undefined') return // ✅ SSR safety
+    
     const handleStorageChange = () => {
       const variantId = localStorage.getItem('selectedVariantId')
       if (variantId) {

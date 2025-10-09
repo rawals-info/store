@@ -3,10 +3,11 @@ import { Container } from "@medusajs/ui"
 import Checkbox from "@modules/common/components/checkbox"
 import Input from "@modules/common/components/input"
 import AddressAutocomplete from "@modules/common/components/address-autocomplete"
-import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
+import { mapKeys } from "@lib/utils/object-utils" // ✅ Using consolidated utility
+import type { AddressData } from "types/address"
 
 const ShippingAddress = ({
   customer,
@@ -112,7 +113,7 @@ const ShippingAddress = ({
             addressInput={
               mapKeys(formData, (_, key) =>
                 key.replace("shipping_address.", "")
-              ) as HttpTypes.StoreCartAddress
+              ) as Partial<AddressData>
             }
             onSelect={setFormAddress}
           />

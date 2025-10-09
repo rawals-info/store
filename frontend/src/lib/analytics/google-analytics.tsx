@@ -266,6 +266,7 @@ export function usePageView() {
 }
 
 // Google Analytics Script Component
+// ✅ Optimized with deferred loading for better performance
 export function GoogleAnalytics() {
   const isProd = process.env.NODE_ENV === 'production'
   if (!isProd) {
@@ -273,14 +274,14 @@ export function GoogleAnalytics() {
   }
   return (
     <>
-      {/* Google Analytics */}
+      {/* Google Analytics - Deferred loading after user interaction */}
       <Script
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
       />
       <Script
         id="google-analytics"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -302,55 +303,61 @@ export function GoogleAnalytics() {
               }
             });
 
-            // Track scroll depth for SEO content analysis
+            // ✅ Throttled scroll depth tracking for better performance
             let scrollDepth = 0;
+            let scrollTimeout;
             window.addEventListener('scroll', function() {
-              const scrolled = Math.floor((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-              if (scrolled > scrollDepth && scrolled % 25 === 0) {
-                scrollDepth = scrolled;
-                gtag('event', 'scroll_depth', {
-                  event_category: 'Engagement',
-                  event_label: scrollDepth + '%',
-                  value: scrollDepth
-                });
-              }
-            });
+              if (scrollTimeout) clearTimeout(scrollTimeout);
+              scrollTimeout = setTimeout(function() {
+                const scrolled = Math.floor((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+                if (scrolled > scrollDepth && scrolled % 25 === 0) {
+                  scrollDepth = scrolled;
+                  gtag('event', 'scroll_depth', {
+                    event_category: 'Engagement',
+                    event_label: scrollDepth + '%',
+                    value: scrollDepth
+                  });
+                }
+              }, 100); // Throttle to 100ms
+            }, { passive: true });
 
-            // Track time on page for content quality analysis
+            // Track time on page (only for engaged sessions > 10s)
             let startTime = Date.now();
             window.addEventListener('beforeunload', function() {
               const timeOnPage = Math.floor((Date.now() - startTime) / 1000);
-              gtag('event', 'time_on_page', {
-                event_category: 'Engagement',
-                value: timeOnPage,
-                custom_parameters: {
-                  page_type: document.title.includes('Petha') ? 'product_page' : 'content_page'
-                }
-              });
+              if (timeOnPage >= 10) { // Only track if user spent at least 10s
+                gtag('event', 'time_on_page', {
+                  event_category: 'Engagement',
+                  value: timeOnPage,
+                  custom_parameters: {
+                    page_type: document.title.includes('Petha') ? 'product_page' : 'content_page'
+                  }
+                });
+              }
             });
           `,
         }}
       />
 
-      {/* Google Tag Manager */}
+      {/* Google Tag Manager - Deferred */}
       <Script
         id="google-tag-manager"
-        strategy="lazyOnload"
+        strategy="worker"
         dangerouslySetInnerHTML={{
           __html: `
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.defer=true;j.src=
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','${GTM_ID}');
           `,
         }}
       />
 
-      {/* Facebook Pixel */}
+      {/* Facebook Pixel - Deferred */}
       <Script
         id="facebook-pixel"
-        strategy="lazyOnload"
+        strategy="worker"
         dangerouslySetInnerHTML={{
           __html: `
             !function(f,b,e,v,n,t,s)
@@ -367,35 +374,45 @@ export function GoogleAnalytics() {
         }}
       />
 
-      {/* Microsoft Clarity for user behavior analytics */}
+      {/* Microsoft Clarity - Loaded on idle */}
       <Script
         id="microsoft-clarity"
-        strategy="lazyOnload"
+        strategy="worker"
         dangerouslySetInnerHTML={{
           __html: `
-            (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "n8n8n8n8n8");
+            // ✅ Load Clarity only when browser is idle
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(function() {
+                (function(c,l,a,r,i,t,y){
+                    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "n8n8n8n8n8");
+              });
+            }
           `,
         }}
       />
 
-      {/* Hotjar for heatmaps and user recordings */}
+      {/* Hotjar - Loaded on idle (only if enabled) */}
       <Script
         id="hotjar"
-        strategy="lazyOnload"
+        strategy="worker"
         dangerouslySetInnerHTML={{
           __html: `
-            (function(h,o,t,j,a,r){
-                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                h._hjSettings={hjid:3507234,hjsv:6};
-                a=o.getElementsByTagName('head')[0];
-                r=o.createElement('script');r.async=1;
-                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-                a.appendChild(r);
-            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+            // ✅ Load Hotjar only when browser is idle
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(function() {
+                (function(h,o,t,j,a,r){
+                    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                    h._hjSettings={hjid:3507234,hjsv:6};
+                    a=o.getElementsByTagName('head')[0];
+                    r=o.createElement('script');r.async=1;
+                    r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                    a.appendChild(r);
+                })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+              });
+            }
           `,
         }}
       />

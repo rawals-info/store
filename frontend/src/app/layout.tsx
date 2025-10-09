@@ -7,10 +7,47 @@ import Script from "next/script";
 import "styles/globals.css"
 import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
 
-const poppins = Poppins({ subsets: ["latin"], weight: ["300","400","500","600","700"], display: "swap", variable: "--font-poppins" })
-const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: "normal", display: "swap", variable: "--font-dm-serif" })
-const interFont = Inter({ subsets: ["latin"], weight: ["400","500","600","700"], display: "swap", variable: "--font-inter" })
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400","500","600","700"], display: "swap", variable: "--font-playfair" })
+// ✅ Optimized font loading with display: 'swap', preload, and adjustFontFallback
+const poppins = Poppins({ 
+  subsets: ["latin"], 
+  weight: ["300","400","500","600","700"], 
+  display: "swap", 
+  variable: "--font-poppins",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ['system-ui', 'arial']
+})
+
+const dmSerif = DM_Serif_Display({ 
+  subsets: ["latin"], 
+  weight: "400", 
+  style: "normal", 
+  display: "swap", 
+  variable: "--font-dm-serif",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ['Georgia', 'serif']
+})
+
+const interFont = Inter({ 
+  subsets: ["latin"], 
+  weight: ["400","500","600","700"], 
+  display: "swap", 
+  variable: "--font-inter",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ['system-ui', 'arial']
+})
+
+const playfair = Playfair_Display({ 
+  subsets: ["latin"], 
+  weight: ["400","500","600","700"], 
+  display: "swap", 
+  variable: "--font-playfair",
+  preload: false, // Only loaded on-demand for specific components
+  adjustFontFallback: true,
+  fallback: ['Georgia', 'Times New Roman', 'serif']
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),

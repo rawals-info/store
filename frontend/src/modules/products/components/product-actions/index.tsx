@@ -5,7 +5,6 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
-import { isEqual } from "lodash"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
@@ -14,6 +13,7 @@ import MobileActions from "./mobile-actions"
 import { announceCart } from "@lib/cart/events"
 import { enqueueCartJob } from "@lib/utils/offline-cart-queue"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { isEqual } from "@lib/utils/object-utils" // ✅ Using consolidated utility
 
 // Legacy in-memory mutation queue replaced by persistent offline queue
 

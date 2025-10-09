@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
@@ -9,13 +9,15 @@ type ImageGalleryProps = {
   images: { id: string; url: string }[]
 }
 
+// ✅ Optimized for performance with lazy loading and preloading strategy
 const ImageGallery = ({ images }: ImageGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
   const [imageLoading, setImageLoading] = useState(true)
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0]))
   
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!isZoomed) return
     
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
@@ -23,25 +25,44 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
     const y = (e.clientY - top) / height
     
     setZoomPosition({ x, y })
-  }
+  }, [isZoomed])
   
-  const handleZoomToggle = () => {
+  const handleZoomToggle = useCallback(() => {
     setIsZoomed(!isZoomed)
-  }
+  }, [isZoomed])
   
-  const handleImageChange = (index: number) => {
+  const handleImageChange = useCallback((index: number) => {
+    if (index === selectedImage) return
     setImageLoading(true)
     setSelectedImage(index)
-  }
+    setLoadedImages(prev => new Set(prev).add(index))
+  }, [selectedImage])
   
-  // Reset loading state after a short delay when selected image changes
+  // Reset loading state when image loads
   useEffect(() => {
     const timer = setTimeout(() => {
       setImageLoading(false)
-    }, 300)
+    }, 100)
     
     return () => clearTimeout(timer)
   }, [selectedImage])
+  
+  // Preload adjacent images for smoother navigation
+  useEffect(() => {
+    if (typeof window === 'undefined' || images.length <= 1) return
+    
+    const preloadIndexes = [
+      selectedImage + 1 < images.length ? selectedImage + 1 : 0,
+      selectedImage - 1 >= 0 ? selectedImage - 1 : images.length - 1
+    ]
+    
+    preloadIndexes.forEach(index => {
+      if (!loadedImages.has(index)) {
+        const img = new window.Image()
+        img.src = images[index].url
+      }
+    })
+  }, [selectedImage, images, loadedImages])
 
   if (!images.length) {
     return (
@@ -73,8 +94,9 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               alt={`Product image ${selectedImage + 1}`}
               fill
               priority={selectedImage === 0}
+              loading={selectedImage === 0 ? "eager" : "lazy"}
               sizes="(max-width: 576px) 100vw, (max-width: 768px) 80vw, (max-width: 992px) 60vw, 50vw"
-              className={`object-cover ${isZoomed ? 'scale-150' : ''} transition-transform duration-300 ${imageLoading ? 'scale-110 blur-sm' : 'scale-100 blur-0'}`}
+              className={`object-cover ${isZoomed ? 'scale-150' : ''} transition-transform duration-300 ${imageLoading ? 'scale-105 blur-sm' : 'scale-100 blur-0'}`}
               style={
                 isZoomed 
                   ? { 
@@ -82,9 +104,10 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
                     } 
                   : undefined
               }
-              quality={90}
+              quality={85}
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+              onLoad={() => setImageLoading(false)}
             />
           </motion.div>
         </AnimatePresence>
@@ -122,8 +145,8 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               fill
               sizes="(max-width: 768px) 25vw, 10vw"
               className="object-cover"
-              loading="lazy"
-              quality={60}
+              loading={index < 4 ? "eager" : "lazy"}
+              quality={50}
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
             />

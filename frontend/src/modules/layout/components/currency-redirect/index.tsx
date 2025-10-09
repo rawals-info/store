@@ -76,8 +76,8 @@ const CurrencyRedirect = () => {
           // 3. The current country has a different currency
           // 4. We haven't shown this popup before (check localStorage)
           // 5. The detected country is in the list of valid countries
-          const hasSeenPopup = localStorage.getItem("currency_redirect_seen")
-          const hasSeenPopupForCountry = localStorage.getItem(`currency_redirect_seen_${detectedCountry}`)
+          const hasSeenPopup = typeof window !== 'undefined' ? localStorage.getItem("currency_redirect_seen") : null // ✅ SSR safety
+          const hasSeenPopupForCountry = typeof window !== 'undefined' ? localStorage.getItem(`currency_redirect_seen_${detectedCountry}`) : null // ✅ SSR safety
           
           if (
             detectedCountry && 
@@ -104,11 +104,13 @@ const CurrencyRedirect = () => {
   const handleClose = () => {
     setShowPopup(false)
     // Remember that user has seen this popup
-    localStorage.setItem("currency_redirect_seen", "true")
-    
-    // Also remember for this specific country
-    if (userCountry) {
-      localStorage.setItem(`currency_redirect_seen_${userCountry}`, "true")
+    if (typeof window !== 'undefined') { // ✅ SSR safety
+      localStorage.setItem("currency_redirect_seen", "true")
+      
+      // Also remember for this specific country
+      if (userCountry) {
+        localStorage.setItem(`currency_redirect_seen_${userCountry}`, "true")
+      }
     }
   }
   
