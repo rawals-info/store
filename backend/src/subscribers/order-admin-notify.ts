@@ -26,12 +26,20 @@ export default async function orderAdminNotify({
   }
 
   try {
+    // ✅ FIX: Add delay to ensure order is fully committed to database
+    await new Promise(resolve => setTimeout(resolve, 2000)) // 2 second delay
+    
     const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
     const notificationService = container.resolve<INotificationModuleService>(
       Modules.NOTIFICATION
     )
 
-    const order = await orderService.retrieveOrder(event.data.id, {
+    // ✅ FIX: Add retry logic with error handling
+    let order: any
+    let retries = 3
+    while (retries > 0) {
+      try {
+        order = await orderService.retrieveOrder(event.data.id, {
       select: [
         "subtotal",
         "shipping_total",
@@ -43,6 +51,22 @@ export default async function orderAdminNotify({
       ],
       relations: ["items", "shipping_address", "billing_address"],
     }) as any
+        break // Successfully retrieved order
+      } catch (error) {
+        retries--
+        if (retries === 0) {
+          logger?.error?.(`Failed to retrieve order ${event.data.id} after 3 attempts`, error)
+          throw error
+        }
+        logger?.warn?.(`Retry ${3 - retries}/3 for order ${event.data.id}`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+
+    if (!order) {
+      logger?.error?.(`Order ${event.data.id} not found after retries`)
+      return
+    }
 
     const asNumber = (val: any): number => {
       if (val == null) return 0

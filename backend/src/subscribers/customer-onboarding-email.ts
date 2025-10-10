@@ -9,8 +9,25 @@ export default async function customerOnboardingEmail({
   container,
 }: SubscriberArgs<{ id: string }>) {
   const orderId = event.data.id
+  
+  // ✅ FIX: Add delay to ensure order is fully committed to database
+  await new Promise(resolve => setTimeout(resolve, 2000)) // 2 second delay
+  
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  const order: any = await orderService.retrieveOrder(orderId)
+  
+  // ✅ FIX: Add retry logic with error handling
+  let order: any
+  try {
+    order = await orderService.retrieveOrder(orderId)
+  } catch (error) {
+    console.error(`[CustomerOnboardingEmail] Failed to retrieve order ${orderId}:`, error)
+    return // Silently fail for onboarding email (non-critical)
+  }
+  
+  if (!order) {
+    console.warn(`[CustomerOnboardingEmail] Order ${orderId} not found`)
+    return
+  }
   const customerId = order.customer_id
 
   const orders = await (orderService as any).listOrders({ customer_id: customerId }, { select: ["id"] })

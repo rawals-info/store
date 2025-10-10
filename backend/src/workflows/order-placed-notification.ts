@@ -9,7 +9,9 @@ interface WorkflowInput {
 export const orderPlacedNotificationWorkflow = createWorkflow(
   "order-placed-notification",
   ({ id }: WorkflowInput) => {
-    // Fetch the order with all the details we need.
+    // ✅ FIX: Fetch the order with all the details we need
+    // Note: useQueryGraphStep should handle timing, but if issues persist,
+    // consider adding a delay step before this query
     const { data: orders } = useQueryGraphStep({
       entity: "order",
       fields: [
@@ -31,16 +33,27 @@ export const orderPlacedNotificationWorkflow = createWorkflow(
       filters: { id },
     });
 
+    // ✅ FIX: Only send notification if order was found
     // Send a Slack notification using the Notification module.
-    sendNotificationsStep([
-      {
-        to: "slack", // matches provider id/channel id configured
-        channel: "slack",
-        template: "order-created",
-        data: {
-          order: orders[0],
+    const order = orders?.[0]
+    
+    if (order) {
+      sendNotificationsStep([
+        {
+          to: "slack", // matches provider id/channel id configured
+          channel: "slack",
+          template: "order-created",
+          data: {
+            order: order,
+            // Include essential fields explicitly
+            order_id: order.id,
+            display_id: order.display_id,
+            email: order.email,
+            total: order.total,
+            currency_code: order.currency_code,
+          },
         },
-      },
-    ]);
+      ]);
+    }
   }
 ); 

@@ -14,9 +14,18 @@ export default async function orderConfirmationEmail({
 }: SubscriberArgs<{ id: string }>) {
   const { id: orderId } = event.data
 
+  // ✅ FIX: Add delay to ensure order is fully committed to database
+  await new Promise(resolve => setTimeout(resolve, 2000)) // 2 second delay
+
   // Retrieve the order with relations so we have customer info
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  const order: any = await orderService.retrieveOrder(orderId, {
+  
+  // ✅ FIX: Add retry logic with error handling
+  let order: any
+  let retries = 3
+  while (retries > 0) {
+    try {
+      order = await orderService.retrieveOrder(orderId, {
     select: [
       "subtotal",
       "shipping_total",
@@ -33,6 +42,22 @@ export default async function orderConfirmationEmail({
       "billing_address",
     ],
   })
+      break // Successfully retrieved order
+    } catch (error) {
+      retries--
+      if (retries === 0) {
+        console.error(`[OrderConfirmationEmail] Failed to retrieve order ${orderId} after 3 attempts:`, error)
+        throw error // Re-throw after all retries exhausted
+      }
+      console.warn(`[OrderConfirmationEmail] Retry ${3 - retries}/3 for order ${orderId}`)
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1s before retry
+    }
+  }
+
+  if (!order) {
+    console.error(`[OrderConfirmationEmail] Order ${orderId} not found after retries`)
+    return
+  }
 
   const asNumber = (val: any): number => {
     if (val == null) return 0
