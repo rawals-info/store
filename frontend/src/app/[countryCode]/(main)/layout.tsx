@@ -6,6 +6,7 @@ import PageTransition from "@modules/common/components/page-transition"
 import ErrorBoundary from "@modules/common/components/error-boundary"
 import { usePathname } from "next/navigation"
 import { clx } from "@medusajs/ui"
+import RecentPurchaseNotification from "@components/RecentPurchaseNotification"
 
 export default function MainLayout({
   children,
@@ -62,9 +63,9 @@ export default function MainLayout({
       <div
         className={clx(
           isHomePage ? "w-full overflow-x-hidden" : "content-container overflow-x-hidden",
-          // Add top padding for banner space (40px banner height) only when banner is visible
+          // Add top padding for banner space (48px banner height) only when banner is visible
           {
-            "pt-10": bannerVisible, // This is equivalent to 40px for the banner
+            "pt-12": bannerVisible, // This is equivalent to 48px for the banner
             "pb-6 sm:pb-10": !isHomePage, // Only bottom padding for non-home pages
           }
         )}
@@ -81,6 +82,9 @@ export default function MainLayout({
           </PageTransition>
         </Suspense>
       </div>
+      
+      {/* Recent Purchase Notifications */}
+      <RecentPurchaseNotification />
     </ErrorBoundary>
   )
 }

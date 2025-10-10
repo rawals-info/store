@@ -267,16 +267,31 @@ export default function HomeClientWrapper({
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${(currentProductIndex * 100) / productsPerView}%)` }}
               >
-                {featuredProducts.map((product, idx) => (
+                {featuredProducts.map((product, idx) => {
+                  // Generate fake low stock number for urgency
+                  const lowStockCount = ((product.id?.charCodeAt(0) || 0) % 7) + 2
+                  const showLowStock = (product.id?.charCodeAt(product.id.length - 1) || 0) % 10 < 7
+                  
+                  return (
                   <div 
                     key={`${product.id}-${idx}`} 
-                    className="group transition-all duration-500 hover:-translate-y-1"
+                    className="group"
                     style={{ minWidth: `${100 / productsPerView}%` }}
                   >
-                    <div className="px-3">
-                      <div className="relative aspect-square overflow-hidden rounded-lg mb-4">
+                    <div className="px-3 transition-all duration-300 hover:-translate-y-2">
+                      <div className="relative aspect-square overflow-hidden rounded-lg mb-4 shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                        {/* Discount Badge - Top Left */}
+                        <div className="absolute top-3 left-3 z-20 transition-transform duration-300 group-hover:scale-105">
+                          <span className="bg-gradient-to-r from-luxury-gold to-yellow-600 px-2.5 py-1.5 text-white text-[10px] uppercase tracking-wider font-bold flex items-center shadow-lg rounded-sm">
+                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+                            </svg>
+                            Save 20%
+                          </span>
+                        </div>
+                        
                         {product.thumbnail ? (
-                          <div className="w-full h-full transition-transform duration-700 group-hover:scale-105">
+                          <div className="w-full h-full transition-transform duration-300 group-hover:scale-110">
                             <Image
                               src={product.thumbnail}
                               alt={product.title}
@@ -294,8 +309,12 @@ export default function HomeClientWrapper({
                             <span className="text-gray-400">No image available</span>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div 
+                          className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+                        />
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                        >
                           <Link href={`/${countryCode}/products/${product.handle}`}>
                             <AnimatedButton variant="gold" size="small" className="w-full">
                               View Details
@@ -314,6 +333,18 @@ export default function HomeClientWrapper({
                           <ProductPreviewRating productId={product.id} />
                         </div>
                         
+                        {/* Low Stock Indicator */}
+                        {showLowStock && (
+                          <div className="flex items-center justify-center gap-1.5 mb-2">
+                            <svg className="w-3 h-3 text-orange-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs font-medium text-orange-600">
+                              Only {lowStockCount} left
+                            </span>
+                          </div>
+                        )}
+                        
                         <div className="text-luxury-charcoal/90">
                           {product.variants && product.variants[0] ? (
                             <ProductPrice 
@@ -326,7 +357,7 @@ export default function HomeClientWrapper({
                       </div>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
             

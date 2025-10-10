@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation"
 import SearchBar from "@modules/search/components/search-bar"
 import CategoryDropdown from "@modules/layout/components/category-dropdown/index"
 import { X } from "@medusajs/icons"
+import CountdownTimer from "@components/CountdownTimer"
 
 const AnimatedHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -34,11 +35,11 @@ const AnimatedHeader = () => {
     setBannerDismissed(dismissed)
   }, [])
   
-  // Promotional messages
+  // Promotional messages with urgency
   const promoMessages = [
-    "🔥 LIMITED TIME: Use code SWEET20 for 20% OFF all Petha — ends midnight Sunday! 🔥",
-    "🎉 SPECIAL OFFER: Use code PETHA12 for exclusive discounts on premium Petha! 🎉",
-    "🍫 New: Chocolate Petha now available — use CHOCO10 for 10% off"
+    "🔥 FLASH SALE: Use code SWEET20 for 20% OFF all Petha",
+    "🎁 SPECIAL: Use code PETHA12 for exclusive discounts",
+    "🍫 NEW LAUNCH: Chocolate Petha — use CHOCO10 for 10% off"
   ]
 
   // Function to handle banner dismissal
@@ -159,53 +160,68 @@ const AnimatedHeader = () => {
       <AnimatePresence>
         {!bannerDismissed && (
           <motion.div
-            className="fixed top-0 inset-x-0 z-[50] bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white h-10 flex items-center overflow-hidden border-b border-luxury-gold/30"
+            className="fixed top-0 inset-x-0 z-[50] bg-gradient-to-r from-luxury-charcoal via-black to-luxury-charcoal text-white h-12 flex items-center overflow-hidden border-b border-luxury-gold/40 shadow-lg"
             initial={{ y: -48, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -48, opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
           >
-            {/* Subtle animated background pattern */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-luxury-gold/5 to-transparent animate-pulse" />
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-luxury-gold/10 to-transparent animate-pulse" />
             
-            {/* Continuous marquee scroll */}
-            <div className="relative w-full overflow-hidden">
-              <motion.div
-                className="flex whitespace-nowrap"
-                animate={{ x: [0, -2000] }}
-                transition={{
-                  x: {
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    duration: 60,
-                    ease: "linear",
-                  },
-                }}
-              >
-                {/* Repeat messages multiple times for seamless loop */}
-                {[...Array(3)].map((_, repeatIndex) => (
-                  <div key={repeatIndex} className="flex">
-                    {promoMessages.map((message, index) => (
-                      <span
-                        key={`${repeatIndex}-${index}`}
-                        className="font-serif font-medium text-sm text-luxury-gold px-8 flex items-center"
-                      >
-                        {message}
-                        <span className="text-luxury-gold/40 mx-8">•</span>
-                      </span>
+            {/* Mobile optimized content */}
+            <div className="relative w-full px-2 sm:px-4">
+              <div className="flex items-center justify-between max-w-7xl mx-auto">
+                {/* Left: Countdown Timer (Hidden on mobile) */}
+                <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+                  <span className="text-xs font-bold uppercase tracking-wide text-luxury-gold">Ends in:</span>
+                  <CountdownTimer />
+                </div>
+                
+                {/* Center: Scrolling Messages */}
+                <div className="flex-1 overflow-hidden mx-2 md:mx-4">
+                  <motion.div
+                    className="flex whitespace-nowrap"
+                    animate={{ x: [0, -1500] }}
+                    transition={{
+                      x: {
+                        repeat: Infinity,
+                        repeatType: "loop",
+                        duration: 45,
+                        ease: "linear",
+                      },
+                    }}
+                  >
+                    {[...Array(3)].map((_, repeatIndex) => (
+                      <div key={repeatIndex} className="flex">
+                        {promoMessages.map((message, index) => (
+                          <span
+                            key={`${repeatIndex}-${index}`}
+                            className="font-bold text-xs sm:text-sm text-luxury-gold px-6 flex items-center"
+                          >
+                            {message}
+                            <span className="text-luxury-gold/40 mx-6">•</span>
+                          </span>
+                        ))}
+                      </div>
                     ))}
-                  </div>
-                ))}
-              </motion.div>
+                  </motion.div>
+                </div>
+                
+                {/* Right: Countdown Timer for Mobile */}
+                <div className="flex md:hidden items-center gap-1 flex-shrink-0">
+                  <CountdownTimer inline className="text-xs text-luxury-gold" />
+                </div>
+              </div>
             </div>
             
-            {/* Close button */}
+            {/* Close button - Properly positioned */}
             <button
               onClick={handleBannerDismiss}
-              className="absolute right-2 p-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 z-10 border border-white/20"
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-1.5 bg-luxury-gold/20 hover:bg-luxury-gold/40 rounded-full transition-all duration-200 z-10 border border-luxury-gold/30"
               aria-label="Dismiss banner"
             >
-              <X width={12} height={12} className="text-white hover:text-luxury-gold transition-colors duration-200" />
+              <X width={12} height={12} className="text-luxury-gold transition-colors duration-200" />
             </button>
           </motion.div>
         )}

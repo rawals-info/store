@@ -35,6 +35,27 @@ const ProductInfo = ({ product, reviewData }: ProductInfoProps) => {
   const isFeatured = product.tags?.some(tag => 
     tag.value?.toLowerCase().includes("featured")
   )
+  
+  // Generate fake low stock number for urgency (3-12 items left)
+  const getLowStockCount = () => {
+    const seed = product.id?.charCodeAt(0) || 0
+    return ((seed % 10) + 3) // Returns 3-12
+  }
+  const lowStockCount = getLowStockCount()
+  
+  // Generate fake view count (between 50-250)
+  const getViewCount = () => {
+    const seed = product.id?.charCodeAt(product.id.length - 1) || 0
+    return ((seed % 200) + 50)
+  }
+  const viewCount = getViewCount()
+  
+  // Generate fake recent purchase count (5-25 in last 24 hours)
+  const getRecentPurchases = () => {
+    const seed = (product.id?.charCodeAt(0) || 0) + (product.id?.charCodeAt(product.id.length - 1) || 0)
+    return ((seed % 21) + 5)
+  }
+  const recentPurchases = getRecentPurchases()
 
   const renderStars = (rating: number, size = "w-4 h-4") => {
     return Array.from({ length: 5 }).map((_, index) => (
@@ -115,8 +136,48 @@ const ProductInfo = ({ product, reviewData }: ProductInfoProps) => {
             </div>
           )}
           
+          {/* Urgency Indicators - Mobile-Optimized Luxury Style */}
+          <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6">
+            {/* Low Stock Warning - Mobile Responsive */}
+            <div className="flex items-center gap-2 sm:gap-3 bg-luxury-cream/30 border border-luxury-gold/30 px-3 py-2 sm:px-4 sm:py-3 rounded-sm">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-luxury-gold animate-pulse flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-semibold text-luxury-charcoal">
+                  Only {lowStockCount} available
+                </p>
+                <p className="text-[10px] sm:text-xs text-luxury-charcoal/60 mt-0.5">
+                  {recentPurchases} orders in 24hrs
+                </p>
+              </div>
+            </div>
+            
+            {/* Social Proof - Mobile Responsive */}
+            <div className="flex items-center gap-2 sm:gap-3 bg-luxury-cream/20 border border-luxury-gold/20 px-3 py-2 sm:px-4 sm:py-3 rounded-sm">
+              <div className="flex -space-x-0.5 sm:-space-x-1 flex-shrink-0">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-luxury-gold/70 to-luxury-gold border-2 border-luxury-ivory"></div>
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-luxury-gold/50 to-luxury-gold/70 border-2 border-luxury-ivory"></div>
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-luxury-gold/30 to-luxury-gold/50 border-2 border-luxury-ivory"></div>
+              </div>
+              <p className="text-xs sm:text-sm font-medium text-luxury-charcoal">
+                {viewCount}+ viewing now
+              </p>
+            </div>
+            
+            {/* Flash Sale Badge - Mobile Responsive */}
+            <div className="flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-luxury-gold to-yellow-600 px-3 py-2 sm:px-4 sm:py-3 rounded-sm shadow-md">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+              </svg>
+              <p className="text-xs sm:text-sm font-bold text-white">
+                Save 20% with SWEET20
+              </p>
+            </div>
+          </div>
+          
           {/* Product badges */}
-          <div className="flex gap-3 mt-2">
+          <div className="flex gap-3 mt-4">
             {isLimitedEdition && (
               <span className="bg-luxury-gold/90 px-3 py-1 text-luxury-ivory text-[11px] uppercase tracking-wider font-medium inline-flex items-center">
                 <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

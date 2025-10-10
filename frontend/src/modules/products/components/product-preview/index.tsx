@@ -75,6 +75,23 @@ const ProductPreview = ({
     tag.value?.toLowerCase().includes("limited") || 
     tag.value?.toLowerCase().includes("edition")
   )
+  
+  // Generate fake low stock number for urgency (2-8 items left)
+  const getLowStockCount = () => {
+    const seed = product.id?.charCodeAt(0) || 0
+    return ((seed % 7) + 2) // Returns 2-8
+  }
+  const lowStockCount = getLowStockCount()
+  
+  // Randomly show low stock indicator (70% of products)
+  const showLowStock = (product.id?.charCodeAt(product.id.length - 1) || 0) % 10 < 7
+  
+  // Check if product is in stock
+  const isInStock = product.variants?.some(variant => 
+    !variant.manage_inventory || 
+    variant.allow_backorder || 
+    (variant.inventory_quantity && variant.inventory_quantity > 0)
+  ) ?? true
 
   return (
     <LocalizedClientLink
@@ -82,25 +99,34 @@ const ProductPreview = ({
       className="group"
     >
       <div
-        data-testid="product-wrapper" className="overflow-hidden rounded-sm border border-luxury-gold/10 bg-luxury-ivory/10 transition-all duration-300 group-hover:shadow-md group-hover:border-luxury-gold/30 group-hover:-translate-y-1">
+        data-testid="product-wrapper" 
+        className="overflow-hidden rounded-sm border border-luxury-gold/10 bg-luxury-ivory/10 transition-all duration-300 hover:shadow-md hover:border-luxury-gold/30 hover:-translate-y-2 active:scale-[0.98]"
+      >
         <div className="relative">
           {/* Product thumbnail - reduced in height */}
           <div className="w-full overflow-hidden relative" style={{ height: '260px' }}>
-            <Thumbnail
-              thumbnail={product.thumbnail}
-              images={product.images}
-              size="full"
-              className="transition-transform duration-700 group-hover:scale-110 object-cover w-full h-full"
-            />
+            <div className="w-full h-full transition-transform duration-300 group-hover:scale-110">
+              <Thumbnail
+                thumbnail={product.thumbnail}
+                images={product.images}
+                size="full"
+                className="object-cover w-full h-full"
+              />
+            </div>
           </div>
           
           {/* Gold gradient overlay on hover */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
-            background: 'linear-gradient(to bottom, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.3))'
-          }}></div>
+          <div 
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+            style={{
+              background: 'linear-gradient(to bottom, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.3))'
+            }}
+          />
           
           {/* Quick View button appears on hover */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 z-20 transform translate-y-4 group-hover:translate-y-0">
+          <div 
+            className="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300"
+          >
             <span className="bg-luxury-ivory/95 border border-luxury-gold px-4 py-2 text-luxury-charcoal text-[10px] uppercase tracking-wider hover:bg-luxury-gold hover:text-luxury-ivory transition-colors duration-300 shadow-sm">
               Quick View
             </span>
@@ -108,10 +134,22 @@ const ProductPreview = ({
           
           {/* Product badges container */}
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+            {/* Discount Badge - Mobile-Optimized */}
+            {isInStock && (
+              <div className="badge-container">
+                <span className="bg-gradient-to-r from-luxury-gold to-yellow-600 px-2 py-1 sm:px-2.5 sm:py-1.5 text-white text-[9px] sm:text-[10px] uppercase tracking-wider font-bold flex items-center shadow-md">
+                  <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+                  </svg>
+                  Save 20%
+                </span>
+              </div>
+            )}
+            
             {/* Limited Edition badge */}
             {isLimitedEdition && (
               <div className="badge-container">
-                <span className="bg-luxury-gold/90 px-2 py-1 text-luxury-ivory text-[9px] uppercase tracking-wider font-medium flex items-center">
+                <span className="bg-luxury-charcoal/90 backdrop-blur-sm px-2 py-1 text-luxury-ivory text-[9px] uppercase tracking-wider font-medium flex items-center border border-luxury-gold/30">
                   <svg className="w-2.5 h-2.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                   </svg>
@@ -141,6 +179,20 @@ const ProductPreview = ({
           {/* Add Reviews Rating */}
           <ProductPreviewRating productId={product.id} />
           
+          {/* Low Stock Urgency - Elegant Style */}
+          {isInStock && showLowStock && (
+            <div className="mt-2 pt-2 border-t border-luxury-gold/20">
+              <div className="flex items-center gap-1.5 text-xs">
+                <svg className="w-3 h-3 text-orange-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium text-orange-600">
+                  Only {lowStockCount} left
+                </span>
+              </div>
+            </div>
+          )}
+          
           {/* Category tags */}
           <div className="flex flex-wrap gap-1 mt-2">
             {product.categories?.slice(0, 2).map((category) => (
@@ -156,3 +208,4 @@ const ProductPreview = ({
 }
 
 export default ProductPreview
+export { ProductPreviewRating }
