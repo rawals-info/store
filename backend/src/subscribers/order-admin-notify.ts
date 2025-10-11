@@ -26,16 +26,26 @@ export default async function orderAdminNotify({
   }
 
   try {
-    // ✅ FIX: Wait 60 seconds to ensure order is fully committed to database
-    logger?.info?.(`[AdminNotify] Waiting 60 seconds before notifying admin for order ${event.data.id}`)
-    await new Promise(resolve => setTimeout(resolve, 60000)) // 60 seconds
-    
     const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
     const notificationService = container.resolve<INotificationModuleService>(
       Modules.NOTIFICATION
     )
 
-    const order = await orderService.retrieveOrder(event.data.id, {
+    // ✅ Smart retry strategy: Try immediately, then retry up to 5 times over 30 seconds
+    let order: any = null
+    const maxAttempts = 6
+    const delays = [0, 5000, 10000, 15000, 20000, 25000]
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        if (delays[attempt] > 0) {
+          logger?.info?.(`[AdminNotify] Retry ${attempt}/${maxAttempts - 1} after ${delays[attempt] / 1000}s for order ${event.data.id}`)
+          await new Promise(resolve => setTimeout(resolve, delays[attempt] - (attempt > 0 ? delays[attempt - 1] : 0)))
+        } else {
+          logger?.info?.(`[AdminNotify] Attempting immediate retrieval for order ${event.data.id}`)
+        }
+        
+        order = await orderService.retrieveOrder(event.data.id, {
       select: [
         "subtotal",
         "shipping_total",
@@ -47,6 +57,22 @@ export default async function orderAdminNotify({
       ],
       relations: ["items", "shipping_address", "billing_address"],
     }) as any
+        
+        logger?.info?.(`[AdminNotify] ✅ Order ${event.data.id} retrieved successfully after ${attempt + 1} attempt(s)`)
+        break
+        
+      } catch (error) {
+        if (attempt === maxAttempts - 1) {
+          logger?.error?.(`[AdminNotify] ❌ Failed to retrieve order ${event.data.id} after ${maxAttempts} attempts`)
+          throw error
+        }
+      }
+    }
+    
+    if (!order) {
+      logger?.error?.(`[AdminNotify] Order ${event.data.id} not found after all retries`)
+      return
+    }
 
     const asNumber = (val: any): number => {
       if (val == null) return 0

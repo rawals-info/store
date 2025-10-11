@@ -10,22 +10,36 @@ export default async function customerOnboardingEmail({
 }: SubscriberArgs<{ id: string }>) {
   const orderId = event.data.id
   
-  // ✅ FIX: Wait 65 seconds (slightly after confirmation email)
-  console.log(`[CustomerOnboardingEmail] Waiting 65 seconds before sending welcome email for order ${orderId}`)
-  await new Promise(resolve => setTimeout(resolve, 65000)) // 65 seconds
-  
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   
-  let order: any
-  try {
-    order = await orderService.retrieveOrder(orderId)
-  } catch (error) {
-    console.error(`[CustomerOnboardingEmail] Failed to retrieve order ${orderId}:`, error)
-    return // Silently fail for onboarding email (non-critical)
+  // ✅ Smart retry strategy: Try immediately, then retry up to 3 times over 15 seconds (non-critical)
+  let order: any = null
+  const maxAttempts = 4 // Fewer retries for non-critical email
+  const delays = [0, 5000, 10000, 15000]
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      if (delays[attempt] > 0) {
+        console.log(`[CustomerOnboardingEmail] Retry ${attempt}/${maxAttempts - 1} after ${delays[attempt] / 1000}s for order ${orderId}`)
+        await new Promise(resolve => setTimeout(resolve, delays[attempt] - (attempt > 0 ? delays[attempt - 1] : 0)))
+      } else {
+        console.log(`[CustomerOnboardingEmail] Attempting immediate retrieval for order ${orderId}`)
+      }
+      
+      order = await orderService.retrieveOrder(orderId)
+      console.log(`[CustomerOnboardingEmail] ✅ Order ${orderId} retrieved successfully`)
+      break
+      
+    } catch (error) {
+      if (attempt === maxAttempts - 1) {
+        console.error(`[CustomerOnboardingEmail] ❌ Failed to retrieve order ${orderId} after ${maxAttempts} attempts - skipping (non-critical)`)
+        return // Silently fail for onboarding email
+      }
+    }
   }
   
   if (!order) {
-    console.warn(`[CustomerOnboardingEmail] Order ${orderId} not found`)
+    console.warn(`[CustomerOnboardingEmail] Order ${orderId} not found after retries - skipping`)
     return
   }
   const customerId = order.customer_id

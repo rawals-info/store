@@ -14,15 +14,25 @@ export default async function orderConfirmationEmail({
 }: SubscriberArgs<{ id: string }>) {
   const { id: orderId } = event.data
 
-  // ✅ FIX: Wait 60 seconds to ensure order is fully committed to database
-  // This is perfectly acceptable for confirmation emails
-  console.log(`[OrderConfirmationEmail] Waiting 60 seconds before sending email for order ${orderId}`)
-  await new Promise(resolve => setTimeout(resolve, 60000)) // 60 seconds
-
   // Retrieve the order with relations so we have customer info
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   
-  const order: any = await orderService.retrieveOrder(orderId, {
+  // ✅ Smart retry strategy: Try immediately, then retry up to 5 times over 30 seconds
+  let order: any = null
+  const maxAttempts = 6 // 1 immediate + 5 retries
+  const delays = [0, 5000, 10000, 15000, 20000, 25000] // 0s, 5s, 10s, 15s, 20s, 25s
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      // Wait before retry (except first attempt which is immediate)
+      if (delays[attempt] > 0) {
+        console.log(`[OrderConfirmationEmail] Retry ${attempt}/${maxAttempts - 1} after ${delays[attempt] / 1000}s for order ${orderId}`)
+        await new Promise(resolve => setTimeout(resolve, delays[attempt] - (attempt > 0 ? delays[attempt - 1] : 0)))
+      } else {
+        console.log(`[OrderConfirmationEmail] Attempting immediate retrieval for order ${orderId}`)
+      }
+      
+      order = await orderService.retrieveOrder(orderId, {
     select: [
       "subtotal",
       "shipping_total",
@@ -39,6 +49,24 @@ export default async function orderConfirmationEmail({
       "billing_address",
     ],
   })
+      
+      console.log(`[OrderConfirmationEmail] ✅ Order ${orderId} retrieved successfully after ${attempt + 1} attempt(s)`)
+      break // Success! Exit retry loop
+      
+    } catch (error) {
+      if (attempt === maxAttempts - 1) {
+        // Final attempt failed
+        console.error(`[OrderConfirmationEmail] ❌ Failed to retrieve order ${orderId} after ${maxAttempts} attempts (30 seconds total)`)
+        throw error
+      }
+      // Continue to next retry
+    }
+  }
+  
+  if (!order) {
+    console.error(`[OrderConfirmationEmail] Order ${orderId} not found after all retries`)
+    return
+  }
 
   const asNumber = (val: any): number => {
     if (val == null) return 0
