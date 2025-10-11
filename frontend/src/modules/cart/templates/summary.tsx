@@ -13,19 +13,7 @@ type SummaryProps = {
   }
 }
 
-function getCheckoutStep(cart: HttpTypes.StoreCart) {
-  if (!cart?.shipping_address?.address_1 || !cart.email) {
-    return "address"
-  } else if (cart?.shipping_methods?.length === 0) {
-    return "delivery"
-  } else {
-    return "payment"
-  }
-}
-
 const Summary = ({ cart }: SummaryProps) => {
-  const step = getCheckoutStep(cart)
-
   return (
     <div className="flex flex-col gap-y-4 px-6">
       <h2 className="font-display text-2xl text-luxury-charcoal">Summary</h2>
@@ -33,11 +21,11 @@ const Summary = ({ cart }: SummaryProps) => {
       <div className="h-px bg-luxury-gold/20 my-2"></div>
       <CartTotals 
         totals={cart}
-        shippingPlaceholder="Calculated at checkout"
+        shippingPlaceholder={(cart.shipping_methods?.length ?? 0) > 0 ? "Free shipping" : "Calculated at checkout"}
         taxPlaceholder="Enjoy tax‑free shopping"
       />
       <LocalizedClientLink
-        href={"/checkout?step=" + step}
+        href="/checkout"
         data-testid="checkout-button"
       >
         <Button className="luxury-btn w-full h-12 mt-2 font-medium tracking-wider uppercase transition-all duration-300 bg-luxury-gold hover:bg-luxury-gold/90">

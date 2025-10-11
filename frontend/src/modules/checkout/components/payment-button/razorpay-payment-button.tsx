@@ -53,7 +53,7 @@ export const RazorpayPaymentButton = ({
         process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID ??
         "", // fallback empty – Razorpay will throw if empty
       callback_url: `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/razorpay/hooks`,
-      amount: (session.amount || 0) * 100, // amount in paise
+      amount: (session.amount || 0), // amount should already be in paise from backend
       order_id: orderId,
       currency: (cart.currency_code || "usd").toUpperCase() as CurrencyCode,
       name: process.env.NEXT_PUBLIC_SHOP_NAME ?? "Checkout",

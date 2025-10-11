@@ -68,7 +68,8 @@ const Shipping: React.FC<ShippingProps> = ({
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams?.get("step") === "delivery"
+  // Always show shipping options when address is filled, collapse when shipping is selected
+  const isOpen = cart?.shipping_address && !cart?.shipping_methods?.length
 
   const _shippingMethods = (availableShippingMethods as HttpTypes.StoreCartShippingOption[])
     // we cast to any here as the typing for service_zone is not in the current Medusa TS types yet.
@@ -82,14 +83,11 @@ const Shipping: React.FC<ShippingProps> = ({
   const hasPickupOptions = !!_pickupMethods?.length
 
   useEffect(() => {
-    // If there's exactly one shipping method (and no pickup flow) auto-select it and continue to payment.
+    // Auto-select the default shipping method if there's only one and no method is selected
     if (isOpen && !hasPickupOptions && _shippingMethods?.length === 1) {
       const sole = _shippingMethods[0]
       if (sole && shippingMethodId === "") {
-        (async () => {
-          await handleSetShippingMethod(sole.id, "shipping")
-          handleSubmit()
-        })()
+        handleSetShippingMethod(sole.id, "shipping")
       }
     }
 
@@ -118,12 +116,15 @@ const Shipping: React.FC<ShippingProps> = ({
     }
   }, [availableShippingMethods])
 
+  const [isEditing, setIsEditing] = useState(false)
+  
   const handleEdit = () => {
-    router.push(pathname + "?step=delivery", { scroll: false })
+    setIsEditing(true)
   }
 
   const handleSubmit = () => {
-    router.push(pathname + "?step=payment", { scroll: false })
+    setIsEditing(false)
+    // No need to navigate since we're on a single page
   }
 
   const handleSetShippingMethod = async (
@@ -184,10 +185,10 @@ const Shipping: React.FC<ShippingProps> = ({
             <CheckCircleSolid className="text-[#9b8b7e]" />
           )}
         </Heading>
-        {!isOpen &&
+        {!isOpen && !isEditing &&
           cart?.shipping_address &&
           cart?.billing_address &&
-          cart?.email && (
+          cart?.email && (cart.shipping_methods?.length ?? 0) > 0 && (
             <Text>
               <button
                 onClick={handleEdit}
@@ -199,7 +200,7 @@ const Shipping: React.FC<ShippingProps> = ({
             </Text>
           )}
       </div>
-      {isOpen ? (
+      {(isOpen || isEditing) ? (
         <>
           <div className="grid">
             <div className="flex flex-col">
@@ -379,16 +380,27 @@ const Shipping: React.FC<ShippingProps> = ({
               error={error}
               data-testid="delivery-option-error-message"
             />
-            <Button
-              size="large"
-              className="mt-8 bg-[var(--color-luxury-gold)] hover:bg-[var(--color-luxury-darkgold)] text-white border-none px-8 py-3 rounded-md luxury-btn"
-              onClick={handleSubmit}
-              isLoading={isLoading}
-              disabled={!shippingMethodId || isLoading}
-              data-testid="submit-delivery-option-button"
-            >
-              Continue to payment
-            </Button>
+            <div className="flex gap-4">
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none px-8 py-3 rounded-md font-medium tracking-wider uppercase transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              )}
+              <Button
+                size="large"
+                className="bg-[var(--color-luxury-gold)] hover:bg-[var(--color-luxury-darkgold)] text-white border-none px-8 py-3 rounded-md luxury-btn"
+                onClick={handleSubmit}
+                isLoading={isLoading}
+                disabled={!shippingMethodId || isLoading}
+                data-testid="submit-delivery-option-button"
+              >
+                Save Delivery Option
+              </Button>
+            </div>
           </div>
         </>
       ) : (

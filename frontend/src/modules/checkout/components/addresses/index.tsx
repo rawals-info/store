@@ -1,13 +1,13 @@
 "use client"
 
-import { setAddresses } from "@lib/actions/cart"
+import { setAddresses, setAddressesSinglePage } from "@lib/actions/cart"
 import compareAddresses from "@lib/util/compare-addresses"
 import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { useToggleState } from "@medusajs/ui"
 import Spinner from "@modules/common/icons/spinner"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useActionState, startTransition } from "react"
+import { startTransition } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
@@ -29,7 +29,8 @@ const Addresses = ({
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams?.get("step") === "address"
+  // Always show form if no address is set, otherwise show summary with edit option
+  const isOpen = !cart?.shipping_address
 
   const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
     cart?.shipping_address && cart?.billing_address
@@ -37,11 +38,11 @@ const Addresses = ({
       : true
   )
 
+  const [isEditing, setIsEditing] = useState(false)
+  
   const handleEdit = () => {
-    router.push(pathname + "?step=address")
+    setIsEditing(true)
   }
-
-  const [message, formAction] = useActionState(setAddresses, null)
 
   // Form state and validation
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
@@ -90,7 +91,7 @@ const Addresses = ({
   }
 
   // Form submission with validation
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsValidating(true)
     
@@ -102,12 +103,19 @@ const Addresses = ({
     setFormErrors(errors)
     
     if (Object.keys(errors).length === 0) {
-      // Form is valid, continue with server action using the generated formAction
-      if (typeof formAction === "function") {
-        startTransition(() => {
-          formAction(formData)
-        })
-      }
+      // Form is valid, continue with server action
+      startTransition(async () => {
+        try {
+          const result = await setAddressesSinglePage(null, formData)
+          if (result?.success) {
+            setIsEditing(false)
+            // Trigger a page refresh to get updated cart data
+            window.location.reload()
+          }
+        } catch (error) {
+          console.error('Error saving address:', error)
+        }
+      })
     }
     
     setIsValidating(false)
@@ -191,9 +199,9 @@ const Addresses = ({
       <div className="flex flex-row items-center justify-between mb-8">
         <h2 className="flex flex-row font-display text-2xl text-luxury-charcoal gap-x-2 items-baseline">
           Shipping Address
-          {!isOpen && <CheckCircleSolid className="text-luxury-gold" />}
+          {!isOpen && !isEditing && <CheckCircleSolid className="text-luxury-gold" />}
         </h2>
-        {!isOpen && cart?.shipping_address && (
+        {!isOpen && !isEditing && cart?.shipping_address && (
           <button
             onClick={handleEdit}
             className="text-luxury-charcoal/70 hover:text-luxury-gold transition-colors duration-150 ease-in-out font-medium text-sm uppercase tracking-wider"
@@ -203,7 +211,7 @@ const Addresses = ({
           </button>
         )}
       </div>
-      {isOpen ? (
+      {(isOpen || isEditing) ? (
         <form className="w-full" onSubmit={handleSubmit} noValidate>
           {/* Hidden field to indicate billing equals shipping */}
           <input type="hidden" name="same_as_billing" value="on" />
@@ -396,13 +404,24 @@ const Addresses = ({
           )}
           
           <div className="flex justify-end mt-6">
-            <SubmitButton 
-              className="bg-luxury-gold hover:bg-luxury-gold/90 text-white border-none px-8 py-3 rounded-md luxury-btn font-medium tracking-wider uppercase transition-all duration-300"
-              variant="primary"
-              data-testid="submit-address-button"
-            >
-              {isValidating ? "Saving..." : "Save and continue"}
-            </SubmitButton>
+            <div className="flex gap-4">
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none px-8 py-3 rounded-md font-medium tracking-wider uppercase transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              )}
+              <SubmitButton 
+                className="bg-luxury-gold hover:bg-luxury-gold/90 text-white border-none px-8 py-3 rounded-md luxury-btn font-medium tracking-wider uppercase transition-all duration-300"
+                variant="primary"
+                data-testid="submit-address-button"
+              >
+                {isValidating ? "Saving..." : "Save Address"}
+              </SubmitButton>
+            </div>
           </div>
         </form>
       ) : (

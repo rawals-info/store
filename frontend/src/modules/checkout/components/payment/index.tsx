@@ -37,7 +37,8 @@ const Payment = ({
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams?.get("step") === "payment"
+  // Show payment form when shipping is selected, collapse when payment is completed
+  const isOpen = cart?.shipping_methods?.length > 0 && !cart?.payment_collection
 
   const isStripe = isStripeFunc(selectedPaymentMethod)
 
@@ -90,8 +91,8 @@ const Payment = ({
         }
       }
 
-      // Navigate to review - the server will provide fresh cart data
-      router.push(pathname + "?step=review")
+      // Close the payment form since we're on a single page
+      setIsEditing(false)
     } catch (err: any) {
       console.error("Payment initialization error:", err)
       setError(err.message || "Failed to initialize payment. Please try again.")
@@ -99,8 +100,10 @@ const Payment = ({
     }
   }
 
+  const [isEditing, setIsEditing] = useState(false)
+  
   const handleEdit = () => {
-    router.push(pathname + "?step=payment")
+    setIsEditing(true)
   }
 
   return (
@@ -119,7 +122,7 @@ const Payment = ({
           Payment
           {!isOpen && paymentReady && <CheckCircleSolid className="text-[#9b8b7e]" />}
         </Heading>
-        {!isOpen && paymentReady && (
+        {!isOpen && !isEditing && paymentReady && (
           <Text>
             <button
               onClick={handleEdit}
@@ -132,7 +135,7 @@ const Payment = ({
         )}
       </div>
       <div>
-        <div className={isOpen ? "block" : "hidden"}>
+        <div className={(isOpen || isEditing) ? "block" : "hidden"}>
           {!paidByGiftcard && availablePaymentMethods?.length && (
             <>
               <RadioGroup
@@ -189,24 +192,35 @@ const Payment = ({
             data-testid="payment-method-error-message"
           />
 
-          <Button
-            size="large"
-            className="mt-8 bg-[var(--color-luxury-gold)] hover:bg-[var(--color-luxury-darkgold)] text-white border-none px-8 py-3 rounded-md luxury-btn"
-            onClick={handleSubmit}
-            isLoading={isLoading}
-            disabled={
-              (isStripe && !cardComplete) ||
-              (!selectedPaymentMethod && !paidByGiftcard)
-            }
-            data-testid="submit-payment-button"
-          >
-            {!activeSession && isStripeFunc(selectedPaymentMethod)
-              ? " Enter card details"
-              : "Continue to review"}
-          </Button>
+          <div className="flex gap-4">
+            {isEditing && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none px-8 py-3 rounded-md font-medium tracking-wider uppercase transition-all duration-300"
+              >
+                Cancel
+              </button>
+            )}
+            <Button
+              size="large"
+              className="bg-[var(--color-luxury-gold)] hover:bg-[var(--color-luxury-darkgold)] text-white border-none px-8 py-3 rounded-md luxury-btn"
+              onClick={handleSubmit}
+              isLoading={isLoading}
+              disabled={
+                (isStripe && !cardComplete) ||
+                (!selectedPaymentMethod && !paidByGiftcard)
+              }
+              data-testid="submit-payment-button"
+            >
+              {!activeSession && isStripeFunc(selectedPaymentMethod)
+                ? " Enter card details"
+                : "Save Payment Method"}
+            </Button>
+          </div>
         </div>
 
-        <div className={isOpen ? "hidden" : "block"}>
+        <div className={(isOpen || isEditing) ? "hidden" : "block"}>
           {cart && paymentReady && activeSession ? (
             <div className="flex items-start gap-x-1 w-full">
               <div className="flex flex-col w-1/3">

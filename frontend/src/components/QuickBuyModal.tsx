@@ -103,8 +103,8 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
         // Don't fail the whole operation if coupon fails
       }
 
-      // Navigate to checkout with address step
-      router.push(`/${countryCode}/checkout?step=address`)
+      // Navigate to unified checkout
+      router.push(`/${countryCode}/checkout`)
     } catch (error) {
       console.error("Failed to add to cart:", error)
       setIsAdding(false)
