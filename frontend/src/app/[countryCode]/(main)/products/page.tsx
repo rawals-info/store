@@ -3,7 +3,7 @@ import { listProducts } from "@lib/data/products"
 import { getIndiaRegion } from "@lib/constants/india-region"
 import { listCategories } from "@lib/data/categories"
 import { listTags } from "@lib/data/tags"
-import ProductPreview from "@modules/products/components/product-preview/server"
+import ProductPreview from "@modules/products/components/product-preview"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { notFound } from "next/navigation"
@@ -12,6 +12,7 @@ import Image from "next/image"
 import { sdk } from "@lib/config"
 import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
 import type { Metadata } from "next"
+import ProductsCountdownBanner from "../../../../components/ProductsCountdownBanner"
 
 export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await params
@@ -160,11 +161,11 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   const featuredProduct = sortedProducts.length > 0 ? sortedProducts[0] : null
   
   return (
-    <div className="content-container">
-      {/* Hero section with featured product backdrop */}
-      <div className="relative overflow-hidden bg-luxury-ivory/5 mb-8">
+    <div className="content-container px-0 sm:px-6 pt-16 sm:pt-0">
+      {/* Mobile-Optimized Hero section with urgency */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-luxury-cream via-luxury-ivory to-luxury-cream mb-6 sm:mb-8">
         {/* Background with gold gradient overlay */}
-        <div className="absolute inset-0 z-0 opacity-20">
+        <div className="absolute inset-0 z-0 opacity-10">
           {featuredProduct?.thumbnail && (
             <div className="w-full h-full relative blur-sm">
               <Image
@@ -180,20 +181,45 @@ export default async function ProductsPage({ params, searchParams }: Props) {
         </div>
         
         {/* Content overlay */}
-        <div className="relative z-10 py-8 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
-          <h1 className="font-display text-4xl md:text-5xl text-luxury-charcoal mb-2">
-           Premium Agra Petha Selection
+        <div className="relative z-10 py-6 sm:py-8 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
+          {/* Mobile-First Flash Sale Banner - Luxury Theme */}
+          <div className="bg-gradient-to-r from-luxury-charcoal via-luxury-charcoal to-black text-luxury-gold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg mb-4 flex items-center gap-2 text-xs sm:text-sm font-medium shadow-lg border border-luxury-gold/30">
+            <span className="text-base sm:text-lg">🔥</span>
+            <span className="font-semibold uppercase tracking-wider">Flash Sale: 20% OFF All Products!</span>
+          </div>
+          
+          <h1 className="font-display text-2xl sm:text-4xl md:text-5xl text-luxury-charcoal mb-2 leading-tight">
+            Premium Agra Petha
           </h1>
-          <div className="h-px w-40 bg-luxury-gold mb-4"></div>
-          <p className="text-serif-regular text-luxury-charcoal/80 max-w-2xl mb-6">
-          Indulge in our hand‑refined Petha recipes—each cube a taste of centuries‑old tradition and pure cane sugar bliss.
+          <div className="h-px w-24 sm:w-40 bg-luxury-gold mb-3 sm:mb-4"></div>
+          <p className="text-sm sm:text-base text-luxury-charcoal/80 max-w-2xl mb-4 sm:mb-6 px-4">
+            Handcrafted traditional sweets delivered fresh to your doorstep
           </p>
+          
+          {/* Urgency Elements - Mobile Optimized */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-2xl px-4 mb-4">
+            <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
+              <div className="text-xl sm:text-2xl font-bold text-luxury-gold">1000+</div>
+              <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Happy Customers</div>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
+              <div className="text-xl sm:text-2xl font-bold text-luxury-gold">24hrs</div>
+              <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Fresh Delivery</div>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
+              <div className="text-xl sm:text-2xl font-bold text-luxury-gold">⭐ 4.8</div>
+              <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Rating</div>
+            </div>
+          </div>
+          
+          {/* Sale Countdown - Synced with announcement banner */}
+          <ProductsCountdownBanner />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[270px_1fr] gap-8">
-        {/* Sidebar with refinements */}
-        <aside>
+      <div className="grid grid-cols-1 lg:grid-cols-[270px_1fr] gap-0 lg:gap-8">
+        {/* Sidebar with refinements - Hidden on mobile, shown on desktop */}
+        <aside className="hidden lg:block px-6">
           {/* Product count & filters */}
           <div className="sticky top-20">
             <RefinementList 
@@ -206,15 +232,21 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               productCount={productCount}
               region={regionData}
             />
-            
           </div>
         </aside>
 
-        {/* Main product grid */}
-        <main>
+        {/* Main product grid - Mobile optimized */}
+        <main className="px-3 sm:px-6">
+          {/* Mobile Filter Toggle */}
+          <div className="lg:hidden mb-4 flex items-center justify-between px-2">
+            <span className="text-sm text-luxury-charcoal/70">
+              {productCount} {productCount === 1 ? 'product' : 'products'}
+            </span>
+          </div>
+          
           <Suspense fallback={<ProductListSkeleton count={8} />}>
             {productCount > 0 ? (
-              <ul className="grid grid-cols-1 small:grid-cols-2 gap-x-8 gap-y-10">
+              <ul className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
                 {sortedProducts.map((product) => (
                   <li key={product.id}>
                     <ProductPreview product={product} region={regionData} />
@@ -222,7 +254,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
                 ))}
               </ul>
             ) : (
-              <div className="py-24 flex flex-col items-center justify-center">
+              <div className="py-24 flex flex-col items-center justify-center px-4">
                 <h2 className="font-display text-xl text-luxury-gold mb-4">No products found</h2>
                 <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
                   We're currently updating our sweet collection. Please check back soon for our latest petha creations.

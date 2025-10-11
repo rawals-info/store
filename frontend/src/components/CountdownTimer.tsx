@@ -20,40 +20,33 @@ export default function CountdownTimer({ className = "", inline = false }: Count
     // ✅ FIX: Only show timer after client-side mount
     setIsMounted(true)
     
-    // Calculate time until end of Sunday (or next Sunday if today is past Sunday)
+    // ✅ 48-hour rolling countdown that resets every 48 hours
     const calculateTimeLeft = () => {
       const now = new Date()
-      const dayOfWeek = now.getDay() // 0 = Sunday, 1 = Monday, etc.
       
-      // Calculate days until next Sunday (0)
-      let daysUntilSunday = (7 - dayOfWeek) % 7
-      if (daysUntilSunday === 0 && now.getHours() >= 23 && now.getMinutes() >= 59) {
-        daysUntilSunday = 7 // If it's Sunday and past 11:59 PM, target next Sunday
-      }
+      // Get a consistent reset point every 48 hours
+      // Using epoch time divided by 48 hours to get consistent 48-hour windows
+      const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000 // 48 hours in milliseconds
+      const epochTime = now.getTime()
+      const timeSinceLastReset = epochTime % FORTY_EIGHT_HOURS
+      const timeUntilNextReset = FORTY_EIGHT_HOURS - timeSinceLastReset
       
-      // Set target to next Sunday at 11:59:59 PM
-      const targetDate = new Date(now)
-      targetDate.setDate(now.getDate() + daysUntilSunday)
-      targetDate.setHours(23, 59, 59, 999)
-      
-      const difference = targetDate.getTime() - now.getTime()
-      
-      if (difference > 0) {
-        const hours = Math.floor(difference / (1000 * 60 * 60))
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+      if (timeUntilNextReset > 0) {
+        const hours = Math.floor(timeUntilNextReset / (1000 * 60 * 60))
+        const minutes = Math.floor((timeUntilNextReset % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((timeUntilNextReset % (1000 * 60)) / 1000)
         
         setTimeLeft({ hours, minutes, seconds })
       } else {
-        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 })
+        setTimeLeft({ hours: 48, minutes: 0, seconds: 0 })
       }
     }
 
     // Calculate immediately
     calculateTimeLeft()
     
-    // Update every 30 seconds (reduced for performance)
-    const interval = setInterval(calculateTimeLeft, 30000)
+    // Update every 1 second for accuracy
+    const interval = setInterval(calculateTimeLeft, 1000)
     
     return () => clearInterval(interval)
   }, [])

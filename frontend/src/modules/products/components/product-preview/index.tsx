@@ -8,6 +8,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 import { getProductReviewSummary } from "@lib/data/products"
+import QuickBuyModal from "@components/QuickBuyModal"
+import { ShoppingBag } from "lucide-react"
 
 // Client-side rating component for ProductPreview
 const ProductPreviewRating = ({ productId }: { productId: string }) => {
@@ -67,6 +69,8 @@ const ProductPreview = ({
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
 }) => {
+  const [isQuickBuyOpen, setIsQuickBuyOpen] = useState(false)
+  
   const { cheapestPrice } = getProductPrice({
     product,
   })
@@ -93,7 +97,20 @@ const ProductPreview = ({
     (variant.inventory_quantity && variant.inventory_quantity > 0)
   ) ?? true
 
+  const handleQuickBuy = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsQuickBuyOpen(true)
+  }
+
   return (
+    <>
+      <QuickBuyModal
+        product={product}
+        region={region}
+        isOpen={isQuickBuyOpen}
+        onClose={() => setIsQuickBuyOpen(false)}
+      />
     <LocalizedClientLink
       href={`/products/${product.handle}`}
       className="group"
@@ -123,13 +140,16 @@ const ProductPreview = ({
             }}
           />
           
-          {/* Quick View button appears on hover */}
-          <div 
-            className="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300"
-          >
-            <span className="bg-luxury-ivory/95 border border-luxury-gold px-4 py-2 text-luxury-charcoal text-[10px] uppercase tracking-wider hover:bg-luxury-gold hover:text-luxury-ivory transition-colors duration-300 shadow-sm">
-              Quick View
-            </span>
+          {/* Quick Buy button - Always visible on mobile, hover on desktop */}
+          <div className="absolute bottom-3 left-3 right-3 z-20 flex gap-2 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-y-2 sm:group-hover:translate-y-0 transition-all duration-300">
+            <button
+              onClick={handleQuickBuy}
+              className="flex-1 bg-luxury-gold hover:bg-luxury-gold/90 text-white py-2.5 px-4 text-sm font-medium uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span className="hidden sm:inline">Quick Buy</span>
+              <span className="sm:hidden">Buy Now</span>
+            </button>
           </div>
           
           {/* Product badges container */}
@@ -204,6 +224,7 @@ const ProductPreview = ({
         </div>
       </div>
     </LocalizedClientLink>
+    </>
   )
 }
 
