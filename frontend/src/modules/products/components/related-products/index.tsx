@@ -2,7 +2,7 @@ import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { getIndiaRegion } from "@lib/constants/india-region"
 import { HttpTypes } from "@medusajs/types"
-import ProductPreview from "../../components/product-preview/server"
+import ProductPreview from "../product-preview"
 
 type RelatedProductsProps = {
   product: HttpTypes.StoreProduct

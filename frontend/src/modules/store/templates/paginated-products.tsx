@@ -3,7 +3,7 @@
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { getIndiaRegion } from "@lib/constants/india-region"
-import ProductPreview from "@modules/products/components/product-preview/server"
+import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"

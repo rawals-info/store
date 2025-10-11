@@ -65,9 +65,11 @@ const ProductPreviewRating = ({ productId }: { productId: string }) => {
 const ProductPreview = ({
   product,
   region,
+  isFeatured,
 }: {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
+  isFeatured?: boolean
 }) => {
   const [isQuickBuyOpen, setIsQuickBuyOpen] = useState(false)
   
