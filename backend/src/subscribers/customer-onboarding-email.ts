@@ -10,34 +10,22 @@ export default async function customerOnboardingEmail({
 }: SubscriberArgs<{ id: string }>) {
   const orderId = event.data.id
   
-  // ✅ FIX: Increase delay significantly
-  await new Promise(resolve => setTimeout(resolve, 6000)) // Wait 6 seconds (after other critical emails)
+  // ✅ FIX: Wait 65 seconds (slightly after confirmation email)
+  console.log(`[CustomerOnboardingEmail] Waiting 65 seconds before sending welcome email for order ${orderId}`)
+  await new Promise(resolve => setTimeout(resolve, 65000)) // 65 seconds
   
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   
-  // ✅ FIX: Add retry logic with error handling (non-critical, so fewer retries)
   let order: any
-  let retries = 3
-  let waitTime = 2000
-  
-  while (retries > 0) {
-    try {
-      order = await orderService.retrieveOrder(orderId)
-      break
-    } catch (error) {
-      retries--
-      if (retries === 0) {
-        console.error(`[CustomerOnboardingEmail] Failed to retrieve order ${orderId} after retries:`, error)
-        return // Silently fail for onboarding email (non-critical)
-      }
-      console.warn(`[CustomerOnboardingEmail] Retry ${3 - retries}/3 for order ${orderId}`)
-      await new Promise(resolve => setTimeout(resolve, waitTime))
-      waitTime *= 1.5
-    }
+  try {
+    order = await orderService.retrieveOrder(orderId)
+  } catch (error) {
+    console.error(`[CustomerOnboardingEmail] Failed to retrieve order ${orderId}:`, error)
+    return // Silently fail for onboarding email (non-critical)
   }
   
   if (!order) {
-    console.warn(`[CustomerOnboardingEmail] Order ${orderId} not found after retries`)
+    console.warn(`[CustomerOnboardingEmail] Order ${orderId} not found`)
     return
   }
   const customerId = order.customer_id

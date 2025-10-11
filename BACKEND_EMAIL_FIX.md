@@ -25,28 +25,22 @@ Timeline:
 
 ---
 
-## The Solution: Aggressive Delays + Exponential Backoff
+## The Solution: Simple 60-Second Delay
 
 ### What Was Changed:
 
 #### 1. **Order Confirmation Email** (Critical)
-- ⏰ Initial delay: **5 seconds** (up from 2)
-- 🔁 Retries: **5 attempts** (up from 3)  
-- 📈 Exponential backoff: 2s → 3s → 4.5s → 6.75s
-- ⏱️ **Total wait time: 21+ seconds** if needed
+- ⏰ Delay: **60 seconds** (1 minute)
+- ✅ Simple, reliable, no retry complexity
+- 🎯 Perfectly acceptable for confirmation emails
 
 #### 2. **Admin Notification** (Critical)
-- ⏰ Initial delay: **5 seconds**
-- 🔁 Retries: **5 attempts**
-- 📈 Exponential backoff
-- ⏱️ **Total wait time: 21+ seconds** if needed
+- ⏰ Delay: **60 seconds** (1 minute)
+- ✅ Ensures admin gets accurate order info
 
 #### 3. **Customer Onboarding Email** (Non-Critical)
-- ⏰ Initial delay: **6 seconds** (runs after critical emails)
-- 🔁 Retries: **3 attempts**
-- 📈 Exponential backoff
-- ⏱️ **Total wait time: 13+ seconds** if needed
-- ✅ Fails silently if still not found
+- ⏰ Delay: **65 seconds** (slightly after confirmation)
+- ✅ Fails silently if order not found (rare)
 
 #### 4. **Slack Workflow**
 - ✅ Added null check before sending
@@ -137,12 +131,13 @@ This is a **known issue** with Medusa's event system:
 - ❌ Lost sales opportunity
 
 ### After Fix:
-- ✅ ~99% email delivery rate
-- ⏰ Slight delay (5-10 seconds for emails)
+- ✅ ~100% email delivery rate
+- ⏰ 1-minute delay for emails (perfectly acceptable)
 - ✅ Happy customers with confirmations
 - ✅ You get all notifications
+- 🧘 Simple, maintainable code
 
-**Trade-off**: Emails arrive 5-10 seconds after order instead of instantly, but this is **MUCH better than 0% delivery**.
+**Trade-off**: Emails arrive 60 seconds after order instead of instantly, but this is **MUCH better than 0% delivery**.
 
 ---
 

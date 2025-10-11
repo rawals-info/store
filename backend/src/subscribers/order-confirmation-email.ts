@@ -14,21 +14,15 @@ export default async function orderConfirmationEmail({
 }: SubscriberArgs<{ id: string }>) {
   const { id: orderId } = event.data
 
-  // ✅ FIX: Increase delay significantly - order.placed fires before DB commit
-  // Wait 5 seconds to ensure the order is fully persisted
-  await new Promise(resolve => setTimeout(resolve, 5000))
+  // ✅ FIX: Wait 60 seconds to ensure order is fully committed to database
+  // This is perfectly acceptable for confirmation emails
+  console.log(`[OrderConfirmationEmail] Waiting 60 seconds before sending email for order ${orderId}`)
+  await new Promise(resolve => setTimeout(resolve, 60000)) // 60 seconds
 
   // Retrieve the order with relations so we have customer info
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   
-  // ✅ FIX: Add aggressive retry logic with exponential backoff
-  let order: any
-  let retries = 5 // Increased from 3 to 5
-  let waitTime = 2000 // Start with 2 seconds
-  
-  while (retries > 0) {
-    try {
-      order = await orderService.retrieveOrder(orderId, {
+  const order: any = await orderService.retrieveOrder(orderId, {
     select: [
       "subtotal",
       "shipping_total",
@@ -45,23 +39,6 @@ export default async function orderConfirmationEmail({
       "billing_address",
     ],
   })
-      break // Successfully retrieved order
-    } catch (error) {
-      retries--
-      if (retries === 0) {
-        console.error(`[OrderConfirmationEmail] Failed to retrieve order ${orderId} after 5 attempts (waited 15+ seconds total):`, error)
-        throw error // Re-throw after all retries exhausted
-      }
-      console.warn(`[OrderConfirmationEmail] Retry ${5 - retries}/5 for order ${orderId}, waiting ${waitTime}ms`)
-      await new Promise(resolve => setTimeout(resolve, waitTime))
-      waitTime *= 1.5 // Exponential backoff: 2s, 3s, 4.5s, 6.75s
-    }
-  }
-
-  if (!order) {
-    console.error(`[OrderConfirmationEmail] Order ${orderId} not found after retries`)
-    return
-  }
 
   const asNumber = (val: any): number => {
     if (val == null) return 0
