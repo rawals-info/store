@@ -26,17 +26,19 @@ export default async function orderAdminNotify({
   }
 
   try {
-    // ✅ FIX: Add delay to ensure order is fully committed to database
-    await new Promise(resolve => setTimeout(resolve, 2000)) // 2 second delay
+    // ✅ FIX: Increase delay significantly
+    await new Promise(resolve => setTimeout(resolve, 5000))
     
     const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
     const notificationService = container.resolve<INotificationModuleService>(
       Modules.NOTIFICATION
     )
 
-    // ✅ FIX: Add retry logic with error handling
+    // ✅ FIX: Add aggressive retry logic with exponential backoff
     let order: any
-    let retries = 3
+    let retries = 5
+    let waitTime = 2000
+    
     while (retries > 0) {
       try {
         order = await orderService.retrieveOrder(event.data.id, {
@@ -55,11 +57,12 @@ export default async function orderAdminNotify({
       } catch (error) {
         retries--
         if (retries === 0) {
-          logger?.error?.(`Failed to retrieve order ${event.data.id} after 3 attempts`, error)
+          logger?.error?.(`Failed to retrieve order ${event.data.id} after 5 attempts (waited 15+ seconds)`, error)
           throw error
         }
-        logger?.warn?.(`Retry ${3 - retries}/3 for order ${event.data.id}`)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        logger?.warn?.(`Retry ${5 - retries}/5 for order ${event.data.id}, waiting ${waitTime}ms`)
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+        waitTime *= 1.5 // Exponential backoff
       }
     }
 

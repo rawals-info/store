@@ -14,15 +14,18 @@ export default async function orderConfirmationEmail({
 }: SubscriberArgs<{ id: string }>) {
   const { id: orderId } = event.data
 
-  // ✅ FIX: Add delay to ensure order is fully committed to database
-  await new Promise(resolve => setTimeout(resolve, 2000)) // 2 second delay
+  // ✅ FIX: Increase delay significantly - order.placed fires before DB commit
+  // Wait 5 seconds to ensure the order is fully persisted
+  await new Promise(resolve => setTimeout(resolve, 5000))
 
   // Retrieve the order with relations so we have customer info
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   
-  // ✅ FIX: Add retry logic with error handling
+  // ✅ FIX: Add aggressive retry logic with exponential backoff
   let order: any
-  let retries = 3
+  let retries = 5 // Increased from 3 to 5
+  let waitTime = 2000 // Start with 2 seconds
+  
   while (retries > 0) {
     try {
       order = await orderService.retrieveOrder(orderId, {
@@ -46,11 +49,12 @@ export default async function orderConfirmationEmail({
     } catch (error) {
       retries--
       if (retries === 0) {
-        console.error(`[OrderConfirmationEmail] Failed to retrieve order ${orderId} after 3 attempts:`, error)
+        console.error(`[OrderConfirmationEmail] Failed to retrieve order ${orderId} after 5 attempts (waited 15+ seconds total):`, error)
         throw error // Re-throw after all retries exhausted
       }
-      console.warn(`[OrderConfirmationEmail] Retry ${3 - retries}/3 for order ${orderId}`)
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1s before retry
+      console.warn(`[OrderConfirmationEmail] Retry ${5 - retries}/5 for order ${orderId}, waiting ${waitTime}ms`)
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+      waitTime *= 1.5 // Exponential backoff: 2s, 3s, 4.5s, 6.75s
     }
   }
 
