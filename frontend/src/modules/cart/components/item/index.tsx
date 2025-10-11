@@ -25,19 +25,41 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const [error, setError] = useState<string | null>(null)
 
   const changeQuantity = async (quantity: number) => {
+    // ✅ Prevent updating while already updating
+    if (updating) {
+      console.log("[CartItem] Update already in progress, ignoring request")
+      return
+    }
+    
     setError(null)
     setUpdating(true)
+    
+    console.log(`[CartItem] Changing quantity for item ${item.id} to ${quantity}`)
 
-    await updateLineItem({
-      lineId: item.id,
-      quantity,
-    })
-      .catch((err) => {
-        setError(err.message)
+    try {
+      await updateLineItem({
+        lineId: item.id,
+        quantity,
       })
-      .finally(() => {
-        setUpdating(false)
-      })
+      
+      console.log(`[CartItem] Successfully updated quantity for item ${item.id}`)
+      
+      // ✅ Trigger cart refresh for all components
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("cartUpdated"))
+      }
+    } catch (err) {
+      console.error(`[CartItem] Failed to update quantity for item ${item.id}:`, err)
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : "Failed to update quantity"
+      setError(errorMessage)
+      
+      // Auto-clear error after 5 seconds
+      setTimeout(() => setError(null), 5000)
+    } finally {
+      setUpdating(false)
+    }
   }
 
   // TODO: Update this to grab the actual max inventory

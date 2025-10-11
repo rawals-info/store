@@ -43,13 +43,12 @@ export async function retrieveCart(
     ...(await getAuthHeaders()),
   }
 
-  // Always fetch the latest cart state. Using `revalidate: 0` ensures the
-  // request bypasses any cached response, preventing issues where the
-  // checkout page shows an empty cart even though items have just been
-  // added.
-  const next = options?.fresh
-    ? { revalidate: 0, tags: ["cart", `cart-${id}`] }
-    : { revalidate: 30, tags: ["cart", `cart-${id}`] }
+  // ✅ FIX: Always use revalidate: 0 for cart to prevent stale data
+  // Cart mutations (add/update/delete) need immediate reflection
+  const next = { 
+    revalidate: 0, 
+    tags: ["cart", `cart-${id}`] 
+  }
 
   return await sdk.client
     .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
@@ -59,7 +58,7 @@ export async function retrieveCart(
       },
       headers,
       next,
-      ...(options?.fresh ? { cache: "no-store" } : {}),
+      cache: "no-store", // ✅ FIX: Always disable cache for cart
     })
     .then(({ cart }) => {
       // Mark cart items and variants to help identify them in price calculations
@@ -371,6 +370,7 @@ export async function updateLineItem({
   lineId: string
   quantity: number
 }) {
+  // ✅ Validate inputs
   if (!lineId) {
     throw new Error("Missing lineItem ID when updating line item")
   }
@@ -385,30 +385,41 @@ export async function updateLineItem({
     ...(await getAuthHeaders()),
   }
 
-  await retryWithBackoff(() => 
-    sdk.store.cart
-      .updateLineItem(cartId, lineId, { quantity }, {}, { 
+  try {
+    console.log(`[Cart] Updating line item ${lineId} to quantity ${quantity}`)
+    
+    // ✅ FIX: Properly await the entire operation
+    await retryWithBackoff(() => 
+      sdk.store.cart.updateLineItem(cartId, lineId, { quantity }, {}, { 
         ...headers, 
         "Idempotency-Key": randomUUID() 
       })
-  )
-    .then(async () => {
-      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
-        getCacheTag("carts"),
-        getCacheTag("fulfillment")
-      ])
-      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
-      
-      // ✅ Invalidate client-side cart cache
-      if (typeof window !== 'undefined') {
-        const { invalidateCartCache } = await import("@lib/hooks/use-cart")
-        invalidateCartCache()
-      }
-    })
-    .catch(medusaError)
+    )
+    
+    console.log(`[Cart] Successfully updated line item ${lineId}`)
+    
+    // ✅ FIX: Invalidate caches after successful update
+    const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+      getCacheTag("carts"),
+      getCacheTag("fulfillment")
+    ])
+    scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
+    
+    // ✅ Invalidate client-side cart cache
+    if (typeof window !== 'undefined') {
+      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
+      invalidateCartCache()
+    }
+    
+    return { success: true }
+  } catch (error) {
+    console.error(`[Cart] Failed to update line item ${lineId}:`, error)
+    throw medusaError(error)
+  }
 }
 
 export async function deleteLineItem(lineId: string) {
+  // ✅ Validate inputs
   if (!lineId) {
     throw new Error("Missing lineItem ID when deleting line item")
   }
@@ -423,27 +434,37 @@ export async function deleteLineItem(lineId: string) {
     ...(await getAuthHeaders()),
   }
 
-  await retryWithBackoff(() =>
-    sdk.store.cart
-      .deleteLineItem(cartId, lineId, { 
+  try {
+    console.log(`[Cart] Attempting to delete line item ${lineId} from cart ${cartId}`)
+    
+    // ✅ FIX: Properly await the entire operation
+    await retryWithBackoff(() =>
+      sdk.store.cart.deleteLineItem(cartId, lineId, { 
         ...headers, 
         "Idempotency-Key": randomUUID() 
       })
-  )
-    .then(async () => {
-      const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
-        getCacheTag("carts"),
-        getCacheTag("fulfillment")
-      ])
-      scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
-      
-      // ✅ Invalidate client-side cart cache
-      if (typeof window !== 'undefined') {
-        const { invalidateCartCache } = await import("@lib/hooks/use-cart")
-        invalidateCartCache()
-      }
-    })
-    .catch(medusaError)
+    )
+    
+    console.log(`[Cart] Successfully deleted line item ${lineId}`)
+    
+    // ✅ FIX: Invalidate caches after successful deletion
+    const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
+      getCacheTag("carts"),
+      getCacheTag("fulfillment")
+    ])
+    scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
+    
+    // ✅ Invalidate client-side cart cache
+    if (typeof window !== 'undefined') {
+      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
+      invalidateCartCache()
+    }
+    
+    return { success: true }
+  } catch (error) {
+    console.error(`[Cart] Failed to delete line item ${lineId}:`, error)
+    throw medusaError(error)
+  }
 }
 
 export async function setShippingMethod({

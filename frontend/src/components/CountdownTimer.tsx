@@ -8,6 +8,8 @@ interface CountdownTimerProps {
 }
 
 export default function CountdownTimer({ className = "", inline = false }: CountdownTimerProps) {
+  // ✅ FIX: Start with null to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false)
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
     minutes: 0,
@@ -15,6 +17,9 @@ export default function CountdownTimer({ className = "", inline = false }: Count
   })
 
   useEffect(() => {
+    // ✅ FIX: Only show timer after client-side mount
+    setIsMounted(true)
+    
     // Calculate time until end of Sunday (or next Sunday if today is past Sunday)
     const calculateTimeLeft = () => {
       const now = new Date()
@@ -47,11 +52,34 @@ export default function CountdownTimer({ className = "", inline = false }: Count
     // Calculate immediately
     calculateTimeLeft()
     
-    // Update every second
-    const interval = setInterval(calculateTimeLeft, 1000)
+    // Update every 30 seconds (reduced for performance)
+    const interval = setInterval(calculateTimeLeft, 30000)
     
     return () => clearInterval(interval)
   }, [])
+
+  // ✅ FIX: Don't render anything until mounted on client
+  if (!isMounted) {
+    // Return placeholder with same structure to prevent layout shift
+    if (inline) {
+      return <span className={`font-mono font-bold ${className}`}>00:00:00</span>
+    }
+    return (
+      <div className={`flex items-center gap-1 ${className}`}>
+        <div className="flex items-center bg-luxury-gold/20 px-1.5 py-0.5 rounded border border-luxury-gold/30">
+          <span className="font-mono text-xs font-bold text-luxury-gold">00</span>
+        </div>
+        <span className="text-xs text-luxury-gold">:</span>
+        <div className="flex items-center bg-luxury-gold/20 px-1.5 py-0.5 rounded border border-luxury-gold/30">
+          <span className="font-mono text-xs font-bold text-luxury-gold">00</span>
+        </div>
+        <span className="text-xs text-luxury-gold">:</span>
+        <div className="flex items-center bg-luxury-gold/20 px-1.5 py-0.5 rounded border border-luxury-gold/30">
+          <span className="font-mono text-xs font-bold text-luxury-gold">00</span>
+        </div>
+      </div>
+    )
+  }
 
   // Format number to always show 2 digits
   const formatNumber = (num: number) => String(num).padStart(2, '0')
