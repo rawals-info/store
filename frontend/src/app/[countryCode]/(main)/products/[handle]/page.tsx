@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
-import { getProductData } from "@lib/data/products"
+import { getProductData, getProductReviewSummary } from "@lib/data/products"
 import { listIndiaRegions } from "@lib/constants/india-region"
 import ProductTemplate from "@modules/products/templates"
 import { Suspense } from "react"
@@ -105,14 +105,114 @@ export default async function ProductPage(props: Props) {
       return notFound()
     }
 
+    // Get review summary for schema
+    let reviewSummary: { average_rating: number; count: number } | null = null
+    try {
+      reviewSummary = await getProductReviewSummary(product.id)
+    } catch { }
+
+    // Calculate price from variants
+    const getProductPrice = (): string => {
+      try {
+        const variants = product.variants || []
+        for (const v of variants as any[]) {
+          const cp = v?.calculated_price
+          if (cp?.calculated_amount !== undefined) {
+            return (Number(cp.calculated_amount) / 100).toFixed(2)
+          }
+          if (v?.prices?.[0]?.amount !== undefined) {
+            return (Number(v.prices[0].amount) / 100).toFixed(2)
+          }
+        }
+        return "0.00"
+      } catch {
+        return "0.00"
+      }
+    }
+
+    const productPrice = getProductPrice()
+    const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0]
+
+    // Generate Product schema for rich results
+    const productSchema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": `https://tajpetha.in/${countryCode}/products/${product.handle}#product`,
+      "name": product.title,
+      "description": product.description || `Premium ${product.title} from Taj Petha. Fresh, hygienic, and authentic.`,
+      "image": product.thumbnail || product.images?.[0]?.url || "https://tajpetha.in/placeholder.jpg",
+      "url": `https://tajpetha.in/${countryCode}/products/${product.handle}`,
+      "brand": {
+        "@type": "Brand",
+        "name": "Taj Petha"
+      },
+      "category": product.categories?.[0]?.name || "Indian Sweets",
+      "sku": product.id,
+      ...(reviewSummary && reviewSummary.count > 0 ? {
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": reviewSummary.average_rating.toFixed(1),
+          "reviewCount": String(reviewSummary.count),
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      } : {}),
+      "offers": {
+        "@type": "Offer",
+        "url": `https://tajpetha.in/${countryCode}/products/${product.handle}`,
+        "priceCurrency": "INR",
+        "price": productPrice,
+        "priceValidUntil": priceValidUntil,
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": {
+          "@type": "Organization",
+          "name": "Taj Petha"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "IN"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 0,
+              "maxValue": 1,
+              "unitCode": "DAY"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 2,
+              "maxValue": 5,
+              "unitCode": "DAY"
+            }
+          }
+        }
+      }
+    }
+
     return (
-      <Suspense fallback={<SkeletonProductPage />}>
-        <ProductTemplate
-          product={product}
-          region={region}
-          countryCode={countryCode}
+      <>
+        {/* Product Schema for Rich Results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(productSchema),
+          }}
         />
-      </Suspense>
+        <Suspense fallback={<SkeletonProductPage />}>
+          <ProductTemplate
+            product={product}
+            region={region}
+            countryCode={countryCode}
+          />
+        </Suspense>
+      </>
     )
   } catch (error) {
     console.error(`Error in ProductPage:`, error)

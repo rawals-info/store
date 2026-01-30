@@ -453,6 +453,273 @@ Today, Taj Petha blends tradition with reliable shipping and packaging so this h
     ],
     image: "https://picsum.photos/800/400?random=39",
     featured: false
+  },
+  {
+    id: "petha-for-diabetics-sugar-free-options",
+    title: "Can Diabetics Eat Petha? Sugar-Free Options, Portion Sizes & Glycemic Impact",
+    excerpt: "A practical guide for sugar patients: understand petha's glycemic index, safe portion sizes, sugar-free alternatives, and when diabetics can enjoy traditional sweets.",
+    content: `Managing diabetes doesn't mean completely avoiding Indian sweets. Here's what you need to know about petha and blood sugar.
+
+**Understanding Petha's Glycemic Impact:**
+- Traditional petha has moderate glycemic index (GI ~55-65)
+- Sugar content: approximately 50-60% by weight
+- Single 25g piece contains roughly 12-15g sugar
+
+**Safe Consumption Guidelines:**
+1. Limit to 1 small piece (25g) occasionally
+2. Pair with protein or fiber-rich foods
+3. Best consumed after meals, not on empty stomach
+4. Monitor blood sugar response individually
+
+**Sugar-Free Petha Options:**
+- Some artisans now offer stevia-sweetened variants
+- Look for "diabetic-friendly" or "sugar-free" labels
+- Verify sweetener type (maltitol, stevia, erythritol)
+
+**When to Avoid:**
+- During fasting or empty stomach
+- If blood sugar is already elevated
+- Without portion control
+
+**Healthier Alternatives:**
+- Dry Petha has slightly lower sugar density than juicy variants
+- Pair with nuts to slow sugar absorption
+
+Always consult your doctor or dietitian for personalized advice. Taj Petha is exploring diabetic-friendly recipes while maintaining authentic taste.`,
+    author: "Health Advisory Team – Taj Petha",
+    publishDate: "2025-01-24",
+    readTime: "7 min read",
+    category: "Health & Nutrition",
+    tags: [
+      "petha for diabetics",
+      "sugar free petha",
+      "can diabetics eat petha",
+      "petha glycemic index",
+      "low sugar indian sweets"
+    ],
+    image: "https://picsum.photos/800/400?random=51",
+    featured: false
+  },
+  {
+    id: "how-to-store-petha-at-home",
+    title: "How to Store Petha at Home: Summer Tips, Refrigeration, Shelf Life & Signs of Spoilage",
+    excerpt: "Keep your petha fresh longer with proper storage. Learn refrigeration tips, summer handling, airtight container methods, and how to tell if petha has gone bad.",
+    content: `Proper storage keeps petha fresh and safe to eat. Follow these guidelines for maximum freshness.
+
+**Storage Basics by Type:**
+
+*Dry Petha:*
+- Room temperature: 45-60 days in cool, dry place
+- Airtight steel or glass containers preferred
+- Avoid plastic that traps moisture
+
+*Juicy/Kesar Petha:*
+- Refrigerate after opening: 15-25 days
+- Keep in original packaging or airtight container
+- Bring to room temperature before eating for best taste
+
+**Summer Storage Tips:**
+1. Always refrigerate juicy variants in hot weather (30°C+)
+2. Use insulated bags for transport
+3. Consume dry petha within 30 days in summer
+4. Keep away from direct sunlight and stove heat
+
+**Signs Your Petha Has Spoiled:**
+- Unusual sour or fermented smell
+- Visible mold (green, white, or black spots)
+- Slimy or overly sticky texture
+- Off-taste or excessive crystallization
+
+**Pro Tips:**
+- Separate pieces with butter paper in box
+- Don't mix fresh and old batches
+- Note the batch date on container
+
+Taj Petha uses vacuum-sealed packaging and date stamps to help you track freshness from dispatch to consumption.`,
+    author: "Quality Control Team – Taj Petha",
+    publishDate: "2025-01-22",
+    readTime: "6 min read",
+    category: "Storage & Care",
+    tags: [
+      "how to store petha",
+      "petha shelf life",
+      "petha storage summer",
+      "keep petha fresh",
+      "petha refrigeration"
+    ],
+    image: "https://picsum.photos/800/400?random=52",
+    featured: false
+  },
+  {
+    id: "petha-delivery-delhi-ncr-same-day",
+    title: "Petha Delivery in Delhi NCR: Same-Day Options, Delivery Areas & Freshness Guarantee",
+    excerpt: "Get authentic Agra petha delivered fresh in Delhi, Noida, Gurgaon, Faridabad & Ghaziabad. Same-day dispatch, delivery areas, timing options, and freshness tips.",
+    content: `Delhi NCR residents can enjoy fresh Agra petha within 24-48 hours. Here's your complete delivery guide.
+
+**Delivery Coverage:**
+- Delhi: All zones (North, South, East, West, Central)
+- Noida & Greater Noida: Sectors 1-150+
+- Gurgaon: All sectors including Cyber City, DLF areas
+- Faridabad: Old city and new sectors
+- Ghaziabad: Indirapuram, Vaishali, Kaushambi, Raj Nagar
+
+**Delivery Timeline:**
+- Order before 12 PM: Same-day dispatch, next-day delivery
+- Order after 12 PM: Dispatch next morning
+- Express option: Selected areas within 24 hours
+
+**Peak Delivery Times:**
+- Diwali, Holi, Raksha Bandhan: Order 3-5 days ahead
+- Wedding season (Oct-Feb): 2-3 days advance booking recommended
+
+**Freshness Guarantee:**
+- Temperature-controlled packaging in summer
+- Insulated boxes for all orders
+- 48-hour freshness window after delivery
+- Damaged deliveries replaced free
+
+**Ordering Tips for Delhi NCR:**
+1. Select morning delivery slot for juicy pethas
+2. Ensure someone receives the package
+3. Refrigerate immediately in summer months
+4. Check package seal before accepting
+
+Taj Petha partners with reliable logistics to ensure your sweets arrive as fresh as they left Agra.`,
+    author: "Delivery Operations – Taj Petha",
+    publishDate: "2025-01-20",
+    readTime: "5 min read",
+    category: "Delivery & Shipping",
+    tags: [
+      "petha delivery delhi",
+      "petha delivery noida",
+      "petha delivery gurgaon",
+      "same day petha delivery",
+      "agra petha delhi ncr"
+    ],
+    image: "https://picsum.photos/800/400?random=53",
+    featured: false
+  },
+  {
+    id: "best-petha-flavors-ranked",
+    title: "Best Petha Flavors Ranked: Kesar vs Dry vs Paan vs Chocolate (2025 Guide)",
+    excerpt: "Not sure which petha to try first? Our ranked comparison of Agra petha varieties by taste, texture, shelf life, and best occasions to help you choose.",
+    content: `With so many petha varieties available, choosing can be overwhelming. Here's our expert ranking.
+
+**#1: Kesar Petha (Saffron)**
+- *Taste:* Rich saffron aroma, luxurious sweetness
+- *Texture:* Soft, slightly juicy
+- *Best for:* Gifting, festivals, special occasions
+- *Shelf life:* 20-30 days refrigerated
+- *Rating:* ★★★★★ (Premium choice)
+
+**#2: Dry Petha (Classic)**
+- *Taste:* Subtle sweetness, authentic Agra flavor
+- *Texture:* Firm, chewy, not sticky
+- *Best for:* Daily snacking, travel, long storage
+- *Shelf life:* 45-60 days at room temperature
+- *Rating:* ★★★★★ (Bestseller)
+
+**#3: Paan Petha (Betel Leaf)**
+- *Taste:* Refreshing, mint-like, unique
+- *Texture:* Soft with slight crunch from gulkand
+- *Best for:* After meals, palate cleanser
+- *Shelf life:* 20-25 days refrigerated
+- *Rating:* ★★★★☆ (Unique experience)
+
+**#4: Chocolate Petha**
+- *Taste:* Sweet, cocoa-infused modern twist
+- *Texture:* Soft with chocolate coating
+- *Best for:* Kids, chocolate lovers, fusion desserts
+- *Shelf life:* 15-20 days refrigerated
+- *Rating:* ★★★★☆ (Kid favorite)
+
+**#5: Angoori Petha**
+- *Taste:* Extra sweet, grape-sized balls
+- *Texture:* Soft, juicy, syrup-heavy
+- *Best for:* Sweet lovers, syrup enthusiasts
+- *Shelf life:* 15-20 days refrigerated
+- *Rating:* ★★★☆☆ (Very sweet)
+
+**Our Recommendation:**
+- First-timer: Start with Dry Petha
+- Gifting: Kesar Petha or Mixed Box
+- Kids: Chocolate Petha
+- Health-conscious: Dry Petha (lower syrup)
+
+Taj Petha offers all varieties with consistent quality and authentic taste.`,
+    author: "Product Team – Taj Petha",
+    publishDate: "2025-01-18",
+    readTime: "8 min read",
+    category: "Product Guides",
+    tags: [
+      "best petha flavor",
+      "kesar petha vs dry petha",
+      "types of agra petha",
+      "petha varieties ranked",
+      "which petha to buy"
+    ],
+    image: "https://picsum.photos/800/400?random=54",
+    featured: true
+  },
+  {
+    id: "corporate-bulk-petha-orders",
+    title: "Corporate Petha Orders: Bulk Pricing, Custom Branding, Diwali Hampers & Employee Gifts",
+    excerpt: "Planning corporate gifting with Indian sweets? Get bulk petha pricing, custom logo packaging, Diwali hamper options, and employee appreciation gift ideas.",
+    content: `Make your corporate gifts memorable with authentic Agra petha. Here's everything for business orders.
+
+**Bulk Pricing Tiers:**
+- 50-100 boxes: 10% discount
+- 100-250 boxes: 15% discount
+- 250-500 boxes: 20% discount
+- 500+ boxes: Custom quote (contact us)
+
+**Custom Branding Options:**
+- Logo-printed box sleeves
+- Custom ribbon and message cards
+- Branded outer cartons
+- QR codes linking to your website
+
+**Popular Corporate Occasions:**
+1. *Diwali Gifting:* Premium hampers with petha + dry fruits
+2. *Employee Appreciation:* Individual boxes with thank-you notes
+3. *Client Relations:* Luxury tins with mixed varieties
+4. *Event Favors:* Mini boxes for conferences, launches
+
+**Diwali Hamper Examples:**
+- ₹500-800: Petha box + small namkeen
+- ₹800-1500: Kesar petha + dry fruits + premium packaging
+- ₹1500+: Curated hamper with sweets, snacks, branded elements
+
+**Delivery & Logistics:**
+- Pan-India delivery for bulk orders
+- Staggered delivery to multiple addresses
+- International shipping available (select countries)
+- Tracking links for each shipment
+
+**Order Timeline:**
+- Standard: 7-10 days lead time
+- Custom branding: 15-20 days lead time
+- Diwali season: Order by September
+
+**How to Order:**
+1. Email: corporate@tajpetha.in
+2. WhatsApp: +91-92594-18994
+3. Fill bulk order form on website
+
+Taj Petha has served 200+ corporate clients including IT companies, banks, and startups with reliable, fresh gifting solutions.`,
+    author: "Corporate Sales – Taj Petha",
+    publishDate: "2025-01-26",
+    readTime: "7 min read",
+    category: "Corporate Gifting",
+    tags: [
+      "corporate petha order",
+      "bulk petha pricing",
+      "diwali corporate gifts",
+      "employee gifting sweets",
+      "custom branded sweets"
+    ],
+    image: "https://picsum.photos/800/400?random=55",
+    featured: false
   }
 ]
 

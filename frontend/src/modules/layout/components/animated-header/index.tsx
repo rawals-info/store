@@ -27,19 +27,19 @@ const AnimatedHeader = () => {
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const { scrollY } = useScroll()
   const pathname = usePathname()
-  
+
   // Check localStorage for banner dismissal state on mount
   useEffect(() => {
     if (typeof window === 'undefined') return // ✅ SSR safety
     const dismissed = localStorage.getItem('promotional-banner-dismissed') === 'true'
     setBannerDismissed(dismissed)
   }, [])
-  
-  // Promotional messages with urgency
+
+  // Premium promotional messages - elegant, no emojis
   const promoMessages = [
-    "🔥 FLASH SALE: Use code SWEET20 for 20% OFF all Petha",
-    "🎁 SPECIAL: Use code PETHA12 for exclusive discounts",
-    "🍫 NEW LAUNCH: Chocolate Petha — use CHOCO10 for 10% off"
+    "Free Shipping on Orders Above ₹500",
+    "Use code SWEET20 for 20% off your first order",
+    "Handcrafted Fresh Daily in Agra — Delivered Nationwide"
   ]
 
   // Function to handle banner dismissal
@@ -64,7 +64,7 @@ const AnimatedHeader = () => {
 
   // Extract country code from pathname
   const countryCode = pathname?.split('/')[1] || 'us'
-  
+
   // Check if we're on the homepage (root country path)
   const isHomePage = pathname?.split('/').length === 2
 
@@ -76,25 +76,25 @@ const AnimatedHeader = () => {
     [0, 50],
     ["0px 0px 0px rgba(0,0,0,0)", "0px 6px 24px rgba(0,0,0,0.03), 0px 2px 8px rgba(212,175,55,0.1)"]
   )
-  
+
   // Header background: transparent on top of homepage, then solid black. All other pages solid black.
   const headerBg = useTransform(
     scrollY,
     [0, 50],
     isHomePage ? ["rgba(0,0,0,0)", "rgba(0,0,0,0.96)"] : ["rgb(0,0,0)", "rgb(0,0,0)"]
   )
-  
+
   // Default links so the header still renders without Tina
   const defaultNavLinks = [
     { href: "/products", label: "Shop", testId: "nav-shop-link" },
     { href: "/about", label: "About", testId: "nav-about-link" },
   ]
-  
+
   const defaultRightLinks = [
     { href: "/account", label: "Account", testId: "nav-account-link" },
     { href: "/contact", label: "Contact", testId: "nav-contact-link" },
   ]
-  
+
   const [navLinks] = useState(() => defaultNavLinks)
   const [rightLinks] = useState(() => defaultRightLinks)
 
@@ -126,13 +126,13 @@ const AnimatedHeader = () => {
       }
     })
   }
-  
+
   // Update isScrolled state based on scroll position
   useEffect(() => {
     const updateScrollState = () => {
       setIsScrolled(window.scrollY > 10)
     }
-    
+
     window.addEventListener("scroll", updateScrollState)
     return () => window.removeEventListener("scroll", updateScrollState)
   }, [])
@@ -168,16 +168,16 @@ const AnimatedHeader = () => {
           >
             {/* Animated background pattern */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-luxury-gold/10 to-transparent animate-pulse" />
-            
+
             {/* Mobile optimized content */}
             <div className="relative w-full px-2 sm:px-4">
               <div className="flex items-center justify-between max-w-7xl mx-auto">
                 {/* Left: Countdown Timer (Hidden on mobile) */}
                 <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs font-bold uppercase tracking-wide text-luxury-gold">Ends in:</span>
+                  <span className="text-xs font-medium uppercase tracking-wide text-white/70">Next batch ships in:</span>
                   <CountdownTimer />
                 </div>
-                
+
                 {/* Center: Scrolling Messages */}
                 <div className="flex-1 overflow-hidden mx-2 md:mx-4">
                   <motion.div
@@ -207,14 +207,14 @@ const AnimatedHeader = () => {
                     ))}
                   </motion.div>
                 </div>
-                
+
                 {/* Right: Countdown Timer for Mobile */}
                 <div className="flex md:hidden items-center gap-1 flex-shrink-0">
                   <CountdownTimer inline className="text-xs text-luxury-gold" />
                 </div>
               </div>
             </div>
-            
+
             {/* Close button - Properly positioned */}
             <button
               onClick={handleBannerDismiss}
@@ -234,9 +234,9 @@ const AnimatedHeader = () => {
             onClick={handleShowBanner}
             className="fixed top-1 left-1/2 transform -translate-x-1/2 z-[45] bg-luxury-gold hover:bg-luxury-gold/90 text-white text-xs px-2 py-1 rounded-full shadow-lg transition-all duration-200 flex items-center gap-1 border border-luxury-gold/30 hover:border-luxury-gold"
             initial={{ y: -20, opacity: 0, scale: 0.8 }}
-            animate={{ 
-              y: 0, 
-              opacity: 1, 
+            animate={{
+              y: 0,
+              opacity: 1,
               scale: 1,
               boxShadow: [
                 "0 2px 15px rgba(212, 175, 55, 0.3)",
@@ -245,8 +245,8 @@ const AnimatedHeader = () => {
               ]
             }}
             exit={{ y: -20, opacity: 0, scale: 0.8 }}
-            transition={{ 
-              duration: 0.3, 
+            transition={{
+              duration: 0.3,
               ease: [0.25, 1, 0.5, 1],
               boxShadow: {
                 duration: 2,
@@ -259,7 +259,7 @@ const AnimatedHeader = () => {
             aria-label="Show promotional banner again"
           >
             <svg width={8} height={8} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 5V19M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 5V19M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="font-medium text-xs hidden sm:inline">Offers</span>
           </motion.button>
@@ -283,49 +283,47 @@ const AnimatedHeader = () => {
         }}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ 
-          duration: 0.7, 
+        transition={{
+          duration: 0.7,
           ease: [0.16, 1, 0.3, 1],
           delay: 0.1
         }}
       >
         {/* Decorative gold gradient line that appears when scrolled */}
         <motion.div
-        className={`
+          className={`
         absolute top-0 left-0 right-0 h-[2px]
         ${isScrolled
-        ? "bg-black opacity-100"       /* solid black at 100% when scrolled */
-        : "gold-gradient opacity-30"    /* your existing gold fade when at top */
-      }
+              ? "bg-black opacity-100"       /* solid black at 100% when scrolled */
+              : "gold-gradient opacity-30"    /* your existing gold fade when at top */
+            }
   `   }
-      initial={{ scaleX: 0, transformOrigin: "left" }}
-      animate={{ scaleX: 1 }}
-      transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
-      />
+          initial={{ scaleX: 0, transformOrigin: "left" }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
+        />
 
-        
+
         {/* Subtle glow effect that appears when scrolled */}
         {isScrolled && (
-          <motion.div 
+          <motion.div
             className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-luxury-gold/30 blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           />
         )}
-        
-        <div className={`w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 ${getTextColor()} h-full transition-all duration-300 box-border ${
-          isScrolled ? "py-1 h-20" : "py-2 h-24"
-        }`}>
+
+        <div className={`w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 ${getTextColor()} h-full transition-all duration-300 box-border ${isScrolled ? "py-1 h-20" : "py-2 h-24"
+          }`}>
           <div className="w-full flex items-center justify-between h-full relative">
             <div className="flex-1 basis-0 h-full flex items-center">
               {/* Mobile menu button */}
               <div className="small:hidden">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className={`flex items-center text-sm font-medium tracking-wide group transition-colors duration-300 ${
-                    "text-white hover:text-luxury-gold"
-                  }`}
+                  className={`flex items-center text-sm font-medium tracking-wide group transition-colors duration-300 ${"text-white hover:text-luxury-gold"
+                    }`}
                   aria-label="Open menu"
                 >
                   <svg className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -355,17 +353,17 @@ const AnimatedHeader = () => {
                   TAJ PETHA
                 </span>
               </LocalizedClientLink>
-              
+
               {/* Navigation links - desktop */}
               <div className="hidden small:flex items-center gap-x-8 h-full">
                 {(navLinks || []).filter(l => l.href !== "/categories" && l.label?.toLowerCase() !== "categories").map((link, i) => {
-                  const isActive = pathname === link.href || 
+                  const isActive = pathname === link.href ||
                     (link.href !== "/" && pathname?.startsWith(link.href))
                   const isCategories = link.href === "/categories"
-                  
+
                   return (
-                    <motion.div 
-                      key={link.href} 
+                    <motion.div
+                      key={link.href}
                       className="relative"
                       whileHover="hover"
                       variants={linkVariants}
@@ -386,7 +384,7 @@ const AnimatedHeader = () => {
                         {link.label}
                       </LocalizedClientLink>
                       {(hoveredLink === link.href || isActive) && (
-                        <motion.div 
+                        <motion.div
                           className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
                           layoutId="underline"
                           initial={{ width: 0, opacity: 0, left: "25%" }}
@@ -395,11 +393,11 @@ const AnimatedHeader = () => {
                           transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
                         />
                       )}
-                      
+
                       {/* Render category dropdown if this is the Categories link */}
                       {isCategories && (
                         <div className="relative">
-                          <CategoryDropdown 
+                          <CategoryDropdown
                             countryCode={countryCode}
                             isOpen={categoryDropdownOpen}
                             onMouseEnter={() => setCategoryDropdownOpen(true)}
@@ -417,7 +415,7 @@ const AnimatedHeader = () => {
             <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
               {/* Search Bar - Added to desktop view */}
               <div className="hidden small:block w-1/2 ml-8">
-                <Suspense fallback={<div className="h-9 w-full bg-white/10 rounded" />}> 
+                <Suspense fallback={<div className="h-9 w-full bg-white/10 rounded" />}>
                   <SearchBar
                     isHomePage={isHomePage}
                     isScrolled={isScrolled}
@@ -425,11 +423,11 @@ const AnimatedHeader = () => {
                   />
                 </Suspense>
               </div>
-              
+
               <div className="hidden small:flex items-center gap-x-6">
                 {rightLinks.map((link, i) => (
-                  <motion.div 
-                    key={link.href} 
+                  <motion.div
+                    key={link.href}
                     className="relative"
                     whileHover="hover"
                     variants={linkVariants}
@@ -444,7 +442,7 @@ const AnimatedHeader = () => {
                       {link.label}
                     </LocalizedClientLink>
                     {hoveredLink === link.href && (
-                      <motion.div 
+                      <motion.div
                         className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
                         layoutId="navIndicator"
                         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
@@ -453,9 +451,9 @@ const AnimatedHeader = () => {
                   </motion.div>
                 ))}
               </div>
-              
+
               {/* Currency switcher removed */}
-              
+
               {/* Mobile Search Icon */}
               <div className="small:hidden flex items-center">
                 <button
@@ -464,17 +462,17 @@ const AnimatedHeader = () => {
                   aria-label="Search"
                 >
                   <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
 
                 </button>
@@ -488,7 +486,7 @@ const AnimatedHeader = () => {
           </div>
         </div>
       </motion.header>
-      
+
       {/* Mobile Search Overlay */}
       <AnimatePresence>
         {mobileSearchOpen && (
@@ -510,7 +508,7 @@ const AnimatedHeader = () => {
                 </svg>
               </button>
             </div>
-            <Suspense fallback={<div className="h-9 w-full bg-luxury-cream/40 rounded" />}> 
+            <Suspense fallback={<div className="h-9 w-full bg-luxury-cream/40 rounded" />}>
               <SearchBar autoSearch={true} autoFocus={true} useCharcoal={true} />
             </Suspense>
           </motion.div>
@@ -600,7 +598,7 @@ const AnimatedHeader = () => {
                     >
                       <SearchBar autoSearch={true} useCharcoal={true} />
                     </motion.div>
-                    
+
                     {/* Currency switcher removed */}
                   </div>
                 </div>

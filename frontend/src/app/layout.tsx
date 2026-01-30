@@ -8,41 +8,41 @@ import "styles/globals.css"
 import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
 
 // ✅ Optimized font loading with display: 'swap', preload, and adjustFontFallback
-const poppins = Poppins({ 
-  subsets: ["latin"], 
-  weight: ["300","400","500","600","700"], 
-  display: "swap", 
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
   variable: "--font-poppins",
   preload: true,
   adjustFontFallback: true,
   fallback: ['system-ui', 'arial']
 })
 
-const dmSerif = DM_Serif_Display({ 
-  subsets: ["latin"], 
-  weight: "400", 
-  style: "normal", 
-  display: "swap", 
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: "400",
+  style: "normal",
+  display: "swap",
   variable: "--font-dm-serif",
   preload: true,
   adjustFontFallback: true,
   fallback: ['Georgia', 'serif']
 })
 
-const interFont = Inter({ 
-  subsets: ["latin"], 
-  weight: ["400","500","600","700"], 
-  display: "swap", 
+const interFont = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
   variable: "--font-inter",
   preload: true,
   adjustFontFallback: true,
   fallback: ['system-ui', 'arial']
 })
 
-const playfair = Playfair_Display({ 
-  subsets: ["latin"], 
-  weight: ["400","500","600","700"], 
-  display: "swap", 
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
   variable: "--font-playfair",
   preload: false, // Only loaded on-demand for specific components
   adjustFontFallback: true,
@@ -121,9 +121,9 @@ export const metadata: Metadata = {
   //   },
   // },
   verification: {
-    google: "google-verification-code", // Add your Google Search Console verification code
+    // Google verification already done in GSC - no meta tag needed
     other: {
-      'facebook-domain-verification': 'facebook-domain-verification-code',
+      'facebook-domain-verification': '67d42axli9oz3jcifxdr025itpyp96',
     },
   },
   category: 'food',
@@ -266,19 +266,19 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         {/* Preload critical resources to reduce HTTP requests */}
         <link rel="preload" href="/hero_image.webp" as="image" />
         <meta property="og:site_name" content="Taj Petha" />
-        
+
         {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         {/* Preconnects removed to avoid unnecessary 3rd-party warmups unless scripts are used */}
-        
+
         {/* Optimized favicon and app icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/manifest.json" />
-        
+
         {/* Service Worker Registration (gated by env + prod) */}
         <script dangerouslySetInnerHTML={{
           __html: `
@@ -323,7 +323,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         }} />
 
         {/* External analytics scripts are loaded centrally in GoogleAnalytics component */}
-        
+
         {/* Enhanced Schema Markup */}
         <script
           type="application/ld+json"
@@ -350,14 +350,14 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NFH57XTD"
           height="0" width="0" style="display:none;visibility:hidden"></iframe>`
         }} />
-        
+
         {/* Analytics Scripts */}
         <GoogleAnalytics />
-        
+
         {/* Vercel Analytics and Speed Insights */}
         <Analytics />
         <SpeedInsights />
-        
+
         <main className="relative">{props.children}</main>
       </body>
     </html>

@@ -1,18 +1,20 @@
 const excludedPaths = [
-  "/checkout", 
-  "/account/*", 
+  "/checkout",
+  "/account/*",
   "/cart",
   "/admin/*",
   "/_next/*",
   "/api/*",
   "/reset-password",
   "/forgot-password",
-  "/payment-icons/*"
+  "/payment-icons/*",
+  "/opengraph-image*",
+  "/search/*"
 ]
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://tajpetha.in',
+  siteUrl: 'https://tajpetha.in', // Standardized to non-www
   generateRobotsTxt: true,
   generateIndexSitemap: false, // Disable index sitemap to avoid conflicts
   // Exclude only private/internal paths that shouldn't be indexed
@@ -21,7 +23,7 @@ module.exports = {
     '/in/store', // Exclude store page since it redirects to /in/products
     // Don't exclude public pages - include canonical /in/* versions only
   ],
-  
+
   // Generate multiple sitemaps for better SEO organization
   additionalPaths: async () => {
     // Keep sitemap minimalist to avoid GSC redirect/canonical conflicts
@@ -37,8 +39,6 @@ module.exports = {
       { loc: '/in/terms', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/privacy', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/returns', priority: 0.7, changefreq: 'monthly' },
-      // Frequently crawled but not indexed — explicitly include to boost signals
-      { loc: '/in/products', priority: 0.8, changefreq: 'daily' },
       { loc: '/in/city/delhi', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/city/mumbai', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/city/bangalore', priority: 0.8, changefreq: 'weekly' },
@@ -134,7 +134,7 @@ module.exports = {
   // Custom options for sitemap generation
   sitemapSize: 5000, // Split large sitemaps
   autoLastmod: true,
-  
+
   // Additional sitemap configurations
   outDir: './public',
 }

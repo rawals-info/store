@@ -10,7 +10,7 @@ import { MAJOR_INDIAN_CITIES } from "@lib/seo"
 
 const baseMetadata: Metadata = {
   title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
-  description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. ✅ Hygienic ✅ Traditional recipes ✅ Same-day dispatch ✅ Free shipping ₹500+",
+  description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch, free shipping on orders above ₹500.",
   keywords: [
     "best petha in India",
     "authentic Agra petha online",
@@ -27,7 +27,7 @@ const baseMetadata: Metadata = {
   ],
   openGraph: {
     title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
-    description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch across India!",
+    description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch across India!",
     url: "https://tajpetha.in",
     images: [
       {
@@ -43,7 +43,7 @@ const baseMetadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
-    description: "🍬 Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch!",
+    description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch!",
     images: ["/hero_image.webp"],
   },
   other: {
@@ -97,7 +97,7 @@ const createHomepageSchema = (
   const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split('T')[0]
-  
+
   // Determine price (major units) for a product using its variants
   const computeProductPrice = (product: any): string => {
     try {
@@ -139,7 +139,7 @@ const createHomepageSchema = (
       return '0.00'
     }
   }
-  
+
   return {
     "@context": "https://schema.org",
     "@type": "Store",
@@ -208,21 +208,21 @@ const createHomepageSchema = (
               "aggregateRating": agg,
               ...(rev
                 ? {
-                    "review": [
-                      {
-                        "@type": "Review",
-                        "reviewRating": {
-                          "@type": "Rating",
-                          "ratingValue": String(rev.rating),
-                          "bestRating": "5",
-                          "worstRating": "1",
-                        },
-                        "author": { "@type": "Person", "name": rev.author },
-                        "reviewBody": rev.content,
-                        "datePublished": rev.date,
+                  "review": [
+                    {
+                      "@type": "Review",
+                      "reviewRating": {
+                        "@type": "Rating",
+                        "ratingValue": String(rev.rating),
+                        "bestRating": "5",
+                        "worstRating": "1",
                       },
-                    ],
-                  }
+                      "author": { "@type": "Person", "name": rev.author },
+                      "reviewBody": rev.content,
+                      "datePublished": rev.date,
+                    },
+                  ],
+                }
                 : {}),
             }
           })(),
@@ -302,7 +302,7 @@ const createHomepageSchema = (
         "priceCurrency": "INR"
       },
       {
-        "@type": "Offer", 
+        "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
           "name": "Same Day Dispatch",
@@ -388,9 +388,9 @@ export default async function Home({ params }: HomeProps) {
             date: new Date(list[0]?.created_at || Date.now()).toISOString().split('T')[0],
           } : undefined,
         }
-      } catch {}
+      } catch { }
     }
-  } catch {}
+  } catch { }
 
   // Generate dynamic schema based on actual products (with review data)
   const homepageSchema = createHomepageSchema(featuredProducts, countryCode, reviewDataById);
@@ -410,14 +410,14 @@ export default async function Home({ params }: HomeProps) {
           __html: JSON.stringify(faqSchema),
         }}
       />
-      
+
       <HomeClientWrapper
         featuredProducts={featuredProducts}
         categories={categories}
         region={region}
         countryCode={countryCode}
       />
-      
+
       {/* Quick links to all products (SEO: reduce orphans) */}
       {featuredProducts && featuredProducts.length > 0 && (
         <section className="py-10 bg-white">

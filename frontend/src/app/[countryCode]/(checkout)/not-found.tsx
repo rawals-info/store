@@ -1,36 +1,43 @@
-import { Button } from "@medusajs/ui"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Metadata } from "next"
+import { ArrowLeft, ShoppingCart } from "lucide-react"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Empty Cart | Taj Petha",
-  description: "Your shopping cart is empty",
+  title: "404 - Page Not Found | Taj Petha",
+  description: "The page you're looking for doesn't exist.",
 }
 
-export default async function NotFound() {
+export default function NotFound() {
   return (
-    <div className="bg-[#f9f6f2] py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-24 flex flex-col justify-center items-center bg-luxury-ivory border border-luxury-lightgold/30 shadow-luxury-sm">
-          {/* Gold line at top */}
-          <div className="h-0.5 w-full gold-gradient absolute top-0"></div>
-          
-          <div className="w-20 h-20 flex items-center justify-center rounded-full border border-luxury-lightgold mb-6">
-            <svg className="w-10 h-10 text-luxury-gold/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-            </svg>
-          </div>
-          
-          <h1 className="font-display text-2xl text-luxury-charcoal mb-2">Your cart is empty</h1>
-          
-          <p className="text-luxury-charcoal/70 text-center max-w-md mb-8 px-6">
-            Please add items to your cart before proceeding to checkout.
+    <div className="min-h-[calc(100vh-64px)] bg-white flex items-center justify-center px-4 py-12">
+      <div className="max-w-md mx-auto text-center space-y-6">
+        <h1 className="font-serif text-7xl font-bold text-[#1A1A1A]">404</h1>
+        <div className="space-y-2">
+          <h2 className="font-serif text-xl text-[#C9A962]">Page Not Found</h2>
+          <p className="text-gray-600">
+            The page you're looking for doesn't exist.
           </p>
-          
-          <LocalizedClientLink href="/products">
-            <Button className="luxury-btn font-medium tracking-wider uppercase transition-all duration-300 bg-luxury-gold hover:bg-luxury-gold/90">
-              Explore Collection
-            </Button>
+        </div>
+
+        <div className="flex items-center justify-center gap-3">
+          <div className="h-px w-8 bg-[#C9A962]"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-[#C9A962]"></div>
+          <div className="h-px w-8 bg-[#C9A962]"></div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+          <LocalizedClientLink
+            href="/"
+            className="group flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white font-medium px-5 py-2.5 rounded-lg transition-all"
+          >
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+            Go Home
+          </LocalizedClientLink>
+          <LocalizedClientLink
+            href="/products"
+            className="text-[#C9A962] hover:text-[#B8983D] font-medium underline underline-offset-4"
+          >
+            Browse Products
           </LocalizedClientLink>
         </div>
       </div>
