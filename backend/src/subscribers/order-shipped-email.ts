@@ -1,6 +1,15 @@
 // @ts-ignore
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import {
+  sendLuxuryEmail,
+  buildLuxuryTemplate,
+  buildInfoBox,
+  buildParagraph,
+  buildStrong,
+  buildLink,
+  buildList,
+  buildSignOff
+} from "../util/email"
 import { Modules } from "@medusajs/framework/utils"
 import type { IOrderModuleService } from "@medusajs/framework/types"
 
@@ -10,7 +19,7 @@ export default async function orderShippedEmail({
 }: SubscriberArgs<{ order_id: string }>) {
   const orderId = event.data.order_id
 
-  console.log(`📦 [ShippingEmail] Processing order ${orderId}`)
+  console.log(`[ShippingEmail] Processing order ${orderId}`)
 
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
   const order: any = await orderService.retrieveOrder(orderId, {
@@ -23,58 +32,49 @@ export default async function orderShippedEmail({
     relations: ["shipping_address"],
   })
 
-  console.log(`📧 [ShippingEmail] Sending shipping notification to ${order.email}`)
+  console.log(`[ShippingEmail] Sending shipping notification to ${order.email}`)
 
-  // For now, we don't have tracking info - can be added later when fulfillment is created
-  const tracking = null
+  const customerName = order.shipping_address?.first_name ?? order.email
 
   const body = `
-    <p>Dear ${order.shipping_address?.first_name ?? order.email},</p>
-    <p>Exciting news! 🚚 Your delicious <strong>Taj Petha</strong> order <strong>#${order.display_id}</strong> has been carefully packed and is now on its sweet journey to you!</p>
+    ${buildParagraph(`Dear ${buildStrong(customerName)},`)}
     
-    <div class="highlight-box">
-      <p><strong>📦 Your Sweets Are On The Way!</strong></p>
-      <p>Our master sweet makers have lovingly prepared your order using our traditional family recipes. Each sweet has been packed with care to ensure it reaches you in perfect condition.</p>
-    </div>
+    ${buildParagraph(`We are pleased to inform you that your ${buildStrong("Taj Petha")} order ${buildStrong("#" + order.display_id)} has been carefully packed and dispatched.`)}
     
-    ${tracking ? `
-    <div class="highlight-box">
-      <p><strong>📍 Track Your Sweet Delivery</strong></p>
-      <p>Your tracking number is: <strong style="font-size: 16px; color: #B8860B;">${tracking}</strong></p>
-      <p>You can use this number to track your package and know exactly when your delicious treats will arrive!</p>
-    </div>
-    ` : ""}
+    ${buildInfoBox("Your Order Is On Its Way", `
+      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">Our artisans have lovingly prepared your order using our traditional family recipes. Each sweet has been packed with care to ensure it reaches you in perfect condition.</p>
+    `)}
     
-    <p><strong>🍯 What to Expect:</strong></p>
-    <ul style="margin: 16px 0; padding-left: 20px;">
-      <li style="margin: 8px 0;">📦 <strong>Premium Packaging:</strong> Your sweets are packed in food-safe, moisture-resistant packaging</li>
-      <li style="margin: 8px 0;">🌡️ <strong>Freshness Guaranteed:</strong> Special care taken to maintain texture and flavor during transit</li>
-      <li style="margin: 8px 0;">⏰ <strong>Estimated Delivery:</strong> 2-5 business days depending on your location</li>
-      <li style="margin: 8px 0;">📱 <strong>Updates:</strong> You'll receive notifications when your package is out for delivery</li>
-    </ul>
+    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">What to Expect</h2>
     
-    <p><strong>💡 Sweet Delivery Tips:</strong></p>
-    <ul style="margin: 16px 0; padding-left: 20px;">
-      <li style="margin: 6px 0;">🏠 Please ensure someone is available to receive the package</li>
-      <li style="margin: 6px 0;">❄️ Store your sweets in a cool, dry place immediately upon arrival</li>
-      <li style="margin: 6px 0;">📞 Contact us immediately if you notice any issues upon delivery</li>
-    </ul>
+    ${buildList([
+    "<strong>Premium Packaging:</strong> Your sweets are packed in food-safe, moisture-resistant packaging",
+    "<strong>Freshness Guaranteed:</strong> Special care taken to maintain texture and flavour during transit",
+    "<strong>Estimated Delivery:</strong> 2-5 business days depending on your location",
+    "<strong>Updates:</strong> You will receive notifications when your package is out for delivery"
+  ])}
     
-    <p>The anticipation of enjoying authentic Agra sweets is almost as delightful as the first bite! We can't wait for you to experience the traditional flavors that have made our family proud for generations.</p>
+    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">Delivery Tips</h2>
     
-    <p>If you have any questions about your shipment or need assistance, please contact us at <strong>support@tajpetha.in</strong>.</p>
+    ${buildList([
+    "Please ensure someone is available to receive the package",
+    "Store your sweets in a cool, dry place immediately upon arrival",
+    "Contact us immediately if you notice any issues upon delivery"
+  ])}
     
-    <p style="margin-top: 32px; font-style: italic;">Sweet travels and happy indulging ahead!<br/>The Taj Petha Family 🍯</p>
+    ${buildParagraph(`Should you have any questions about your shipment, please contact us at ${buildLink("mailto:support@tajpetha.in", "support@tajpetha.in")}`)}
+    
+    ${buildSignOff()}
   `
 
   await sendLuxuryEmail({
     to: order.email as string,
-    name: order.shipping_address?.first_name ?? order.email,
-    subject: `Your Sweet Order #${order.display_id} Has Shipped! 🚚🍯 - Taj Petha`,
-    html: buildLuxuryTemplate("Your Sweets Are On The Way!", body),
+    name: customerName,
+    subject: `Your Order #${order.display_id} Has Been Dispatched - Taj Petha`,
+    html: buildLuxuryTemplate("Your Order Has Shipped", body),
   })
 
-  console.log(`✅ [ShippingEmail] Shipping notification sent successfully to ${order.email}`)
+  console.log(`[ShippingEmail] Shipping notification sent successfully to ${order.email}`)
 }
 
 export const config: SubscriberConfig = {

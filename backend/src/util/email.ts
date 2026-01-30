@@ -17,197 +17,143 @@ const transactionalApi = new Brevo.TransactionalEmailsApi()
 if (process.env.BREVO_API_KEY) {
   // Brevo's generated SDK names the authentication scheme `apiKey` (camelCase)
   // See: https://github.com/getbrevo/brevo-node/blob/main/docs/transactionalEmailsApi.md#setApiKey
-  ;(transactionalApi as any).authentications["apiKey"].apiKey = process.env.BREVO_API_KEY
+  ; (transactionalApi as any).authentications["apiKey"].apiKey = process.env.BREVO_API_KEY
 }
 
 /**
- * Traditional Indian sweet shop email layout for Taj Petha
+ * Premium luxury email template for Taj Petha
+ * Elegant, refined design with muted gold accents and sophisticated typography
  */
 export function buildLuxuryTemplate(title: string, body: string) {
   return `
   <html>
     <head>
-      <style>
-        @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@300;400;500;700&display=swap");
-        body {
-          font-family: 'Lato', Arial, sans-serif;
-          background: linear-gradient(135deg, #FFF8E7 0%, #F5E6D3 100%);
-          color: #4A4A4A;
-          margin: 0;
-          padding: 0;
-          line-height: 1.6;
-        }
-        .wrapper {
-          max-width: 600px;
-          margin: 0 auto;
-          background: #FFFFFF;
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-          border: 3px solid #E8944A;
-        }
-        .header {
-          background: linear-gradient(135deg, #E8944A 0%, #D2691E 100%);
-          color: #FFFFFF;
-          padding: 30px 32px;
-          text-align: center;
-          position: relative;
-        }
-        .header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #FFD700, #FFA500, #FF6347, #FFD700);
-        }
-        .brand-name {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 24px;
-          font-weight: 700;
-          margin: 0 0 8px 0;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .brand-tagline {
-          font-size: 13px;
-          opacity: 0.9;
-          margin: 0;
-          font-style: italic;
-        }
-        .content {
-          padding: 40px 32px;
-        }
-        h1 {
-          font-family: 'Cormorant Garamond', serif;
-          color: #B8860B;
-          font-size: 28px;
-          font-weight: 600;
-          margin: 0 0 24px 0;
-          text-align: center;
-        }
-        .decorative-divider {
-          height: 3px;
-          width: 80px;
-          background: linear-gradient(90deg, #E8944A, #D2691E);
-          margin: 24px auto;
-          border-radius: 2px;
-          position: relative;
-        }
-        .decorative-divider::before,
-        .decorative-divider::after {
-          content: '◆';
-          position: absolute;
-          top: -8px;
-          color: #E8944A;
-          font-size: 14px;
-        }
-        .decorative-divider::before {
-          left: -20px;
-        }
-        .decorative-divider::after {
-          right: -20px;
-        }
-        p {
-          line-height: 1.7;
-          font-size: 15px;
-          margin: 16px 0;
-          color: #5A5A5A;
-        }
-        strong {
-          color: #B8860B;
-          font-weight: 600;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 20px 0;
-          background: #FFFEF7;
-          border-radius: 8px;
-          overflow: hidden;
-          border: 2px solid #F0E68C;
-        }
-        th {
-          background: linear-gradient(135deg, #E8944A, #D2691E);
-          color: #FFFFFF;
-          padding: 12px 8px;
-          font-weight: 600;
-          font-size: 14px;
-        }
-        td {
-          padding: 10px 8px;
-          border-bottom: 1px solid #F0E68C;
-          font-size: 14px;
-        }
-        tr:nth-child(even) {
-          background-color: #FFF8E7;
-        }
-        .footer {
-          background: linear-gradient(135deg, #4A4A4A 0%, #2C2C2C 100%);
-          color: #FFFFFF;
-          padding: 30px 32px;
-          text-align: center;
-          font-size: 13px;
-        }
-        .footer-brand {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 18px;
-          font-weight: 600;
-          margin-bottom: 8px;
-          color: #E8944A;
-        }
-        .footer-contact {
-          margin: 8px 0;
-          opacity: 0.8;
-        }
-        .footer-tagline {
-          margin-top: 16px;
-          font-style: italic;
-          opacity: 0.7;
-          font-size: 12px;
-        }
-        .highlight-box {
-          background: linear-gradient(135deg, #FFF8E7, #F0E68C);
-          border-left: 4px solid #E8944A;
-          padding: 16px;
-          margin: 20px 0;
-          border-radius: 0 8px 8px 0;
-        }
-        .address-section {
-          background: #FFFEF7;
-          padding: 16px;
-          border-radius: 8px;
-          border: 1px solid #F0E68C;
-          margin: 16px 0;
-        }
-        .address-section h3 {
-          color: #B8860B;
-          margin: 0 0 8px 0;
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 18px;
-        }
-      </style>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
-      <div class="wrapper">
-        <div class="header">
-          <div class="brand-name">TAJ PETHA</div>
-          <div class="brand-tagline">Authentic Agra Sweets Since Generations</div>
+    <body style="font-family: 'Georgia', 'Times New Roman', serif; background: #F5F5F3; color: #2C2C2C; margin: 0; padding: 0; line-height: 1.7;">
+      
+      <!-- Email Wrapper -->
+      <div style="max-width: 600px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E8E4DC;">
+        
+        <!-- Header -->
+        <div style="background: #1A1A1A; padding: 40px 48px; text-align: center;">
+          <div style="font-family: 'Georgia', serif; font-size: 28px; font-weight: 400; letter-spacing: 6px; color: #C9A962; margin: 0;">TAJ PETHA</div>
+          <div style="font-family: 'Georgia', serif; font-size: 11px; letter-spacing: 3px; color: #A0A0A0; margin-top: 8px; text-transform: uppercase;">Artisanal Sweets from Agra</div>
         </div>
-        <div class="content">
-          <h1>${title}</h1>
-          <div class="decorative-divider"></div>
+        
+        <!-- Gold Accent Line -->
+        <div style="height: 3px; background: linear-gradient(90deg, #C9A962, #E8D5A3, #C9A962);"></div>
+        
+        <!-- Content -->
+        <div style="padding: 48px;">
+          
+          <!-- Title -->
+          <h1 style="font-family: 'Georgia', serif; font-size: 24px; font-weight: 400; color: #1A1A1A; text-align: center; margin: 0 0 8px 0; letter-spacing: 1px;">${title}</h1>
+          <div style="width: 40px; height: 1px; background: #C9A962; margin: 0 auto 32px auto;"></div>
+          
           ${body}
+          
         </div>
-        <div class="footer">
-          <div class="footer-brand">Taj Petha</div>
-          <div class="footer-contact">Email: support@tajpetha.in | Visit: Agra, India</div>
-          <div class="footer-tagline">"Where tradition meets taste, and every bite tells a story"</div>
-          <div style="margin-top: 12px; font-size: 11px;">© ${new Date().getFullYear()} Taj Petha. All rights reserved.</div>
+        
+        <!-- Footer -->
+        <div style="background: #1A1A1A; padding: 32px 48px; text-align: center;">
+          <div style="font-family: 'Georgia', serif; font-size: 16px; letter-spacing: 4px; color: #C9A962; margin-bottom: 8px;">TAJ PETHA</div>
+          <div style="font-size: 12px; color: #808080; margin-bottom: 16px;">Agra, India</div>
+          <div style="font-size: 11px; color: #606060; letter-spacing: 1px;">Where tradition meets taste</div>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
+            <div style="font-size: 11px; color: #505050;">© ${new Date().getFullYear()} Taj Petha. All rights reserved.</div>
+          </div>
         </div>
+        
       </div>
+      
     </body>
   </html>`
+}
+
+/**
+ * Helper: Build order details box for emails
+ */
+export function buildOrderDetailsBox(content: string) {
+  return `
+    <div style="background: #FAFAF8; border: 1px solid #E8E4DC; padding: 32px; margin: 32px 0;">
+      ${content}
+    </div>
+  `
+}
+
+/**
+ * Helper: Build info box with gold left border
+ */
+export function buildInfoBox(title: string, content: string) {
+  return `
+    <div style="background: #FAFAF8; border-left: 3px solid #C9A962; padding: 24px; margin: 32px 0;">
+      <h3 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 0 0 12px 0; letter-spacing: 1px;">${title}</h3>
+      ${content}
+    </div>
+  `
+}
+
+/**
+ * Helper: Section heading
+ */
+export function buildSectionHeading(text: string) {
+  return `<h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">${text}</h2>`
+}
+
+/**
+ * Helper: Paragraph text
+ */
+export function buildParagraph(text: string) {
+  return `<p style="font-size: 15px; color: #4A4A4A; margin: 0 0 24px 0;">${text}</p>`
+}
+
+/**
+ * Helper: Strong/emphasis text
+ */
+export function buildStrong(text: string) {
+  return `<strong style="color: #1A1A1A;">${text}</strong>`
+}
+
+/**
+ * Helper: Link
+ */
+export function buildLink(href: string, text: string) {
+  return `<a href="${href}" style="color: #C9A962; text-decoration: none;">${text}</a>`
+}
+
+/**
+ * Helper: Button
+ */
+export function buildButton(href: string, text: string) {
+  return `
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="${href}" style="display: inline-block; background: #1A1A1A; color: #C9A962; padding: 14px 32px; text-decoration: none; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; border: 1px solid #C9A962;">${text}</a>
+    </div>
+  `
+}
+
+/**
+ * Helper: List items
+ */
+export function buildList(items: string[]) {
+  const listItems = items.map(item =>
+    `<li style="margin: 6px 0; font-size: 14px; color: #4A4A4A;">${item}</li>`
+  ).join('')
+  return `<ul style="margin: 16px 0; padding-left: 18px; line-height: 2;">${listItems}</ul>`
+}
+
+/**
+ * Helper: Sign off
+ */
+export function buildSignOff(name: string = "The Taj Petha Family") {
+  return `
+    <p style="font-size: 14px; color: #4A4A4A; margin: 32px 0 0 0;">
+      With warm regards,<br>
+      <span style="font-family: 'Georgia', serif; color: #1A1A1A; font-style: italic;">${name}</span>
+    </p>
+  `
 }
 
 export async function sendLuxuryEmail({
@@ -235,4 +181,4 @@ export async function sendLuxuryEmail({
   email.subject = subject
   email.htmlContent = html
   await transactionalApi.sendTransacEmail(email)
-} 
+}

@@ -1,6 +1,15 @@
 // @ts-ignore
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import {
+  sendLuxuryEmail,
+  buildLuxuryTemplate,
+  buildInfoBox,
+  buildParagraph,
+  buildStrong,
+  buildLink,
+  buildList,
+  buildSignOff
+} from "../util/email"
 import { Modules } from "@medusajs/framework/utils"
 import type { IOrderModuleService } from "@medusajs/framework/types"
 
@@ -12,37 +21,43 @@ export default async function orderRefundedEmail({
   if (!orderId) return
 
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  const order: any = await orderService.retrieveOrder(orderId)
+  const order: any = await orderService.retrieveOrder(orderId, {
+    select: ["id", "display_id", "email"],
+    relations: ["shipping_address"],
+  })
+
+  const customerName = order.shipping_address?.first_name ?? order.email
 
   const body = `
-    <p>Dear ${order.shipping_address?.first_name ?? order.email},</p>
-    <p>We have successfully processed a refund for your <strong>Taj Petha</strong> order <strong>#${order.display_id}</strong>. 💰</p>
+    ${buildParagraph(`Dear ${buildStrong(customerName)},`)}
     
-    <div class="highlight-box">
-      <p><strong>💳 Refund Details</strong></p>
-      <p>The refund amount will be credited back to your original payment method within 3-5 business days, depending on your bank's processing time.</p>
-    </div>
+    ${buildParagraph(`We have successfully processed a refund for your ${buildStrong("Taj Petha")} order ${buildStrong("#" + order.display_id)}.`)}
     
-    <p>We sincerely apologize for any inconvenience this may have caused. At Taj Petha, we're committed to ensuring every customer has a delightful experience with our traditional sweets.</p>
+    ${buildInfoBox("Refund Details", `
+      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">The refund amount will be credited back to your original payment method within 3-5 business days, depending on your bank's processing time.</p>
+    `)}
     
-    <p><strong>What's Next:</strong></p>
-    <ul style="margin: 16px 0; padding-left: 20px;">
-      <li style="margin: 6px 0;">💫 Your refund will appear on your statement within 3-5 business days</li>
-      <li style="margin: 6px 0;">📧 You'll receive a confirmation once the refund is processed by your bank</li>
-      <li style="margin: 6px 0;">🍯 We'd love to serve you again with our authentic Agra sweets</li>
-    </ul>
+    ${buildParagraph("We sincerely apologise for any inconvenience this may have caused. At Taj Petha, we are committed to ensuring every customer has a delightful experience with our traditional sweets.")}
     
-    <p>If you have any questions about this refund or would like to place a new order, please don't hesitate to contact us at <strong>support@tajpetha.in</strong>. Our customer care team is always here to help.</p>
+    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">What Happens Next</h2>
     
-    <p>We hope to have the opportunity to serve you again soon with our delicious traditional sweets!</p>
+    ${buildList([
+    "Your refund will appear on your statement within 3-5 business days",
+    "You will receive a confirmation once the refund is processed by your bank",
+    "We would love to serve you again with our authentic Agra sweets"
+  ])}
     
-    <p style="margin-top: 32px; font-style: italic;">With warm regards and sweet wishes,<br/>The Taj Petha Family 🍯</p>
+    ${buildParagraph(`If you have any questions about this refund or would like to place a new order, please do not hesitate to contact us at ${buildLink("mailto:support@tajpetha.in", "support@tajpetha.in")}. Our customer care team is always here to help.`)}
+    
+    ${buildParagraph("We hope to have the opportunity to serve you again soon with our delicious traditional sweets.")}
+    
+    ${buildSignOff()}
   `
 
   await sendLuxuryEmail({
     to: order.email as string,
-    name: order.shipping_address?.first_name ?? order.email,
-    subject: `Refund Processed for Order #${order.display_id} - Taj Petha 💰`,
+    name: customerName,
+    subject: `Refund Processed - Order #${order.display_id} - Taj Petha`,
     html: buildLuxuryTemplate("Refund Confirmation", body),
   })
 }
@@ -50,4 +65,4 @@ export default async function orderRefundedEmail({
 export const config: SubscriberConfig = {
   event: "payment.refunded",
   context: { subscriberId: "order-refunded-email" },
-} 
+}

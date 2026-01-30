@@ -1,6 +1,15 @@
 // @ts-ignore
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import {
+  sendLuxuryEmail,
+  buildLuxuryTemplate,
+  buildInfoBox,
+  buildParagraph,
+  buildStrong,
+  buildLink,
+  buildList,
+  buildSignOff
+} from "../util/email"
 import { Modules } from "@medusajs/framework/utils"
 import type { IOrderModuleService } from "@medusajs/framework/types"
 
@@ -10,46 +19,51 @@ export default async function orderDeliveredEmail({
 }: SubscriberArgs<{ id: string }>) {
   const orderId = event.data.id
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  const order: any = await orderService.retrieveOrder(orderId)
+  const order: any = await orderService.retrieveOrder(orderId, {
+    select: ["id", "display_id", "email"],
+    relations: ["shipping_address"],
+  })
+
+  const customerName = order.shipping_address?.first_name ?? order.email
 
   const body = `
-    <p>Dear ${order.shipping_address?.first_name ?? order.email},</p>
-    <p>Sweet news! 🍯 Your <strong>Taj Petha</strong> order <strong>#${order.display_id}</strong> has been successfully delivered and is now ready for you to enjoy!</p>
+    ${buildParagraph(`Dear ${buildStrong(customerName)},`)}
     
-    <div class="highlight-box">
-      <p><strong>🎉 Your Sweet Treats Have Arrived!</strong></p>
-      <p>We hope every bite brings you the authentic taste of Agra's finest traditions. Our artisans have carefully crafted each sweet with the same love and expertise that has been passed down through generations.</p>
-    </div>
+    ${buildParagraph(`Your ${buildStrong("Taj Petha")} order ${buildStrong("#" + order.display_id)} has been successfully delivered and is ready for you to enjoy.`)}
     
-    <p><strong>🍯 How to Enjoy Your Taj Petha:</strong></p>
-    <ul style="margin: 16px 0; padding-left: 20px;">
-      <li style="margin: 8px 0;">💫 <strong>Fresh Taste:</strong> Best enjoyed within 15-20 days for optimal flavor and texture</li>
-      <li style="margin: 8px 0;">🌡️ <strong>Storage Tips:</strong> Keep in a cool, dry place away from direct sunlight</li>
-      <li style="margin: 8px 0;">🍃 <strong>Serving Suggestion:</strong> Perfect with a cup of Indian chai or as a sweet ending to your meals</li>
-      <li style="margin: 8px 0;">🎁 <strong>Share the Joy:</strong> Great for sharing with family and friends during special moments</li>
-    </ul>
+    ${buildInfoBox("Your Sweets Have Arrived", `
+      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">We hope every bite brings you the authentic taste of Agra's finest traditions. Our artisans have carefully crafted each sweet with the same expertise that has been passed down through generations.</p>
+    `)}
     
-    <div class="highlight-box">
-      <p><strong>❤️ We Value Your Experience</strong></p>
-      <p>How did we do? We'd love to hear about your experience with our sweets! Your feedback helps us maintain the high quality that makes Taj Petha special.</p>
-    </div>
+    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">Enjoying Your Taj Petha</h2>
     
-    <p>If you notice anything that doesn't meet our usual standards of excellence, please reach out to us immediately at <strong>support@tajpetha.in</strong>. We stand behind every sweet we make.</p>
+    ${buildList([
+    "<strong>Best Before:</strong> Enjoy within 15-20 days for optimal flavour and texture",
+    "<strong>Storage:</strong> Keep in a cool, dry place away from direct sunlight",
+    "<strong>Serving Suggestion:</strong> Perfect with a cup of Indian chai or as a sweet ending to your meals",
+    "<strong>Share the Joy:</strong> Ideal for sharing with family and friends during special moments"
+  ])}
     
-    <p>Thank you for choosing Taj Petha and for being part of our sweet family. We look forward to serving you again soon with more delicious traditional flavors!</p>
+    ${buildInfoBox("We Value Your Experience", `
+      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">How did we do? We would love to hear about your experience with our sweets. Your feedback helps us maintain the high quality that makes Taj Petha special.</p>
+    `)}
     
-    <p style="margin-top: 32px; font-style: italic;">Enjoy every sweet moment!<br/>The Taj Petha Family 🍯</p>
+    ${buildParagraph(`If you notice anything that does not meet our usual standards of excellence, please reach out to us immediately at ${buildLink("mailto:support@tajpetha.in", "support@tajpetha.in")}. We stand behind every sweet we make.`)}
+    
+    ${buildParagraph("Thank you for choosing Taj Petha and for being part of our family. We look forward to serving you again soon.")}
+    
+    ${buildSignOff()}
   `
 
   await sendLuxuryEmail({
     to: order.email as string,
-    name: order.shipping_address?.first_name ?? order.email,
-    subject: `Sweet Delivery Complete! Order #${order.display_id} - Taj Petha 🍯`,
-    html: buildLuxuryTemplate("Your Sweets Have Arrived!", body),
+    name: customerName,
+    subject: `Delivery Complete - Order #${order.display_id} - Taj Petha`,
+    html: buildLuxuryTemplate("Your Order Has Been Delivered", body),
   })
 }
 
 export const config: SubscriberConfig = {
   event: "order.completed",
   context: { subscriberId: "order-delivered-email" },
-} 
+}

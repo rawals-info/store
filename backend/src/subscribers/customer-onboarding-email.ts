@@ -1,6 +1,14 @@
 // @ts-ignore
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import {
+  sendLuxuryEmail,
+  buildLuxuryTemplate,
+  buildInfoBox,
+  buildParagraph,
+  buildStrong,
+  buildList,
+  buildSignOff
+} from "../util/email"
 import { Modules } from "@medusajs/framework/utils"
 import type { IOrderModuleService } from "@medusajs/framework/types"
 
@@ -9,14 +17,14 @@ export default async function customerOnboardingEmail({
   container,
 }: SubscriberArgs<{ id: string }>) {
   const orderId = event.data.id
-  
+
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  
-  // ✅ Smart retry strategy: Try immediately, then retry up to 3 times over 15 seconds (non-critical)
+
+  // Smart retry strategy: Try immediately, then retry up to 3 times over 15 seconds (non-critical)
   let order: any = null
   const maxAttempts = 4 // Fewer retries for non-critical email
   const delays = [0, 5000, 10000, 15000]
-  
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       if (delays[attempt] > 0) {
@@ -25,19 +33,19 @@ export default async function customerOnboardingEmail({
       } else {
         console.log(`[CustomerOnboardingEmail] Attempting immediate retrieval for order ${orderId}`)
       }
-      
+
       order = await orderService.retrieveOrder(orderId)
-      console.log(`[CustomerOnboardingEmail] ✅ Order ${orderId} retrieved successfully`)
+      console.log(`[CustomerOnboardingEmail] Order ${orderId} retrieved successfully`)
       break
-      
+
     } catch (error) {
       if (attempt === maxAttempts - 1) {
-        console.error(`[CustomerOnboardingEmail] ❌ Failed to retrieve order ${orderId} after ${maxAttempts} attempts - skipping (non-critical)`)
+        console.error(`[CustomerOnboardingEmail] Failed to retrieve order ${orderId} after ${maxAttempts} attempts - skipping (non-critical)`)
         return // Silently fail for onboarding email
       }
     }
   }
-  
+
   if (!order) {
     console.warn(`[CustomerOnboardingEmail] Order ${orderId} not found after retries - skipping`)
     return
@@ -50,46 +58,49 @@ export default async function customerOnboardingEmail({
     return
   }
 
+  const customerName = order.shipping_address?.first_name ?? order.email
+
   const body = `
-    <p>Dear ${order.shipping_address?.first_name ?? order.email},</p>
-    <p>Welcome to the sweet world of <strong>Taj Petha</strong>! 🍯 Thank you for placing your very first order with us. You've just taken your first step into a journey of authentic Agra flavors that have been cherished for generations.</p>
+    ${buildParagraph(`Dear ${buildStrong(customerName)},`)}
     
-    <div class="highlight-box">
-      <p><strong>🌟 You've Discovered Something Special!</strong></p>
-      <p>Our family has been perfecting the art of sweet-making for decades, using the same traditional recipes and techniques that made Agra famous for its pethas. Each sweet is Hand-Made with love, ensuring you experience the true taste of our heritage.</p>
-    </div>
+    ${buildParagraph(`Welcome to the world of ${buildStrong("Taj Petha")}. Thank you for placing your first order with us. You have taken your first step into a journey of authentic Agra flavours that have been cherished for generations.`)}
     
-    <p><strong>What Makes Taj Petha Special:</strong></p>
-    <ul style="margin: 16px 0; padding-left: 20px;">
-      <li style="margin: 8px 0;">🏺 <strong>Traditional Recipes:</strong> Passed down through generations of master sweet makers</li>
-      <li style="margin: 8px 0;">🌿 <strong>Premium Ingredients:</strong> Only the finest ash gourd, pure sugar, and authentic spices</li>
-      <li style="margin: 8px 0;">👨‍🍳 <strong>Hand-Made Excellence:</strong> Each piece lovingly made by experienced artisans</li>
-      <li style="margin: 8px 0;">📦 <strong>Fresh Delivery:</strong> Packed with care to preserve taste and texture</li>
-    </ul>
+    ${buildInfoBox("You Have Discovered Something Special", `
+      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">Our family has been perfecting the art of sweet-making for decades, using the same traditional recipes and techniques that made Agra famous for its pethas. Each sweet is handcrafted with care, ensuring you experience the true taste of our heritage.</p>
+    `)}
     
-    <p>Over the coming weeks, we'll share with you:</p>
-    <ul style="margin: 16px 0; padding-left: 20px;">
-      <li style="margin: 6px 0;">🍯 Stories behind our traditional recipes and the history of Agra sweets</li>
-      <li style="margin: 6px 0;">🎉 Exclusive previews of seasonal specialties and festival collections</li>
-      <li style="margin: 6px 0;">💡 Tips on how to store and enjoy your pethas for maximum freshness</li>
-      <li style="margin: 6px 0;">🎁 Special member-only discounts and offers</li>
-    </ul>
+    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">What Makes Taj Petha Special</h2>
     
-    <div class="highlight-box">
-      <p><strong>💝 A Sweet Surprise Awaits!</strong></p>
-      <p>Keep an eye on your inbox for a special welcome discount on your next order. We can't wait to share more of our traditional flavors with you!</p>
-    </div>
+    ${buildList([
+    "<strong>Traditional Recipes:</strong> Passed down through generations of master sweet makers",
+    "<strong>Premium Ingredients:</strong> Only the finest ash gourd, pure sugar, and authentic spices",
+    "<strong>Handcrafted Excellence:</strong> Each piece lovingly made by experienced artisans",
+    "<strong>Fresh Delivery:</strong> Packed with care to preserve taste and texture"
+  ])}
     
-    <p>Thank you for choosing Taj Petha and allowing us to be part of your sweet moments. We're honored to share our family's legacy with yours.</p>
+    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">What to Look Forward To</h2>
     
-    <p style="margin-top: 32px; font-style: italic;">Stay sweet and keep indulging,<br/>The Taj Petha Family 🍯</p>
+    ${buildList([
+    "Stories behind our traditional recipes and the history of Agra sweets",
+    "Exclusive previews of seasonal specialties and festival collections",
+    "Tips on how to store and enjoy your pethas for maximum freshness",
+    "Special member-only discounts and offers"
+  ])}
+    
+    ${buildInfoBox("A Special Welcome Awaits", `
+      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">Keep an eye on your inbox for a special welcome discount on your next order. We look forward to sharing more of our traditional flavours with you.</p>
+    `)}
+    
+    ${buildParagraph("Thank you for choosing Taj Petha and allowing us to be part of your sweet moments. We are honoured to share our family's legacy with yours.")}
+    
+    ${buildSignOff()}
   `
 
   await sendLuxuryEmail({
     to: order.email as string,
     // @ts-ignore
-    name: order.shipping_address?.first_name ?? order.email,
-    subject: "Your Sweet Journey with Taj Petha Begins! 🍯✨",
+    name: customerName,
+    subject: "Your Journey with Taj Petha Begins",
     html: buildLuxuryTemplate("Welcome to the Taj Petha Family", body),
   })
 }
@@ -97,4 +108,4 @@ export default async function customerOnboardingEmail({
 export const config: SubscriberConfig = {
   event: "order.placed",
   context: { subscriberId: "customer-onboarding-email" },
-} 
+}

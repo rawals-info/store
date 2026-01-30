@@ -1,6 +1,17 @@
 // @ts-ignore – types provided by Medusa at runtime
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { sendLuxuryEmail, buildLuxuryTemplate } from "../util/email"
+import {
+  sendLuxuryEmail,
+  buildLuxuryTemplate,
+  buildOrderDetailsBox,
+  buildInfoBox,
+  buildSectionHeading,
+  buildParagraph,
+  buildStrong,
+  buildLink,
+  buildList,
+  buildSignOff
+} from "../util/email"
 import { Modules } from "@medusajs/framework/utils"
 import type { IOrderModuleService } from "@medusajs/framework/types"
 
@@ -16,12 +27,12 @@ export default async function orderConfirmationEmail({
 
   // Retrieve the order with relations so we have customer info
   const orderService = container.resolve<IOrderModuleService>(Modules.ORDER)
-  
-  // ✅ Smart retry strategy: Try immediately, then retry up to 5 times over 30 seconds
+
+  // Smart retry strategy: Try immediately, then retry up to 5 times over 30 seconds
   let order: any = null
   const maxAttempts = 6 // 1 immediate + 5 retries
   const delays = [0, 5000, 10000, 15000, 20000, 25000] // 0s, 5s, 10s, 15s, 20s, 25s
-  
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       // Wait before retry (except first attempt which is immediate)
@@ -31,38 +42,38 @@ export default async function orderConfirmationEmail({
       } else {
         console.log(`[OrderConfirmationEmail] Attempting immediate retrieval for order ${orderId}`)
       }
-      
+
       order = await orderService.retrieveOrder(orderId, {
-    select: [
-      "subtotal",
-      "shipping_total",
-      "tax_total",
-      "discount_total",
-      "total",
-      "currency_code",
-      "email",
-      "display_id",
-    ],
-    relations: [
-      "items",
-      "shipping_address",
-      "billing_address",
-    ],
-  })
-      
-      console.log(`[OrderConfirmationEmail] ✅ Order ${orderId} retrieved successfully after ${attempt + 1} attempt(s)`)
+        select: [
+          "subtotal",
+          "shipping_total",
+          "tax_total",
+          "discount_total",
+          "total",
+          "currency_code",
+          "email",
+          "display_id",
+        ],
+        relations: [
+          "items",
+          "shipping_address",
+          "billing_address",
+        ],
+      })
+
+      console.log(`[OrderConfirmationEmail] Order ${orderId} retrieved successfully after ${attempt + 1} attempt(s)`)
       break // Success! Exit retry loop
-      
+
     } catch (error) {
       if (attempt === maxAttempts - 1) {
         // Final attempt failed
-        console.error(`[OrderConfirmationEmail] ❌ Failed to retrieve order ${orderId} after ${maxAttempts} attempts (30 seconds total)`)
+        console.error(`[OrderConfirmationEmail] Failed to retrieve order ${orderId} after ${maxAttempts} attempts (30 seconds total)`)
         throw error
       }
       // Continue to next retry
     }
   }
-  
+
   if (!order) {
     console.error(`[OrderConfirmationEmail] Order ${orderId} not found after all retries`)
     return
@@ -85,16 +96,30 @@ export default async function orderConfirmationEmail({
   })
 
   const fmt = (amt: number) =>
-    Intl.NumberFormat("en-US", {
+    Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: order.currency_code?.toUpperCase?.() ?? "INR",
     }).format(amt)
 
   const items: any[] = Array.isArray(order.items) ? order.items : []
+
+  // Build items table with variant information
   const itemsHtml = items
     .map((it: any) => {
       const lineTotal = asNumber(it.total ?? it.unit_price * it.quantity)
-      return `<tr><td style="padding: 12px 8px; border-bottom: 1px solid #F0E68C;">${it.title}</td><td style="padding: 12px 8px; text-align:center; border-bottom: 1px solid #F0E68C;">${it.quantity}</td><td style="padding: 12px 8px; text-align:right; border-bottom: 1px solid #F0E68C; font-weight: 600;">${fmt(lineTotal)}</td></tr>`
+      // Get variant info - could be variant_title, variant_sku, or product_title with options
+      const variantInfo = it.variant_title || it.variant_sku || ""
+      const variantDisplay = variantInfo && variantInfo !== "Default variant" && variantInfo !== it.title
+        ? `<div style="font-size: 12px; color: #8A8A8A; margin-top: 4px;">${variantInfo}</div>`
+        : ""
+      return `
+        <tr>
+          <td style="padding: 16px 0; border-bottom: 1px solid #F0EDE8; font-size: 14px; color: #2C2C2C;">
+            ${it.title}${variantDisplay}
+          </td>
+          <td style="padding: 16px 0; border-bottom: 1px solid #F0EDE8; font-size: 14px; color: #2C2C2C; text-align: center;">${it.quantity}</td>
+          <td style="padding: 16px 0; border-bottom: 1px solid #F0EDE8; font-size: 14px; color: #2C2C2C; text-align: right;">${fmt(lineTotal)}</td>
+        </tr>`
     })
     .join("")
 
@@ -103,66 +128,79 @@ export default async function orderConfirmationEmail({
       [addr.first_name, addr.last_name].filter(Boolean).join(" "),
       addr.address_1,
       addr.address_2,
-      `${addr.postal_code ?? ""} ${addr.city ?? ""}`.trim(),
+      `${addr.city ?? ""} ${addr.postal_code ?? ""}`.trim(),
       addr.country_code ? addr.country_code.toUpperCase() : undefined,
-      addr.phone,
+      addr.phone ? `<span style="color: #6A6A6A;">${addr.phone}</span>` : undefined,
     ]
       .filter(Boolean)
-      .map((l) => `<div style="margin: 4px 0;">${l}</div>`) // wrap each line
+      .map((l) => `<div style="font-size: 14px; color: #4A4A4A; line-height: 1.8;">${l}</div>`)
       .join("")
 
+  const customerName = order.shipping_address?.first_name ?? order.email
+
   const body = `
-    <p>Dear ${(order as any).shipping_address?.first_name ?? order.email},</p>
-    <p>Thank you for choosing <strong>Taj Petha</strong> for your sweet cravings! 🍯 Your order <strong>#${order.display_id ?? order.id}</strong> has been received and our master sweet makers are already preparing your delicious treats.</p>
-
-    <div class="highlight-box">
-      <p><strong>🎯 Your Sweet Order Summary</strong></p>
-      <p>Each item is lovingly Hand-Made using our traditional family recipes, ensuring you receive the authentic taste of Agra's finest sweets.</p>
-    </div>
-
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin: 24px 0;">
-      <thead>
-        <tr>
-          <th style="text-align: left; padding: 12px 8px; background: linear-gradient(135deg, #E8944A, #D2691E); color: #FFFFFF; font-weight: 600;">Sweet Item</th>
-          <th style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, #E8944A, #D2691E); color: #FFFFFF; font-weight: 600;">Qty</th>
-          <th style="text-align: right; padding: 12px 8px; background: linear-gradient(135deg, #E8944A, #D2691E); color: #FFFFFF; font-weight: 600;">Total</th>
-        </tr>
-      </thead>
-      <tbody style="background: #FFFEF7;">${itemsHtml}</tbody>
-    </table>
+    ${buildParagraph(`Dear ${buildStrong(customerName)},`)}
     
-    <div style="background: #FFF8E7; padding: 20px; border-radius: 8px; margin: 24px 0; border: 1px solid #F0E68C;">
-      <p style="margin: 8px 0; font-size: 16px;"><strong>Subtotal:</strong> <span style="float: right; color: #B8860B;">${fmt(asNumber(order.subtotal))}</span></p>
-      <p style="margin: 8px 0; font-size: 16px;"><strong>Shipping:</strong> <span style="float: right; color: #B8860B;">${fmt(asNumber(order.shipping_total))}</span></p>
-      <p style="margin: 8px 0; font-size: 16px;"><strong>Tax:</strong> <span style="float: right; color: #B8860B;">${fmt(asNumber(order.tax_total))}</span></p>
-      ${order.discount_total ? `<p style="margin: 8px 0; font-size: 16px;"><strong>Discount:</strong> <span style="float: right; color: #E8944A;">-${fmt(asNumber(order.discount_total))}</span></p>` : ""}
-      <hr style="border: none; height: 1px; background: #E8944A; margin: 16px 0;">
-      <p style="margin: 8px 0; font-size: 18px; font-weight: 700;"><strong>Grand Total:</strong> <span style="float: right; color: #B8860B; font-size: 20px;">${fmt(asNumber(order.total))}</span></p>
-    </div>
+    ${buildParagraph(`Thank you for choosing ${buildStrong("Taj Petha")}. Your order ${buildStrong("#" + (order.display_id ?? order.id))} has been received and our artisans are preparing your selection with care.`)}
 
-    <div class="address-section">
-      <h3>🏠 Delivery Address</h3>
-      ${addressLines(order.shipping_address ?? {})}
-    </div>
+    ${buildOrderDetailsBox(`
+      <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 0 0 24px 0; letter-spacing: 2px; text-transform: uppercase;">Order Summary</h2>
+      
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="text-align: left; padding: 12px 0; border-bottom: 1px solid #E8E4DC; font-family: 'Georgia', serif; font-size: 12px; font-weight: 400; color: #8A8A8A; letter-spacing: 1px; text-transform: uppercase;">Item</th>
+            <th style="text-align: center; padding: 12px 0; border-bottom: 1px solid #E8E4DC; font-family: 'Georgia', serif; font-size: 12px; font-weight: 400; color: #8A8A8A; letter-spacing: 1px; text-transform: uppercase;">Qty</th>
+            <th style="text-align: right; padding: 12px 0; border-bottom: 1px solid #E8E4DC; font-family: 'Georgia', serif; font-size: 12px; font-weight: 400; color: #8A8A8A; letter-spacing: 1px; text-transform: uppercase;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+      
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #E8E4DC;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 14px; color: #6A6A6A;">Subtotal</span>
+          <span style="font-size: 14px; color: #2C2C2C;">${fmt(asNumber(order.subtotal))}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 14px; color: #6A6A6A;">Shipping</span>
+          <span style="font-size: 14px; color: #2C2C2C;">${fmt(asNumber(order.shipping_total))}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 14px; color: #6A6A6A;">Tax</span>
+          <span style="font-size: 14px; color: #2C2C2C;">${fmt(asNumber(order.tax_total))}</span>
+        </div>
+        ${order.discount_total ? `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 14px; color: #6A6A6A;">Discount</span>
+          <span style="font-size: 14px; color: #C9A962;">-${fmt(asNumber(order.discount_total))}</span>
+        </div>` : ""}
+        <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px solid #C9A962;">
+          <span style="font-family: 'Georgia', serif; font-size: 16px; color: #1A1A1A; letter-spacing: 1px;">Total</span>
+          <span style="font-family: 'Georgia', serif; font-size: 18px; color: #1A1A1A; font-weight: 600;">${fmt(asNumber(order.total))}</span>
+        </div>
+      </div>
+    `)}
 
-    <div class="highlight-box">
-      <p><strong>📦 What Happens Next?</strong></p>
-      <p>• Our sweet makers will carefully prepare your order with love and tradition<br/>
-      • Your sweets will be packed in our premium, food-safe packaging<br/>
-      • You'll receive a tracking notification once your order is dispatched<br/>
-      • Enjoy your authentic Agra sweets fresh from our kitchen to your home!</p>
-    </div>
+    ${buildSectionHeading("Delivery Address")}
+    ${addressLines(order.shipping_address ?? {})}
+
+    ${buildInfoBox("What Happens Next", buildList([
+    "Our artisans will prepare your order with traditional expertise",
+    "Your sweets will be carefully packed in premium packaging",
+    "You will receive a shipping notification once dispatched"
+  ]))}
     
-    <p>If you have any questions about your order or need assistance, please don't hesitate to contact us at <strong>support@tajpetha.in</strong>.</p>
+    ${buildParagraph(`Should you have any questions, please contact us at ${buildLink("mailto:support@tajpetha.in", "support@tajpetha.in")}`)}
     
-    <p style="margin-top: 32px; font-style: italic;">Sweet regards and thank you for your trust,<br/>The Taj Petha Family 🍯</p>
+    ${buildSignOff()}
   `
 
   await sendLuxuryEmail({
     to: order.email as string,
-    name: order.email,
-    subject: `Sweet Order #${(order.display_id ?? order.id) as string} Confirmed - Taj Petha 🍯`,
-    html: buildLuxuryTemplate("Order Confirmation", body),
+    name: customerName,
+    subject: `Order #${(order.display_id ?? order.id) as string} Confirmed - Taj Petha`,
+    html: buildLuxuryTemplate("Order Confirmed", body),
   })
 }
 
@@ -171,4 +209,4 @@ export const config: SubscriberConfig = {
   context: {
     subscriberId: "order-confirmation-email",
   },
-} 
+}
