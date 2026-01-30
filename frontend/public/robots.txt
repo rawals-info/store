@@ -10,6 +10,8 @@ Disallow: /api/*
 Disallow: /reset-password
 Disallow: /forgot-password
 Disallow: /payment-icons/*
+Disallow: /opengraph-image*
+Disallow: /search/*
 
 # Googlebot
 User-agent: Googlebot
@@ -28,9 +30,9 @@ Disallow: /cart
 Disallow: /admin
 
 # Host
-Host: https://www.tajpetha.in
+Host: https://tajpetha.in
 
 # Sitemaps
-Sitemap: https://www.tajpetha.in/sitemap.xml
+Sitemap: https://tajpetha.in/sitemap.xml
 Sitemap: https://tajpetha.in/server-sitemap.xml
 Sitemap: https://tajpetha.in/blog-sitemap.xml

@@ -17,9 +17,41 @@ import ProductsCountdownBanner from "../../../../components/ProductsCountdownBan
 export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await params
   return {
+    title: "Buy Petha Online | Authentic Agra Petha & Namkeen | Taj Petha India",
+    description: "Buy authentic Agra petha online at India's #1 trusted store. Fresh dry petha, kesar petha, paan petha. Same-day dispatch, free delivery ₹500+. Order now!",
+    keywords: [
+      "buy petha online",
+      "buy agra petha",
+      "order petha online",
+      "agra petha online",
+      "authentic petha online",
+      "buy dry petha",
+      "buy kesar petha online",
+      "petha online shopping",
+      "fresh petha order",
+      "agra sweets online",
+      "buy namkeen online",
+      "petha delivery India",
+      "petha home delivery",
+      "taj petha products",
+      "indian sweets online"
+    ],
+    openGraph: {
+      title: "Buy Petha Online | Authentic Agra Petha | Taj Petha",
+      description: "Shop authentic Agra petha & namkeen online. Same-day dispatch, free delivery on orders above ₹500.",
+      url: `https://tajpetha.in/${countryCode}/products`,
+      type: "website",
+      images: [{ url: "/hero_image.webp", width: 1200, height: 630, alt: "Buy Authentic Agra Petha Online" }]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Buy Petha Online | Taj Petha India",
+      description: "Order authentic Agra petha online with same-day dispatch. 50,000+ happy customers!"
+    },
     alternates: {
       canonical: `https://tajpetha.in/${countryCode}/products`,
     },
+    robots: { index: true, follow: true }
   }
 }
 
@@ -39,11 +71,11 @@ type Props = {
 // Helper function to get product price
 const getProductPrice = (product: any) => {
   if (!product || !product.variants || !product.variants.length) return 0
-  
+
   const prices = product.variants
     .filter((v: any) => v.calculated_price)
     .map((v: any) => v.calculated_price.calculated_amount || 0)
-  
+
   return prices.length > 0 ? Math.min(...prices) : 0
 }
 
@@ -51,14 +83,14 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   // Await params and searchParams
   const paramsData = await params
   const searchParamsData = await searchParams
-  
+
   // Extract search params safely
   const sortBy = searchParamsData.sortBy || "created_at"
   const categoryFilter = searchParamsData.categories
   const tagFilter = searchParamsData.tags
   const price_min = searchParamsData.price_min
   const price_max = searchParamsData.price_max
-  
+
   // Get country code from params
   const countryCode = paramsData.countryCode
 
@@ -156,10 +188,10 @@ export default async function ProductsPage({ params, searchParams }: Props) {
       })
     }
   }
-  
+
   // Get featured product (first product or null)
   const featuredProduct = sortedProducts.length > 0 ? sortedProducts[0] : null
-  
+
   return (
     <div className="content-container px-0 sm:px-6 pt-16 sm:pt-0">
       {/* Mobile-Optimized Hero section with urgency */}
@@ -179,7 +211,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
             </div>
           )}
         </div>
-        
+
         {/* Content overlay */}
         <div className="relative z-10 py-6 sm:py-8 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
           {/* Mobile-First Flash Sale Banner - Luxury Theme */}
@@ -187,7 +219,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
             <span className="text-base sm:text-lg">🔥</span>
             <span className="font-semibold uppercase tracking-wider">Flash Sale: 20% OFF All Products!</span>
           </div>
-          
+
           <h1 className="font-display text-2xl sm:text-4xl md:text-5xl text-luxury-charcoal mb-2 leading-tight">
             Premium Agra Petha
           </h1>
@@ -195,7 +227,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
           <p className="text-sm sm:text-base text-luxury-charcoal/80 max-w-2xl mb-4 sm:mb-6 px-4">
             Handcrafted traditional sweets delivered fresh to your doorstep
           </p>
-          
+
           {/* Urgency Elements - Mobile Optimized */}
           <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-2xl px-4 mb-4">
             <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
@@ -211,7 +243,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Rating</div>
             </div>
           </div>
-          
+
           {/* Sale Countdown - Synced with announcement banner */}
           <ProductsCountdownBanner />
         </div>
@@ -222,7 +254,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
         <aside className="hidden lg:block px-6">
           {/* Product count & filters */}
           <div className="sticky top-20">
-            <RefinementList 
+            <RefinementList
               sortBy={sortBy as SortOptions}
               categories={categories}
               tags={tagsList}
@@ -243,7 +275,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
               {productCount} {productCount === 1 ? 'product' : 'products'}
             </span>
           </div>
-          
+
           <Suspense fallback={<ProductListSkeleton count={8} />}>
             {productCount > 0 ? (
               <ul className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">

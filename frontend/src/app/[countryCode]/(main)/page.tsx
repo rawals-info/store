@@ -9,21 +9,46 @@ import Link from "next/link"
 import { MAJOR_INDIAN_CITIES } from "@lib/seo"
 
 const baseMetadata: Metadata = {
-  title: "Taj Petha | Authentic Agra Petha & Namkeen Online",
-  description: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, same-day dispatch, free shipping on orders above ₹500.",
+  title: "Buy Authentic Agra Petha Online | Fresh Namkeen | Taj Petha India",
+  description: "Buy authentic Agra petha online with same-day dispatch. India's #1 trusted petha store. Fresh, hygienic, traditional recipes. Free shipping ₹500+. Order now!",
   keywords: [
+    // High-intent commercial keywords
+    "buy petha online",
+    "buy agra petha",
+    "order petha online",
+    "petha online shopping",
+    "buy authentic agra petha",
+    "agra petha online order",
+    "fresh petha buy online",
+    "petha home delivery",
+    "order agra sweets online",
+    // Brand + location keywords
+    "taj petha agra",
+    "taj petha online",
     "best petha in India",
     "authentic Agra petha online",
+    // Product variety keywords
+    "kesar petha online",
+    "dry petha buy online",
+    "paan petha order",
+    "chocolate petha online",
+    // Delivery keywords
     "fresh petha delivery India",
+    "petha same day delivery",
+    "agra petha home delivery",
+    // Quality keywords
     "hygienic Indian sweets online",
-    "traditional namkeen buy online",
-    "Taj Petha official store",
-    "Agra sweets home delivery",
-    "premium Indian sweets online",
-    "fresh petha same day delivery",
-    "best namkeen brand India online",
-    "authentic petha Agra taste",
-    "hygienic sweet shop online India"
+    "traditional petha recipes",
+    "premium agra sweets",
+    // Gift keywords
+    "petha gift box online",
+    "diwali sweets online",
+    "corporate sweet gifting",
+    // Namkeen keywords
+    "buy namkeen online",
+    "fresh namkeen delivery",
+    "dalmoth online order",
+    "traditional namkeen buy online"
   ],
   openGraph: {
     title: "Taj Petha | Authentic Agra Petha & Namkeen Online",

@@ -8,19 +8,34 @@ export const getBaseURL = () => {
 // SEO Constants
 export const SEO_CONSTANTS = {
   siteName: "Taj Petha",
-  defaultTitle: "Taj Petha | India's Best Authentic Agra Petha & Fresh Namkeen Online",
-  defaultDescription: "Buy India's finest authentic Agra petha & fresh namkeen online. Hygienic preparation, traditional recipes, premium ingredients. Same-day dispatch across India.",
+  defaultTitle: "Buy Authentic Agra Petha Online | Fresh Namkeen | Taj Petha India",
+  defaultDescription: "Buy authentic Agra petha online at India's #1 trusted store. Fresh, hygienic, traditional recipes. Same-day dispatch, free delivery ₹500+. Order now!",
   defaultKeywords: [
+    // High-intent commercial keywords
+    "buy petha online",
+    "buy agra petha",
+    "order petha online",
+    "agra petha online",
+    "authentic petha buy",
+    // Brand keywords
+    "taj petha",
+    "taj petha agra",
+    "taj petha online",
+    // Location keywords
     "best petha in India",
     "authentic Agra petha online",
     "fresh petha delivery India",
+    // Product keywords
+    "buy dry petha online",
+    "buy kesar petha online",
+    "buy namkeen online",
+    // Quality keywords
     "hygienic Indian sweets",
     "traditional namkeen online",
-    "Taj Petha",
-    "Agra sweets online",
-    "premium Indian sweets",
-    "fresh petha home delivery",
-    "best namkeen brand India"
+    "premium petha online",
+    // Delivery keywords
+    "petha home delivery",
+    "petha same day delivery"
   ],
   companyInfo: {
     name: "Taj Petha",
@@ -240,7 +255,7 @@ export const generateProductSchema = (
       "value": "Made fresh daily"
     },
     {
-      "@type": "PropertyValue", 
+      "@type": "PropertyValue",
       "name": "Packaging",
       "value": "Hygienic packaging"
     }
@@ -361,40 +376,40 @@ export const generateProductSchema = (
     },
     ...(reviewCount > 0 && ratingValue > 0
       ? {
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": ratingValue.toFixed(1),
-            "reviewCount": reviewCount.toString(),
-            "bestRating": "5",
-            "worstRating": "1"
-          }
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": ratingValue.toFixed(1),
+          "reviewCount": reviewCount.toString(),
+          "bestRating": "5",
+          "worstRating": "1"
         }
+      }
       : {}),
     // Add review array with proper itemReviewed if provided
     ...(reviews && reviews.length > 0
       ? {
-          "review": reviews.slice(0, 10).map(r => ({
-            "@type": "Review",
-            "reviewRating": {
-              "@type": "Rating",
-              "ratingValue": r.rating.toString(),
-              "bestRating": "5",
-              "worstRating": "1"
-            },
-            "author": {
-              "@type": "Person",
-              "name": `${r.first_name} ${r.last_name}`.trim() || "Anonymous"
-            },
-            "name": r.title || `${product.title} review`,
-            "reviewBody": r.content,
-            "datePublished": new Date().toISOString().split('T')[0],
-            "itemReviewed": {
-              "@type": "Product",
-              "@id": `${baseUrl}/${countryCode}/products/${product.handle}#product`,
-              "name": product.title
-            }
-          }))
-        }
+        "review": reviews.slice(0, 10).map(r => ({
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": r.rating.toString(),
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "author": {
+            "@type": "Person",
+            "name": `${r.first_name} ${r.last_name}`.trim() || "Anonymous"
+          },
+          "name": r.title || `${product.title} review`,
+          "reviewBody": r.content,
+          "datePublished": new Date().toISOString().split('T')[0],
+          "itemReviewed": {
+            "@type": "Product",
+            "@id": `${baseUrl}/${countryCode}/products/${product.handle}#product`,
+            "name": product.title
+          }
+        }))
+      }
       : {}),
     // Add additional properties for better SEO
     "identifier": {
@@ -410,7 +425,7 @@ export const generateProductSchema = (
   return productSchema
 }
 
-export const generateBreadcrumbSchema = (breadcrumbs: Array<{name: string, url: string}>) => {
+export const generateBreadcrumbSchema = (breadcrumbs: Array<{ name: string, url: string }>) => {
   const baseUrl = getBaseURL()
   return {
     "@context": "https://schema.org",
@@ -424,7 +439,7 @@ export const generateBreadcrumbSchema = (breadcrumbs: Array<{name: string, url: 
   }
 }
 
-export const generateFAQSchema = (faqs: Array<{question: string, answer: string}>) => {
+export const generateFAQSchema = (faqs: Array<{ question: string, answer: string }>) => {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -467,14 +482,14 @@ export const generateOpenGraphUrl = (path: string) => {
 
 // City-specific SEO helpers
 export const MAJOR_INDIAN_CITIES = [
-  { name: "Delhi", slug: "delhi", keywords: ["petha delivery delhi", "agra sweets delhi"] },
-  { name: "Mumbai", slug: "mumbai", keywords: ["agra petha mumbai", "fresh petha mumbai"] },
-  { name: "Bangalore", slug: "bangalore", keywords: ["fresh petha bangalore", "namkeen bangalore"] },
-  { name: "Hyderabad", slug: "hyderabad", keywords: ["namkeen delivery hyderabad", "petha hyderabad"] },
-  { name: "Chennai", slug: "chennai", keywords: ["petha online chennai", "agra sweets chennai"] },
-  { name: "Pune", slug: "pune", keywords: ["agra sweets pune", "traditional sweets pune"] },
-  { name: "Kolkata", slug: "kolkata", keywords: ["petha delivery kolkata", "bengali sweet lovers petha"] },
-  { name: "Ahmedabad", slug: "ahmedabad", keywords: ["fresh namkeen ahmedabad", "gujarati petha lovers"] }
+  { name: "Delhi", slug: "delhi", keywords: ["buy petha delhi", "agra petha delivery delhi", "order petha online delhi", "petha home delivery delhi ncr"] },
+  { name: "Mumbai", slug: "mumbai", keywords: ["buy agra petha mumbai", "fresh petha mumbai", "order petha online mumbai", "petha delivery mumbai"] },
+  { name: "Bangalore", slug: "bangalore", keywords: ["buy petha bangalore", "agra petha online bangalore", "petha delivery bangalore", "namkeen bangalore"] },
+  { name: "Hyderabad", slug: "hyderabad", keywords: ["buy petha hyderabad", "order petha online hyderabad", "agra sweets delivery hyderabad"] },
+  { name: "Chennai", slug: "chennai", keywords: ["buy petha online chennai", "agra sweets chennai", "petha delivery chennai"] },
+  { name: "Pune", slug: "pune", keywords: ["buy agra petha pune", "order petha pune", "traditional sweets pune"] },
+  { name: "Kolkata", slug: "kolkata", keywords: ["buy petha kolkata", "agra petha delivery kolkata", "order petha online kolkata"] },
+  { name: "Ahmedabad", slug: "ahmedabad", keywords: ["buy petha ahmedabad", "fresh namkeen ahmedabad", "agra petha delivery ahmedabad"] }
 ]
 
 export const generateCityPageMetadata = (citySlug: string, productType: string = "petha") => {

@@ -20,7 +20,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
   const { blogId, countryCode } = await params
   const post = getBlogPostById(blogId)
-  
+
   if (!post) {
     return {
       title: "Blog Post Not Found | Taj Petha",
@@ -29,13 +29,13 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
   }
 
   // Optimize title length (under 60 chars)
-  const optimizedTitle = post.title.length > 50 
-    ? `${post.title.substring(0, 47)}... | Taj Petha` 
+  const optimizedTitle = post.title.length > 50
+    ? `${post.title.substring(0, 47)}... | Taj Petha`
     : `${post.title} | Taj Petha`
 
   // Optimize description length (under 160 chars)
-  const optimizedDescription = post.excerpt.length > 155 
-    ? `${post.excerpt.substring(0, 152)}...` 
+  const optimizedDescription = post.excerpt.length > 155
+    ? `${post.excerpt.substring(0, 152)}...`
     : post.excerpt
 
   const canonical = `https://tajpetha.in/${countryCode}/blog/${blogId}`
@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
 export default async function BlogPost({ params }: BlogPostProps) {
   const { blogId, countryCode } = await params
   const post = getBlogPostById(blogId)
-  
+
   if (!post) {
     notFound()
   }
@@ -184,20 +184,20 @@ export default async function BlogPost({ params }: BlogPostProps) {
               {post.category}
             </span>
           </div>
-          
+
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             {post.title}
           </h1>
-          
+
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
             <div className="flex items-center">
               <span className="font-medium">By {post.author}</span>
             </div>
             <div>•</div>
-            <div>{new Date(post.publishDate).toLocaleDateString('en-IN', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            <div>{new Date(post.publishDate).toLocaleDateString('en-IN', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}</div>
             <div>•</div>
             <div>{post.readTime}</div>
@@ -290,24 +290,72 @@ export default async function BlogPost({ params }: BlogPostProps) {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 bg-gradient-to-r from-luxury-gold to-yellow-600 text-white rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">Try Our Authentic Products</h3>
-          <p className="mb-6 text-yellow-100">
-            Experience the traditional flavors mentioned in this article with our premium collection.
+        <div className="mt-12 bg-[#1A1A1A] text-white rounded-2xl p-8 text-center">
+          <h3 className="text-2xl font-bold mb-4">Buy Fresh Petha Online</h3>
+          <p className="mb-6 text-gray-300">
+            Experience the traditional flavors mentioned in this article. Same-day dispatch, free delivery ₹500+
           </p>
-          <Link
-            href={`/${countryCode}/products`}
-            className="inline-block bg-white text-luxury-gold px-8 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
-          >
-            Shop Now
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href={`/${countryCode}/products`}
+              className="inline-block bg-[#C9A962] text-black px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#B8983D] transition-colors"
+            >
+              Shop Now
+            </Link>
+            <Link
+              href={`/${countryCode}/buy-petha-online`}
+              className="inline-block border-2 border-[#C9A962] text-[#C9A962] px-8 py-3 rounded-xl font-bold hover:bg-[#C9A962] hover:text-black transition-colors"
+            >
+              Buy Petha Online
+            </Link>
+          </div>
+        </div>
+
+        {/* Related Posts Section for SEO Interlinking */}
+        <div className="mt-12">
+          <h3 className="text-2xl font-serif font-bold text-[#1A1A1A] mb-6">Related Articles</h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            {blogPosts
+              .filter(p => p.id !== blogId && p.category === post.category)
+              .slice(0, 3)
+              .map((relatedPost) => (
+                <Link
+                  key={relatedPost.id}
+                  href={`/${countryCode}/blog/${relatedPost.id}`}
+                  className="group border border-gray-200 rounded-xl p-4 hover:border-[#C9A962] transition-all"
+                >
+                  <span className="text-xs text-[#C9A962] font-medium">{relatedPost.category}</span>
+                  <h4 className="font-semibold text-[#1A1A1A] group-hover:text-[#C9A962] transition-colors mt-1 line-clamp-2">
+                    {relatedPost.title}
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-2 line-clamp-2">{relatedPost.excerpt}</p>
+                  <span className="text-sm text-[#C9A962] font-medium mt-3 inline-block group-hover:underline">
+                    Read More →
+                  </span>
+                </Link>
+              ))}
+          </div>
+        </div>
+
+        {/* Quick Product Links for SEO */}
+        <div className="mt-10 p-6 bg-gray-50 rounded-xl">
+          <h3 className="font-semibold text-[#1A1A1A] mb-4">Popular Products</h3>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/${countryCode}/products/dry-petha`} className="text-sm text-[#C9A962] hover:underline">Buy Dry Petha</Link>
+            <span className="text-gray-300">|</span>
+            <Link href={`/${countryCode}/products/kesar-petha`} className="text-sm text-[#C9A962] hover:underline">Buy Kesar Petha</Link>
+            <span className="text-gray-300">|</span>
+            <Link href={`/${countryCode}/products`} className="text-sm text-[#C9A962] hover:underline">All Products</Link>
+            <span className="text-gray-300">|</span>
+            <Link href={`/${countryCode}/buy-petha-online`} className="text-sm text-[#C9A962] hover:underline">Buy Petha Online</Link>
+          </div>
         </div>
 
         {/* Back to Blog */}
         <div className="mt-8 text-center">
           <Link
             href={`/${countryCode}/blog`}
-            className="inline-flex items-center text-luxury-gold font-medium hover:underline"
+            className="inline-flex items-center text-[#C9A962] font-medium hover:underline"
           >
             ← Back to All Articles
           </Link>

@@ -29,7 +29,8 @@ module.exports = {
     // Keep sitemap minimalist to avoid GSC redirect/canonical conflicts
     const basePaths = [
       { loc: '/in', priority: 1.0, changefreq: 'daily' },
-      { loc: '/in/products', priority: 0.9, changefreq: 'daily' },
+      { loc: '/in/products', priority: 0.95, changefreq: 'daily' },
+      { loc: '/in/buy-petha-online', priority: 0.95, changefreq: 'daily' }, // NEW commercial landing page
       { loc: '/in/categories', priority: 0.9, changefreq: 'weekly' },
       { loc: '/in/collections', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/blog', priority: 0.9, changefreq: 'weekly' },
@@ -39,9 +40,15 @@ module.exports = {
       { loc: '/in/terms', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/privacy', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/returns', priority: 0.7, changefreq: 'monthly' },
-      { loc: '/in/city/delhi', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/city/mumbai', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/city/bangalore', priority: 0.8, changefreq: 'weekly' },
+      // City landing pages - all major cities
+      { loc: '/in/city/delhi', priority: 0.85, changefreq: 'weekly' },
+      { loc: '/in/city/mumbai', priority: 0.85, changefreq: 'weekly' },
+      { loc: '/in/city/bangalore', priority: 0.85, changefreq: 'weekly' },
+      { loc: '/in/city/hyderabad', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/chennai', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/pune', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/kolkata', priority: 0.8, changefreq: 'weekly' },
+      { loc: '/in/city/ahmedabad', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/categories/gift-boxes', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/categories/traditional-sweets', priority: 0.8, changefreq: 'weekly' },
       { loc: '/in/blog/seasonal-namkeen-guide', priority: 0.7, changefreq: 'monthly' },

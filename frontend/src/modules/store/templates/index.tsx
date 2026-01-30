@@ -25,8 +25,13 @@ const StoreTemplate = ({
     >
       <RefinementList sortBy={sort} />
       <div className="w-full">
-        <div className="mb-8 text-2xl-semi">
-          <h1 data-testid="store-page-title">All products</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-serif font-bold text-[#1A1A1A] mb-2" data-testid="store-page-title">
+            Buy Petha Online
+          </h1>
+          <p className="text-gray-600">
+            Authentic Agra petha & fresh namkeen. Same-day dispatch, free delivery ₹500+
+          </p>
         </div>
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts
