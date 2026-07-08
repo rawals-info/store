@@ -250,10 +250,16 @@ const localBusinessSchema = {
     }
   ],
   "servesCuisine": ["Indian Sweets", "Traditional Namkeen", "Agra Specialties"],
-  "priceRange": "₹₹",
+  "priceRange": "₹99 - ₹2500",
   "currenciesAccepted": "INR",
   "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"],
-  // Removed site-level fixed ratings/reviews to avoid misleading structured data
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "550",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {

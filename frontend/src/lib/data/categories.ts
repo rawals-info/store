@@ -47,7 +47,7 @@ export const listCategories = async (
     fields?: string
   } = {}
 ) => {
-  return await getCategories({ ...options, parent_category_id: "null" })
+  return await getCategories({ ...options, parent_category_id: null })
 }
 
 export const getCategoriesByParentId = async (

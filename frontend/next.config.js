@@ -114,7 +114,7 @@ const nextConfig = {
       },
       // Image caching headers (non-SVG images don't need indexing)
       {
-        source: '/(.*)\\.(jpg|jpeg|png|webp|avif|ico)',
+        source: '/(.*)\\.(jpg|jpeg|png|webp|avif)',
         headers: [
           {
             key: 'Cache-Control',
@@ -127,6 +127,20 @@ const nextConfig = {
           {
             key: 'X-Robots-Tag',
             value: 'noindex, nofollow'
+          }
+        ]
+      },
+      // Favicon caching headers (allow indexing)
+      {
+        source: '/(.*)\\.(ico)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, s-maxage=31536000, immutable'
+          },
+          {
+            key: 'Expires',
+            value: new Date(Date.now() + 31536000000).toUTCString()
           }
         ]
       },

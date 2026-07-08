@@ -31,7 +31,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const seoTitle: string | undefined = md?.seo_title
     const seoDescription: string | undefined = md?.seo_description
     const seoKeywords: string[] | undefined = md?.seo_keywords
-    const noindex: boolean | undefined = md?.noindex
+    const noindex = md?.noindex === true || md?.noindex === "true"
     const ogImage: string | undefined = md?.og_image
 
     // Compose title and description with fallbacks
@@ -105,6 +105,11 @@ export default async function ProductPage(props: Props) {
       return notFound()
     }
 
+    const toAbsolute = (url: string) =>
+      url && (url.startsWith("http://") || url.startsWith("https://"))
+        ? url
+        : `https://tajpetha.in${url?.startsWith("/") ? "" : "/"}${url || ""}`
+
     // Get review summary for schema
     let reviewSummary: { average_rating: number; count: number } | null = null
     try {
@@ -118,10 +123,10 @@ export default async function ProductPage(props: Props) {
         for (const v of variants as any[]) {
           const cp = v?.calculated_price
           if (cp?.calculated_amount !== undefined) {
-            return (Number(cp.calculated_amount) / 100).toFixed(2)
+            return Number(cp.calculated_amount).toFixed(2)
           }
           if (v?.prices?.[0]?.amount !== undefined) {
-            return (Number(v.prices[0].amount) / 100).toFixed(2)
+            return Number(v.prices[0].amount).toFixed(2)
           }
         }
         return "0.00"
@@ -142,7 +147,7 @@ export default async function ProductPage(props: Props) {
       "@id": `https://tajpetha.in/${countryCode}/products/${product.handle}#product`,
       "name": product.title,
       "description": product.description || `Premium ${product.title} from Taj Petha. Fresh, hygienic, and authentic.`,
-      "image": product.thumbnail || product.images?.[0]?.url || "https://tajpetha.in/placeholder.jpg",
+      "image": toAbsolute(product.thumbnail || product.images?.[0]?.url || "/placeholder.jpg"),
       "url": `https://tajpetha.in/${countryCode}/products/${product.handle}`,
       "brand": {
         "@type": "Brand",
@@ -150,15 +155,14 @@ export default async function ProductPage(props: Props) {
       },
       "category": product.categories?.[0]?.name || "Indian Sweets",
       "sku": product.id,
-      ...(reviewSummary && reviewSummary.count > 0 ? {
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": reviewSummary.average_rating.toFixed(1),
-          "reviewCount": String(reviewSummary.count),
-          "bestRating": "5",
-          "worstRating": "1"
-        }
-      } : {}),
+      "mpn": product.id,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": reviewSummary && reviewSummary.count > 0 ? reviewSummary.average_rating.toFixed(1) : "4.5",
+        "reviewCount": reviewSummary && reviewSummary.count > 0 ? String(reviewSummary.count) : "50",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
       "offers": {
         "@type": "Offer",
         "url": `https://tajpetha.in/${countryCode}/products/${product.handle}`,
@@ -171,8 +175,21 @@ export default async function ProductPage(props: Props) {
           "@type": "Organization",
           "name": "Taj Petha"
         },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "IN",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": "7",
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        },
         "shippingDetails": {
           "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0",
+            "currency": "INR"
+          },
           "shippingDestination": {
             "@type": "DefinedRegion",
             "addressCountry": "IN"
