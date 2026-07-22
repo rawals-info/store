@@ -42,8 +42,7 @@ export default function CategoryCarousel({ categories, countryCode }: CategoryCa
                       src={category.imageSrc || ""}
                       alt={category.displayName}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      unoptimized
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300"></div>
                   </div>

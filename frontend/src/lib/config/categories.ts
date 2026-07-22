@@ -22,17 +22,17 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   namkeen: {
     displayName: "Namkeen",
     handle: "namkeen",
-    imageSrc: "/images/namkeen.png",
+    imageSrc: "/images/namkeen.webp",
   },
   dalmoth: {
     displayName: "Dalmoth",
     handle: "dalmoth",
-    imageSrc: "/images/dalmoth.png",
+    imageSrc: "/images/dalmoth.webp",
   },
   // combo: {
   //   displayName: "Combo (Petha + Dalmoth)",
   //   handle: "combo1",
-  //   imageSrc: "/images/combo.png",
+  //   imageSrc: "/images/combo.webp",
   // },
 }
 

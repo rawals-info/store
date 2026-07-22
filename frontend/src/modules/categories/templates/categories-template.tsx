@@ -62,10 +62,10 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
   const getCategoryImage = (handle: string) => {
     // Use the new category images
     const imageMappings: Record<string, string> = {
-      "petha": "/images/petha.png",
-      "namkeen": "/images/namkeen.png",
-      "dalmoth": "/images/dalmoth.png",
-      // "combo1": "/images/combo.png", // commented out
+      "petha": "/images/petha.webp",
+      "namkeen": "/images/namkeen.webp",
+      "dalmoth": "/images/dalmoth.webp",
+      // "combo1": "/images/combo.webp", // commented out
     }
     
     return imageMappings[handle] || null
@@ -91,7 +91,6 @@ export default function CategoriesTemplate({ categories, region }: CategoriesTem
           fill
           className="object-cover"
           onError={() => setHasError(true)}
-          unoptimized
         />
       </div>
     );
