@@ -3,7 +3,19 @@ REMEMBER TO ALWAYS ADD TIMESTAMP AND DATE OF NEW CHANGES
 
 ---
 
-## July 22, 2026 — 04:10 UTC — Major Schema & Indexing Fixes
+## July 22, 2026 — 04:33 UTC — City Page Merchant Listing Fix
+
+### Changes Made
+
+#### 7. Fixed City Page "Missing field image" Merchant Listing Error
+**File:** `frontend/src/app/[countryCode]/(main)/city/[citySlug]/page.tsx`
+- **Problem:** City pages (/in/city/ahmedabad, /in/city/bangalore, /in/city/pune etc.) had a `Product` schema inside `hasOfferCatalog.itemListElement[0].itemOffered` that was (a) missing required `image` field, (b) had invalid `price: "0.00"`, (c) pointed to `/products/petha` — a URL that doesn't exist as a product handle.
+- **Fix:** Changed `itemOffered` from `@type: "Product"` to `@type: "Service"`. City pages are delivery service landing pages, not product pages — Service is the semantically correct type and won't trigger invalid merchant listing warnings.
+- **Impact:** Removes 3 invalid merchant listing items from GSC. City pages now correctly described as delivery services.
+
+---
+
+
 
 ### Changes Made
 

@@ -93,29 +93,17 @@ export default function CityPage({ params, searchParams }: CityPageProps) {
         {
           "@type": "Offer",
           "itemOffered": {
-            "@type": "Product",
-            "@id": `https://tajpetha.in/${countryCode}/products/${productType}`,
-            "name": `Fresh ${productType.charAt(0).toUpperCase() + productType.slice(1)}`,
-            "description": `Authentic Agra ${productType} delivered fresh to ${city.name}`
-            ,
-            // Remove fake aggregateRating to avoid misleading data
-            // Added direct Offer to fulfil Google Product Snippet requirements
-            "offers": {
-              "@type": "Offer",
-              "price": "0.00",
-              "priceCurrency": "INR",
-              "availability": "https://schema.org/InStock",
-              "itemCondition": "https://schema.org/NewCondition",
-              "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              "url": `https://tajpetha.in/${countryCode}/products/${productType}`,
-              "seller": {
-                "@id": `https://tajpetha.in/#organization`
-              },
-              "priceSpecification": {
-                "@type": "PriceSpecification",
-                "price": "0.00",
-                "priceCurrency": "INR"
-              }
+            "@type": "Service",
+            "name": `Fresh ${productType.charAt(0).toUpperCase() + productType.slice(1)} Delivery in ${city.name}`,
+            "description": `Authentic Agra ${productType} delivered fresh to ${city.name}. Same-day dispatch, hygienic packaging, free delivery above ₹500.`,
+            "url": `https://tajpetha.in/${countryCode}/products`,
+            "areaServed": {
+              "@type": "City",
+              "name": city.name,
+              "addressCountry": "IN"
+            },
+            "provider": {
+              "@id": `https://tajpetha.in/#organization`
             }
           },
           "priceRange": "₹₹",
