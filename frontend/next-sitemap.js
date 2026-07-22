@@ -1,15 +1,23 @@
 const excludedPaths = [
   "/checkout",
+  "/*/checkout",
   "/account/*",
+  "/*/account/*",
   "/cart",
+  "/*/cart",
   "/admin/*",
   "/_next/*",
   "/api/*",
+  // Auth pages — must exclude BOTH the root and the /in/ prefixed versions
   "/reset-password",
+  "/*/reset-password",
   "/forgot-password",
+  "/*/forgot-password",
   "/payment-icons/*",
   "/opengraph-image*",
-  "/search/*"
+  // Search pages should not be indexed
+  "/search/*",
+  "/*/search/*",
 ]
 
 /** @type {import('next-sitemap').IConfig} */

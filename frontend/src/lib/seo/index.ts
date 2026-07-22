@@ -318,6 +318,7 @@ export const generateProductSchema = (
       "price": finalPrice,
       "priceCurrency": region?.currency_code?.toUpperCase() || "INR",
       "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "validFrom": new Date().toISOString().split('T')[0],
       "priceValidUntil": priceValidUntil,
       "itemCondition": "https://schema.org/NewCondition",
       "url": `${baseUrl}/${countryCode}/products/${product.handle}`,

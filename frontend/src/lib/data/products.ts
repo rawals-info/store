@@ -48,7 +48,7 @@ export const listProducts = async ({
   queryParams?: HttpTypes.StoreProductParams
 }> => {
   const region = regionId ? { id: regionId } : getIndiaRegion()
-  
+
   if (!region) {
     return {
       response: { products: [], count: 0 },
@@ -238,9 +238,9 @@ export const getProductData = cache(
     // Fetch product with region-aware pricing directly
     const detailedProduct = await sdk.client
       .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
-        query: { 
-          handle, 
-          limit: 1, 
+        query: {
+          handle,
+          limit: 1,
           region_id: region.id,
           fields: PRODUCT_FIELDS.DETAIL // Use detailed fields for product pages
         },
@@ -292,7 +292,7 @@ export const getProductReviews = async ({
 }: {
   productId: string
   limit?: number
-  offset?: number 
+  offset?: number
 }) => {
   const headers = {
     ...(await getAuthHeaders()),

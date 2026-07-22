@@ -1,8 +1,6 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { listProducts } from "@lib/data/products"
-import { getProductData, getProductReviewSummary } from "@lib/data/products"
-import { listIndiaRegions } from "@lib/constants/india-region"
+import { getProductData } from "@lib/data/products"
 import ProductTemplate from "@modules/products/templates"
 import { Suspense } from "react"
 import SkeletonProductPage from "@modules/skeletons/templates/skeleton-product-page"
@@ -105,131 +103,16 @@ export default async function ProductPage(props: Props) {
       return notFound()
     }
 
-    const toAbsolute = (url: string) =>
-      url && (url.startsWith("http://") || url.startsWith("https://"))
-        ? url
-        : `https://tajpetha.in${url?.startsWith("/") ? "" : "/"}${url || ""}`
-
-    // Get review summary for schema
-    let reviewSummary: { average_rating: number; count: number } | null = null
-    try {
-      reviewSummary = await getProductReviewSummary(product.id)
-    } catch { }
-
-    // Calculate price from variants
-    const getProductPrice = (): string => {
-      try {
-        const variants = product.variants || []
-        for (const v of variants as any[]) {
-          const cp = v?.calculated_price
-          if (cp?.calculated_amount !== undefined) {
-            return Number(cp.calculated_amount).toFixed(2)
-          }
-          if (v?.prices?.[0]?.amount !== undefined) {
-            return Number(v.prices[0].amount).toFixed(2)
-          }
-        }
-        return "0.00"
-      } catch {
-        return "0.00"
-      }
-    }
-
-    const productPrice = getProductPrice()
-    const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0]
-
-    // Generate Product schema for rich results
-    const productSchema = {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "@id": `https://tajpetha.in/${countryCode}/products/${product.handle}#product`,
-      "name": product.title,
-      "description": product.description || `Premium ${product.title} from Taj Petha. Fresh, hygienic, and authentic.`,
-      "image": toAbsolute(product.thumbnail || product.images?.[0]?.url || "/placeholder.jpg"),
-      "url": `https://tajpetha.in/${countryCode}/products/${product.handle}`,
-      "brand": {
-        "@type": "Brand",
-        "name": "Taj Petha"
-      },
-      "category": product.categories?.[0]?.name || "Indian Sweets",
-      "sku": product.id,
-      "mpn": product.id,
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": reviewSummary && reviewSummary.count > 0 ? reviewSummary.average_rating.toFixed(1) : "4.5",
-        "reviewCount": reviewSummary && reviewSummary.count > 0 ? String(reviewSummary.count) : "50",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "offers": {
-        "@type": "Offer",
-        "url": `https://tajpetha.in/${countryCode}/products/${product.handle}`,
-        "priceCurrency": "INR",
-        "price": productPrice,
-        "priceValidUntil": priceValidUntil,
-        "availability": "https://schema.org/InStock",
-        "itemCondition": "https://schema.org/NewCondition",
-        "seller": {
-          "@type": "Organization",
-          "name": "Taj Petha"
-        },
-        "hasMerchantReturnPolicy": {
-          "@type": "MerchantReturnPolicy",
-          "applicableCountry": "IN",
-          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-          "merchantReturnDays": "7",
-          "returnMethod": "https://schema.org/ReturnByMail",
-          "returnFees": "https://schema.org/FreeReturn"
-        },
-        "shippingDetails": {
-          "@type": "OfferShippingDetails",
-          "shippingRate": {
-            "@type": "MonetaryAmount",
-            "value": "0",
-            "currency": "INR"
-          },
-          "shippingDestination": {
-            "@type": "DefinedRegion",
-            "addressCountry": "IN"
-          },
-          "deliveryTime": {
-            "@type": "ShippingDeliveryTime",
-            "handlingTime": {
-              "@type": "QuantitativeValue",
-              "minValue": 0,
-              "maxValue": 1,
-              "unitCode": "DAY"
-            },
-            "transitTime": {
-              "@type": "QuantitativeValue",
-              "minValue": 2,
-              "maxValue": 5,
-              "unitCode": "DAY"
-            }
-          }
-        }
-      }
-    }
-
+    // All schema markup (Product, Breadcrumb, FAQ) is generated inside ProductTemplate
+    // via generateProductSchema() in @lib/seo — no duplicate schema here.
     return (
-      <>
-        {/* Product Schema for Rich Results */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(productSchema),
-          }}
+      <Suspense fallback={<SkeletonProductPage />}>
+        <ProductTemplate
+          product={product}
+          region={region}
+          countryCode={countryCode}
         />
-        <Suspense fallback={<SkeletonProductPage />}>
-          <ProductTemplate
-            product={product}
-            region={region}
-            countryCode={countryCode}
-          />
-        </Suspense>
-      </>
+      </Suspense>
     )
   } catch (error) {
     console.error(`Error in ProductPage:`, error)

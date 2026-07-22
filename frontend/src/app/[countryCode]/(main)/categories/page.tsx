@@ -22,7 +22,7 @@ export default async function Categories(props: {
   const region = getIndiaRegion()
   const categories = await listCategories().catch(() => null)
 
-  if (!categories) {
+  if (!categories || categories.length === 0) {
     return notFound()
   }
 

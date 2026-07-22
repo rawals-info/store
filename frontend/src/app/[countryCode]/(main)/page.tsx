@@ -132,34 +132,39 @@ const createHomepageSchema = (
       for (const v of variants as any[]) {
         const cp = v?.calculated_price
         if (cp && cp.currency_code && String(cp.currency_code).toUpperCase() === wantedCurrency && cp.calculated_amount !== undefined) {
+          // calculated_amount is already in major currency units (INR) — NO /100
           const amt = Number(cp.calculated_amount)
           if (!Number.isNaN(amt)) amounts.push(amt)
           continue
         }
         const matchInPrices = (v?.prices || []).find((p: any) => p?.currency_code && String(p.currency_code).toUpperCase() === wantedCurrency)
         if (matchInPrices && matchInPrices.amount !== undefined) {
-          const amt = Number(matchInPrices.amount)
+          // prices[].amount is stored in paise (minor units) — MUST divide by 100
+          const amt = Number(matchInPrices.amount) / 100
           if (!Number.isNaN(amt)) amounts.push(amt)
         }
       }
-      let minorUnits: number | null = null
+      let priceInINR: number | null = null
       if (amounts.length > 0) {
-        minorUnits = Math.min(...amounts)
+        priceInINR = Math.min(...amounts)
       } else {
         const anyAmounts: number[] = []
         for (const v of variants as any[]) {
           const cp = v?.calculated_price
           if (cp && cp.calculated_amount !== undefined) {
+            // calculated_amount already in INR — no /100
             const amt = Number(cp.calculated_amount)
             if (!Number.isNaN(amt)) anyAmounts.push(amt)
           } else if (Array.isArray(v?.prices) && v.prices.length > 0) {
-            const amt = Number(v.prices[0]?.amount)
+            // prices[].amount in paise — divide by 100
+            const amt = Number(v.prices[0]?.amount) / 100
             if (!Number.isNaN(amt)) anyAmounts.push(amt)
           }
         }
-        if (anyAmounts.length > 0) minorUnits = Math.min(...anyAmounts)
+        if (anyAmounts.length > 0) priceInINR = Math.min(...anyAmounts)
       }
-      return typeof minorUnits === 'number' ? (minorUnits / 100).toFixed(2) : '0.00'
+      // priceInINR is now in major units (INR) — return as-is
+      return typeof priceInINR === 'number' ? priceInINR.toFixed(2) : '0.00'
     } catch {
       return '0.00'
     }
@@ -258,6 +263,7 @@ const createHomepageSchema = (
             "priceCurrency": "INR",
             "availability": "https://schema.org/InStock",
             "itemCondition": "https://schema.org/NewCondition",
+            "validFrom": new Date().toISOString().split('T')[0],
             "priceValidUntil": priceValidUntil,
             "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
             "seller": {
@@ -267,6 +273,42 @@ const createHomepageSchema = (
               "@type": "PriceSpecification",
               "price": computeProductPrice(product),
               "priceCurrency": "INR"
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "IN",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 7,
+              "returnMethod": "https://schema.org/ReturnByMail",
+              "returnFees": "https://schema.org/FreeReturn",
+              "refundType": "https://schema.org/StoreCreditRefund"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "IN"
+              },
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0.00",
+                "currency": "INR"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 1,
+                  "unitCode": "d"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 1,
+                  "maxValue": 4,
+                  "unitCode": "d"
+                }
+              }
             }
           }
         },
