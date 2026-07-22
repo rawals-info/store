@@ -2,16 +2,22 @@
 User-agent: *
 Allow: /
 Disallow: /checkout
+Disallow: /*/checkout
 Disallow: /account/*
+Disallow: /*/account/*
 Disallow: /cart
+Disallow: /*/cart
 Disallow: /admin/*
 Disallow: /_next/*
 Disallow: /api/*
 Disallow: /reset-password
+Disallow: /*/reset-password
 Disallow: /forgot-password
+Disallow: /*/forgot-password
 Disallow: /payment-icons/*
 Disallow: /opengraph-image*
 Disallow: /search/*
+Disallow: /*/search/*
 
 # Googlebot
 User-agent: Googlebot
@@ -29,6 +35,8 @@ Disallow: /account
 Disallow: /cart
 Disallow: /admin
 
+# Host
+Host: https://tajpetha.in
 
 # Sitemaps
 Sitemap: https://tajpetha.in/sitemap.xml
