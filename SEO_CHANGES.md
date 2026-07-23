@@ -3,6 +3,18 @@ REMEMBER TO ALWAYS ADD TIMESTAMP AND DATE OF NEW CHANGES
 
 ---
 
+## July 23, 2026 — 07:25 UTC — Product Schema Circular Reference Fix
+
+### Changes Made
+
+#### 8. Fixed "Duplicate field brand/sku" & "Review has multiple aggregate ratings" Merchant Listing Errors
+**File:** `frontend/src/lib/seo/index.ts`
+- **Problem:** Google Search Console was flagging duplicate `sku` and `brand` fields, as well as multiple `aggregateRating` objects for the Product schema. This was caused by an SEO schema circular reference: the `review` property correctly contained a list of `Review` items, but each review included an `itemReviewed` block that pointed back to the main product `@id`. This forced Google's strict parser to extract the parent Product fields twice (once from the root, once from the embedded `itemReviewed` reference).
+- **Fix:** Removed the `itemReviewed` property entirely from the `generateProductSchema` reviews map. According to Schema.org, when a review is nested inside a `Product.review` array, the reviewed item is implicitly the parent product. Also removed the redundant `identifier` (SKU) property and `manufacturer` property to ensure a perfectly flat schema.
+- **Impact:** Clears GSC Merchant Listings errors. The JSON-LD schema now renders exactly one `brand`, one `sku`, and one `aggregateRating`.
+
+---
+
 ## July 22, 2026 — 04:33 UTC — City Page Merchant Listing Fix
 
 ### Changes Made

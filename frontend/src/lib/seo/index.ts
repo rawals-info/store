@@ -308,10 +308,6 @@ export const generateProductSchema = (
       "name": "Taj Petha",
       "url": baseUrl
     },
-    "manufacturer": {
-      "@type": "Organization",
-      "name": "Taj Petha"
-    },
     "category": productCategory,
     "offers": {
       "@type": "Offer",
@@ -403,21 +399,11 @@ export const generateProductSchema = (
           },
           "name": r.title || `${product.title} review`,
           "reviewBody": r.content,
-          "datePublished": new Date().toISOString().split('T')[0],
-          "itemReviewed": {
-            "@type": "Product",
-            "@id": `${baseUrl}/${countryCode}/products/${product.handle}#product`,
-            "name": product.title
-          }
+          "datePublished": new Date().toISOString().split('T')[0]
         }))
       }
       : {}),
     // Add additional properties for better SEO
-    "identifier": {
-      "@type": "PropertyValue",
-      "name": "SKU",
-      "value": product.variants?.[0]?.sku || `TAJ-${product.id}`
-    },
     ...(product.weight ? { "weight": `${product.weight}g` } : {}),
     "material": "Premium ingredients with traditional recipe",
     "additionalProperty": additionalProperty
