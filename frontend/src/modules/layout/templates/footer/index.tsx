@@ -264,8 +264,28 @@ export default function Footer() {
       
       <div className="border-t border-luxury-lightgold/20 py-6 px-4 sm:px-8 overflow-x-auto">
         <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between min-w-max">
-          <div className="text-small-regular text-white/60">
-            © 2025 Taj Petha. All rights reserved.
+          <div className="text-small-regular text-white/60 flex flex-col gap-1">
+            <span>© 2025 Taj Petha. All rights reserved.</span>
+            <span className="flex items-center gap-1.5 mt-1">
+              Designed & Developed with 
+              <motion.span 
+                animate={{ scale: [1, 1.2, 1] }} 
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} 
+                className="text-red-500 inline-block"
+              >
+                ❤️
+              </motion.span> 
+              by 
+              <a 
+                href="https://www.mimctechnologies.com/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-white hover:text-luxury-gold transition-colors duration-300 font-medium relative group"
+              >
+                MIMC Technologies
+                <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
+              </a>
+            </span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             {/* Currency switcher removed */}
