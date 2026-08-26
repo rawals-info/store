@@ -16,7 +16,7 @@ export default function GiftingBanner({ countryCode }: { countryCode: string }) 
 
   return (
     <section className="py-0 overflow-hidden" aria-label="Gifting and festive occasions">
-      <div className="relative min-h-[480px] flex items-center">
+      <div className="relative min-h-[360px] flex items-center">
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
@@ -31,7 +31,7 @@ export default function GiftingBanner({ countryCode }: { countryCode: string }) 
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-5 lg:px-10 py-20 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-5 lg:px-10 py-10 w-full">
           <div className="max-w-xl">
             {/* Eyebrow */}
             <motion.div

@@ -1,46 +1,43 @@
 "use client"
 
-import { Text } from "@medusajs/ui"
+import React from "react"
 import { CalculatedVariant } from "@lib/util/get-product-price"
-import { clx } from "@medusajs/ui"
-import { convertToLocale } from "@lib/util/money"
+import { formatIndianPrice } from "@lib/util/money"
+import { calculateDiscountedPrice } from "@lib/config/promotions"
 
 export default function PreviewPrice({
   price,
 }: {
   price: CalculatedVariant
 }) {
-  // Handle case where price might not be available
   if (!price || !price.calculated_price || price.calculated_price_number === 0) {
     return (
-      <div className="font-serif flex flex-col items-end">
-        <Text className="text-luxury-gold font-medium text-base-regular">
-          Contact for price
-        </Text>
+      <div className="font-mono flex flex-col items-start">
+        <span className="font-bold text-sm text-slate-800">
+          ₹249
+        </span>
       </div>
     )
   }
-  
-  // Check if this is a sale price
-  const isSale = price.price_type === "sale" && 
-    price.original_price && 
-    price.original_price_number > price.calculated_price_number
+
+  const rawNum = price.calculated_price_number || 249
+  const { discountedPrice, isDiscounted, discountPercent } = calculateDiscountedPrice(rawNum)
 
   return (
-    <div
-      className={clx("font-serif flex flex-col items-end", {
-        "text-luxury-gold": price.price_type === "sale",
-        "text-luxury-charcoal/90": price.price_type !== "sale",
-      })}
-    >
-      {isSale && (
-        <Text className="text-ui-fg-muted line-through text-small-regular">
-          {price.original_price}
-        </Text>
+    <div className="flex flex-col items-start">
+      <span className="font-mono font-bold text-sm sm:text-base text-slate-900 leading-tight">
+        ₹{formatIndianPrice(discountedPrice)}
+      </span>
+      {isDiscounted && (
+        <div className="flex items-center gap-1 mt-0.5">
+          <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
+            ₹{formatIndianPrice(rawNum)}
+          </span>
+          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta">
+            {discountPercent}% OFF
+          </span>
+        </div>
       )}
-      <Text className={`font-medium text-base-regular ${isSale ? 'text-ui-fg-interactive' : 'text-luxury-gold'}`}>
-        {price.calculated_price}
-      </Text>
     </div>
   )
 }

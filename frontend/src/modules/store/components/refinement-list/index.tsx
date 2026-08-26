@@ -66,8 +66,8 @@ const RefinementList = ({
   const priceMaxParam = searchParams.get("price_max")
 
   const currentPriceRange: [number, number] = [
-    priceMinParam ? parseInt(priceMinParam) : safeMinPrice,
-    priceMaxParam ? parseInt(priceMaxParam) : safeMaxPrice
+    priceMinParam ? parseInt(priceMinParam) : 0,
+    priceMaxParam ? parseInt(priceMaxParam) : 1000
   ]
 
   const createQueryString = useCallback(
@@ -89,7 +89,7 @@ const RefinementList = ({
 
   const setQueryParams = (name: string, value: string) => {
     const query = createQueryString({ [name]: value })
-    router.push(`${pathname}?${query}`)
+    router.push(`${pathname}?${query}`, { scroll: false })
   }
 
   const handleCategoryChange = (id: string) => {
@@ -100,7 +100,7 @@ const RefinementList = ({
     const query = createQueryString({
       categories: updated.length ? updated.join(",") : null
     })
-    router.push(`${pathname}?${query}`)
+    router.push(`${pathname}?${query}`, { scroll: false })
   }
 
   const handleTagChange = (id: string) => {
@@ -111,19 +111,19 @@ const RefinementList = ({
     const query = createQueryString({
       tags: updated.length ? updated.join(",") : null
     })
-    router.push(`${pathname}?${query}`)
+    router.push(`${pathname}?${query}`, { scroll: false })
   }
 
   const handlePriceChange = (values: [number, number]) => {
     const query = createQueryString({
-      price_min: values[0] > safeMinPrice ? values[0] : null,
-      price_max: values[1] < safeMaxPrice ? values[1] : null
+      price_min: values[0] > 0 ? values[0] : null,
+      price_max: values[1] < 1000 ? values[1] : null
     })
-    router.push(`${pathname}?${query}`)
+    router.push(`${pathname}?${query}`, { scroll: false })
   }
 
   const clearAllFilters = () => {
-    router.push(pathname)
+    router.push(pathname, { scroll: false })
   }
 
   const hasActiveFilters = categoryIds.length > 0 || tagIds.length > 0 || priceMinParam || priceMaxParam
@@ -131,17 +131,19 @@ const RefinementList = ({
   return (
     <div className="flex flex-col gap-y-5" data-testid={dataTestId}>
       {/* Header with count & sort */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-        <div>
-          <span className="font-jakarta text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Catalog Filter
+      <div className="flex flex-col gap-2.5 pb-3 border-b border-slate-100">
+        <div className="flex items-center justify-between">
+          <span className="font-jakarta text-[10px] font-extrabold uppercase tracking-wider text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
+            Filters
           </span>
-          <p className="font-cormorant text-xl font-bold text-slate-900">
-            {productCount || 0} Products
-          </p>
+          <span className="font-jakarta text-xs font-bold text-slate-700">
+            {productCount !== undefined ? `${productCount} Sweets` : "All Sweets"}
+          </span>
         </div>
 
-        <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} />
+        <div className="w-full">
+          <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} />
+        </div>
       </div>
 
       {/* Active Filter Tags */}
@@ -172,6 +174,15 @@ const RefinementList = ({
                 </span>
               ) : null
             })}
+
+            {priceMinParam || priceMaxParam ? (
+              <span
+                onClick={() => handlePriceChange([0, 1000])}
+                className="px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-slate-800 text-[11px] font-jakarta font-semibold flex items-center gap-1 cursor-pointer hover:bg-rose-50 hover:text-rose-700"
+              >
+                ₹{priceMinParam || 0}–₹{priceMaxParam || 1000} ×
+              </span>
+            ) : null}
           </div>
         </div>
       )}

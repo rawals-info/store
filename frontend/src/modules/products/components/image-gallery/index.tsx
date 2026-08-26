@@ -73,10 +73,10 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* Main image */}
       <div 
-        className="relative w-full aspect-square rounded-md overflow-hidden cursor-zoom-in"
+        className="relative w-full aspect-square rounded-2xl border border-amber-100/90 bg-amber-50/20 overflow-hidden cursor-zoom-in shadow-xs"
         onClick={handleZoomToggle}
         onMouseMove={handleMouseMove}
       >
@@ -124,18 +124,18 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
       </div>
 
       {/* Thumbnails */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2.5">
         {images.map((image, index) => (
           <motion.button
             key={image.id}
-            className={`relative aspect-square rounded-md overflow-hidden border-2 ${
+            className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
               selectedImage === index 
-                ? "border-amber-500" 
-                : "border-transparent hover:border-gray-200"
+                ? "border-petha-amber ring-2 ring-amber-200/60 shadow-xs" 
+                : "border-slate-100 hover:border-amber-300"
             }`}
             onClick={() => handleImageChange(index)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.2 }}
             aria-label={`View product image ${index + 1}`}
           >

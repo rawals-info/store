@@ -61,7 +61,7 @@ export default function Process() {
     <section
       id="process-section"
       ref={sectionRef}
-      className="py-20 lg:py-28 bg-[#FAF8F5] border-y border-amber-900/5 relative overflow-hidden"
+      className="py-8 lg:py-14 bg-[#FAF8F5] border-y border-amber-900/5 relative overflow-hidden"
       aria-label="Our purity and preparation process"
     >
       <div className="max-w-7xl mx-auto px-5 lg:px-10 relative z-10">
@@ -70,7 +70,7 @@ export default function Process() {
           initial={prefersReduced ? false : { opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55 }}
-          className="text-center max-w-2xl mx-auto mb-16"
+          className="text-center max-w-2xl mx-auto mb-8"
         >
           <span className="font-jakarta text-xs uppercase tracking-[0.2em] text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/60 mb-3">
             Pure Agra Purity

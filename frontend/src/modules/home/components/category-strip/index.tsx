@@ -33,11 +33,11 @@ export default function CategoryStrip({ countryCode }: CategoryStripProps) {
   const cats: CategoryConfig[] = Object.values(CATEGORIES)
 
   return (
-    <section className="py-16 lg:py-24 bg-[#FCFAF6] border-b border-amber-100/60" aria-label="Shop by category">
+    <section className="py-8 lg:py-12 bg-[#FCFAF6] border-b border-amber-100/60" aria-label="Shop by category">
       <div className="max-w-7xl mx-auto px-5 lg:px-10">
 
         {/* Circular quick chips bar (Mobile + Desktop) */}
-        <div className="mb-14 pb-4 overflow-x-auto no-scrollbar">
+        <div className="mb-6 pb-2 overflow-x-auto no-scrollbar">
           <div className="flex items-center justify-start sm:justify-center gap-4 sm:gap-8 min-w-max px-2">
             {CIRCULAR_CHIPS.map((chip, idx) => (
               <Link

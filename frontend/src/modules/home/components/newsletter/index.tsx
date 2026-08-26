@@ -27,7 +27,7 @@ export default function Newsletter() {
   )}`
 
   return (
-    <section className="py-16 bg-petha-warm border-t border-petha-border" aria-label="Newsletter and contact">
+    <section className="py-8 lg:py-12 bg-petha-warm border-t border-petha-border" aria-label="Newsletter and contact">
       <div className="max-w-7xl mx-auto px-5 lg:px-10">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
 

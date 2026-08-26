@@ -487,9 +487,9 @@ export default async function Home({ params }: HomeProps) {
 
 
       {/* Major Cities Delivery Section (Clean Commercial SEO Chips) */}
-      <section className="py-14 bg-[#FBF9F5] border-t border-amber-100/60" aria-label="City Delivery Locations">
+      <section className="py-8 lg:py-10 bg-[#FBF9F5] border-t border-amber-100/60" aria-label="City Delivery Locations">
         <div className="max-w-7xl mx-auto px-5 lg:px-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-2">
             <div>
               <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
                 Doorstep Express Delivery
@@ -519,9 +519,9 @@ export default async function Home({ params }: HomeProps) {
       </section>
 
       {/* From our Sweet Heritage Blog */}
-      <section className="py-14 bg-white border-t border-slate-100" aria-label="Heritage & Guides">
+      <section className="py-8 lg:py-10 bg-white border-t border-slate-100" aria-label="Heritage & Guides">
         <div className="max-w-7xl mx-auto px-5 lg:px-10">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-5">
             <div>
               <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
                 Agra Food Stories &amp; Guides

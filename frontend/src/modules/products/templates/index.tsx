@@ -130,13 +130,13 @@ export default async function ProductTemplate({
             className="mb-6 rounded-2xl border border-amber-100/90 shadow-xs"
           />
 
-          {/* Main Card */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
-              {/* Left Column: Image Gallery */}
-              <div className="w-full">
+          {/* Main Card with Commercial 5-Col/7-Col B2C Layout */}
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-8 shadow-xs mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+              {/* Left Column: Image Gallery (Compact, Proportional) */}
+              <div className="w-full lg:col-span-5 max-w-[440px] mx-auto lg:max-w-none">
                 <Suspense fallback={
-                  <div className="aspect-square w-full bg-amber-50 rounded-3xl animate-pulse" />
+                  <div className="aspect-square w-full bg-amber-50 rounded-2xl animate-pulse" />
                 }>
                   {(() => {
                     const galleryImages =
@@ -153,8 +153,8 @@ export default async function ProductTemplate({
                 </Suspense>
               </div>
               
-              {/* Right Column: Details & Fast Buy Actions */}
-              <div className="flex flex-col space-y-6">
+              {/* Right Column: Details, Description & Fast Buy Actions (Spacious) */}
+              <div className="w-full lg:col-span-7 flex flex-col space-y-6">
                 <ProductInfo product={product} reviewData={reviewData} />
                 
                 <div className="pt-6 border-t border-slate-100">

@@ -73,11 +73,20 @@ type Props = {
 const getProductPrice = (product: any) => {
   if (!product || !product.variants || !product.variants.length) return 0
 
-  const prices = product.variants
-    .filter((v: any) => v.calculated_price)
-    .map((v: any) => v.calculated_price.calculated_amount || 0)
+  const prices: number[] = []
+  for (const v of product.variants) {
+    if (v.calculated_price?.calculated_amount !== undefined) {
+      prices.push(Number(v.calculated_price.calculated_amount))
+    } else if (v.calculated_price?.amount !== undefined) {
+      prices.push(Number(v.calculated_price.amount))
+    } else if (Array.isArray(v.prices) && v.prices.length > 0) {
+      const amt = Number(v.prices[0]?.amount)
+      prices.push(amt > 1000 ? amt / 100 : amt)
+    }
+  }
 
-  return prices.length > 0 ? Math.min(...prices) : 0
+  const validPrices = prices.filter(p => p > 0)
+  return validPrices.length > 0 ? Math.min(...validPrices) : 0
 }
 
 export default async function ProductsPage({ params, searchParams }: Props) {
@@ -119,8 +128,6 @@ export default async function ProductsPage({ params, searchParams }: Props) {
       const matched = categories.find(c => c.handle === token || c.id === token || c.name?.toLowerCase().includes(token.toLowerCase()))
       if (matched) {
         resolvedIds.push(matched.id)
-      } else {
-        resolvedIds.push(token)
       }
     })
     
@@ -130,11 +137,6 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   }
 
   if (tagFilter) queryParams.tags = tagFilter.split(",")
-  if (price_min || price_max) {
-    queryParams.price = {}
-    if (price_min) queryParams.price.gte = parseInt(price_min)
-    if (price_max) queryParams.price.lte = parseInt(price_max)
-  }
 
   let products: any[] = []
   let productCount = 0
@@ -149,15 +151,18 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     products = []
   }
 
-  const prices = products.map(product => getProductPrice(product)).filter(price => price > 0)
-  let minPrice = 0
-  let maxPrice = 1000
-  if (prices.length > 0) {
-    minPrice = Math.floor(Math.min(...prices))
-    maxPrice = Math.ceil(Math.max(...prices))
+  let sortedProducts = [...products]
+
+  // In-memory price filter to guarantee 100% precision
+  if (price_min) {
+    const minVal = parseFloat(price_min)
+    sortedProducts = sortedProducts.filter(p => getProductPrice(p) >= minVal)
+  }
+  if (price_max) {
+    const maxVal = parseFloat(price_max)
+    sortedProducts = sortedProducts.filter(p => getProductPrice(p) <= maxVal)
   }
 
-  let sortedProducts = [...products]
   if (sortBy === "price_asc") {
     sortedProducts.sort((a, b) => getProductPrice(a) - getProductPrice(b))
   } else if (sortBy === "price_desc") {
@@ -259,33 +264,38 @@ export default async function ProductsPage({ params, searchParams }: Props) {
           </div>
         </div>
 
-        {/* Content Layout */}
-        <div className="flex flex-col small:flex-row small:items-start gap-8">
-          <RefinementList
-            sortBy={sortBy as SortOptions}
-            categories={categories}
-            tags={tagsList}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-          />
+        {/* Content Layout: Slim Sidebar + Hero Sweets Grid */}
+        <div className="flex flex-col small:flex-row small:items-start gap-6 lg:gap-8">
+          <aside className="w-full small:w-[220px] lg:w-[240px] flex-shrink-0 bg-white p-4 sm:p-5 rounded-3xl border border-amber-100/90 shadow-xs">
+            <RefinementList
+              sortBy={sortBy as SortOptions}
+              categories={categories}
+              tags={tagsList}
+              minPrice={0}
+              maxPrice={1000}
+              productCount={sortedProducts.length}
+              currencyCode="INR"
+              region={regionData}
+            />
+          </aside>
 
-          <div className="flex-1 w-full min-w-0">
+          <main className="flex-1 w-full min-w-0">
             {sortedProducts.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-amber-100/90 p-12 text-center space-y-4">
+              <div className="bg-white rounded-3xl border border-amber-100/90 p-12 text-center space-y-4 shadow-xs">
                 <span className="text-4xl">🍬</span>
                 <h3 className="font-cormorant text-2xl font-bold text-slate-800">No sweets match this filter</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                <p className="text-xs text-slate-500 max-w-sm mx-auto font-jakarta">
                   Try clearing your category or price filters to see all authentic Agra sweets.
                 </p>
                 <Link
                   href={`/${countryCode}/products`}
-                  className="inline-block px-5 py-2.5 rounded-full bg-petha-amber text-white font-bold text-xs uppercase tracking-wider"
+                  className="inline-block px-6 py-3 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-bold text-xs uppercase tracking-wider font-jakarta transition-all shadow-md"
                 >
                   View All Sweets
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-6">
                 {sortedProducts.map((p) => (
                   <ProductPreview
                     key={p.id}
@@ -295,7 +305,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
                 ))}
               </div>
             )}
-          </div>
+          </main>
         </div>
 
       </div>

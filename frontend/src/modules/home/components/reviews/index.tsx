@@ -92,7 +92,7 @@ export default function Reviews() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section className="py-20 bg-petha-cream" aria-label="Customer reviews">
+    <section className="py-8 lg:py-14 bg-petha-cream" aria-label="Customer reviews">
       <div className="max-w-7xl mx-auto px-5 lg:px-10">
         {/* Header */}
         <motion.div
@@ -100,7 +100,7 @@ export default function Reviews() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.55 }}
-          className="text-center mb-14"
+          className="text-center mb-8"
         >
           <span className="font-jakarta text-xs uppercase tracking-[0.2em] text-petha-amber font-semibold">
             Real People, Real Reviews

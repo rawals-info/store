@@ -39,7 +39,7 @@ export default function WhyUs() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section className="py-20 lg:py-28 bg-white" aria-label="Why choose Taj Petha">
+    <section className="py-8 lg:py-14 bg-white" aria-label="Why choose Taj Petha">
       <div className="max-w-7xl mx-auto px-5 lg:px-10">
         {/* Section header */}
         <motion.div
@@ -47,18 +47,18 @@ export default function WhyUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.55 }}
-          className="text-center mb-20"
+          className="text-center mb-8"
         >
           <span className="font-jakarta text-xs uppercase tracking-[0.2em] text-petha-amber font-semibold">
             The Taj Promise
           </span>
-          <h2 className="font-cormorant text-4xl lg:text-5xl font-semibold text-petha-text mt-3 leading-tight">
+          <h2 className="font-cormorant text-3xl lg:text-4xl font-semibold text-petha-text mt-2 leading-tight">
             Why 50,000+ Indians Choose Us
           </h2>
         </motion.div>
 
         {/* Alternating rows */}
-        <div className="flex flex-col gap-20 lg:gap-28">
+        <div className="flex flex-col gap-8 lg:gap-12">
           {ROWS.map((row, i) => (
             <div
               key={row.eyebrow}

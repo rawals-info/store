@@ -74,10 +74,12 @@ const StoreTemplate = ({
         </div>
 
         {/* Main Store Grid with Sidebar Filter */}
-        <div className="flex flex-col small:flex-row small:items-start gap-8">
-          <RefinementList sortBy={sort} />
+        <div className="flex flex-col small:flex-row small:items-start gap-6 lg:gap-8">
+          <aside className="w-full small:w-[220px] lg:w-[240px] flex-shrink-0 bg-white p-4 sm:p-5 rounded-3xl border border-amber-100/90 shadow-xs">
+            <RefinementList sortBy={sort} />
+          </aside>
           
-          <div className="flex-1 w-full min-w-0">
+          <main className="flex-1 w-full min-w-0">
             <Suspense fallback={<SkeletonProductGrid />}>
               <PaginatedProducts
                 sortBy={sort}
@@ -85,7 +87,7 @@ const StoreTemplate = ({
                 countryCode={countryCode}
               />
             </Suspense>
-          </div>
+          </main>
         </div>
 
       </div>

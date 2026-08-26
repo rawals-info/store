@@ -207,7 +207,7 @@ export default function Bestsellers({ products, countryCode, region }: Bestselle
   ]
 
   return (
-    <section className="py-16 lg:py-24 bg-[#FFFDF9] border-b border-amber-100/60" aria-label="Authentic Products Catalog">
+    <section className="py-8 lg:py-12 bg-[#FFFDF9] border-b border-amber-100/60" aria-label="Authentic Products Catalog">
       <div className="max-w-7xl mx-auto px-5 lg:px-10" ref={ref}>
         
         {/* Section Header */}
