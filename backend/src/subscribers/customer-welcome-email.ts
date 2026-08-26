@@ -3,11 +3,11 @@ import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import {
   sendLuxuryEmail,
   buildLuxuryTemplate,
-  buildInfoBox,
+  buildHeroStatusCard,
   buildParagraph,
   buildStrong,
+  buildSignOff,
   buildList,
-  buildSignOff
 } from "../util/email"
 
 export default async function customerWelcomeEmail({
@@ -18,36 +18,46 @@ export default async function customerWelcomeEmail({
   const customerService = container.resolve("customer") as any
   const customer = await customerService.retrieve(customerId)
 
-  const customerName = customer.first_name ?? customer.email
+  if (!customer) return
+
+  const customerName = customer.first_name || customer.email?.split("@")[0] || "Valued Connoisseur"
 
   const body = `
-    ${buildParagraph(`Dear ${buildStrong(customerName)},`)}
-    
-    ${buildParagraph(`A warm welcome to ${buildStrong("Taj Petha")} – where every sweet tells a story of tradition, heritage, and the authentic flavours of Agra.`)}
-    
-    ${buildInfoBox("Welcome to Our Legacy", `
-      <p style="font-size: 14px; color: #4A4A4A; margin: 0;">For generations, we have been crafting the finest pethas, namkeens, and traditional Indian sweets using time-honoured recipes passed down through our family. Each bite is a celebration of Agra's rich culinary heritage.</p>
-    `)}
-    
-    <h2 style="font-family: 'Georgia', serif; font-size: 14px; font-weight: 400; color: #1A1A1A; margin: 32px 0 16px 0; letter-spacing: 2px; text-transform: uppercase;">As a Valued Member, You Will Enjoy</h2>
-    
-    ${buildList([
-    "<strong>Early access</strong> to our seasonal specialties and festival collections",
-    "<strong>Exclusive offers</strong> on our premium petha varieties",
-    "<strong>Special discounts</strong> on bulk orders for celebrations",
-    "<strong>First to know</strong> about new flavours and traditional recipes"
-  ])}
-    
-    ${buildParagraph(`Whether you are craving our signature ${buildStrong("Kesar Petha")}, the delightful ${buildStrong("Angoori Petha")}, or our famous ${buildStrong("Dalmoth")}, we are here to bring the authentic taste of Agra right to your doorstep.`)}
-    
+    ${buildHeroStatusCard({
+      icon: "👑",
+      title: "Welcome to the Taj Petha Family",
+      subtitle: `Dear ${customerName}, your account is now ready. Discover the authentic royal heritage of Agra sweets.`,
+      badgeText: "🏛️ Agra Master Confectionery",
+    })}
+
+    <div style="background: #FFFDF9; border: 1px solid #FDE68A; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+      <h3 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; color: #0F172A; margin: 0 0 8px 0;">
+        Handcrafted with 70+ Years of Tradition
+      </h3>
+      <p style="font-size: 13px; color: #475569; line-height: 1.6; margin: 0 0 12px 0;">
+        For generations, our master halwais in Agra have prepared daily batches using zero preservatives, pure ingredients, and sealed vacuum freshness.
+      </p>
+      ${buildList([
+        "<strong>Fresh Air Dispatch:</strong> Orders express-shipped directly from our Agra master kitchens.",
+        "<strong>Exclusive Member Perks:</strong> Early access to festival batches & royal gift boxes.",
+        "<strong>100% Transit Safe:</strong> Guaranteed safe, damage-free delivery to your doorstep.",
+      ])}
+    </div>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://tajpetha.in/in/products" class="cta-button">
+        Explore Fresh Sweets Collection ➔
+      </a>
+    </div>
+
     ${buildSignOff()}
   `
 
   await sendLuxuryEmail({
     to: customer.email,
     name: customerName,
-    subject: "Welcome to Taj Petha",
-    html: buildLuxuryTemplate("Welcome to Our Family", body),
+    subject: "Welcome to Taj Petha - Authentic Agra Sweets",
+    html: buildLuxuryTemplate("Welcome to Taj Petha", body),
   })
 }
 

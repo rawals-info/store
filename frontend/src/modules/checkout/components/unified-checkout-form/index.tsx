@@ -318,7 +318,7 @@ export default function UnifiedCheckoutForm({
                   Quick Google Address Search:
                 </span>
                 <AddressAutocomplete
-                  label="Search your area, building, street or colony..."
+                  label="Search area, building or colony..."
                   name="search_address"
                   value={searchAddress}
                   onChange={(e) => setSearchAddress(e.target.value)}

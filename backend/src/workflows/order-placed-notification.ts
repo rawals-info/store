@@ -47,7 +47,7 @@ export const orderPlacedNotificationWorkflow = createWorkflow(
             order: order,
             // Include essential fields explicitly
             order_id: order.id,
-            display_id: order.display_id,
+            display_id: (order as any).display_id,
             email: order.email,
             total: order.total,
             currency_code: order.currency_code,

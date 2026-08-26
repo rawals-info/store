@@ -56,10 +56,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <label
             htmlFor={name}
             onClick={() => inputRef.current?.focus()}
-            className="flex items-center justify-center mx-3 px-1 transition-all absolute duration-300 top-3 -z-1 origin-0 text-gray-700/70"
+            className="flex items-center justify-start mx-3 px-1 transition-all absolute duration-300 top-3 -z-1 origin-0 text-gray-700/70 truncate max-w-[85%] pointer-events-none"
           >
-            {label}
-            {required && <span className="text-rose-500">*</span>}
+            <span className="truncate">{label}</span>
+            {required && <span className="text-rose-500 ml-0.5 flex-shrink-0">*</span>}
           </label>
           {type === "password" && (
             <button
