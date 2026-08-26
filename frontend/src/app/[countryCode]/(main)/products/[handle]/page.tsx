@@ -32,12 +32,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const noindex = md?.noindex === true || md?.noindex === "true"
     const ogImage: string | undefined = md?.og_image
 
-    // Compose title and description with fallbacks
-    const baseTitle = seoTitle || `${product.title} | Taj Petha`
+    // Compose high-converting SEO title and description with fallbacks
+    const baseTitle = seoTitle || `Buy ${product.title} Online | 100% Authentic Agra Petha | Taj Petha`
     const descriptionRaw =
       seoDescription ||
       product.description ||
-      `Buy ${product.title} online. Made fresh with hygienic packing, same-day dispatch, and quick delivery across India.`
+      `Buy authentic ${product.title} online directly from Agra halwais. Fresh daily preparation, vacuum sealed with 30-day freshness, and delivered across India.`
     const description = descriptionRaw.length > 160 ? `${descriptionRaw.substring(0, 157)}...` : descriptionRaw
 
     // Prefer product thumbnail, then og_image override, then gallery images

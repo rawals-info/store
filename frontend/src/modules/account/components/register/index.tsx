@@ -1,13 +1,9 @@
 "use client"
 
-import { useActionState } from "react"
-import Input from "@modules/common/components/input"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
-import ErrorMessage from "@modules/checkout/components/error-message"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { handleSignup } from "@lib/data/client-actions"
 import { useState } from "react"
+import { Lock, Mail, User, Phone, ArrowRight, Sparkles } from "lucide-react"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -31,7 +27,6 @@ const Register = ({ setCurrentView }: Props) => {
       if (result.error) {
         setError(result.error)
       } else if (result.success) {
-        // Registration successful, redirect or show success message
         window.location.href = "/account"
       }
     } catch (err) {
@@ -43,116 +38,130 @@ const Register = ({ setCurrentView }: Props) => {
   }
 
   return (
-    <div
-      className="w-full flex flex-col items-center"
-      data-testid="register-page"
-    >
-      <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-gradient-to-r from-[var(--color-luxury-gold)]/10 to-[var(--color-luxury-gold)]/20 border border-[var(--color-luxury-gold)]/30">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-luxury-darkgold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <line x1="19" y1="8" x2="19" y2="14"></line>
-          <line x1="22" y1="11" x2="16" y2="11"></line>
-        </svg>
+    <div className="space-y-5" data-testid="register-page">
+      <div className="text-center space-y-1">
+        <h2 className="font-cormorant text-2xl font-bold text-slate-900">
+          Create Your Taj Petha Profile
+        </h2>
+        <p className="text-xs text-slate-500">
+          Join our VIP club for instant 20% discount code and order tracking.
+        </p>
       </div>
-      
-      <h1 className="font-display text-2xl text-[var(--color-luxury-charcoal)] mb-2 uppercase tracking-wider text-center">
-        Become a Taj Petha Member
-      </h1>
-      <div className="h-0.5 w-32 gold-gradient mb-6"></div>
-      <p className="text-center text-[var(--color-luxury-charcoal)]/70 mb-8 max-w-sm">
-        Create your Taj Petha Member profile, and get access to an enhanced
-        shopping experience.
-      </p>
-      <form className="w-full max-w-sm flex flex-col" onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="flex flex-col w-full gap-y-4">
-          <Input
-            label="First name"
-            name="first_name"
-            required
-            autoComplete="given-name"
-            data-testid="first-name-input"
-            className="luxury-input"
-          />
-          <Input
-            label="Last name"
-            name="last_name"
-            required
-            autoComplete="family-name"
-            data-testid="last-name-input"
-            className="luxury-input"
-          />
-          <Input
-            label="Email"
-            name="email"
-            required
-            type="email"
-            autoComplete="email"
-            data-testid="email-input"
-            className="luxury-input"
-          />
-          <Input
-            label="Phone"
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            data-testid="phone-input"
-            className="luxury-input"
-          />
-          <Input
-            label="Password"
-            name="password"
-            required
-            type="password"
-            autoComplete="new-password"
-            data-testid="password-input"
-            className="luxury-input"
-          />
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">First Name *</label>
+            <div className="relative">
+              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                name="first_name"
+                required
+                placeholder="First"
+                autoComplete="given-name"
+                className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-petha-amber focus:bg-white transition-all"
+                data-testid="first-name-input"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Last Name *</label>
+            <input
+              type="text"
+              name="last_name"
+              required
+              placeholder="Last"
+              autoComplete="family-name"
+              className="w-full px-3 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-petha-amber focus:bg-white transition-all"
+              data-testid="last-name-input"
+            />
+          </div>
         </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
+          <div className="relative">
+            <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="name@example.com"
+              autoComplete="email"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-petha-amber focus:bg-white transition-all"
+              data-testid="email-input"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number (Optional)</label>
+          <div className="relative">
+            <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="+91 98765 43210"
+              autoComplete="tel"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-petha-amber focus:bg-white transition-all"
+              data-testid="phone-input"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-700 mb-1">Create Password *</label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="password"
+              name="password"
+              required
+              placeholder="At least 8 characters"
+              autoComplete="new-password"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-petha-amber focus:bg-white transition-all"
+              data-testid="password-input"
+            />
+          </div>
+        </div>
+
         {error && (
-          <div className="bg-red-100 p-4 rounded mt-4 text-red-700">
+          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
             {error}
           </div>
         )}
-        <span className="text-center text-[var(--color-luxury-charcoal)]/70 mt-8 text-sm">
-          By creating an account, you agree to Taj Petha&apos;s{" "}
-          <LocalizedClientLink
-            href="/content/privacy-policy"
-          >
-            <span className="text-[var(--color-luxury-gold)] hover:text-[var(--color-luxury-darkgold)] font-medium">Privacy Policy</span>
-          </LocalizedClientLink>{" "}
-          and{" "}
-          <LocalizedClientLink
-            href="/content/terms-of-use"
-          >
-            <span className="text-[var(--color-luxury-gold)] hover:text-[var(--color-luxury-darkgold)] font-medium">Terms of Use</span>
-          </LocalizedClientLink>
-          .
-        </span>
-        <button 
+
+        <button
           type="submit"
           disabled={loading}
-          className="w-full mt-8 bg-gradient-to-r from-[var(--color-luxury-darkgold)] to-[var(--color-luxury-gold)] hover:from-[var(--color-luxury-gold)] hover:to-[var(--color-luxury-darkgold)] text-white px-6 py-3 rounded luxury-btn disabled:opacity-70" 
+          className="w-full bg-petha-amber hover:bg-petha-saffron text-white py-3.5 px-6 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
           data-testid="register-button"
         >
-          {loading ? "Creating Account..." : "Join"}
+          {loading ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              <span>Create Taj Petha Profile</span>
+            </>
+          )}
         </button>
       </form>
-      <div className="w-full max-w-sm flex items-center my-8">
-        <div className="flex-grow h-px bg-[var(--color-luxury-lightgold)]/20"></div>
-        <span className="px-4 text-[var(--color-luxury-charcoal)]/50 text-sm">OR</span>
-        <div className="flex-grow h-px bg-[var(--color-luxury-lightgold)]/20"></div>
+
+      <div className="text-center pt-2">
+        <p className="text-xs text-slate-500">
+          Already registered?{" "}
+          <button
+            type="button"
+            onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
+            className="font-bold text-petha-amber hover:underline cursor-pointer"
+          >
+            Sign in here
+          </button>
+        </p>
       </div>
-      <span className="text-center text-[var(--color-luxury-charcoal)]/70">
-        Already a member?{" "}
-        <button
-          onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-          className="text-[var(--color-luxury-gold)] hover:text-[var(--color-luxury-darkgold)] font-medium"
-          data-testid="sign-in-link"
-        >
-          Sign in
-        </button>
-      </span>
     </div>
   )
 }

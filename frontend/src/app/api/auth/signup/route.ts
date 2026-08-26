@@ -3,109 +3,126 @@ import { getCacheTag, getCartId, setAuthToken } from "@lib/data/cookies"
 import { scheduleRevalidate } from "@lib/utils/revalidate"
 import { NextRequest, NextResponse } from "next/server"
 
-// Force dynamic behavior since this route uses cookies
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
   try {
-    let customerForm: any = {};
-    let password: string = "";
-    
-    // Check content type and handle accordingly
-    const contentType = req.headers.get("content-type") || "";
-    
+    let customerForm: any = {}
+    let password: string = ""
+
+    const contentType = req.headers.get("content-type") || ""
+
     if (contentType.includes("application/json")) {
-      // Handle JSON request
-      const jsonData = await req.json();
-      password = jsonData.password;
+      const jsonData = await req.json().catch(() => ({}))
+      password = (jsonData.password || "").trim()
       customerForm = {
-        email: jsonData.email,
-        first_name: jsonData.first_name,
-        last_name: jsonData.last_name,
-        phone: jsonData.phone,
-      };
+        email: (jsonData.email || "").trim(),
+        first_name: (jsonData.first_name || "").trim(),
+        last_name: (jsonData.last_name || "").trim(),
+        phone: (jsonData.phone || "").trim(),
+      }
     } else {
-      // Handle FormData request
       try {
-        const formData = await req.formData();
-        password = formData.get("password") as string;
+        const formData = await req.formData()
+        password = ((formData.get("password") as string) || "").trim()
         customerForm = {
-          email: formData.get("email") as string,
-          first_name: formData.get("first_name") as string,
-          last_name: formData.get("last_name") as string,
-          phone: formData.get("phone") as string,
-        };
+          email: ((formData.get("email") as string) || "").trim(),
+          first_name: ((formData.get("first_name") as string) || "").trim(),
+          last_name: ((formData.get("last_name") as string) || "").trim(),
+          phone: ((formData.get("phone") as string) || "").trim(),
+        }
       } catch (formError) {
-        console.error("Error parsing form data:", formError);
         return NextResponse.json(
-          { 
-            success: false, 
-            error: "Invalid form data. Please check your input and try again." 
-          }, 
-          { status: 400 }
-        );
+          {
+            success: false,
+            error: "Invalid registration form data. Please try again.",
+          },
+          { status: 200 }
+        )
       }
     }
 
-    // Validate required fields
-    if (!customerForm.email || !password) {
+    if (!customerForm.email || !password || !customerForm.first_name) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: "Email and password are required." 
-        }, 
-        { status: 400 }
-      );
+        {
+          success: false,
+          error: "First name, email, and password are required to create an account.",
+        },
+        { status: 200 }
+      )
     }
 
-    // Register the user
-    const token = await sdk.auth.register("customer", "emailpass", {
-      email: customerForm.email,
-      password: password,
-    })
+    try {
+      // 1. Register auth credential
+      const token = await sdk.auth.register("customer", "emailpass", {
+        email: customerForm.email,
+        password: password,
+      })
 
-    await setAuthToken(token as string)
+      if (!token) {
+        throw new Error("Failed to generate authentication token")
+      }
 
-    const headers = {
-      authorization: `Bearer ${token}`,
+      await setAuthToken(token as string)
+
+      const headers = {
+        authorization: `Bearer ${token}`,
+      }
+
+      // 2. Create customer record in Medusa
+      const { customer: createdCustomer } = await sdk.store.customer.create(
+        customerForm,
+        {},
+        headers
+      )
+
+      // 3. Login to ensure full session
+      const loginToken = await sdk.auth.login("customer", "emailpass", {
+        email: customerForm.email,
+        password,
+      })
+
+      if (loginToken) {
+        await setAuthToken(loginToken as string)
+      }
+
+      const customerCacheTag = await getCacheTag("customers")
+      scheduleRevalidate(customerCacheTag)
+
+      try {
+        const cartId = await getCartId()
+        if (cartId) {
+          await sdk.store.cart.transferCart(cartId, {}, { authorization: `Bearer ${loginToken || token}` })
+          const cartCacheTag = await getCacheTag("carts")
+          scheduleRevalidate(cartCacheTag)
+        }
+      } catch (cartErr) {
+        console.warn("Cart transfer error on register:", cartErr)
+      }
+
+      return NextResponse.json({ success: true, customer: createdCustomer })
+    } catch (regError: any) {
+      console.error("Medusa register failed:", regError?.message || regError)
+      const errorMsg = regError?.message?.includes("already exists") || regError?.message?.includes("duplicate")
+        ? "An account with this email already exists. Please sign in instead."
+        : regError?.message || "Registration failed. Please check your details and try again."
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: errorMsg,
+        },
+        { status: 200 }
+      )
     }
-
-    // Create the customer
-    const { customer: createdCustomer } = await sdk.store.customer.create(
-      customerForm,
-      {},
-      headers
-    )
-
-    // Login the user
-    const loginToken = await sdk.auth.login("customer", "emailpass", {
-      email: customerForm.email,
-      password,
-    })
-
-    await setAuthToken(loginToken as string)
-
-    // Revalidate cache
-    const customerCacheTag = await getCacheTag("customers")
-    scheduleRevalidate(customerCacheTag)
-
-    // Transfer cart
-    const cartId = await getCartId()
-    if (cartId) {
-      await sdk.store.cart.transferCart(cartId, {}, { authorization: `Bearer ${loginToken}` })
-      const cartCacheTag = await getCacheTag("carts")
-      scheduleRevalidate(cartCacheTag)
-    }
-
-    return NextResponse.json({ success: true, customer: createdCustomer })
-  } catch (error: unknown) {
-    console.error("Error during signup:", error)
+  } catch (error: any) {
+    console.error("General signup route error:", error)
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
-      }, 
-      { status: 500 }
+      {
+        success: false,
+        error: "Unable to complete registration. Please try again.",
+      },
+      { status: 200 }
     )
   }
-} 
+}

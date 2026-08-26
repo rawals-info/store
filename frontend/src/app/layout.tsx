@@ -5,7 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
 import Script from "next/script";
 import "styles/globals.css"
-import { Poppins, DM_Serif_Display, Inter, Playfair_Display } from "next/font/google"
+import { Poppins, DM_Serif_Display, Inter, Playfair_Display, Cormorant_Garamond, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
 
 // ✅ Optimized font loading with display: 'swap', preload, and adjustFontFallback
 const poppins = Poppins({
@@ -44,10 +44,43 @@ const playfair = Playfair_Display({
   weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-playfair",
-  preload: false, // Only loaded on-demand for specific components
+  preload: false,
   adjustFontFallback: true,
   fallback: ['Georgia', 'Times New Roman', 'serif']
 })
+
+// New B2C typography system
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-cormorant",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ['Georgia', 'serif']
+})
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-jakarta",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ['system-ui', 'arial']
+})
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  variable: "--font-jetbrains",
+  preload: false,
+  adjustFontFallback: true,
+  fallback: ['Menlo', 'Monaco', 'monospace']
+})
+
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -267,7 +300,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   const enableServiceWorker = process.env.NEXT_PUBLIC_ENABLE_SW === 'true'
   const isProd = process.env.NODE_ENV === 'production'
   return (
-    <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable}`}>
+    <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable} ${cormorant.variable} ${jakarta.variable} ${jetbrains.variable}`}>
       <head>
         {/* Preload critical resources to reduce HTTP requests */}
         <link rel="preload" href="/hero_image.webp" as="image" />

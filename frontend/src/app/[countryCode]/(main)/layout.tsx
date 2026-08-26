@@ -6,7 +6,6 @@ import PageTransition from "@modules/common/components/page-transition"
 import ErrorBoundary from "@modules/common/components/error-boundary"
 import { usePathname } from "next/navigation"
 import { clx } from "@medusajs/ui"
-import RecentPurchaseNotification from "@components/RecentPurchaseNotification"
 
 export default function MainLayout({
   children,
@@ -70,7 +69,7 @@ export default function MainLayout({
           }
         )}
       >
-          <Suspense
+        <Suspense
           fallback={
             <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
               <LoadingSpinner size="large" />
@@ -82,9 +81,6 @@ export default function MainLayout({
           </PageTransition>
         </Suspense>
       </div>
-      
-      {/* Recent Purchase Notifications */}
-      <RecentPurchaseNotification />
     </ErrorBoundary>
   )
 }

@@ -38,11 +38,15 @@ export async function handleSignup(formData: FormData) {
       body: formData,
     })
     
-    return await response.json()
+    const text = await response.text()
+    try {
+      return JSON.parse(text)
+    } catch {
+      return { success: false, error: "Registration failed. If you already have an account, please sign in." }
+    }
   } catch (error: unknown) {
     console.error('Error signing up:', error)
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return { error: errorMessage };
+    return { success: false, error: 'Unable to connect to server. Please try again.' }
   }
 }
 
@@ -56,11 +60,15 @@ export async function handleLogin(formData: FormData) {
       body: formData,
     })
     
-    return await response.json()
+    const text = await response.text()
+    try {
+      return JSON.parse(text)
+    } catch {
+      return { success: false, error: "Invalid email or password. Please verify your credentials or create a new account." }
+    }
   } catch (error: unknown) {
     console.error('Error logging in:', error)
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return { error: errorMessage };
+    return { success: false, error: 'Unable to connect to server. Please try again.' }
   }
 }
 

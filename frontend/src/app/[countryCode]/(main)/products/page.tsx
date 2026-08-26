@@ -6,47 +6,48 @@ import { listTags } from "@lib/data/tags"
 import ProductPreview from "@modules/products/components/product-preview"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
-import Image from "next/image"
 import { sdk } from "@lib/config"
 import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
 import type { Metadata } from "next"
-import ProductsCountdownBanner from "../../../../components/ProductsCountdownBanner"
+import Link from "next/link"
+import { Sparkles, Truck, ShieldCheck } from "lucide-react"
+
+import Breadcrumb from "@modules/common/components/breadcrumb"
 
 export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await params
   return {
-    title: "Buy Petha Online | Authentic Agra Petha & Namkeen | Taj Petha India",
-    description: "Buy authentic Agra petha online at India's #1 trusted store. Fresh dry petha, kesar petha, paan petha. Same-day dispatch, free delivery ₹500+. Order now!",
+    title: "Buy Authentic Agra Petha Online | Fresh Dalmoth & Namkeen | Taj Petha",
+    description: "Buy 100% authentic Agra petha and crispy dalmoth online. Handcrafted daily by master halwais, vacuum-sealed, and delivered fresh across India in 24–48 hours. Free shipping above ₹500. Order now!",
     keywords: [
       "buy petha online",
       "buy agra petha",
+      "best petha in agra",
       "order petha online",
-      "agra petha online",
-      "authentic petha online",
-      "buy dry petha",
-      "buy kesar petha online",
-      "petha online shopping",
-      "fresh petha order",
-      "agra sweets online",
-      "buy namkeen online",
-      "petha delivery India",
-      "petha home delivery",
-      "taj petha products",
-      "indian sweets online"
+      "authentic agra petha",
+      "kesar petha online",
+      "dry petha buy online",
+      "paan petha online",
+      "chocolate petha online",
+      "angoori petha online",
+      "agra dalmoth online",
+      "fresh namkeen buy online",
+      "taj petha online order",
+      "petha home delivery"
     ],
     openGraph: {
-      title: "Buy Petha Online | Authentic Agra Petha | Taj Petha",
-      description: "Shop authentic Agra petha & namkeen online. Same-day dispatch, free delivery on orders above ₹500.",
+      title: "Buy Authentic Agra Petha Online | Taj Petha India",
+      description: "Order authentic Agra petha & fresh namkeen direct to your doorstep with same-day dispatch and 30-day freshness guarantee.",
       url: `https://tajpetha.in/${countryCode}/products`,
       type: "website",
       images: [{ url: "/hero_image.webp", width: 1200, height: 630, alt: "Buy Authentic Agra Petha Online" }]
     },
     twitter: {
       card: "summary_large_image",
-      title: "Buy Petha Online | Taj Petha India",
-      description: "Order authentic Agra petha online with same-day dispatch. 50,000+ happy customers!"
+      title: "Buy Authentic Agra Petha Online | Taj Petha India",
+      description: "Order authentic Agra petha online. 50,000+ happy sweet lovers nationwide!",
+      images: ["/hero_image.webp"]
     },
     alternates: {
       canonical: `https://tajpetha.in/${countryCode}/products`,
@@ -58,6 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<{ countryCo
 type SearchParams = {
   sortBy?: string
   categories?: string
+  category?: string
   tags?: string
   price_min?: string
   price_max?: string
@@ -68,7 +70,6 @@ type Props = {
   searchParams: Promise<SearchParams>
 }
 
-// Helper function to get product price
 const getProductPrice = (product: any) => {
   if (!product || !product.variants || !product.variants.length) return 0
 
@@ -80,44 +81,61 @@ const getProductPrice = (product: any) => {
 }
 
 export default async function ProductsPage({ params, searchParams }: Props) {
-  // Await params and searchParams
   const paramsData = await params
   const searchParamsData = await searchParams
 
-  // Extract search params safely
   const sortBy = searchParamsData.sortBy || "created_at"
-  const categoryFilter = searchParamsData.categories
+  const rawCategory = searchParamsData.category || searchParamsData.categories || ""
   const tagFilter = searchParamsData.tags
   const price_min = searchParamsData.price_min
   const price_max = searchParamsData.price_max
-
-  // Get country code from params
   const countryCode = paramsData.countryCode
 
-  // Use hardcoded India region instead of API call
   const regionData = getIndiaRegion()
 
-  // Build query params for product API
+  // Fetch categories first to resolve handles to IDs
+  let categories: HttpTypes.StoreProductCategory[] = []
+  let tagsList: any[] = []
+
+  try {
+    const [categoriesResponse, tagsResponse] = await Promise.all([
+      sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
+        "/store/product-categories",
+        { query: { limit: 100, fields: "*category_children, *parent_category" } }
+      ).catch(() => ({ product_categories: [] })),
+      listTags().catch(() => []),
+    ])
+    categories = categoriesResponse.product_categories || []
+    tagsList = tagsResponse || []
+  } catch (error) {}
+
   const queryParams: Record<string, any> = {}
-
-  // Add category filter
-  if (categoryFilter) {
-    queryParams.category_id = categoryFilter.split(",")
+  
+  if (rawCategory) {
+    const categoryTokens = rawCategory.split(",")
+    const resolvedIds: string[] = []
+    
+    categoryTokens.forEach(token => {
+      const matched = categories.find(c => c.handle === token || c.id === token || c.name?.toLowerCase().includes(token.toLowerCase()))
+      if (matched) {
+        resolvedIds.push(matched.id)
+      } else {
+        resolvedIds.push(token)
+      }
+    })
+    
+    if (resolvedIds.length > 0) {
+      queryParams.category_id = resolvedIds
+    }
   }
 
-  // Add tag filter
-  if (tagFilter) {
-    queryParams.tags = tagFilter.split(",")
-  }
-
-  // Add price filter
+  if (tagFilter) queryParams.tags = tagFilter.split(",")
   if (price_min || price_max) {
     queryParams.price = {}
     if (price_min) queryParams.price.gte = parseInt(price_min)
     if (price_max) queryParams.price.lte = parseInt(price_max)
   }
 
-  // Fetch products
   let products: any[] = []
   let productCount = 0
   try {
@@ -128,41 +146,9 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     products = response.products
     productCount = response.count
   } catch (e) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("ProductsPage: listProducts failed", e)
-    }
+    products = []
   }
 
-  // Fetch categories and tags concurrently to reduce overall TTFB
-  let categories: HttpTypes.StoreProductCategory[] = []
-  let tagsList: any[] = []
-
-  try {
-    const [categoriesResponse, tagsResponse] = await Promise.all([
-      // Categories – SDK fetch gives richer object graph
-      sdk.client.fetch<{ product_categories: HttpTypes.StoreProductCategory[] }>(
-        "/store/product-categories",
-        {
-          query: {
-            limit: 100,
-            fields: "*category_children, *parent_category",
-          },
-        }
-      ),
-      // Tags – simple helper
-      listTags(),
-    ])
-
-    categories = categoriesResponse.product_categories || []
-    tagsList = tagsResponse || []
-  } catch (error) {
-    // Only log in non-production environments
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Error fetching categories or tags:", error)
-    }
-  }
-
-  // Calculate price range
   const prices = products.map(product => getProductPrice(product)).filter(price => price > 0)
   let minPrice = 0
   let maxPrice = 1000
@@ -171,131 +157,148 @@ export default async function ProductsPage({ params, searchParams }: Props) {
     maxPrice = Math.ceil(Math.max(...prices))
   }
 
-  // Sort products if needed
   let sortedProducts = [...products]
-  if (sortBy) {
-    if (sortBy === "price_asc") {
-      sortedProducts.sort((a, b) => {
-        return getProductPrice(a) - getProductPrice(b)
-      })
-    } else if (sortBy === "price_desc") {
-      sortedProducts.sort((a, b) => {
-        return getProductPrice(b) - getProductPrice(a)
-      })
-    } else if (sortBy === "created_at") {
-      sortedProducts.sort((a, b) => {
-        return new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
-      })
-    }
+  if (sortBy === "price_asc") {
+    sortedProducts.sort((a, b) => getProductPrice(a) - getProductPrice(b))
+  } else if (sortBy === "price_desc") {
+    sortedProducts.sort((a, b) => getProductPrice(b) - getProductPrice(a))
+  } else if (sortBy === "created_at") {
+    sortedProducts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }
 
-  // Get featured product (first product or null)
-  const featuredProduct = sortedProducts.length > 0 ? sortedProducts[0] : null
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Agra Petha & Namkeen Sweets Catalog",
+    "description": "Authentic Agra Petha varieties and fresh Dalmoth snacks available for online ordering.",
+    "numberOfItems": sortedProducts.length,
+    "itemListElement": sortedProducts.map((p, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": p.title,
+      "url": `https://tajpetha.in/${countryCode}/products/${p.handle}`,
+      "image": p.thumbnail || "https://tajpetha.in/hero_image.webp"
+    }))
+  }
+
+  const CATEGORY_TABS = [
+    { label: "✨ All Sweets", value: "" },
+    { label: "🍬 Agra Petha", value: "petha" },
+    { label: "🥜 Royal Dalmoth", value: "dalmoth" },
+    { label: "🌶️ Crispy Namkeen", value: "namkeen" },
+    { label: "🎁 Sweet Gift Boxes", value: "combo" },
+  ]
 
   return (
-    <div className="content-container px-0 sm:px-6 pt-16 sm:pt-0">
-      {/* Mobile-Optimized Hero section with urgency */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-luxury-cream via-luxury-ivory to-luxury-cream mb-6 sm:mb-8">
-        {/* Background with gold gradient overlay */}
-        <div className="absolute inset-0 z-0 opacity-10">
-          {featuredProduct?.thumbnail && (
-            <div className="w-full h-full relative blur-sm">
-              <Image
-                src={featuredProduct.thumbnail}
-                alt="Featured petha"
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-luxury-gold/30 to-luxury-charcoal/80"></div>
-            </div>
-          )}
-        </div>
+    <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-12 font-jakarta">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
 
-        {/* Content overlay */}
-        <div className="relative z-10 py-6 sm:py-8 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
-          {/* Mobile-First Flash Sale Banner - Luxury Theme */}
-          <div className="bg-gradient-to-r from-luxury-charcoal via-luxury-charcoal to-black text-luxury-gold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg mb-4 flex items-center gap-2 text-xs sm:text-sm font-medium shadow-lg border border-luxury-gold/30">
-            <span className="text-base sm:text-lg">🔥</span>
-            <span className="font-semibold uppercase tracking-wider">Flash Sale: 20% OFF All Products!</span>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* Header Banner */}
+        <div>
+          <Breadcrumb
+            items={
+              rawCategory
+                ? [
+                    { label: "All Sweets", href: `/${countryCode}/products` },
+                    { label: rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1), isCurrent: true }
+                  ]
+                : [{ label: "All Sweets", isCurrent: true }]
+            }
+            countryCode={countryCode}
+            className="mb-4 rounded-2xl border border-amber-100/90 shadow-xs"
+          />
 
-          <h1 className="font-display text-2xl sm:text-4xl md:text-5xl text-luxury-charcoal mb-2 leading-tight">
-            Premium Agra Petha
-          </h1>
-          <div className="h-px w-24 sm:w-40 bg-luxury-gold mb-3 sm:mb-4"></div>
-          <p className="text-sm sm:text-base text-luxury-charcoal/80 max-w-2xl mb-4 sm:mb-6 px-4">
-            Handcrafted traditional sweets delivered fresh to your doorstep
-          </p>
-
-          {/* Urgency Elements - Mobile Optimized */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-2xl px-4 mb-4">
-            <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
-              <div className="text-xl sm:text-2xl font-bold text-luxury-gold">1000+</div>
-              <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Happy Customers</div>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
-              <div className="text-xl sm:text-2xl font-bold text-luxury-gold">24hrs</div>
-              <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Fresh Delivery</div>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm border border-luxury-gold/20 rounded-lg p-2 sm:p-3 text-center">
-              <div className="text-xl sm:text-2xl font-bold text-luxury-gold">⭐ 4.8</div>
-              <div className="text-[10px] sm:text-xs text-luxury-charcoal/70 uppercase">Rating</div>
-            </div>
-          </div>
-
-          {/* Sale Countdown - Synced with announcement banner */}
-          <ProductsCountdownBanner />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[270px_1fr] gap-0 lg:gap-8">
-        {/* Sidebar with refinements - Hidden on mobile, shown on desktop */}
-        <aside className="hidden lg:block px-6">
-          {/* Product count & filters */}
-          <div className="sticky top-20">
-            <RefinementList
-              sortBy={sortBy as SortOptions}
-              categories={categories}
-              tags={tagsList}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-              currencyCode={regionData.currency_code}
-              productCount={productCount}
-              region={regionData}
-            />
-          </div>
-        </aside>
-
-        {/* Main product grid - Mobile optimized */}
-        <main className="px-3 sm:px-6">
-          {/* Mobile Filter Toggle */}
-          <div className="lg:hidden mb-4 flex items-center justify-between px-2">
-            <span className="text-sm text-luxury-charcoal/70">
-              {productCount} {productCount === 1 ? 'product' : 'products'}
-            </span>
-          </div>
-
-          <Suspense fallback={<ProductListSkeleton count={8} />}>
-            {productCount > 0 ? (
-              <ul className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
-                {sortedProducts.map((product) => (
-                  <li key={product.id}>
-                    <ProductPreview product={product} region={regionData} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="py-24 flex flex-col items-center justify-center px-4">
-                <h2 className="font-display text-xl text-luxury-gold mb-4">No products found</h2>
-                <p className="text-serif-regular text-luxury-charcoal/80 text-center max-w-lg">
-                  We're currently updating our sweet collection. Please check back soon for our latest petha creations.
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <span className="text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70 mb-2">
+                  Direct From Agra Halwais
+                </span>
+                <h1 className="font-cormorant text-3xl sm:text-5xl font-bold text-slate-900 leading-tight">
+                  Buy Authentic Agra Petha &amp; Fresh Namkeen
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-2xl leading-relaxed">
+                  Crafted daily in small batches with ash gourd, cane sugar syrup, and royal spices. Sealed for 30-day doorstep freshness across India.
                 </p>
               </div>
+
+              <div className="flex items-center gap-3 bg-amber-50/80 border border-amber-200/60 rounded-2xl p-4 flex-shrink-0">
+                <span className="text-2xl">🌱</span>
+                <div className="text-xs">
+                  <p className="font-bold text-slate-900">100% Pure Vegetarian</p>
+                  <p className="text-emerald-700 font-semibold">Free Express Shipping ₹500+</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Category Filter Chips */}
+            <div className="flex items-center gap-2 overflow-x-auto pt-6 mt-6 border-t border-slate-100 no-scrollbar">
+              {CATEGORY_TABS.map((tab) => {
+                const isActive = (tab.value === "" && !rawCategory) || (tab.value !== "" && rawCategory.toLowerCase().includes(tab.value))
+                const href = tab.value ? `/${countryCode}/products?category=${tab.value}` : `/${countryCode}/products`
+                return (
+                  <Link
+                    key={tab.label}
+                    href={href}
+                    className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-xs ${
+                      isActive
+                        ? "bg-slate-900 text-white"
+                        : "bg-white hover:bg-amber-50 border border-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Layout */}
+        <div className="flex flex-col small:flex-row small:items-start gap-8">
+          <RefinementList
+            sortBy={sortBy as SortOptions}
+            categories={categories}
+            tags={tagsList}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+          />
+
+          <div className="flex-1 w-full min-w-0">
+            {sortedProducts.length === 0 ? (
+              <div className="bg-white rounded-3xl border border-amber-100/90 p-12 text-center space-y-4">
+                <span className="text-4xl">🍬</span>
+                <h3 className="font-cormorant text-2xl font-bold text-slate-800">No sweets match this filter</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Try clearing your category or price filters to see all authentic Agra sweets.
+                </p>
+                <Link
+                  href={`/${countryCode}/products`}
+                  className="inline-block px-5 py-2.5 rounded-full bg-petha-amber text-white font-bold text-xs uppercase tracking-wider"
+                >
+                  View All Sweets
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+                {sortedProducts.map((p) => (
+                  <ProductPreview
+                    key={p.id}
+                    product={p}
+                    region={regionData}
+                  />
+                ))}
+              </div>
             )}
-          </Suspense>
-        </main>
+          </div>
+        </div>
+
       </div>
     </div>
   )
-} 
+}

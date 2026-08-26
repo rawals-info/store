@@ -7,3 +7,5 @@ scripts/review-script/*
 .yarnrc
 .yarnrc.yaml
 .yarnrc.yml
+taj_db_prod.dump
+frontend/scratch/run-tests.js

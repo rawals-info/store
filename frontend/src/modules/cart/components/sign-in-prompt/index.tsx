@@ -1,27 +1,23 @@
-import { Button } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { UserCheck } from "lucide-react"
 
 const SignInPrompt = () => {
   return (
-    <div className="flex items-center justify-between px-6">
-      <div>
-        <h2 className="font-display text-xl text-luxury-charcoal">
-          Already have an account?
-        </h2>
-        <p className="text-luxury-charcoal/70 text-sm mt-1">
-          Sign in for a better experience.
-        </p>
+    <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 text-xs font-jakarta">
+      <div className="flex items-center gap-2.5">
+        <span className="text-base">👋</span>
+        <div>
+          <span className="font-bold text-slate-800">Returning Sweet Lover? </span>
+          <span className="text-slate-600 hidden sm:inline">Sign in for saved delivery addresses &amp; rewards.</span>
+        </div>
       </div>
-      <div>
-        <LocalizedClientLink href="/account">
-          <Button 
-            className="border border-luxury-gold/50 bg-transparent hover:bg-luxury-cream text-luxury-gold px-6 py-2 text-sm font-medium tracking-wide transition-colors duration-200" 
-            data-testid="sign-in-button"
-          >
-            Sign in
-          </Button>
-        </LocalizedClientLink>
-      </div>
+      <LocalizedClientLink
+        href="/account"
+        className="px-3.5 py-1.5 rounded-xl bg-white border border-amber-300 hover:bg-petha-amber hover:text-white font-jakarta font-bold text-xs text-slate-800 transition-colors shadow-sm whitespace-nowrap"
+        data-testid="sign-in-button"
+      >
+        Sign In →
+      </LocalizedClientLink>
     </div>
   )
 }

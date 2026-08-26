@@ -3,46 +3,56 @@
 import OrderCard from "../order-card"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
+import { Package, ArrowRight, Sparkles } from "lucide-react"
 
 const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
   if (orders?.length) {
     return (
-      <div className="flex flex-col gap-y-8 w-full">
-        {orders.map((o) => (
-          <div
-            key={o.id}
-            className="border-b border-[var(--color-luxury-lightgold)]/20 pb-6 last:pb-0 last:border-none"
-          >
-            <OrderCard order={o} />
+      <div className="space-y-6 font-jakarta">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div>
+            <h2 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900">
+              Your Orders &amp; Delivery History
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Showing all {orders.length} orders placed with Taj Petha Agra.
+            </p>
           </div>
-        ))}
+        </div>
+
+        <div className="space-y-4">
+          {orders.map((o) => (
+            <OrderCard key={o.id} order={o} />
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
     <div
-      className="w-full flex flex-col items-center gap-y-8 py-12 account-card"
+      className="w-full bg-slate-50/70 border border-slate-200 rounded-3xl p-10 text-center space-y-4 font-jakarta"
       data-testid="no-orders-container"
     >
-      <div className="w-20 h-20 rounded-full flex items-center justify-center bg-[var(--color-luxury-ivory)]">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-luxury-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
+      <div className="w-16 h-16 rounded-full bg-amber-100 text-petha-amber flex items-center justify-center mx-auto shadow-xs">
+        <Package className="w-8 h-8" />
       </div>
-      <div className="text-center">
-        <h2 className="font-display text-xl text-[var(--color-luxury-charcoal)] mb-2">Nothing to see here</h2>
-        <p className="text-[var(--color-luxury-charcoal)]/70 mb-6">
-          You don&apos;t have any orders yet, let us change that {":)"}
+      <div className="space-y-1">
+        <h2 className="font-cormorant text-2xl font-bold text-slate-900">
+          No Orders Placed Yet
+        </h2>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+          Ready to experience authentic Agra sweets? Browse our freshly prepared white petha, kesar angoori, and dalmoth.
         </p>
       </div>
-      <LocalizedClientLink href="/products" passHref>
-        <button className="luxury-btn px-8 py-3 tracking-wider">
-          CONTINUE SHOPPING
-        </button>
-      </LocalizedClientLink>
+      <div className="pt-2">
+        <LocalizedClientLink href="/products">
+          <button className="px-6 py-3 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm hover:shadow-md cursor-pointer inline-flex items-center gap-2">
+            <span>Explore Fresh Sweets</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </LocalizedClientLink>
+      </div>
     </div>
   )
 }

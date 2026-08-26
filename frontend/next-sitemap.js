@@ -48,6 +48,7 @@ module.exports = {
       { loc: '/in/terms', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/privacy', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/returns', priority: 0.7, changefreq: 'monthly' },
+      { loc: '/in/city', priority: 0.9, changefreq: 'daily' },
       // City landing pages - all major cities
       { loc: '/in/city/delhi', priority: 0.85, changefreq: 'weekly' },
       { loc: '/in/city/mumbai', priority: 0.85, changefreq: 'weekly' },

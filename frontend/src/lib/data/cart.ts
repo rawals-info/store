@@ -197,7 +197,7 @@ export async function addToCart({
     ...(await getAuthHeaders()),
   }
 
-  // No cart yet → create one and include the requested item in the same request
+  // No cart yet → create one first, then add line item
   if (!existingCart) {
     const [region, authHeaders] = await Promise.all([
       getIndiaRegion(),
@@ -211,42 +211,32 @@ export async function addToCart({
     const combinedHeaders = { ...authHeaders }
 
     try {
-      const { cart: newCart } = await withTimeout(
-        sdk.store.cart.create(
-          {
-            region_id: region.id,
-            items: [
-              {
-                variant_id: variantId,
-                quantity,
-              },
-            ],
-          },
-          {},
-          combinedHeaders
-        ),
-        10000,
-        "Creating cart timed out"
+      const { cart: newCart } = await sdk.store.cart.create(
+        { region_id: region.id },
+        {},
+        combinedHeaders
       )
 
-      // Persist cart ID for subsequent requests
       await setCartId(newCart.id)
 
-    const cartCacheTag = await getCacheTag("carts")
-    // Also revalidate the generic and specific cart tags used by RSC fetches
-    scheduleRevalidates([
-      cartCacheTag,
-      "cart",
-      `cart-${newCart.id}`,
-    ])
-    
-    // ✅ Invalidate client-side cart cache
-    if (typeof window !== 'undefined') {
-      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
-      invalidateCartCache()
-    }
+      const lineItemRes = await sdk.store.cart.createLineItem(
+        newCart.id,
+        {
+          variant_id: variantId,
+          quantity,
+        },
+        {},
+        combinedHeaders
+      )
 
-    return { success: true, cart: newCart }
+      const cartCacheTag = await getCacheTag("carts")
+      scheduleRevalidates([
+        cartCacheTag,
+        "cart",
+        `cart-${newCart.id}`,
+      ])
+      
+      return { success: true, cart: lineItemRes.cart }
     } catch (error) {
       return {
         success: false,
@@ -255,24 +245,16 @@ export async function addToCart({
     }
   }
 
-  // Cart already exists → add the item via the usual line-item endpoint
+  // Cart already exists → add the item via createLineItem
   try {
-    const idempotentHeaders = { ...headers, "Idempotency-Key": randomUUID() }
-
-    const result = await retryWithBackoff(() =>
-      withTimeout(
-        sdk.store.cart.createLineItem(
-          existingCart.id,
-          {
-            variant_id: variantId,
-            quantity,
-          },
-          {},
-          { ...headers, "Idempotency-Key": randomUUID() }
-        ),
-        8000,
-        "Adding item to cart timed out"
-      )
+    const result = await sdk.store.cart.createLineItem(
+      existingCart.id,
+      {
+        variant_id: variantId,
+        quantity,
+      },
+      {},
+      headers
     )
 
     const cartCacheTag = await getCacheTag("carts")
@@ -282,15 +264,30 @@ export async function addToCart({
       `cart-${existingCart.id}`,
     ])
     
-    // ✅ Invalidate client-side cart cache
-    if (typeof window !== 'undefined') {
-      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
-      invalidateCartCache()
-    }
-
     return { success: true, cart: result.cart }
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+    // If existing cart is completed or invalid, recreate
+    try {
+      const region = getIndiaRegion()
+      const { cart: freshCart } = await sdk.store.cart.create(
+        { region_id: region.id },
+        {},
+        headers
+      )
+      await setCartId(freshCart.id)
+      const freshLineRes = await sdk.store.cart.createLineItem(
+        freshCart.id,
+        { variant_id: variantId, quantity },
+        {},
+        headers
+      )
+      return { success: true, cart: freshLineRes.cart }
+    } catch (retryErr) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to add to cart",
+      }
+    }
   }
 }
 

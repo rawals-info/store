@@ -1,298 +1,386 @@
-"use server"
-
-import { getRegion } from "@lib/data/regions"
-import type { Metadata } from "next"
 import { getIndiaRegion } from "@lib/constants/india-region"
-import Image from "next/image"
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
+import { Sparkles, ShieldCheck, Truck, Leaf, Award, HeartHandshake, CheckCircle2, ArrowRight, Clock, Star } from "lucide-react"
+
+import Breadcrumb from "@modules/common/components/breadcrumb"
 
 interface AboutPageProps {
-  params: {
+  params: Promise<{
     countryCode: string
+  }>
+}
+
+export async function generateMetadata({ params }: AboutPageProps): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    title: "About Taj Petha | Authentic Agra Petha Sweet Heritage Since 2013",
+    description:
+      "Discover the heritage of Taj Petha Agra. Handcrafted daily by master halwais with pure winter melon (ash gourd), royal saffron & pistachio. Fresh nationwide air express delivery.",
+    keywords: [
+      "About Taj Petha",
+      "Authentic Agra Petha",
+      "Best Petha in Agra",
+      "Agra Sweets Heritage",
+      "Buy Petha Online India",
+      "Original Kesar Petha Agra",
+      "Siddharth Rawal Taj Petha",
+    ],
+    alternates: {
+      canonical: `https://tajpetha.in/${countryCode}/about`,
+    },
+    openGraph: {
+      title: "About Taj Petha | Authentic Agra Sweet Legacy",
+      description: "Discover Agra's purest GI-tagged petha and crispy dalmoth, handcrafted fresh daily and delivered across India in 24-48 hours.",
+      url: `https://tajpetha.in/${countryCode}/about`,
+      siteName: "Taj Petha",
+      images: [
+        {
+          url: "https://tajpetha.in/hero_petha_square.jpg",
+          width: 1200,
+          height: 630,
+          alt: "Taj Petha Agra Master Artisans",
+        },
+      ],
+      type: "article",
+    },
   }
 }
 
 export default async function AboutPage(props: AboutPageProps) {
-  const params = await props.params
-  const countryCode = params.countryCode
+  const { countryCode } = await props.params
   const region = getIndiaRegion()
 
   if (!region) {
     notFound()
   }
 
-  return (
-    <div className="content-container py-12">
-      {/* Hero section */}
-      <div className="flex flex-col items-center text-center mb-20">
-        <h1 className="font-display text-4xl text-luxury-charcoal mb-4">
-          About Taj Petha
-        </h1>
-        <div className="h-px w-20 bg-luxury-gold mb-8"></div>
-        <p className="text-serif-regular text-luxury-charcoal/80 max-w-2xl mx-auto">
-          Experience the true taste of Agra—one crystal-clear piece at a time!
-        </p>
-      </div>
-
-      {/* Our Story section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
-        <div>
-          <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Our Story</h2>
-          <div className="h-px w-16 bg-luxury-gold mb-8"></div>
-          <div className="text-serif-regular text-luxury-charcoal/80 space-y-4">
-            <p>
-              Founded in 2013 by Siddharth Rawal, Taj Petha was born from a passion for preserving Agra's most beloved sweet: the iconic petha. Nestled in the historic lanes of Agra, we set out with one goal—to craft the finest, most authentic Agra petha while blending time-honored recipes with modern hygiene and packaging standards.
-            </p>
-            <p>
-              Over the past decade, Taj Petha has grown from a single shop into a household name, delighting petha lovers across India and around the world.
-            </p>
-          </div>
-        </div>
-        <div className="relative h-96 luxury-image-hover overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/petha-craftsman.jpg')] bg-cover bg-center hover:scale-105 transition-transform duration-700"></div>
-        </div>
-      </div>
-
-      {/* Our Mission section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
-        <div className="order-2 lg:order-1 relative h-96 luxury-image-hover overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/petha-varieties.jpg')] bg-cover bg-center hover:scale-105 transition-transform duration-700"></div>
-        </div>
-        <div className="order-1 lg:order-2">
-          <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Our Mission</h2>
-          <div className="h-px w-16 bg-luxury-gold mb-8"></div>
-          <div className="text-serif-regular text-luxury-charcoal/80 space-y-4">
-            <p>
-              At Taj Petha, our mission is simple: to treat every customer like royalty and to exceed expectations with every bite. We honor the legacy of Agra's sweet artisans by using only premium ingredients, meticulous quality controls, and eco-friendly packaging.
-            </p>
-            <p>
-              Whether you're seeking classic crystal-white Kesar Petha, exotic flavours like Rose and Elaichi, or limited-edition gourmet blends, our commitment remains the same—unmatched taste, nutrition, and purity.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Why Choose Taj Petha section */}
-      <div className="mb-24">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Why Choose Taj Petha?</h2>
-          <div className="h-px w-16 bg-luxury-gold mx-auto mb-8"></div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Feature 1 */}
-          <div className="flex flex-col items-center text-center p-6 bg-luxury-cream/30">
-            <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Authentic Agra Heritage</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              Hand-Made in the heart of Agra using recipes perfected over centuries, our pethas capture the city's royal legacy and Mughal flavors.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="flex flex-col items-center text-center p-6 bg-luxury-cream/30">
-            <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-              </svg>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Premium Ingredients</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              We source only Grade A ash gourd, fragrant saffron, natural rose extracts, and 100% pure sugar to ensure every piece delivers irresistible taste and nutrition.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="flex flex-col items-center text-center p-6 bg-luxury-cream/30">
-            <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-              </svg>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Stringent Quality Control</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              From washing and peeling to cooking and packaging, each step undergoes rigorous, in-house quality checks to guarantee freshness, hygiene, and consistency.
-            </p>
-          </div>
-
-          {/* Feature 4 */}
-          <div className="flex flex-col items-center text-center p-6 bg-luxury-cream/30">
-            <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">State-of-the-Art Facilities</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              Our modern production units blend traditional karigari (craftsmanship) with automated grinding and packaging lines, assuring safe, tamper-proof products.
-            </p>
-          </div>
-
-          {/* Feature 5 */}
-          <div className="flex flex-col items-center text-center p-6 bg-luxury-cream/30">
-            <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-              </svg>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Eco-Friendly Packaging & Fast Delivery</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              We use recyclable boxes and air-sealed pouches to lock in flavor and freshness, with pan-India and international shipping options to bring Agra's best sweets right to your doorstep.
-            </p>
-          </div>
-
-          {/* Feature 6 */}
-          <div className="flex flex-col items-center text-center p-6 bg-luxury-cream/30">
-            <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-              <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Competitive Pricing</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              By controlling every stage of production, we offer premium petha at affordable prices—so everyone can enjoy a taste of Agra.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Our Process section */}
-      <div className="mb-24">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Our Process</h2>
-          <div className="h-px w-16 bg-luxury-gold mx-auto mb-8"></div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Step 1 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-luxury-cream flex items-center justify-center mb-4">
-              <span className="font-display text-2xl text-luxury-gold">1</span>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Selection & Washing</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              Fresh ash gourds are hand-picked and thoroughly cleaned to remove impurities.
-            </p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-luxury-cream flex items-center justify-center mb-4">
-              <span className="font-display text-2xl text-luxury-gold">2</span>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Cooking & Flavouring</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              Gourds are simmered in a light sugar syrup, then infused with natural essences such as saffron, rose, and cardamom.
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-luxury-cream flex items-center justify-center mb-4">
-              <span className="font-display text-2xl text-luxury-gold">3</span>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Crystalizing & Cutting</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              Each piece is carefully crystalized to achieve that signature translucent look, then cut into perfect bite-sized chunks.
-            </p>
-          </div>
-
-          {/* Step 4 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-luxury-cream flex items-center justify-center mb-4">
-              <span className="font-display text-2xl text-luxury-gold">4</span>
-            </div>
-            <h3 className="font-display text-xl text-luxury-charcoal mb-2">Packaging & Dispatch</h3>
-            <p className="text-serif-regular text-luxury-charcoal/80">
-              Once cooled and quality-checked, pethas are sealed in hygienic pouches and packed in sturdy, eco-friendly boxes for delivery.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Meet the Founder section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
-        <div>
-          <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Meet the Founder</h2>
-          <div className="h-px w-16 bg-luxury-gold mb-8"></div>
-          <div className="text-serif-regular text-luxury-charcoal/80 space-y-4">
-            <p>
-              Siddharth Rawal's vision was to showcase Agra's culinary heritage while embracing innovation. A true Agra native, Siddharth combines respect for traditional recipes with a forward-thinking approach to quality, branding, and customer experience.
-            </p>
-            <p>
-              His dedication to excellence has driven Taj Petha to become one of the most trusted names in premium sweets.
-            </p>
-          </div>
-        </div>
-        <div className="relative h-96 luxury-image-hover overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/founder.jpg')] bg-cover bg-center hover:scale-105 transition-transform duration-700"></div>
-        </div>
-      </div>
-
-      {/* Get in Touch */}
-      <div className="bg-luxury-cream/30 p-12">
-        <div className="text-center">
-          <h2 className="font-display text-2xl text-luxury-charcoal mb-4">Get in Touch</h2>
-          <div className="h-px w-16 bg-luxury-gold mx-auto mb-8"></div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
-                </svg>
-              </div>
-              <h3 className="font-display text-lg text-luxury-charcoal mb-2">Website</h3>
-              <a href="https://tajpetha.in" className="text-serif-regular text-luxury-gold hover:text-luxury-gold/80 transition-colors">
-                tajpetha.in
-              </a>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <h3 className="font-display text-lg text-luxury-charcoal mb-2">Email</h3>
-              <a href="mailto:support@tajpetha.in" className="text-serif-regular text-luxury-gold hover:text-luxury-gold/80 transition-colors">
-                support@tajpetha.in
-              </a>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-luxury-ivory border border-luxury-gold/20 flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                </svg>
-              </div>
-              <h3 className="font-display text-lg text-luxury-charcoal mb-2">Phone</h3>
-              <p className="text-serif-regular text-luxury-gold">
-                +91-92594-18994
-              </p>
-            </div>
-          </div>
-
-          <p className="text-serif-regular text-luxury-charcoal/80 max-w-2xl mx-auto mt-10">
-            Experience the true taste of Agra—one crystal-clear piece at a time!
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-} 
-
-export async function generateMetadata({ params }: AboutPageProps): Promise<Metadata> {
-  const { countryCode } = await params
-  return {
-    title: "About Taj Petha | Authentic Agra Petha Since 2013",
-    description: "Learn about Taj Petha's heritage, quality standards, and mission to deliver authentic Agra petha across India.",
-    alternates: {
-      canonical: `https://tajpetha.in/${countryCode}/about`,
+  // Structured JSON-LD Schemas for SEO
+  const jsonLdOrg = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Taj Petha",
+    legalName: "Taj Petha Confectioners Agra",
+    url: "https://tajpetha.in",
+    logo: "https://tajpetha.in/logo.webp",
+    foundingDate: "2013",
+    founder: {
+      "@type": "Person",
+      name: "Siddharth Rawal",
     },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Noori Gate, Near Taj Mahal",
+      addressLocality: "Agra",
+      addressRegion: "Uttar Pradesh",
+      postalCode: "282001",
+      addressCountry: "IN",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+91-92594-18994",
+      contactType: "Customer Support",
+      areaServed: "IN",
+      availableLanguage: ["English", "Hindi"],
+    },
+    sameAs: [
+      "https://facebook.com/tajpethaofficial",
+      "https://instagram.com/tajpetha_in",
+      "https://twitter.com/tajpetha",
+    ],
   }
+
+  const jsonLdAbout = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: "About Taj Petha Confectioners",
+    description: "The story of Taj Petha - preserving Agra's 350-year-old royal sweet-making tradition with zero preservatives and nationwide express delivery.",
+    url: `https://tajpetha.in/${countryCode}/about`,
+  }
+
+  const jsonLdFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What makes Taj Petha authentic?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Taj Petha is prepared in Agra using 100% farm-fresh ash gourd (winter melon) and traditional open-fire brass kadhais, following the 350-year-old Mughal recipe with zero artificial preservatives.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How fresh does Taj Petha stay during transit?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Every box is vacuum-sealed immediately after cooking and dispatched via Air Express within 24 hours. Our pethas maintain peak freshness and melt-in-mouth texture for 30 days.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Is Taj Petha 100% vegetarian?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes, all Taj Petha sweets and namkeens are 100% pure vegetarian, FSSAI certified, and made with natural ingredients.",
+        },
+      },
+    ],
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdAbout) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+      />
+
+      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+          
+          {/* Hero Story Banner */}
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-14 lg:p-16 shadow-sm text-center relative overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+            
+            {/* Breadcrumb */}
+            <Breadcrumb
+              items={[{ label: "Our Story & Heritage", isCurrent: true }]}
+              countryCode={countryCode}
+              className="p-0 bg-transparent border-0 mb-6 justify-center"
+            />
+
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-jakarta font-bold uppercase tracking-wider mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
+              <span>Agra Heritage Since 2013</span>
+            </div>
+
+            <h1 className="font-cormorant text-4xl sm:text-6xl font-bold text-slate-900 leading-tight max-w-3xl mx-auto">
+              Preserving Agra’s Royal Sweet Heritage
+            </h1>
+
+            <p className="font-jakarta text-sm sm:text-base text-slate-600 mt-4 max-w-2xl mx-auto leading-relaxed">
+              Experience India’s purest, crystal-translucent Agra Petha. Handcrafted daily in historic Agra by generational halwais using royal Mughal recipes and 100% natural ash gourd.
+            </p>
+
+            {/* Quick Numbers Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 pt-10 border-t border-slate-100">
+              <div className="p-3">
+                <span className="font-mono text-3xl sm:text-4xl font-bold text-slate-900 block">50k+</span>
+                <span className="text-xs text-slate-500 font-jakarta font-semibold">Happy Sweet Lovers</span>
+              </div>
+              <div className="p-3">
+                <span className="font-mono text-3xl sm:text-4xl font-bold text-slate-900 block">100%</span>
+                <span className="text-xs text-slate-500 font-jakarta font-semibold">Pure Vegetarian &amp; Fresh</span>
+              </div>
+              <div className="p-3">
+                <span className="font-mono text-3xl sm:text-4xl font-bold text-slate-900 block">30-Day</span>
+                <span className="text-xs text-slate-500 font-jakarta font-semibold">Vacuum Freshness</span>
+              </div>
+              <div className="p-3">
+                <span className="font-mono text-3xl sm:text-4xl font-bold text-slate-900 block">24h</span>
+                <span className="text-xs text-slate-500 font-jakarta font-semibold">Express Air Dispatch</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Our Story Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 text-amber-950 text-xs font-jakarta font-bold uppercase tracking-wider">
+                <HeartHandshake className="w-3.5 h-3.5 text-petha-amber" />
+                <span>The Taj Petha Origin</span>
+              </div>
+
+              <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
+                Born in the Heart of Agra with a Simple Mission
+              </h2>
+
+              <div className="font-jakarta text-xs sm:text-sm text-slate-600 space-y-4 leading-relaxed">
+                <p>
+                  Founded in 2013 by <strong>Siddharth Rawal</strong>, Taj Petha began with a clear purpose: to bridge the gap between century-old traditional Agra sweet-making and modern food safety standards.
+                </p>
+                <p>
+                  Legend tells us that petha was originally created in the royal kitchens of the Mughal Empire during the construction of the Taj Mahal to provide workers with high energy and natural cooling. Over centuries, mass commercialization degraded the authentic taste.
+                </p>
+                <p>
+                  At Taj Petha, we brought back the original royal standard: <strong>open-kadhai slow cooking</strong>, pure winter melon pulp, hand-pounded saffron from Kashmir, and hygienic food-grade air-sealed packaging that keeps every batch as tender as if it were served fresh in Agra today.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 pt-2">
+                <Link
+                  href={`/${countryCode}/products`}
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-lg cursor-pointer"
+                >
+                  <span>Taste The Collection</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Visual Card */}
+            <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-amber-100/50 shadow-inner">
+                <Image
+                  src="/hero_petha_square.webp"
+                  alt="Authentic Agra Petha Preparation"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/70 space-y-2 text-xs font-jakarta text-slate-800">
+                <p className="font-bold text-amber-950 flex items-center gap-2">
+                  <Award className="w-4 h-4 text-petha-amber" />
+                  The Agra Confectionery Standard
+                </p>
+                <p className="text-slate-600 leading-relaxed">
+                  Every batch of White Petha, Kesar Angoori, Paan Petha, and Agra Dalmoth is prepared using GI-tagged local techniques passed down through generations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 4 Pillars of Excellence */}
+          <div className="space-y-8">
+            <div className="text-center space-y-2 max-w-xl mx-auto">
+              <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70">
+                Why Sweet Lovers Choose Us
+              </span>
+              <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900">
+                What Makes Taj Petha Special?
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-3xl border border-amber-100/90 shadow-sm space-y-3 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-petha-amber flex items-center justify-center">
+                  <Leaf className="w-6 h-6" />
+                </div>
+                <h3 className="font-jakarta font-bold text-base text-slate-900">100% Pure Ash Gourd</h3>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  We use only ripe winter melon without any synthetic fillers or chemical bleaching agents.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl border border-amber-100/90 shadow-sm space-y-3 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-petha-amber flex items-center justify-center">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <h3 className="font-jakarta font-bold text-base text-slate-900">Royal Kashmiri Saffron</h3>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  Natural saffron threads, rose water, and pistachios give our sweets their signature aroma.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl border border-amber-100/90 shadow-sm space-y-3 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <h3 className="font-jakarta font-bold text-base text-slate-900">FSSAI Certified Safety</h3>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  State-of-the-art hygienic cleanrooms ensure touch-free packaging and 100% vegetarian purity.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl border border-amber-100/90 shadow-sm space-y-3 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-petha-amber flex items-center justify-center">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <h3 className="font-jakarta font-bold text-base text-slate-900">Air Express Shipping</h3>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  Vacuum-sealed immediately after cooking and delivered anywhere in India within 24–48 hours.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 4-Step Crafting Process */}
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-12 shadow-sm space-y-8">
+            <div className="text-center space-y-2">
+              <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70">
+                Halwai Craftsmanship
+              </span>
+              <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900">
+                The 4-Step Royal Process
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-3">
+                <span className="font-mono text-2xl font-bold text-petha-amber">01</span>
+                <h4 className="font-jakarta font-bold text-sm text-slate-900">Hand-Picked Ash Gourd</h4>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  Carefully peeled, cubed, and soaked in natural lime water for crisp yet tender texture.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-3">
+                <span className="font-mono text-2xl font-bold text-petha-amber">02</span>
+                <h4 className="font-jakarta font-bold text-sm text-slate-900">Open-Kadhai Simmering</h4>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  Slowly simmered in pure sugar syrup until translucent and infused with natural aromatic juices.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-3">
+                <span className="font-mono text-2xl font-bold text-petha-amber">03</span>
+                <h4 className="font-jakarta font-bold text-sm text-slate-900">Flavor Infusion</h4>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  Infused with pure saffron, paan gulkand, chocolate glaze, or roasted dry fruits.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-3">
+                <span className="font-mono text-2xl font-bold text-petha-amber">04</span>
+                <h4 className="font-jakarta font-bold text-sm text-slate-900">Vacuum Seal &amp; Dispatch</h4>
+                <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
+                  Sealed in food-grade airtight pouches to lock in natural moisture for 30 days.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Reviews & Trust Strip */}
+          <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl border border-amber-500/20 text-center space-y-6">
+            <div className="flex items-center justify-center gap-1 text-amber-400">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 fill-amber-400" />
+              ))}
+            </div>
+            
+            <blockquote className="font-cormorant text-2xl sm:text-3xl font-bold text-amber-100 max-w-2xl mx-auto italic leading-relaxed">
+              “The most authentic Agra petha I’ve had outside of the old city lanes. Fresh, juicy, and beautifully packed!”
+            </blockquote>
+
+            <p className="font-jakarta text-xs sm:text-sm text-slate-400 font-semibold">
+              — Verified Sweet Box Customer from Bangalore
+            </p>
+
+            <div className="pt-4">
+              <Link
+                href={`/${countryCode}/products`}
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl cursor-pointer"
+              >
+                <span>Shop Fresh Agra Sweets (20% OFF with SWEET20)</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </>
+  )
 }

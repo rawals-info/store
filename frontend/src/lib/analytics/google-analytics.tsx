@@ -2,279 +2,396 @@
 
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef, Suspense } from 'react'
 
-// Google Analytics tracking ID
+// Configuration & IDs
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'
-
-// Google Tag Manager ID
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-NFH57XTD'
-
-// Facebook Pixel ID
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID || '123456789'
 
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void
-    dataLayer: any[]
-    fbq: (...args: any[]) => void
+    gtag?: (...args: any[]) => void
+    dataLayer?: any[]
+    fbq?: (...args: any[]) => void
   }
 }
 
-// Google Analytics helper functions
-export const pageview = (url: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', GA_TRACKING_ID, {
-      page_path: url,
-      custom_map: {
-        custom_parameter_1: 'petha_category',
-        custom_parameter_2: 'city_location'
+// First-touch attribution helper
+export interface AttributionData {
+  firstLandingPage?: string
+  referrer?: string
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
+  utmTerm?: string
+  utmContent?: string
+  landingTime?: string
+}
+
+export const getAttributionData = (): AttributionData => {
+  if (typeof window === 'undefined') return {}
+  try {
+    const raw = sessionStorage.getItem('tp_attribution') || localStorage.getItem('tp_attribution')
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+export const recordFirstTouch = (pathname: string, searchParams: URLSearchParams) => {
+  if (typeof window === 'undefined') return
+  try {
+    const existing = sessionStorage.getItem('tp_attribution')
+    if (!existing) {
+      const data: AttributionData = {
+        firstLandingPage: pathname,
+        referrer: document.referrer || 'direct',
+        utmSource: searchParams.get('utm_source') || undefined,
+        utmMedium: searchParams.get('utm_medium') || undefined,
+        utmCampaign: searchParams.get('utm_campaign') || undefined,
+        utmTerm: searchParams.get('utm_term') || undefined,
+        utmContent: searchParams.get('utm_content') || undefined,
+        landingTime: new Date().toISOString(),
       }
-    })
+      sessionStorage.setItem('tp_attribution', JSON.stringify(data))
+      localStorage.setItem('tp_attribution', JSON.stringify(data))
+    }
+  } catch {}
+}
+
+// DataLayer Dispatcher Helper
+export const pushDataLayer = (payload: Record<string, any>) => {
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || []
+    window.dataLayer.push(payload)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Analytics dataLayer]', payload)
+    }
   }
 }
 
-export const event = ({
-  action,
-  category,
-  label,
-  value,
-  custom_parameters = {}
-}: {
-  action: string
-  category: string
-  label?: string
-  value?: number
-  custom_parameters?: Record<string, any>
+// SPA Route Change Tracker Listener
+function NavigationListener() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const lastTrackedUrl = useRef<string>('')
+
+  useEffect(() => {
+    if (!pathname) return
+    const queryString = searchParams?.toString()
+    const fullUrl = queryString ? `${pathname}?${queryString}` : pathname
+
+    if (fullUrl === lastTrackedUrl.current) return
+    lastTrackedUrl.current = fullUrl
+
+    // Record First Touch & UTM attribution
+    if (searchParams) {
+      recordFirstTouch(pathname, searchParams)
+    }
+
+    const attribution = getAttributionData()
+
+    // Push GA4 page_view
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_path: fullUrl,
+        page_title: document.title,
+        first_touch_landing: attribution.firstLandingPage,
+        utm_source: attribution.utmSource,
+        utm_campaign: attribution.utmCampaign,
+      })
+    }
+
+    // Push GTM dataLayer page view
+    pushDataLayer({
+      event: 'virtual_page_view',
+      page_path: fullUrl,
+      page_title: document.title,
+      first_landing_page: attribution.firstLandingPage,
+      referrer: document.referrer || 'direct',
+      utm_source: attribution.utmSource,
+      utm_medium: attribution.utmMedium,
+      utm_campaign: attribution.utmCampaign,
+    })
+
+    // Meta Pixel PageView
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'PageView')
+    }
+  }, [pathname, searchParams])
+
+  return null
+}
+
+// E-Commerce Tracking Events
+export const trackProductView = (product: {
+  id?: string
+  title: string
+  handle?: string
+  category?: string
+  price: number
+  city?: string
 }) => {
+  const attribution = getAttributionData()
+
+  // Google Analytics view_item
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
-      ...custom_parameters
+    window.gtag('event', 'view_item', {
+      currency: 'INR',
+      value: product.price,
+      items: [{
+        item_id: product.id || product.handle || product.title,
+        item_name: product.title,
+        item_category: product.category || 'Agra Petha',
+        price: product.price,
+      }],
+      first_touch_landing: attribution.firstLandingPage,
+    })
+  }
+
+  // GTM DataLayer
+  pushDataLayer({
+    event: 'view_item',
+    ecommerce: {
+      currency: 'INR',
+      value: product.price,
+      items: [{
+        item_id: product.id || product.handle || product.title,
+        item_name: product.title,
+        item_category: product.category || 'Agra Petha',
+        price: product.price,
+      }],
+    },
+    viewing_city: product.city,
+  })
+
+  // Meta Pixel ViewContent
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', 'ViewContent', {
+      content_name: product.title,
+      content_ids: [product.id || product.handle || 'petha'],
+      content_type: 'product',
+      value: product.price,
+      currency: 'INR',
     })
   }
 }
 
-// Enhanced e-commerce tracking for petha sales
-export const trackPurchase = (transactionData: {
+export const trackAddToCart = (item: {
+  id?: string
+  title: string
+  price: number
+  quantity: number
+  category?: string
+}) => {
+  const totalValue = item.price * item.quantity
+  const attribution = getAttributionData()
+
+  // Google Analytics add_to_cart
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'add_to_cart', {
+      currency: 'INR',
+      value: totalValue,
+      items: [{
+        item_id: item.id || item.title,
+        item_name: item.title,
+        item_category: item.category || 'Agra Petha',
+        quantity: item.quantity,
+        price: item.price,
+      }],
+      first_touch_landing: attribution.firstLandingPage,
+    })
+  }
+
+  // GTM DataLayer
+  pushDataLayer({
+    event: 'add_to_cart',
+    ecommerce: {
+      currency: 'INR',
+      value: totalValue,
+      items: [{
+        item_id: item.id || item.title,
+        item_name: item.title,
+        item_category: item.category || 'Agra Petha',
+        quantity: item.quantity,
+        price: item.price,
+      }],
+    },
+  })
+
+  // Meta Pixel AddToCart
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', 'AddToCart', {
+      content_name: item.title,
+      content_ids: [item.id || item.title],
+      content_type: 'product',
+      value: totalValue,
+      currency: 'INR',
+    })
+  }
+}
+
+export const trackBeginCheckout = (cart: {
+  total: number
+  items: Array<{
+    id?: string
+    title: string
+    quantity: number
+    price: number
+  }>
+  coupon?: string
+}) => {
+  const attribution = getAttributionData()
+
+  // Google Analytics begin_checkout
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'begin_checkout', {
+      currency: 'INR',
+      value: cart.total,
+      coupon: cart.coupon,
+      items: cart.items.map((i) => ({
+        item_id: i.id || i.title,
+        item_name: i.title,
+        quantity: i.quantity,
+        price: i.price,
+      })),
+      first_touch_landing: attribution.firstLandingPage,
+    })
+  }
+
+  // GTM DataLayer
+  pushDataLayer({
+    event: 'begin_checkout',
+    ecommerce: {
+      currency: 'INR',
+      value: cart.total,
+      coupon: cart.coupon,
+      items: cart.items.map((i) => ({
+        item_id: i.id || i.title,
+        item_name: i.title,
+        quantity: i.quantity,
+        price: i.price,
+      })),
+    },
+  })
+
+  // Meta Pixel InitiateCheckout
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', 'InitiateCheckout', {
+      value: cart.total,
+      currency: 'INR',
+      num_items: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+    })
+  }
+}
+
+export const trackPurchase = (transaction: {
   transaction_id: string
   value: number
-  currency: string
+  currency?: string
+  shipping?: number
+  coupon?: string
   items: Array<{
     item_id: string
     item_name: string
-    category: string
+    category?: string
     quantity: number
     price: number
   }>
   city?: string
-  customer_type?: string
+  state?: string
 }) => {
+  const attribution = getAttributionData()
+
+  // Google Analytics purchase
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'purchase', {
-      transaction_id: transactionData.transaction_id,
-      value: transactionData.value,
-      currency: transactionData.currency,
-      items: transactionData.items.map(item => ({
-        item_id: item.item_id,
-        item_name: item.item_name,
-        item_category: item.category,
-        quantity: item.quantity,
-        price: item.price
+      transaction_id: transaction.transaction_id,
+      value: transaction.value,
+      currency: transaction.currency || 'INR',
+      shipping: transaction.shipping || 0,
+      coupon: transaction.coupon || 'SWEET20',
+      items: transaction.items.map((i) => ({
+        item_id: i.item_id,
+        item_name: i.item_name,
+        item_category: i.category || 'Agra Petha',
+        quantity: i.quantity,
+        price: i.price,
       })),
-      custom_parameters: {
-        delivery_city: transactionData.city,
-        customer_type: transactionData.customer_type,
-        business_type: 'petha_ecommerce'
-      }
+      first_touch_landing: attribution.firstLandingPage,
+      utm_source: attribution.utmSource,
+      utm_campaign: attribution.utmCampaign,
+      delivery_city: transaction.city,
     })
-
-    // Track Facebook Pixel purchase
-    if (window.fbq) {
-      window.fbq('track', 'Purchase', {
-        value: transactionData.value,
-        currency: transactionData.currency,
-        content_ids: transactionData.items.map(item => item.item_id),
-        content_type: 'product',
-        content_category: 'Indian Sweets'
-      })
-    }
   }
-}
 
-export const trackProductView = (productData: {
-  item_id: string
-  item_name: string
-  category: string
-  price: number
-  city?: string
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'view_item', {
-      currency: 'INR',
-      value: productData.price,
-      items: [{
-        item_id: productData.item_id,
-        item_name: productData.item_name,
-        item_category: productData.category,
-        price: productData.price
-      }],
-      custom_parameters: {
-        viewing_from_city: productData.city,
-        product_type: 'traditional_sweets'
-      }
-    })
+  // GTM DataLayer
+  pushDataLayer({
+    event: 'purchase',
+    ecommerce: {
+      transaction_id: transaction.transaction_id,
+      value: transaction.value,
+      currency: transaction.currency || 'INR',
+      shipping: transaction.shipping || 0,
+      coupon: transaction.coupon || 'SWEET20',
+      items: transaction.items.map((i) => ({
+        item_id: i.item_id,
+        item_name: i.item_name,
+        item_category: i.category || 'Agra Petha',
+        quantity: i.quantity,
+        price: i.price,
+      })),
+    },
+    attribution,
+    customer_city: transaction.city,
+    customer_state: transaction.state,
+  })
 
-    // Track Facebook Pixel view
-    if (window.fbq) {
-      window.fbq('track', 'ViewContent', {
-        content_ids: [productData.item_id],
-        content_type: 'product',
-        content_name: productData.item_name,
-        content_category: productData.category,
-        value: productData.price,
-        currency: 'INR'
-      })
-    }
-  }
-}
-
-export const trackAddToCart = (itemData: {
-  item_id: string
-  item_name: string
-  category: string
-  price: number
-  quantity: number
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'add_to_cart', {
-      currency: 'INR',
-      value: itemData.price * itemData.quantity,
-      items: [{
-        item_id: itemData.item_id,
-        item_name: itemData.item_name,
-        item_category: itemData.category,
-        quantity: itemData.quantity,
-        price: itemData.price
-      }]
-    })
-
-    // Track Facebook Pixel add to cart
-    if (window.fbq) {
-      window.fbq('track', 'AddToCart', {
-        content_ids: [itemData.item_id],
-        content_type: 'product',
-        content_name: itemData.item_name,
-        value: itemData.price * itemData.quantity,
-        currency: 'INR'
-      })
-    }
-  }
-}
-
-export const trackCityPageView = (cityData: {
-  city_name: string
-  product_type: string
-  page_type: 'city_landing'
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'city_page_view', {
-      event_category: 'Local SEO',
-      event_label: cityData.city_name,
-      custom_parameters: {
-        city_name: cityData.city_name,
-        product_type: cityData.product_type,
-        page_type: cityData.page_type,
-        local_seo_intent: true
-      }
+  // Meta Pixel Purchase
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', 'Purchase', {
+      value: transaction.value,
+      currency: transaction.currency || 'INR',
+      content_type: 'product',
+      content_ids: transaction.items.map((i) => i.item_id),
+      num_items: transaction.items.reduce((sum, item) => sum + item.quantity, 0),
     })
   }
 }
 
-export const trackBlogEngagement = (blogData: {
-  article_id: string
-  article_title: string
-  category: string
-  reading_time: number
-  scroll_depth?: number
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'blog_engagement', {
-      event_category: 'Content Marketing',
-      event_label: blogData.article_title,
-      custom_parameters: {
-        article_id: blogData.article_id,
-        content_category: blogData.category,
-        estimated_reading_time: blogData.reading_time,
-        scroll_depth: blogData.scroll_depth,
-        content_type: 'educational_blog'
-      }
-    })
-  }
+export const trackCityPageView = (cityName: string, region: string) => {
+  pushDataLayer({
+    event: 'city_page_view',
+    city_name: cityName,
+    city_region: region,
+  })
 }
 
-export const trackSearchQuery = (searchData: {
-  search_term: string
-  results_count: number
-  category_filter?: string
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'search', {
-      search_term: searchData.search_term,
-      custom_parameters: {
-        results_count: searchData.results_count,
-        category_filter: searchData.category_filter,
-        search_type: 'product_search'
-      }
-    })
-  }
-}
-
-// Enhanced conversion tracking for different user journeys
-export const trackConversionFunnel = (funnelData: {
-  step: 'homepage' | 'category' | 'product' | 'cart' | 'checkout' | 'purchase'
-  user_type: 'new' | 'returning'
-  source_page?: string
-  city?: string
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'conversion_funnel', {
-      event_category: 'User Journey',
-      event_label: funnelData.step,
-      custom_parameters: {
-        funnel_step: funnelData.step,
-        user_type: funnelData.user_type,
-        source_page: funnelData.source_page,
-        user_city: funnelData.city,
-        business_vertical: 'traditional_sweets'
-      }
-    })
-  }
-}
-
-// Component for tracking page views
-export function usePageView() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    const url = pathname + (searchParams ? searchParams.toString() : '')
-    pageview(url)
-  }, [pathname, searchParams])
-}
-
-// Google Analytics Script Component
-// ✅ Optimized with deferred loading for better performance
+// Master Analytics Scripts Component
 export function GoogleAnalytics() {
-  const isProd = process.env.NODE_ENV === 'production'
-  if (!isProd) {
-    return null
-  }
   return (
     <>
-      {/* Google Analytics - Deferred loading after user interaction */}
+      <Suspense fallback={null}>
+        <NavigationListener />
+      </Suspense>
+
+      {/* Google Tag Manager - Async load */}
+      <Script
+        id="google-tag-manager"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${GTM_ID}');
+          `,
+        }}
+      />
+
+      {/* Google Analytics 4 - gtag.js */}
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
@@ -288,76 +405,16 @@ export function GoogleAnalytics() {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${GA_TRACKING_ID}', {
-              page_path: window.location.pathname,
-              custom_map: {
-                'custom_parameter_1': 'petha_category',
-                'custom_parameter_2': 'city_location'
-              },
-              // Enhanced ecommerce settings
-              send_page_view: true,
-              enhanced_ecommerce: true,
-              // User properties for better segmentation
-              user_properties: {
-                business_type: 'indian_sweets_ecommerce',
-                primary_product: 'agra_petha'
-              }
-            });
-
-            // ✅ Throttled scroll depth tracking for better performance
-            let scrollDepth = 0;
-            let scrollTimeout;
-            window.addEventListener('scroll', function() {
-              if (scrollTimeout) clearTimeout(scrollTimeout);
-              scrollTimeout = setTimeout(function() {
-                const scrolled = Math.floor((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-                if (scrolled > scrollDepth && scrolled % 25 === 0) {
-                  scrollDepth = scrolled;
-                  gtag('event', 'scroll_depth', {
-                    event_category: 'Engagement',
-                    event_label: scrollDepth + '%',
-                    value: scrollDepth
-                  });
-                }
-              }, 100); // Throttle to 100ms
-            }, { passive: true });
-
-            // Track time on page (only for engaged sessions > 10s)
-            let startTime = Date.now();
-            window.addEventListener('beforeunload', function() {
-              const timeOnPage = Math.floor((Date.now() - startTime) / 1000);
-              if (timeOnPage >= 10) { // Only track if user spent at least 10s
-                gtag('event', 'time_on_page', {
-                  event_category: 'Engagement',
-                  value: timeOnPage,
-                  custom_parameters: {
-                    page_type: document.title.includes('Petha') ? 'product_page' : 'content_page'
-                  }
-                });
-              }
+              send_page_view: false // Managed dynamically by NavigationListener
             });
           `,
         }}
       />
 
-      {/* Google Tag Manager - Deferred */}
-      <Script
-        id="google-tag-manager"
-        strategy="worker"
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.defer=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${GTM_ID}');
-          `,
-        }}
-      />
-
-      {/* Facebook Pixel - Deferred */}
+      {/* Meta Pixel */}
       <Script
         id="facebook-pixel"
-        strategy="worker"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             !function(f,b,e,v,n,t,s)
@@ -369,50 +426,6 @@ export function GoogleAnalytics() {
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${FB_PIXEL_ID}');
-            fbq('track', 'PageView');
-          `,
-        }}
-      />
-
-      {/* Microsoft Clarity - Loaded on idle */}
-      <Script
-        id="microsoft-clarity"
-        strategy="worker"
-        dangerouslySetInnerHTML={{
-          __html: `
-            // ✅ Load Clarity only when browser is idle
-            if ('requestIdleCallback' in window) {
-              requestIdleCallback(function() {
-                (function(c,l,a,r,i,t,y){
-                    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                })(window, document, "clarity", "script", "n8n8n8n8n8");
-              });
-            }
-          `,
-        }}
-      />
-
-      {/* Hotjar - Loaded on idle (only if enabled) */}
-      <Script
-        id="hotjar"
-        strategy="worker"
-        dangerouslySetInnerHTML={{
-          __html: `
-            // ✅ Load Hotjar only when browser is idle
-            if ('requestIdleCallback' in window) {
-              requestIdleCallback(function() {
-                (function(h,o,t,j,a,r){
-                    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                    h._hjSettings={hjid:3507234,hjsv:6};
-                    a=o.getElementsByTagName('head')[0];
-                    r=o.createElement('script');r.async=1;
-                    r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-                    a.appendChild(r);
-                })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-              });
-            }
           `,
         }}
       />
@@ -420,36 +433,13 @@ export function GoogleAnalytics() {
   )
 }
 
-// Enhanced tracking for A/B testing and conversion optimization
-export const trackABTest = (testData: {
-  experiment_id: string
-  variant: string
-  conversion_goal: string
-}) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'ab_test_view', {
-      event_category: 'A/B Testing',
-      event_label: testData.experiment_id,
-      custom_parameters: {
-        experiment_id: testData.experiment_id,
-        variant: testData.variant,
-        conversion_goal: testData.conversion_goal
-      }
-    })
-  }
-}
-
 export default {
   GoogleAnalytics,
-  usePageView,
-  pageview,
-  event,
-  trackPurchase,
   trackProductView,
   trackAddToCart,
+  trackBeginCheckout,
+  trackPurchase,
   trackCityPageView,
-  trackBlogEngagement,
-  trackSearchQuery,
-  trackConversionFunnel,
-  trackABTest
-} 
+  getAttributionData,
+  pushDataLayer,
+}

@@ -1,9 +1,8 @@
 import React from "react"
-
-import UnderlineLink from "@modules/common/components/interactive-link"
-
+import Link from "next/link"
 import AccountNav from "../components/account-nav"
 import { HttpTypes } from "@medusajs/types"
+import { HelpCircle, ArrowRight, Sparkles } from "lucide-react"
 
 interface AccountLayoutProps {
   customer: HttpTypes.StoreCustomer | null
@@ -14,37 +13,55 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   customer,
   children,
 }) => {
-  // If no customer (login/register view), use a different layout
   if (!customer) {
     return (
-      <div className="flex-1 flex flex-col min-h-[calc(100vh-64px)] luxury-pattern" data-testid="account-page">
+      <div className="min-h-[85vh] bg-[#FAF8F5]" data-testid="account-page">
         {children}
       </div>
     )
   }
 
-  // Regular account layout for logged in users
   return (
-    <div className="flex-1 small:py-12 luxury-pattern" data-testid="account-page">
-      <div className="flex-1 content-container h-full max-w-5xl mx-auto bg-white flex flex-col rounded-md luxury-shadow-md fade-in">
-        <div className="grid grid-cols-1 small:grid-cols-[240px_1fr] py-12">
-          <div className="px-4 sm:px-8">{customer && <AccountNav customer={customer} />}</div>
-          <div className="flex-1 px-4 sm:px-8">{children}</div>
-        </div>
-        <div className="flex flex-col small:flex-row items-end justify-between small:border-t border-[var(--color-luxury-lightgold)]/30 py-12 px-8 gap-8">
-          <div>
-            <h3 className="font-display text-xl text-[var(--color-luxury-charcoal)] mb-4">Got questions?</h3>
-            <span className="text-[var(--color-luxury-charcoal)]/70">
-              You can find frequently asked questions and answers on our
-              customer service page.
-            </span>
-          </div>
-          <div>
-            <UnderlineLink href="/customer-service">
-              <span className="text-[var(--color-luxury-gold)] hover:text-[var(--color-luxury-darkgold)]">Customer Service</span>
-            </UnderlineLink>
+    <div className="min-h-screen bg-[#FAF8F5] py-8 sm:py-12 font-jakarta" data-testid="account-page">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* Main Dashboard Card */}
+        <div className="bg-white rounded-3xl border border-amber-100/90 shadow-sm p-6 sm:p-10">
+          <div className="grid grid-cols-1 small:grid-cols-[240px_1fr] gap-8 items-start">
+            <div className="border-b small:border-b-0 small:border-r border-slate-100 pb-6 small:pb-0 small:pr-6">
+              <AccountNav customer={customer} />
+            </div>
+            <div className="flex-1 min-w-0">
+              {children}
+            </div>
           </div>
         </div>
+
+        {/* VIP Help & Support Banner */}
+        <div className="bg-amber-50/80 border border-amber-200/80 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white border border-amber-300 flex items-center justify-center flex-shrink-0 text-petha-amber">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-cormorant text-xl font-bold text-slate-900">
+                Need Help with Your Sweet Delivery?
+              </h4>
+              <p className="text-xs text-slate-600">
+                Our Agra customer support team is available 7 days a week for immediate tracking and assistance.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/contact"
+            className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs whitespace-nowrap transition-colors flex items-center gap-1.5 shadow-xs"
+          >
+            <span>Contact Support</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
       </div>
     </div>
   )

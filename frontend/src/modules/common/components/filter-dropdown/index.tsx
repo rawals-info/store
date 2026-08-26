@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Popover, Checkbox, Text, Label, Button } from "@medusajs/ui"
-import { ChevronUpMini } from "@medusajs/icons"
+import { Popover, Checkbox, Text } from "@medusajs/ui"
+import { ChevronDown } from "lucide-react"
 
 type FilterItem = {
   id: string
@@ -27,7 +27,6 @@ const FilterDropdown = ({
 }: FilterDropdownProps) => {
   const [open, setOpen] = useState(false)
   
-  // Only show if we have items
   if (!items.length) {
     return null
   }
@@ -38,56 +37,59 @@ const FilterDropdown = ({
     .filter(Boolean)
     .join(", ")
   
-  // Truncate selected names if too long
   const displayText = selectedCount > 0
     ? selectedCount > 1
       ? `${selectedCount} selected`
       : selectedNames
-    : "Select"
+    : "All"
 
   return (
     <div className="flex flex-col gap-y-1.5">
-      <Text className="text-serif font-medium text-xs text-luxury-charcoal tracking-wide uppercase">{title}</Text>
+      <Text className="font-jakarta font-bold text-[11px] text-slate-500 tracking-wider uppercase">
+        {title}
+      </Text>
       <Popover open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button
-            variant="transparent"
-            className="px-2.5 py-1.5 border border-luxury-gold/30 hover:border-luxury-gold bg-luxury-ivory shadow-sm w-full flex items-center justify-between text-left h-auto transition-all rounded-sm group"
+          <button
+            type="button"
+            className="px-3 py-2 border border-slate-200 hover:border-petha-amber bg-white shadow-sm w-full flex items-center justify-between text-left rounded-xl transition-all group cursor-pointer"
             data-testid={dataTestId}
           >
-            <span className="text-xs font-serif text-luxury-charcoal group-hover:text-luxury-gold/90 transition-colors truncate">
+            <span className="text-xs font-jakarta font-semibold text-slate-800 group-hover:text-petha-amber transition-colors truncate">
               {displayText}
             </span>
-            <ChevronUpMini
-              className={`w-3.5 h-3.5 ${open ? "rotate-0" : "rotate-180"} transition-transform duration-300 text-luxury-gold`}
+            <ChevronDown
+              className={`w-3.5 h-3.5 ${open ? "rotate-180" : "rotate-0"} transition-transform duration-200 text-slate-400 group-hover:text-petha-amber`}
             />
-          </Button>
+          </button>
         </Popover.Trigger>
         <Popover.Content
-          className="w-full min-w-[220px] p-3 border border-luxury-gold/30 shadow-lg bg-luxury-ivory rounded-sm"
+          className="w-full min-w-[220px] p-2.5 border border-slate-200 shadow-xl bg-white rounded-2xl z-50"
           side="bottom"
           align="start"
-          sideOffset={4}
+          sideOffset={6}
         >
-          <div className="flex flex-col gap-y-0.5 max-h-[250px] overflow-auto">
+          <div className="flex flex-col gap-y-1 max-h-[250px] overflow-auto no-scrollbar">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center gap-x-1.5 py-1 px-1 hover:bg-luxury-cream/10 rounded-sm transition-colors">
+              <label
+                key={item.id}
+                className="flex items-center gap-x-2.5 py-1.5 px-2 hover:bg-amber-50/70 rounded-xl transition-colors cursor-pointer"
+              >
                 <Checkbox
                   id={`filter-${title}-${item.id}`}
                   checked={selectedItems.includes(item.id)}
                   onCheckedChange={() => handleChange(item.id)}
-                  className="text-luxury-gold border-luxury-gold/50 hover:border-luxury-gold focus:border-luxury-gold data-[state=checked]:bg-luxury-gold data-[state=checked]:text-luxury-ivory h-3.5 w-3.5"
+                  className="data-[state=checked]:bg-petha-amber data-[state=checked]:border-petha-amber rounded-md"
                 />
-                <Label
-                  htmlFor={`filter-${title}-${item.id}`}
-                  className="text-luxury-charcoal text-xs cursor-pointer flex justify-between w-full"
-                >
-                  <span className="font-serif">{item.name}</span>
-                  {item.count !== undefined && (
-                    <span className="text-luxury-gold/70 text-xs ml-2 font-serif">({item.count})</span>
-                  )}
-                </Label>
-              </div>
+                <span className="text-xs font-jakarta text-slate-700 select-none flex-1 truncate">
+                  {item.name}
+                </span>
+                {item.count !== undefined && (
+                  <span className="text-[10px] font-mono text-slate-400">
+                    ({item.count})
+                  </span>
+                )}
+              </label>
             ))}
           </div>
         </Popover.Content>
@@ -96,4 +98,4 @@ const FilterDropdown = ({
   )
 }
 
-export default FilterDropdown 
+export default FilterDropdown

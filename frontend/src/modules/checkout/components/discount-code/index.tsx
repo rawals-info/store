@@ -103,36 +103,36 @@ React.useEffect(() => {
             <button
               onClick={() => {
                 setIsOpen(!isOpen)
-                // reset local error when reopening input
                 setLocalError(null)
               }}
               type="button"
-              className="font-medium text-[#43372f] hover:text-[#2a221e] transition-colors duration-150 ease-in-out"
+              className="font-jakarta text-xs font-bold text-petha-amber hover:text-petha-saffron transition-colors underline-offset-2 hover:underline cursor-pointer flex items-center gap-1"
               data-testid="add-discount-button"
             >
-              Add Promotion Code(s)
+              <span>🎟️ Have a coupon or promo code?</span>
             </button>
           </Label>
 
           {isOpen && (
             <>
-              <div className="flex w-full gap-x-2">
-                <Input
-                  className="size-full border-[#e2d9cf] rounded-md focus:border-[#43372f] transition-all duration-150 ease-in-out"
+              <div className="flex w-full gap-x-2 mt-2">
+                <input
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 font-mono text-xs focus:border-petha-amber focus:outline-none uppercase"
                   id="promotion-input"
                   name="code"
                   type="text"
+                  placeholder="e.g. SWEET20"
                   autoFocus={false}
                   ref={inputRef}
                   data-testid="discount-input"
                 />
-                <SubmitButton
-                  variant="secondary"
-                  className="bg-[var(--color-luxury-gold)] hover:bg-[var(--color-luxury-darkgold)] text-white border-none px-4 py-2 rounded-md"
+                <button
+                  type="submit"
+                  className="bg-petha-amber hover:bg-petha-saffron text-white font-jakarta font-bold text-xs uppercase px-4 py-2 rounded-xl shadow-sm transition-colors cursor-pointer flex-shrink-0"
                   data-testid="discount-apply-button"
                 >
                   Apply
-                </SubmitButton>
+                </button>
               </div>
 
               {/* Server-returned error takes precedence */}
@@ -164,14 +164,10 @@ React.useEffect(() => {
                     data-testid="discount-row"
                   >
                     <Text className="flex gap-x-1 items-baseline text-sm w-4/5 pr-1">
-                      <span className="truncate" data-testid="discount-code">
-                        <Badge
-                          color={promotion.is_automatic ? "green" : "grey"}
-                          size="small"
-                          className="bg-[#f3efe9] text-[#43372f] border-[#e2d9cf]"
-                        >
-                          {promotion.code}
-                        </Badge>{" "}
+                      <span className="truncate flex items-center gap-1.5" data-testid="discount-code">
+                        <span className="px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold">
+                          🎉 {promotion.code}
+                        </span>{" "}
                         (
                         {promotion.application_method?.value !== undefined &&
                           promotion.application_method.currency_code !==

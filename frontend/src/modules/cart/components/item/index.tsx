@@ -2,16 +2,11 @@
 
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import CartItemSelect from "@modules/cart/components/cart-item-select"
-import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
-import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
-import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { Table } from "@medusajs/ui"
+import { Minus, Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 type ItemProps = {
@@ -25,16 +20,10 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const [error, setError] = useState<string | null>(null)
 
   const changeQuantity = async (quantity: number) => {
-    // ✅ Prevent updating while already updating
-    if (updating) {
-      console.log("[CartItem] Update already in progress, ignoring request")
-      return
-    }
+    if (updating || quantity < 1) return
     
     setError(null)
     setUpdating(true)
-    
-    console.log(`[CartItem] Changing quantity for item ${item.id} to ${quantity}`)
 
     try {
       await updateLineItem({
@@ -42,58 +31,96 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         quantity,
       })
       
-      console.log(`[CartItem] Successfully updated quantity for item ${item.id}`)
-      
-      // ✅ Trigger cart refresh for all components
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("cartUpdated"))
       }
     } catch (err) {
-      console.error(`[CartItem] Failed to update quantity for item ${item.id}:`, err)
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : "Failed to update quantity"
+      const errorMessage = err instanceof Error ? err.message : "Failed to update quantity"
       setError(errorMessage)
-      
-      // Auto-clear error after 5 seconds
-      setTimeout(() => setError(null), 5000)
+      setTimeout(() => setError(null), 4000)
     } finally {
       setUpdating(false)
     }
   }
 
-  // TODO: Update this to grab the actual max inventory
-  const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
-
+  // Tailored compact preview layout for checkout summary sidebar & mini-cart
   if (type === "preview") {
     return (
-      <Table.Row className="py-4">
-        {/* Image Cell */}
-        <Table.Cell className="w-16 p-0 pr-4 align-top">
-          <LocalizedClientLink
-            href={`/products/${item.product_handle}`}
-            className="block"
-          >
-            <Thumbnail
-              thumbnail={item.thumbnail}
-              images={item.variant?.product?.images}
-              size="square"
-            />
-          </LocalizedClientLink>
-        </Table.Cell>
+      <div
+        className="py-3.5 flex items-start gap-3 border-b border-slate-100 last:border-0 group"
+        data-testid="product-row"
+      >
+        {/* Product Image */}
+        <LocalizedClientLink
+          href={`/products/${item.product_handle}`}
+          className="relative w-16 h-16 rounded-xl overflow-hidden bg-amber-50/50 border border-amber-200/60 flex-shrink-0 shadow-xs group-hover:border-petha-amber transition-colors"
+        >
+          <Thumbnail
+            thumbnail={item.thumbnail}
+            images={item.variant?.product?.images}
+            size="full"
+            className="object-cover w-full h-full"
+          />
+          <div className="absolute top-1 right-1 w-3 h-3 rounded-xs bg-white border border-emerald-600 flex items-center justify-center shadow-xs">
+            <div className="w-1 h-1 rounded-full bg-emerald-600" />
+          </div>
+        </LocalizedClientLink>
 
-        {/* Info Cell */}
-        <Table.Cell className="p-0 align-top">
-          <div className="flex flex-col justify-between h-full">
-            <div>
-              <h3 className="font-display text-base text-luxury-charcoal">
-                {item.product_title}
-              </h3>
-              <LineItemOptions variant={item.variant} />
+        {/* Product Info & Controls */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <LocalizedClientLink
+              href={`/products/${item.product_handle}`}
+              className="font-cormorant text-base sm:text-lg font-bold text-slate-900 hover:text-petha-amber transition-colors line-clamp-2 leading-snug"
+              data-testid="product-title"
+            >
+              {item.product_title}
+            </LocalizedClientLink>
+
+            <DeleteButton
+              id={item.id}
+              data-testid="product-delete-button"
+              className="p-1 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer flex-shrink-0"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </DeleteButton>
+          </div>
+
+          <p className="font-jakarta text-[11px] text-slate-500 mt-0.5">
+            {item.variant?.title ? `${item.variant.title} · ` : ""}Authentic Agra Sweet
+          </p>
+
+          {/* Stepper and Price Row */}
+          <div className="flex items-center justify-between mt-2.5 pt-1">
+            {/* Quantity Stepper */}
+            <div className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 p-0.5 shadow-xs">
+              <button
+                type="button"
+                onClick={() => changeQuantity(item.quantity - 1)}
+                disabled={updating || item.quantity <= 1}
+                className="w-6 h-6 rounded-md bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 text-slate-700 disabled:opacity-40 transition-colors cursor-pointer"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="w-2.5 h-2.5" />
+              </button>
+              
+              <span className="font-mono text-xs font-bold w-7 text-center text-slate-900">
+                {updating ? "..." : item.quantity}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => changeQuantity(item.quantity + 1)}
+                disabled={updating || item.quantity >= 10}
+                className="w-6 h-6 rounded-md bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 text-slate-700 disabled:opacity-40 transition-colors cursor-pointer"
+                aria-label="Increase quantity"
+              >
+                <Plus className="w-2.5 h-2.5" />
+              </button>
             </div>
-            <div className="flex justify-between mt-2">
-              <span className="text-luxury-charcoal/70">{item.quantity}x</span>
+
+            {/* Price */}
+            <div className="text-right">
               <LineItemPrice
                 item={item}
                 style="tight"
@@ -101,85 +128,107 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               />
             </div>
           </div>
-        </Table.Cell>
-      </Table.Row>
+        </div>
+      </div>
     )
   }
 
+  // Full layout for the cart page
   return (
-    <div className="grid grid-cols-1 small:grid-cols-[100px_1fr_120px_120px_120px] gap-4 py-8" data-testid="product-row">
-      {/* Image */}
-      <div className="w-[100px]">
-        <LocalizedClientLink href={`/products/${item.product_handle}`} className="block group">
-          <div className="relative">
-            <Thumbnail
-              thumbnail={item.thumbnail}
-              images={item.variant?.product?.images}
-              size="square"
-            />
-            <div className="absolute inset-0 bg-luxury-gold/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div
+      className="py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group border-b border-slate-100 last:border-0"
+      data-testid="product-row"
+    >
+      {/* Left: Image & Info */}
+      <div className="flex items-center gap-4 min-w-0 flex-1">
+        <LocalizedClientLink
+          href={`/products/${item.product_handle}`}
+          className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-amber-50/50 border border-amber-200/60 flex-shrink-0 shadow-sm group-hover:border-petha-amber transition-colors"
+        >
+          <Thumbnail
+            thumbnail={item.thumbnail}
+            images={item.variant?.product?.images}
+            size="full"
+            className="object-cover w-full h-full"
+          />
+          <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-sm bg-white border border-emerald-600 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
           </div>
         </LocalizedClientLink>
-      </div>
 
-      {/* Product Info */}
-      <div className="flex flex-col">
-        <h3 className="font-display text-base text-luxury-charcoal" data-testid="product-title">
-          <LocalizedClientLink href={`/products/${item.product_handle}`} className="hover:text-luxury-gold transition-colors duration-300">
+        <div className="min-w-0 flex-1">
+          <LocalizedClientLink
+            href={`/products/${item.product_handle}`}
+            className="font-cormorant text-lg sm:text-2xl font-bold text-slate-900 hover:text-petha-amber transition-colors line-clamp-2 leading-snug"
+            data-testid="product-title"
+          >
             {item.product_title}
           </LocalizedClientLink>
-        </h3>
-        <LineItemOptions variant={item.variant} data-testid="product-variant" />
-      </div>
 
-      {/* Quantity */}
-      <div className="flex items-center">
-        <div className="flex gap-2 items-center">
-          <DeleteButton 
-            id={item.id} 
-            data-testid="product-delete-button" 
-            className="text-xs uppercase tracking-wider text-luxury-charcoal/70 hover:text-luxury-gold transition-colors duration-300"
-          >
-            Remove
-          </DeleteButton>
-          <CartItemSelect
-            value={item.quantity}
-            onChange={(value) => changeQuantity(parseInt(value.target.value))}
-            className="w-14 h-10 p-2 border border-luxury-lightgold/30 bg-luxury-ivory text-luxury-charcoal focus:border-luxury-gold"
-            data-testid="product-select-button"
-          >
-            {Array.from(
-              {
-                length: Math.min(maxQuantity, 10),
-              },
-              (_, i) => (
-                <option value={i + 1} key={i}>
-                  {i + 1}
-                </option>
-              )
-            )}
-          </CartItemSelect>
-          {updating && <Spinner />}
+          <p className="font-jakarta text-xs text-slate-500 mt-0.5">
+            {item.variant?.title ? `${item.variant.title} · ` : ""}Authentic Agra Sweet
+          </p>
+
+          {/* Unit price on mobile */}
+          <div className="mt-1 sm:hidden">
+            <LineItemPrice
+              item={item}
+              style="tight"
+              currencyCode={currencyCode}
+            />
+          </div>
         </div>
-        {error && <ErrorMessage error={error} data-testid="product-error-message" />}
       </div>
 
-      {/* Unit Price */}
-      <div className="hidden small:flex items-center text-luxury-charcoal">
-        <LineItemUnitPrice
-          item={item}
-          style="tight"
-          currencyCode={currencyCode}
-        />
-      </div>
+      {/* Right: Quantity Stepper & Price & Delete */}
+      <div className="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-50">
+        
+        {/* Quantity Stepper */}
+        <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+          <button
+            type="button"
+            onClick={() => changeQuantity(item.quantity - 1)}
+            disabled={updating || item.quantity <= 1}
+            className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 text-slate-700 disabled:opacity-40 transition-colors cursor-pointer"
+            aria-label="Decrease quantity"
+          >
+            <Minus className="w-3 h-3" />
+          </button>
+          
+          <span className="font-mono text-xs sm:text-sm font-bold w-9 text-center text-slate-900">
+            {updating ? "..." : item.quantity}
+          </span>
 
-      {/* Total Price */}
-      <div className="flex items-center justify-end font-display text-luxury-gold">
-        <LineItemPrice
-          item={item}
-          style="tight"
-          currencyCode={currencyCode}
-        />
+          <button
+            type="button"
+            onClick={() => changeQuantity(item.quantity + 1)}
+            disabled={updating || item.quantity >= 10}
+            className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 text-slate-700 disabled:opacity-40 transition-colors cursor-pointer"
+            aria-label="Increase quantity"
+          >
+            <Plus className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* Total Price (Desktop) */}
+        <div className="hidden sm:block text-right min-w-[90px]">
+          <div className="font-mono text-lg font-bold text-slate-900">
+            <LineItemPrice
+              item={item}
+              style="tight"
+              currencyCode={currencyCode}
+            />
+          </div>
+        </div>
+
+        {/* Delete Button */}
+        <DeleteButton
+          id={item.id}
+          data-testid="product-delete-button"
+          className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+        >
+          <Trash2 className="w-4 h-4" />
+        </DeleteButton>
       </div>
     </div>
   )

@@ -1,46 +1,73 @@
 "use client"
 
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from "@headlessui/react"
+import { Popover, PopoverButton, PopoverPanel, Transition } from "@headlessui/react"
+import { usePathname } from "next/navigation"
+import { Fragment, useEffect, useRef, useState } from "react"
+import Image from "next/image"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { usePathname } from "next/navigation"
-import { Fragment, useEffect, useRef, useState } from "react"
-import { useCart } from "@lib/hooks/use-cart"
+import useSWR from "swr"
 
-const CartDropdown = () => {
-  const { cart: cartState } = useCart()
-  const [activeTimer, setActiveTimer] = useState<ReturnType<typeof setTimeout> | null>(
-    null
+// Simple fetcher for SWR
+const fetcher = async (url: string) => {
+  const res = await fetch(url, {
+    credentials: "include",
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+    },
+  })
+  if (!res.ok) {
+    throw new Error("Cart fetch failed")
+  }
+  const data = await res.json()
+  return data.cart
+}
+
+const CartDropdown = ({
+  cart: initialCart,
+}: {
+  cart?: HttpTypes.StoreCart | null
+}) => {
+  const [activeTimer, setActiveTimer] = useState<NodeJS.Timeout | undefined>(
+    undefined
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
+
+  // Use SWR to fetch and auto-revalidate cart
+  const { data: cartState } = (useSWR as any)(
+    "/api/cart",
+    fetcher,
+    {
+      fallbackData: initialCart,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 2000,
+    }
+  )
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
 
+  const cart = cartState as HttpTypes.StoreCart | null
+
   const totalItems =
-    cartState?.items?.reduce((acc, item) => {
-      return acc + item.quantity
+    cart?.items?.reduce((acc: number, item: any) => {
+      return acc + (item.quantity || 0)
     }, 0) || 0
 
-  const subtotal = cartState?.subtotal ?? 0
+  const subtotal = cart?.subtotal ?? 0
   const itemRef = useRef<number>(totalItems || 0)
 
   const timedOpen = () => {
     open()
-
-    const timer = setTimeout(close, 5000)
-
+    const timer = setTimeout(close, 4000)
     setActiveTimer(timer)
   }
 
@@ -48,11 +75,9 @@ const CartDropdown = () => {
     if (activeTimer) {
       clearTimeout(activeTimer)
     }
-
     open()
   }
 
-  // Clean up the timer when the component unmounts
   useEffect(() => {
     return () => {
       if (activeTimer) {
@@ -62,23 +87,15 @@ const CartDropdown = () => {
   }, [activeTimer])
 
   const pathname = usePathname() ?? ""
-
-  // On cart item changes (except for the very first render) open the dropdown
-  // to provide feedback – but skip the initial page-load so the cart doesn't
-  // pop open automatically on refresh.
   const initialRender = useRef(true)
 
   useEffect(() => {
     if (initialRender.current) {
-      // First render — just record the current count
       initialRender.current = false
       itemRef.current = totalItems
       return
     }
 
-    // If the previous count was 0 (typical after a refresh when the cart is
-    // fetched async) skip opening once. This prevents the dropdown from
-    // popping open immediately on page load.
     if (itemRef.current === 0) {
       itemRef.current = totalItems
       return
@@ -92,24 +109,18 @@ const CartDropdown = () => {
       timedOpen()
     }
 
-    // Save the current number of items for future comparison
     itemRef.current = totalItems
   }, [totalItems, pathname])
 
-  // Listen for cart updates via custom event
   useEffect(() => {
     const handleCartUpdate = (event: CustomEvent) => {
       if (!pathname.includes("/cart") && !pathname.includes("/checkout")) {
-        // Force open the cart dropdown immediately
         if (event.detail?.forceOpen) {
-          // Clear any existing timer
           if (activeTimer) {
             clearTimeout(activeTimer)
           }
           open()
-          
-          // Set a new timer to close after 5 seconds
-          const timer = setTimeout(close, 5000)
+          const timer = setTimeout(close, 4000)
           setActiveTimer(timer)
         } else {
           timedOpen()
@@ -118,11 +129,15 @@ const CartDropdown = () => {
     }
     
     window.addEventListener('cartUpdated', handleCartUpdate as EventListener)
-    
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate as EventListener)
     }
-  }, [pathname, activeTimer, open, close, timedOpen])
+  }, [pathname, activeTimer])
+
+  // Free shipping threshold (₹500)
+  const freeShippingThreshold = 500
+  const currentTotalInINR = subtotal > 100 ? subtotal : subtotal * 100 // adjust if needed
+  const neededForFreeShipping = Math.max(0, freeShippingThreshold - subtotal)
 
   return (
     <div
@@ -131,169 +146,183 @@ const CartDropdown = () => {
       onMouseLeave={close}
     >
       <Popover className="relative h-full">
-        <PopoverButton className="h-full">
+        <PopoverButton className="h-full focus:outline-none">
           <LocalizedClientLink
-            className="hover:text-luxury-gold transition-colors duration-300 uppercase tracking-wider text-small-semi flex items-center"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200/80 text-slate-800 hover:text-petha-amber transition-all duration-200 shadow-sm"
             href="/cart"
             data-testid="nav-cart-link"
           >
-            <span className="relative">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            <div className="relative flex items-center">
+              <svg className="w-5 h-5 text-petha-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
               </svg>
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 w-4 h-4 bg-luxury-gold rounded-full flex items-center justify-center text-[10px] text-luxury-ivory font-medium">
+                <span className="absolute -top-2 -right-2.5 min-w-[18px] h-[18px] px-1 bg-emerald-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold font-jakarta shadow-sm animate-pulse">
                   {totalItems}
                 </span>
               )}
+            </div>
+            <span className="text-xs sm:text-sm font-bold font-jakarta uppercase tracking-wider text-slate-800">
+              Cart
             </span>
-            Cart
           </LocalizedClientLink>
         </PopoverButton>
+
         <Transition
           show={cartDropdownOpen}
           as={Fragment}
           enter="transition ease-out duration-200"
-          enterFrom="opacity-0 translate-y-1"
-          enterTo="opacity-100 translate-y-0"
+          enterFrom="opacity-0 translate-y-1 scale-95"
+          enterTo="opacity-100 translate-y-0 scale-100"
           leave="transition ease-in duration-150"
-          leaveFrom="opacity-100 translate-y-0"
-          leaveTo="opacity-0 translate-y-1"
+          leaveFrom="opacity-100 translate-y-0 scale-100"
+          leaveTo="opacity-0 translate-y-1 scale-95"
         >
           <PopoverPanel
             static
-            className="cart-ivory-panel absolute top-[calc(100%+1px)] right-0 border border-luxury-gold/40 shadow-lg w-[75vw] max-w-[320px] sm:w-[380px] sm:max-w-[420px] md:w-[480px] lg:w-[540px] text-luxury-charcoal z-[110]"
-            style={{ backgroundColor: "#FFFAF2" }}
+            className="absolute top-[calc(100%+8px)] right-0 bg-white rounded-3xl border border-amber-100/90 shadow-2xl w-[90vw] max-w-[340px] sm:w-[400px] sm:max-w-[420px] text-slate-800 z-[110] overflow-hidden"
             data-testid="nav-cart-dropdown"
           >
-            {/* Gold line at top */}
-            <div className="h-0.5 w-full gold-gradient"></div>
-            
-            <div className="p-4 flex items-center justify-center border-b border-luxury-lightgold/30">
-              <h3 className="font-display text-xl text-luxury-gold">Your Cart</h3>
+            {/* Header */}
+            <div className="px-5 py-4 bg-amber-50/70 border-b border-amber-100/80 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🛍️</span>
+                <h3 className="font-cormorant text-xl font-bold text-slate-900">Your Fresh Box</h3>
+              </div>
+              <span className="font-jakarta text-xs font-bold text-petha-amber">
+                {totalItems} {totalItems === 1 ? "Item" : "Items"}
+              </span>
             </div>
-            {cartState && cartState.items?.length ? (
+
+            {/* Free Delivery Bar */}
+            <div className="px-5 py-2.5 bg-[#FFFDF9] border-b border-amber-100/60 text-xs font-jakarta">
+              {subtotal >= 500 ? (
+                <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                  <span>🎉</span> You qualify for FREE Nationwide Delivery!
+                </div>
+              ) : (
+                <div className="text-slate-600">
+                  Add <span className="font-bold text-petha-amber">₹{500 - Math.round(subtotal)}</span> more for <span className="font-bold text-emerald-700">FREE Express Delivery</span>
+                </div>
+              )}
+            </div>
+
+            {cart && cart.items?.length ? (
               <>
-                <div className="overflow-y-auto max-h-[50vh] sm:max-h-[65vh] px-3 sm:px-4 grid grid-cols-1 gap-y-6 sm:gap-y-8 no-scrollbar py-3 sm:py-4">
-                  {cartState.items
-                    .sort((a, b) => {
-                      return (a.created_at ?? "") > (b.created_at ?? "")
-                        ? -1
-                        : 1
-                    })
-                    .map((item) => (
+                {/* Items List */}
+                <div className="overflow-y-auto max-h-[45vh] px-5 py-3 divide-y divide-slate-100 no-scrollbar">
+                  {cart.items
+                    .sort((a: any, b: any) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1))
+                    .map((item: any) => (
                       <div
-                        className="grid grid-cols-[70px_1fr] sm:grid-cols-[100px_1fr] gap-x-2 sm:gap-x-3 pb-3 sm:pb-4 border-b border-luxury-lightgold/20 last:border-0"
+                        className="py-3.5 flex items-center gap-3.5 group"
                         key={item.id}
                         data-testid="cart-item"
                       >
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-[60px] sm:w-[90px] overflow-hidden group"
+                          className="w-14 h-14 rounded-xl overflow-hidden bg-amber-50 border border-amber-100 flex-shrink-0"
                         >
-                          <div className="relative">
-                            <Thumbnail
-                              thumbnail={item.thumbnail}
-                              images={item.variant?.product?.images}
-                              size="square"
-                            />
-                            <div className="absolute inset-0 bg-luxury-gold/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          </div>
+                          <Thumbnail
+                            thumbnail={item.thumbnail}
+                            images={item.variant?.product?.images}
+                            size="square"
+                          />
                         </LocalizedClientLink>
-                        <div className="flex flex-col justify-between flex-1">
-                          <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis sm:whitespace-nowrap mr-4 w-[150px]">
-                                <h3 className="font-display text-base overflow-hidden text-ellipsis">
-                                  <LocalizedClientLink
-                                    href={`/products/${item.product_handle}`}
-                                    className="hover:text-luxury-gold transition-colors duration-300"
-                                    data-testid="product-link"
-                                  >
-                                    {item.title}
-                                  </LocalizedClientLink>
-                                </h3>
-                                <LineItemOptions
-                                  variant={item.variant}
-                                  data-testid="cart-item-variant"
-                                  data-value={item.variant}
-                                />
-                                <span
-                                  className="text-serif-regular text-sm text-luxury-charcoal/80 mt-1"
-                                  data-testid="cart-item-quantity"
-                                  data-value={item.quantity}
-                                >
-                                  Quantity: {item.quantity}
-                                </span>
-                              </div>
-                              <div className="flex justify-end">
-                                <LineItemPrice
-                                  item={item}
-                                  style="tight"
-                                  currencyCode={cartState.currency_code}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <DeleteButton
-                            id={item.id}
-                            className="mt-2 text-xs uppercase tracking-wider text-luxury-charcoal/80 hover:text-luxury-gold transition-colors duration-300"
-                            data-testid="cart-item-remove-button"
+
+                        <div className="flex-1 min-w-0">
+                          <LocalizedClientLink
+                            href={`/products/${item.product_handle}`}
+                            className="font-cormorant text-base font-bold text-slate-900 hover:text-petha-amber transition-colors line-clamp-1 leading-snug"
                           >
-                            Remove
-                          </DeleteButton>
+                            {item.title}
+                          </LocalizedClientLink>
+
+                          <p className="font-jakarta text-[11px] text-slate-500 truncate">
+                            {item.variant?.title || "Standard Box"} · Qty: {item.quantity}
+                          </p>
+
+                          <div className="flex items-center justify-between mt-1">
+                            <LineItemPrice
+                              item={item}
+                              style="tight"
+                              currencyCode={cartState.currency_code}
+                            />
+                            <DeleteButton
+                              id={item.id}
+                              className="text-[11px] font-jakarta font-semibold text-rose-600 hover:underline"
+                            >
+                              Remove
+                            </DeleteButton>
+                          </div>
                         </div>
                       </div>
                     ))}
                 </div>
-                <div className="cart-ivory-panel p-6 flex flex-col gap-y-4 text-small-regular border-t border-luxury-gold/30" style={{ backgroundColor: "#FFFAF2" }}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-luxury-charcoal font-serif font-medium text-base">
-                      Subtotal{" "}
-                      <span className="font-normal text-luxury-charcoal/70">(excl. taxes)</span>
-                    </span>
-                    <span
-                      className="font-display text-xl text-luxury-gold"
-                      data-testid="cart-subtotal"
-                      data-value={subtotal}
-                    >
+
+                {/* Subtotal & Buttons */}
+                <div className="p-5 bg-amber-50/40 border-t border-amber-100 space-y-3">
+                  <div className="flex items-baseline justify-between font-jakarta">
+                    <span className="text-xs font-semibold text-slate-600">Subtotal:</span>
+                    <span className="font-mono text-xl font-bold text-slate-900">
                       {convertToLocale({
                         amount: subtotal,
                         currency_code: cartState.currency_code,
                       })}
                     </span>
                   </div>
-                  <LocalizedClientLink href="/cart" passHref>
-                    <Button
-                      className="luxury-btn w-full mt-2"
-                      size="large"
-                      data-testid="go-to-cart-button"
+
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <LocalizedClientLink
+                      href="/cart"
+                      onClick={close}
+                      className="w-full text-center py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 font-jakarta text-xs font-bold text-slate-800 transition-colors"
                     >
                       View Cart
-                    </Button>
-                  </LocalizedClientLink>
+                    </LocalizedClientLink>
+
+                    <LocalizedClientLink
+                      href="/checkout"
+                      onClick={close}
+                      className="w-full text-center py-2.5 px-3 rounded-xl bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold transition-colors shadow-sm"
+                    >
+                      Checkout →
+                    </LocalizedClientLink>
+                  </div>
                 </div>
               </>
             ) : (
-              <div>
-                <div className="flex py-16 flex-col gap-y-6 items-center justify-center px-8 text-center">
-                  <div className="w-16 h-16 flex items-center justify-center rounded-full border border-luxury-gold/60">
-                    <svg className="w-8 h-8 text-luxury-gold/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-y-2">
-                    <span className="font-display text-lg">Your shopping bag is empty</span>
-                    <span className="text-serif-regular text-luxury-charcoal/80">Discover our collection of authentic Agra Petha</span>
-                  </div>
-                  <div>
-                    <LocalizedClientLink href="/products">
-                      <>
-                        <span className="sr-only">Go to all products page</span>
-                        <Button className="luxury-btn" onClick={close}>Explore Collection</Button>
-                      </>
-                    </LocalizedClientLink>
-                  </div>
+              <div className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-amber-100 text-petha-amber flex items-center justify-center mx-auto text-xl">
+                  🍬
+                </div>
+                <div>
+                  <h4 className="font-cormorant text-lg font-bold text-slate-900">Your bag is empty</h4>
+                  <p className="font-jakarta text-xs text-slate-500 mt-0.5">Explore our freshly prepared Agra sweets:</p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 justify-center pt-2">
+                  <LocalizedClientLink
+                    href="/categories/petha"
+                    onClick={close}
+                    className="px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-jakarta font-semibold text-petha-amber hover:bg-amber-100 transition-colors"
+                  >
+                    🍬 Petha
+                  </LocalizedClientLink>
+                  <LocalizedClientLink
+                    href="/categories/dalmoth"
+                    onClick={close}
+                    className="px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-jakarta font-semibold text-petha-amber hover:bg-amber-100 transition-colors"
+                  >
+                    🥜 Dalmoth
+                  </LocalizedClientLink>
+                  <LocalizedClientLink
+                    href="/store"
+                    onClick={close}
+                    className="px-3 py-1.5 rounded-full bg-slate-900 text-xs font-jakarta font-semibold text-white hover:bg-slate-800 transition-colors"
+                  >
+                    All Sweets →
+                  </LocalizedClientLink>
                 </div>
               </div>
             )}

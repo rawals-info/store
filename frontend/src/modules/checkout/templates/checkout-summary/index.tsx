@@ -1,33 +1,168 @@
-import { Heading } from "@medusajs/ui"
+"use client"
 
+import { useState } from "react"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import DiscountCode from "@modules/checkout/components/discount-code"
 import CartTotals from "@modules/common/components/cart-totals"
-import Divider from "@modules/common/components/divider"
+import { ShieldCheck, Truck, Sparkles, Plus, Check } from "lucide-react"
+import Image from "next/image"
+import { addToCart } from "@lib/data/cart"
+import { useParams } from "next/navigation"
+
+const UPSELL_SNACKS = [
+  {
+    id: "prod_dalmoth",
+    title: "Special Agra Dalmoth",
+    price: 249,
+    image: "/images/dalmoth.webp",
+    weight: "400g Crispy Namkeen",
+  },
+  {
+    id: "prod_peanuts",
+    title: "Special Masala Peanuts",
+    price: 199,
+    image: "/images/namkeen.webp",
+    weight: "250g Crunchy Snack",
+  },
+]
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
-  // Determine if we're still on the address step based on cart data
   const atAddressStep = !cart?.shipping_address?.address_1 || !cart.email
   const shippingPlaceholder = atAddressStep ? "Enter your shipping address" : undefined
-  
+  const countryCode = (useParams()?.countryCode as string) || "in"
+  const [addingId, setAddingId] = useState<string | null>(null)
+  const [addedIds, setAddedIds] = useState<string[]>([])
+
+  const handleQuickAdd = async (item: typeof UPSELL_SNACKS[0]) => {
+    setAddingId(item.id)
+    try {
+      // Fetch matching product to get valid variant ID
+      const res = await fetch(`/api/search-suggest?q=${encodeURIComponent(item.title)}&countryCode=${countryCode}`)
+      const data = await res.json()
+      const matchedProd = data.products?.[0]
+      const variantId = matchedProd?.variants?.[0]?.id
+
+      if (variantId) {
+        const addRes = await addToCart({
+          variantId,
+          quantity: 1,
+          countryCode,
+        })
+        if (addRes?.success) {
+          setAddedIds((prev) => [...prev, item.id])
+          if (typeof window !== "undefined") {
+            window.location.reload()
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to add cross-sell snack:", e)
+    } finally {
+      setAddingId(null)
+    }
+  }
+
   return (
-    <div className="sticky top-4 flex flex-col-reverse small:flex-col gap-y-8 py-8 small:py-0">
-      <div className="w-full bg-luxury-ivory flex flex-col p-8 rounded-md shadow-luxury-sm border border-luxury-lightgold/30 checkout-section transition-shadow duration-200 hover:shadow-luxury-md">
-        <div className="h-0.5 w-full gold-gradient mb-6"></div>
-        
-        <h2 className="font-display text-2xl text-luxury-charcoal mb-6">
-          Your Order
-        </h2>
-        <CartTotals 
-          totals={cart} 
-          shippingPlaceholder={shippingPlaceholder}
-          taxPlaceholder="Enjoy tax‑free shopping" 
-        />
-        <div className="h-px bg-luxury-gold/20 my-6"></div>
-        <ItemsPreviewTemplate cart={cart} />
-        <div className="h-px bg-luxury-gold/20 my-6"></div>
-        <div className="mt-2">
+    <div className="sticky top-20 flex flex-col gap-y-6">
+      {/* Order Summary Card */}
+      <div className="w-full bg-white flex flex-col p-6 sm:p-8 rounded-3xl shadow-sm border border-amber-100/90">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <h2 className="font-cormorant text-2xl font-bold text-slate-900">
+            Order Summary
+          </h2>
+          <span className="font-jakarta text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-full">
+            {cart?.items?.length || 0} {cart?.items?.length === 1 ? "Item" : "Items"}
+          </span>
+        </div>
+
+        {/* Totals */}
+        <div className="py-4">
+          <CartTotals 
+            totals={cart} 
+            shippingPlaceholder={shippingPlaceholder}
+            taxPlaceholder="All taxes included" 
+          />
+        </div>
+
+        <div className="h-px bg-slate-100 my-2" />
+
+        {/* Items Preview */}
+        <div className="py-2">
+          <ItemsPreviewTemplate cart={cart} />
+        </div>
+
+        <div className="h-px bg-slate-100 my-4" />
+
+        {/* Promo Code Input */}
+        <div>
           <DiscountCode cart={cart} />
+        </div>
+      </div>
+
+      {/* Cross-Sell / Impulse Snack Row */}
+      <div className="w-full bg-amber-50/70 border border-amber-200/80 rounded-3xl p-5 space-y-3">
+        <div className="flex items-center gap-1.5 text-xs font-jakarta font-bold text-amber-900 uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
+          <span>Add Royal Agra Snacks (Best with Petha):</span>
+        </div>
+
+        <div className="space-y-2.5">
+          {UPSELL_SNACKS.map((snack) => {
+            const isAdded = addedIds.includes(snack.id)
+            return (
+              <div
+                key={snack.id}
+                className="flex items-center justify-between p-2.5 bg-white rounded-2xl border border-amber-200/60 shadow-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl overflow-hidden relative bg-amber-100/50 flex-shrink-0">
+                    <Image src={snack.image} alt={snack.title} fill className="object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="font-jakarta text-xs font-bold text-slate-800 leading-tight">
+                      {snack.title}
+                    </h4>
+                    <p className="font-jakarta text-[11px] text-slate-500">
+                      ₹{snack.price} · {snack.weight}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickAdd(snack)}
+                  disabled={isAdded || addingId === snack.id}
+                  className={`px-3 py-1.5 rounded-xl font-jakarta text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                    isAdded
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-amber-100 hover:bg-petha-amber hover:text-white text-amber-950"
+                  }`}
+                >
+                  {isAdded ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-600" /> Added
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-3 h-3" /> + Add
+                    </>
+                  )}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Trust & Guarantee Box */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-2 text-xs font-jakarta text-slate-600">
+        <div className="flex items-center gap-2">
+          <Truck className="w-4 h-4 text-petha-amber flex-shrink-0" />
+          <span>Express Nationwide Air Dispatch in 24h</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+          <span>30-Day Freshness Guarantee (Vacuum Sealed)</span>
         </div>
       </div>
     </div>

@@ -468,16 +468,9 @@ export const generateOpenGraphUrl = (path: string) => {
 }
 
 // City-specific SEO helpers
-export const MAJOR_INDIAN_CITIES = [
-  { name: "Delhi", slug: "delhi", keywords: ["buy petha delhi", "agra petha delivery delhi", "order petha online delhi", "petha home delivery delhi ncr"] },
-  { name: "Mumbai", slug: "mumbai", keywords: ["buy agra petha mumbai", "fresh petha mumbai", "order petha online mumbai", "petha delivery mumbai"] },
-  { name: "Bangalore", slug: "bangalore", keywords: ["buy petha bangalore", "agra petha online bangalore", "petha delivery bangalore", "namkeen bangalore"] },
-  { name: "Hyderabad", slug: "hyderabad", keywords: ["buy petha hyderabad", "order petha online hyderabad", "agra sweets delivery hyderabad"] },
-  { name: "Chennai", slug: "chennai", keywords: ["buy petha online chennai", "agra sweets chennai", "petha delivery chennai"] },
-  { name: "Pune", slug: "pune", keywords: ["buy agra petha pune", "order petha pune", "traditional sweets pune"] },
-  { name: "Kolkata", slug: "kolkata", keywords: ["buy petha kolkata", "agra petha delivery kolkata", "order petha online kolkata"] },
-  { name: "Ahmedabad", slug: "ahmedabad", keywords: ["buy petha ahmedabad", "fresh namkeen ahmedabad", "agra petha delivery ahmedabad"] }
-]
+import { MAJOR_INDIAN_CITIES, type CityDeliveryInfo } from "./cities"
+export { MAJOR_INDIAN_CITIES, type CityDeliveryInfo }
+
 
 export const generateCityPageMetadata = (citySlug: string, productType: string = "petha") => {
   const city = MAJOR_INDIAN_CITIES.find(c => c.slug === citySlug)

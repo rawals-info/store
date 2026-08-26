@@ -1,19 +1,15 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { useState, useEffect, useRef } from "react"
-import { staggerContainer, fadeIn } from "@lib/util/animations"
-import ScrollReveal from "@modules/common/components/scroll-reveal"
-import AnimatedButton from "@modules/common/components/animated-button"
-import Link from "next/link"
-import Image from "next/image"
-import { Heading, Text } from "@medusajs/ui"
-import ProductPrice from "@modules/products/components/product-price"
-import Features from "./features"
 import { HttpTypes } from "@medusajs/types"
-import CategoryCarousel from "./category-carousel"
-import ProductPreviewRating from "@modules/products/components/product-preview/rating-client"
-import TrustBadges from "@components/TrustBadges"
+import HeroV2 from "./hero-v2"
+import ProofBar from "./proof-bar"
+import Bestsellers from "./bestsellers"
+import CategoryStrip from "./category-strip"
+import WhyUs from "./why-us"
+import Process from "./process"
+import Reviews from "./reviews"
+import GiftingBanner from "./gifting-banner"
+import Newsletter from "./newsletter"
 
 type HomeClientWrapperProps = {
   featuredProducts: any[]
@@ -22,409 +18,40 @@ type HomeClientWrapperProps = {
   countryCode: string
 }
 
-export default function HomeClientWrapper({ 
-  featuredProducts, 
-  categories, 
+export default function HomeClientWrapper({
+  featuredProducts,
+  categories,
   region,
-  countryCode
+  countryCode,
 }: HomeClientWrapperProps) {
-  // Fallback image for categories
-  const fallbackImage = "/table-top.webp"
-
-  // Filter to only parent categories for the carousel
-  const parentCategories = categories.filter(cat => !cat.parent_category)
-  
-  // State for category carousel
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [autoRotate, setAutoRotate] = useState(true)
-  const autoRotateRef = useRef<NodeJS.Timeout | null>(null)
-  
-  // State for products carousel - changed to rotate one by one
-  const [currentProductIndex, setCurrentProductIndex] = useState(0)
-  const [productsPerView, setProductsPerView] = useState(4)
-  const [productAutoRotate, setProductAutoRotate] = useState(true)
-  const productAutoRotateRef = useRef<NodeJS.Timeout | null>(null)
-  
-  // Background colors for categories
-  const bgGradients = [
-    'from-amber-50 to-amber-200',
-    'from-slate-100 to-slate-300',
-    'from-stone-100 to-stone-200',
-    'from-gray-50 to-gray-200',
-  ]
-
-  // Get category image or use fallback
-  const getCategoryImage = (handle: string) => {
-    // Map category handles to the new images
-    const imageMappings: Record<string, string> = {
-      "table-top": "/category_table_top.webp",
-      "jewelry": "/category_jewelry.webp",
-      "home-decor": "/category_home_decor.webp", 
-      "sculpture": "/category_sculpture.webp"
-    }
-    
-    return imageMappings[handle] || fallbackImage
-  }
-
-  // Auto-rotate categories
-  useEffect(() => {
-    if (autoRotate && parentCategories.length > 1) {
-      autoRotateRef.current = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % parentCategories.length)
-      }, 5000)
-    }
-    
-    return () => {
-      if (autoRotateRef.current) {
-        clearInterval(autoRotateRef.current)
-      }
-    }
-  }, [autoRotate, parentCategories.length])
-  
-  // Auto-rotate products - now one by one
-  useEffect(() => {
-    if (productAutoRotate && featuredProducts.length > productsPerView) {
-      productAutoRotateRef.current = setInterval(() => {
-        setCurrentProductIndex((prev) => {
-          const maxIndex = featuredProducts.length - productsPerView
-          return prev >= maxIndex ? 0 : prev + 1
-        })
-      }, 2500) // Faster rotation since we're moving one at a time
-    }
-    
-    return () => {
-      if (productAutoRotateRef.current) {
-        clearInterval(productAutoRotateRef.current)
-      }
-    }
-  }, [productAutoRotate, featuredProducts.length, productsPerView])
-  
-  // Calculate products per view based on screen size
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setProductsPerView(2) // show 2 products on very small screens
-      } else if (window.innerWidth < 768) {
-        setProductsPerView(2)
-      } else if (window.innerWidth < 1024) {
-        setProductsPerView(3)
-      } else {
-        setProductsPerView(4)
-      }
-    }
-    
-    // Set initial value
-    handleResize()
-    
-    // Update on window resize
-    window.addEventListener('resize', handleResize)
-    
-    // Cleanup
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-  
-  // Reset currentProductIndex when productsPerView changes
-  useEffect(() => {
-    const maxIndex = Math.max(0, featuredProducts.length - productsPerView)
-    if (currentProductIndex > maxIndex) {
-      setCurrentProductIndex(maxIndex)
-    }
-  }, [productsPerView, featuredProducts.length, currentProductIndex])
-  
-  // Pause auto-rotation when user interacts with categories
-  const handleNavigation = (index: number) => {
-    setCurrentIndex(index)
-    setAutoRotate(false)
-    
-    // Resume auto-rotation after 10 seconds of inactivity
-    if (autoRotateRef.current) {
-      clearInterval(autoRotateRef.current)
-    }
-    
-    setTimeout(() => {
-      setAutoRotate(true)
-    }, 10000)
-  }
-  
-  // Handle next/prev navigation for categories
-  const handlePrev = () => {
-    const newIndex = currentIndex === 0 ? parentCategories.length - 1 : currentIndex - 1
-    handleNavigation(newIndex)
-  }
-  
-  const handleNext = () => {
-    const newIndex = (currentIndex + 1) % parentCategories.length
-    handleNavigation(newIndex)
-  }
-  
-  // Handle product carousel navigation
-  const handlePrevProduct = () => {
-    setCurrentProductIndex((prev) => (prev === 0 ? featuredProducts.length - productsPerView : prev - 1))
-    setProductAutoRotate(false)
-    if (productAutoRotateRef.current) {
-      clearInterval(productAutoRotateRef.current)
-    }
-    setTimeout(() => setProductAutoRotate(true), 10000)
-  }
-  
-  const handleNextProduct = () => {
-    setCurrentProductIndex((prev) => {
-      const maxIndex = featuredProducts.length - productsPerView
-      return prev >= maxIndex ? 0 : prev + 1
-    })
-    setProductAutoRotate(false)
-    if (productAutoRotateRef.current) {
-      clearInterval(productAutoRotateRef.current)
-    }
-    setTimeout(() => setProductAutoRotate(true), 10000)
-  }
-
   return (
-    <div className="w-full overflow-hidden">
-      {/* Hero Section */}
-      <motion.section
-        className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
-        initial="initial"
-        animate="animate"
-        variants={staggerContainer}
-      >
-        {/* Hero image with petha display */}
-        <div className="absolute inset-0 z-0 w-full h-full">
-          <Image
-            src="/hero_image.webp"
-            alt="Luxury petha display in elegant setting"
-            fill
-            priority={true}
-            sizes="100vw"
-            className="object-cover w-full h-full"
-            quality={90}
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-          />
-          <div className="absolute inset-0 bg-black/15"></div>
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-6 w-full py-12">
-          <motion.div variants={fadeIn} className="mb-4 md:mb-6">
-            <Heading level="h1" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 font-serif text-white leading-tight">
-              <span className="block">Taste the Legend</span>
-              <span className="block">Petha of Agra</span>
-            </Heading>
-          </motion.div>
-          
-          <motion.div variants={fadeIn} className="mb-6 md:mb-8">
-            <Text className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-white">
-              Authentic, Hand-Made Petha—Since 2013
-            </Text>
-          </motion.div>
-          
-          <motion.div variants={fadeIn}>
-            <Link href={`/${countryCode}/products`}>
-              <AnimatedButton variant="gold" size="large" className="w-full sm:w-auto">
-                Shop Our Signature Petha
-              </AnimatedButton>
-            </Link>
-          </motion.div>
-        </div>
-        
-        {/* Scrolling indicator */}
-        <motion.div 
-          className="hidden md:block absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
-            <path d="M12 5L12 19M12 19L6 13M12 19L18 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </motion.div>
-      </motion.section>
-      
-      {/* Trust Badges Section */}
-      <section className="py-12 bg-white border-b border-luxury-gold/10">
-        <div className="max-w-7xl mx-auto px-4">
-          <TrustBadges variant="compact" showAll={false} />
-        </div>
-      </section>
-      
-      {/* Featured Products Section - CAROUSEL */}
-      <section className="py-16 bg-luxury-ivory w-full">
-        <div className="max-w-7xl mx-auto px-4 w-full box-border">
-          <ScrollReveal>
-            <div className="text-center mb-12">
-              <Heading level="h2" className="text-3xl md:text-4xl mb-3 font-serif text-luxury-charcoal">
-                Featured Products
-              </Heading>
-              <div className="h-px w-24 bg-luxury-gold mx-auto mb-4"></div>
-            </div>
-          </ScrollReveal>
-          
-          {/* Products Carousel */}
-          <div className="relative">
-            {/* Carousel Container */}
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(-${(currentProductIndex * 100) / productsPerView}%)` }}
-              >
-                {featuredProducts.map((product, idx) => {
-                  // Generate fake low stock number for urgency
-                  const lowStockCount = ((product.id?.charCodeAt(0) || 0) % 7) + 2
-                  const showLowStock = (product.id?.charCodeAt(product.id.length - 1) || 0) % 10 < 7
-                  
-                  return (
-                  <div 
-                    key={`${product.id}-${idx}`} 
-                    className="group"
-                    style={{ minWidth: `${100 / productsPerView}%` }}
-                  >
-                    <div className="px-3 transition-all duration-300 hover:-translate-y-2">
-                      <div className="relative aspect-square overflow-hidden rounded-lg mb-4 shadow-md group-hover:shadow-xl transition-shadow duration-300">
-                        {/* Discount Badge - Top Left */}
-                        <div className="absolute top-3 left-3 z-20 transition-transform duration-300 group-hover:scale-105">
-                          <span className="bg-gradient-to-r from-luxury-gold to-yellow-600 px-2.5 py-1.5 text-white text-[10px] uppercase tracking-wider font-bold flex items-center shadow-lg rounded-sm">
-                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
-                            </svg>
-                            Save 20%
-                          </span>
-                        </div>
-                        
-                        {product.thumbnail ? (
-                          <div className="w-full h-full transition-transform duration-300 group-hover:scale-110">
-                            <Image
-                              src={product.thumbnail}
-                              alt={product.title}
-                              fill
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                              className="object-cover"
-                              onError={(e) => {
-                                // @ts-ignore - TypeScript doesn't know about currentTarget
-                                e.currentTarget.src = fallbackImage;
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                            <span className="text-gray-400">No image available</span>
-                          </div>
-                        )}
-                        <div 
-                          className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                        />
-                        <div 
-                          className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300"
-                        >
-                          <Link href={`/${countryCode}/products/${product.handle}`}>
-                            <AnimatedButton variant="gold" size="small" className="w-full">
-                              View Details
-                            </AnimatedButton>
-                          </Link>
-                        </div>
-                      </div>
-                      
-                      <div className="text-center">
-                        <Link href={`/${countryCode}/products/${product.handle}`} className="block group-hover:text-luxury-gold text-luxury-charcoal transition-colors mb-1">
-                          <h3 className="font-serif text-xl line-clamp-1">{product.title}</h3>
-                        </Link>
-                        
-                        {/* Add Reviews Rating */}
-                        <div className="flex justify-center mb-2">
-                          <ProductPreviewRating productId={product.id} />
-                        </div>
-                        
-                        {/* Low Stock Indicator */}
-                        {showLowStock && (
-                          <div className="flex items-center justify-center gap-1.5 mb-2">
-                            <svg className="w-3 h-3 text-orange-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-xs font-medium text-orange-600">
-                              Only {lowStockCount} left
-                            </span>
-                          </div>
-                        )}
-                        
-                        <div className="text-luxury-charcoal/90">
-                          {product.variants && product.variants[0] ? (
-                            <ProductPrice 
-                              product={product}
-                            />
-                          ) : (
-                            <span>Price not available</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )})}
-              </div>
-            </div>
-            
-            {/* Navigation buttons - only show if we have more products than visible */}
-            {featuredProducts.length > productsPerView && (
-              <>
-                <button 
-                  onClick={handlePrevProduct}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 lg:-translate-x-6 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
-                  aria-label="Previous product"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                
-                <button 
-                  onClick={handleNextProduct}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 lg:translate-x-6 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-luxury-gold hover:text-white transition-colors z-10"
-                  aria-label="Next product"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </>
-            )}
-            
-            {/* Pagination dots - show dots for each possible starting position */}
-            {featuredProducts.length > productsPerView && (
-              <div className="flex justify-center mt-8 gap-2">
-                {Array(Math.max(0, featuredProducts.length - productsPerView + 1)).fill(0).map((_, i) => (
-                  <button
-                    key={`dot-${i}`}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      currentProductIndex === i ? 'bg-luxury-gold scale-125' : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    onClick={() => {
-                      setCurrentProductIndex(i);
-                      setProductAutoRotate(false);
-                      if (productAutoRotateRef.current) {
-                        clearInterval(productAutoRotateRef.current);
-                      }
-                      setTimeout(() => setProductAutoRotate(true), 10000);
-                    }}
-                    aria-label={`Go to product position ${i + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-            
-            {/* View all button */}
-            <div className="text-center mt-10">
-              <Link href={`/${countryCode}/products`}>
-                <AnimatedButton variant="gold" size="medium">
-                  View All Products
-                </AnimatedButton>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Category Carousel Section */}
-      <CategoryCarousel categories={categories} countryCode={countryCode} />
+    <div className="w-full overflow-hidden bg-[#FAF8F5]">
+      {/* 1. Hero Banner */}
+      <HeroV2 countryCode={countryCode} />
 
-      {/* Commitment / Features Section removed per request */}
+      {/* 2. Social proof stats bar */}
+      <ProofBar />
+
+      {/* 3. Main Products Catalog (Centerpiece with filter tabs & instant Add to Cart) */}
+      <Bestsellers products={featuredProducts} countryCode={countryCode} region={region} />
+
+      {/* 4. Curated Collections & Story Chips */}
+      <CategoryStrip categories={categories} countryCode={countryCode} />
+
+      {/* 5. Why Choose Us editorial rows */}
+      <WhyUs />
+
+      {/* 6. Purity & Craft 4-step process */}
+      <Process />
+
+      {/* 7. Verified Customer reviews */}
+      <Reviews />
+
+      {/* 8. Festive & Corporate Gifting banner */}
+      <GiftingBanner countryCode={countryCode} />
+
+      {/* 9. Newsletter & Instant Contact */}
+      <Newsletter />
     </div>
   )
 }

@@ -270,18 +270,35 @@ export const getInitialProducts = cache(async (countryCode: string) => {
 export const getHomepageProducts = cache(async (countryCode: string) => {
   // Use hardcoded India region and fetch collection
   const region = getIndiaRegion()
-  const featuredCollection = await getCollectionByHandle("featured-products").catch(() => null)
 
-  if (!featuredCollection || !region) {
+  if (!region) {
     return { featuredProducts: [] }
   }
 
-  const { products: featuredProducts } = await getProducts(
-    { limit: 24, collection_id: [featuredCollection.id] } as any,
-    region.id
-  )
+  try {
+    const featuredCollection = await getCollectionByHandle("featured-products").catch(() => null)
 
-  return { featuredProducts }
+    if (featuredCollection) {
+      const { products: featuredProducts } = await getProducts(
+        { limit: 24, collection_id: [featuredCollection.id] } as any,
+        region.id
+      ).catch(() => ({ products: [] }))
+
+      if (featuredProducts && featuredProducts.length > 0) {
+        return { featuredProducts }
+      }
+    }
+
+    // Fallback: fetch active products so homepage always displays top products
+    const { products: featuredProducts } = await getProducts(
+      { limit: 24 } as any,
+      region.id
+    ).catch(() => ({ products: [] }))
+
+    return { featuredProducts: featuredProducts || [] }
+  } catch (e) {
+    return { featuredProducts: [] }
+  }
 })
 
 
@@ -302,22 +319,32 @@ export const getProductReviews = async ({
     ...(await getCacheOptions(`product-reviews-${productId}`)),
   }
 
-  return sdk.client.fetch<{
-    reviews: StoreProductReview[]
-    average_rating: number
-    limit: number
-    offset: number
-    count: number
-  }>(`/store/products/${productId}/reviews`, {
-    headers,
-    query: {
+  try {
+    return await sdk.client.fetch<{
+      reviews: StoreProductReview[]
+      average_rating: number
+      limit: number
+      offset: number
+      count: number
+    }>(`/store/products/${productId}/reviews`, {
+      headers,
+      query: {
+        limit,
+        offset,
+        order: "-created_at",
+      },
+      next,
+      cache: "force-cache",
+    })
+  } catch (err) {
+    return {
+      reviews: [],
+      average_rating: 5,
       limit,
       offset,
-      order: "-created_at",
-    },
-    next,
-    cache: "force-cache",
-  })
+      count: 0,
+    }
+  }
 }
 
 export const getProductReviewSummary = async (productId: string) => {

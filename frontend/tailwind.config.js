@@ -34,6 +34,21 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
+        // New B2C commercial design tokens
+        petha: {
+          cream:      "#FAF8F4",   // Page base bg
+          warm:       "#F2EDE4",   // Alternating section bg
+          amber:      "#D97706",   // Primary CTA, links
+          saffron:    "#F59E0B",   // Hover, badges
+          terracotta: "#C2410C",   // Sale badges, urgency
+          forest:     "#1E3A2F",   // Deep accent headings, announcement bar
+          slate:      "#1F2937",   // Body copy, nav
+          mist:       "#F9FAFB",   // Card backgrounds
+          gold:       "#B45309",   // Harmonised gold accent
+          border:     "#E8DDD0",   // Warm border color
+          text:       "#2D2013",   // Primary text - warm dark
+          subtle:     "#7C6B5A",   // Muted text
+        },
         luxury: {
           gold: "#F4C110",           // Vibrant golden accent used in the new design
           lightgold: "#FBE57F",     // Softer golden tint for subtle decorations
@@ -124,6 +139,25 @@ module.exports = {
         display: [
           "var(--font-playfair)",
           "serif",
+        ],
+        jakarta: [
+          "var(--font-jakarta)",
+          "var(--font-poppins)",
+          "sans-serif",
+        ],
+        cormorant: [
+          "var(--font-cormorant)",
+          "var(--font-dm-serif)",
+          "Georgia",
+          "serif",
+        ],
+        mono: [
+          "var(--font-jetbrains)",
+          "JetBrains Mono",
+          "Menlo",
+          "Monaco",
+          "Courier New",
+          "monospace",
         ],
       },
       keyframes: {

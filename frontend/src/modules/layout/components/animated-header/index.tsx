@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
+import Image from "next/image"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { clx } from "@medusajs/ui"
 import CartButton from "@modules/layout/components/cart-button"
@@ -64,6 +65,12 @@ const AnimatedHeader = () => {
 
   // Extract country code from pathname
   const countryCode = pathname?.split('/')[1] || 'us'
+  
+  // Hide store header & promotional marquee completely on checkout pages
+  const isCheckout = pathname?.includes('/checkout')
+  if (isCheckout) {
+    return null
+  }
 
   // Check if we're on the homepage (root country path)
   const isHomePage = pathname?.split('/').length === 2
@@ -77,22 +84,31 @@ const AnimatedHeader = () => {
     ["0px 0px 0px rgba(0,0,0,0)", "0px 6px 24px rgba(0,0,0,0.03), 0px 2px 8px rgba(212,175,55,0.1)"]
   )
 
-  // Header background: transparent on top of homepage, then solid black. All other pages solid black.
+  // Header background: clean light ivory/white across all pages
   const headerBg = useTransform(
     scrollY,
-    [0, 50],
-    isHomePage ? ["rgba(0,0,0,0)", "rgba(0,0,0,0.96)"] : ["rgb(0,0,0)", "rgb(0,0,0)"]
+    [0, 60],
+    isHomePage
+      ? ["rgba(255,253,249,0.9)", "rgba(255,253,249,0.98)"]
+      : ["rgba(255,253,249,0.98)", "rgba(255,253,249,0.98)"]
   )
+
+  // Nav link colors: slate-700 hover petha-amber everywhere
+  const navTextClass = "text-slate-700 hover:text-petha-amber font-jakarta font-semibold"
 
   // Default links so the header still renders without Tina
   const defaultNavLinks = [
-    { href: "/products", label: "Shop", testId: "nav-shop-link" },
-    { href: "/about", label: "About", testId: "nav-about-link" },
+    { href: "/products", label: "All Sweets", testId: "nav-shop-link" },
+    { href: "/products?category=petha", label: "Petha", testId: "nav-petha-link" },
+    { href: "/products?category=dalmoth", label: "Dalmoth", testId: "nav-dalmoth-link" },
+    { href: "/products?category=namkeen", label: "Namkeen", testId: "nav-namkeen-link" },
+    { href: "/about", label: "Our Story", testId: "nav-about-link" },
+    { href: "/blog", label: "Blog", testId: "nav-blog-link" },
   ]
 
   const defaultRightLinks = [
     { href: "/account", label: "Account", testId: "nav-account-link" },
-    { href: "/contact", label: "Contact", testId: "nav-contact-link" },
+    { href: "/contact", label: "Help", testId: "nav-contact-link" },
   ]
 
   const [navLinks] = useState(() => defaultNavLinks)
@@ -151,8 +167,8 @@ const AnimatedHeader = () => {
     setMobileMenuOpen(false)
   }
 
-  // Always use white text for the dark header
-  const getTextColor = () => "text-white"
+  // Text color for the header container — consistent slate-800 across all pages
+  const getTextColor = () => "text-slate-800"
 
   return (
     <>
@@ -160,26 +176,23 @@ const AnimatedHeader = () => {
       <AnimatePresence>
         {!bannerDismissed && (
           <motion.div
-            className="fixed top-0 inset-x-0 z-[50] bg-gradient-to-r from-luxury-charcoal via-black to-luxury-charcoal text-white h-12 flex items-center overflow-hidden border-b border-luxury-gold/40 shadow-lg"
+            className="fixed top-0 inset-x-0 z-[50] bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-white h-12 flex items-center overflow-hidden border-b border-amber-800/40 shadow-sm"
             initial={{ y: -48, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -48, opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
           >
-            {/* Animated background pattern */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-luxury-gold/10 to-transparent animate-pulse" />
-
             {/* Mobile optimized content */}
-            <div className="relative w-full px-2 sm:px-4">
+            <div className="relative w-full px-3 sm:px-6 pr-9 sm:pr-6">
               <div className="flex items-center justify-between max-w-7xl mx-auto">
-                {/* Left: Countdown Timer (Hidden on mobile) */}
+                {/* Left: Countdown Timer (Desktop) */}
                 <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs font-medium uppercase tracking-wide text-white/70">Next batch ships in:</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-200">Next batch ships:</span>
                   <CountdownTimer />
                 </div>
 
                 {/* Center: Scrolling Messages */}
-                <div className="flex-1 overflow-hidden mx-2 md:mx-4">
+                <div className="flex-1 overflow-hidden mx-1 md:mx-6">
                   <motion.div
                     className="flex whitespace-nowrap"
                     animate={{ x: [0, -1500] }}
@@ -187,41 +200,36 @@ const AnimatedHeader = () => {
                       x: {
                         repeat: Infinity,
                         repeatType: "loop",
-                        duration: 45,
+                        duration: 35,
                         ease: "linear",
                       },
                     }}
                   >
                     {[...Array(3)].map((_, repeatIndex) => (
-                      <div key={repeatIndex} className="flex">
+                      <div key={repeatIndex} className="flex items-center">
                         {promoMessages.map((message, index) => (
                           <span
                             key={`${repeatIndex}-${index}`}
-                            className="font-bold text-xs sm:text-sm text-luxury-gold px-6 flex items-center"
+                            className="font-jakarta font-bold text-xs sm:text-sm text-white px-4 sm:px-6 flex items-center gap-2"
                           >
-                            {message}
-                            <span className="text-luxury-gold/40 mx-6">•</span>
+                            <span>{message}</span>
+                            <span className="text-amber-300/60 mx-3">•</span>
                           </span>
                         ))}
                       </div>
                     ))}
                   </motion.div>
                 </div>
-
-                {/* Right: Countdown Timer for Mobile */}
-                <div className="flex md:hidden items-center gap-1 flex-shrink-0">
-                  <CountdownTimer inline className="text-xs text-luxury-gold" />
-                </div>
               </div>
             </div>
 
-            {/* Close button - Properly positioned */}
+            {/* Clean Close button */}
             <button
               onClick={handleBannerDismiss}
-              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-1.5 bg-luxury-gold/20 hover:bg-luxury-gold/40 rounded-full transition-all duration-200 z-10 border border-luxury-gold/30"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/30 hover:bg-black/50 rounded-full transition-all duration-200 z-10 text-white hover:text-amber-200 cursor-pointer"
               aria-label="Dismiss banner"
             >
-              <X width={12} height={12} className="text-luxury-gold transition-colors duration-200" />
+              <X width={14} height={14} className="text-white" />
             </button>
           </motion.div>
         )}
@@ -270,12 +278,14 @@ const AnimatedHeader = () => {
         className={clx(
           "fixed inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-visible",
           {
-            "border-b border-luxury-gold/10": isScrolled,
+            "border-b": isScrolled,
+            "border-petha-border": isScrolled && isHomePage,
+            "border-luxury-gold/10": isScrolled && !isHomePage,
             "backdrop-blur-sm": isScrolled,
           }
         )}
         style={{
-          top: bannerDismissed ? 0 : 40,
+          top: bannerDismissed ? 0 : 48,
           opacity: headerOpacity,
           scale: headerScale,
           boxShadow: headerShadow,
@@ -289,15 +299,11 @@ const AnimatedHeader = () => {
           delay: 0.1
         }}
       >
-        {/* Decorative gold gradient line that appears when scrolled */}
+        {/* Decorative accent line */}
         <motion.div
-          className={`
-        absolute top-0 left-0 right-0 h-[2px]
-        ${isScrolled
-              ? "bg-black opacity-100"       /* solid black at 100% when scrolled */
-              : "gold-gradient opacity-30"    /* your existing gold fade when at top */
-            }
-  `   }
+          className={`absolute top-0 left-0 right-0 h-[2px] ${
+            isHomePage ? "bg-petha-amber/30" : "gold-gradient opacity-30"
+          }`}
           initial={{ scaleX: 0, transformOrigin: "left" }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
@@ -316,106 +322,80 @@ const AnimatedHeader = () => {
 
         <div className={`w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 ${getTextColor()} h-full transition-all duration-300 box-border ${isScrolled ? "py-1 h-20" : "py-2 h-24"
           }`}>
-          <div className="w-full flex items-center justify-between h-full relative">
-            <div className="flex-1 basis-0 h-full flex items-center">
+          <div className="w-full flex items-center justify-between h-full relative gap-4">
+            
+            {/* Left: Logo */}
+            <div className="flex items-center flex-shrink-0">
               {/* Mobile menu button */}
-              <div className="small:hidden">
+              <div className="small:hidden mr-2">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className={`flex items-center text-sm font-medium tracking-wide group transition-colors duration-300 ${"text-white hover:text-luxury-gold"
-                    }`}
+                  className="p-1.5 rounded-lg transition-colors text-slate-800 hover:text-petha-amber"
                   aria-label="Open menu"
                 >
-                  <svg className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16"></path>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
                   </svg>
-                  <span className="sr-only small:not-sr-only">Menu</span>
                 </button>
               </div>
 
-              {/* Brand / Logo (shown on all sizes) */}
-              <LocalizedClientLink href="/" className="flex items-center gap-2 ml-2 small:ml-0 small:mr-10 group">
-                {/* Simple Taj Mahal outline icon – hide on smaller screens to save space */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="hidden small:block w-6 h-6 text-luxury-gold group-hover:scale-105 transition-transform"
-                >
-                  <path d="M12 2l2 2h4v4l2 2v10H4V10l2-2V4h4l2-2z" />
-                  <path d="M9 22V12h6v10" />
-                </svg>
-                <span className="font-serif text-xl small:text-2xl tracking-wide uppercase text-luxury-gold group-hover:text-white transition-colors whitespace-nowrap">
+              {/* Brand / Logo */}
+              <LocalizedClientLink href="/" className="flex items-center gap-2.5 group mr-4 lg:mr-8">
+                <Image
+                  src="/logo.webp"
+                  alt="Taj Petha Logo"
+                  width={36}
+                  height={36}
+                  className="w-8 h-8 small:w-9 small:h-9 object-contain group-hover:scale-105 transition-transform"
+                />
+                <span className="font-cormorant text-xl small:text-2xl tracking-wide uppercase font-bold text-slate-900 group-hover:text-petha-amber transition-colors whitespace-nowrap">
                   TAJ PETHA
                 </span>
               </LocalizedClientLink>
-
-              {/* Navigation links - desktop */}
-              <div className="hidden small:flex items-center gap-x-8 h-full">
-                {(navLinks || []).filter(l => l.href !== "/categories" && l.label?.toLowerCase() !== "categories").map((link, i) => {
-                  const isActive = pathname === link.href ||
-                    (link.href !== "/" && pathname?.startsWith(link.href))
-                  const isCategories = link.href === "/categories"
-
-                  return (
-                    <motion.div
-                      key={link.href}
-                      className="relative"
-                      whileHover="hover"
-                      variants={linkVariants}
-                    >
-                      <LocalizedClientLink
-                        className={`text-sm text-white hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap ${isActive ? "text-luxury-gold" : ""}`}
-                        href={link.href}
-                        data-testid={link.testId}
-                        onMouseEnter={() => {
-                          setHoveredLink(link.href)
-                          if (isCategories) setCategoryDropdownOpen(true)
-                        }}
-                        onMouseLeave={() => {
-                          setHoveredLink(null)
-                          if (isCategories) setCategoryDropdownOpen(false)
-                        }}
-                      >
-                        {link.label}
-                      </LocalizedClientLink>
-                      {(hoveredLink === link.href || isActive) && (
-                        <motion.div
-                          className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
-                          layoutId="underline"
-                          initial={{ width: 0, opacity: 0, left: "25%" }}
-                          animate={{ width: "100%", opacity: 1, left: 0 }}
-                          exit={{ width: 0, opacity: 0, left: "75%" }}
-                          transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
-                        />
-                      )}
-
-                      {/* Render category dropdown if this is the Categories link */}
-                      {isCategories && (
-                        <div className="relative">
-                          <CategoryDropdown
-                            countryCode={countryCode}
-                            isOpen={categoryDropdownOpen}
-                            onMouseEnter={() => setCategoryDropdownOpen(true)}
-                            onMouseLeave={() => setCategoryDropdownOpen(false)}
-                          />
-                        </div>
-                      )}
-                    </motion.div>
-                  )
-                })}
-              </div>
             </div>
 
-            {/* Right side items: Account, Cart, etc. */}
-            <div className="flex-1 basis-0 flex items-center justify-end gap-x-3 sm:gap-x-6">
-              {/* Search Bar - Added to desktop view */}
-              <div className="hidden small:block w-1/2 ml-8">
-                <Suspense fallback={<div className="h-9 w-full bg-white/10 rounded" />}>
+            {/* Center: Navigation links - desktop */}
+            <div className="hidden small:flex items-center gap-x-5 lg:gap-x-7 h-full flex-shrink-0">
+              {(navLinks || []).filter(l => l.href !== "/categories" && l.label?.toLowerCase() !== "categories").map((link) => {
+                const isActive = pathname === link.href ||
+                  (link.href !== "/" && pathname?.startsWith(link.href))
+
+                return (
+                  <motion.div
+                    key={link.href}
+                    className="relative"
+                    whileHover="hover"
+                    variants={linkVariants}
+                  >
+                    <LocalizedClientLink
+                      className={`text-xs lg:text-sm font-semibold font-jakarta transition-colors duration-200 tracking-wide py-2 whitespace-nowrap text-slate-800 hover:text-petha-amber ${isActive ? 'text-petha-amber font-bold' : ''}`}
+                      href={link.href}
+                      data-testid={link.testId}
+                      onMouseEnter={() => setHoveredLink(link.href)}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      {link.label}
+                    </LocalizedClientLink>
+                    {(hoveredLink === link.href || isActive) && (
+                      <motion.div
+                        className="absolute -bottom-1 left-0 w-full h-[2px] rounded-full bg-petha-amber"
+                        layoutId="underline"
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "100%", opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                      />
+                    )}
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Right: Search Bar + Account + Cart */}
+            <div className="flex items-center justify-end gap-x-3 sm:gap-x-5 flex-1 max-w-xl">
+              {/* Search Bar */}
+              <div className="hidden small:block w-full max-w-[280px] lg:max-w-[340px]">
+                <Suspense fallback={<div className="h-9 w-full bg-slate-100 rounded-full" />}>
                   <SearchBar
                     isHomePage={isHomePage}
                     isScrolled={isScrolled}
@@ -424,46 +404,30 @@ const AnimatedHeader = () => {
                 </Suspense>
               </div>
 
-              <div className="hidden small:flex items-center gap-x-6">
-                {rightLinks.map((link, i) => (
-                  <motion.div
+              {/* Account & Help links */}
+              <div className="hidden lg:flex items-center gap-x-4 flex-shrink-0">
+                {rightLinks.map((link) => (
+                  <LocalizedClientLink
                     key={link.href}
-                    className="relative"
-                    whileHover="hover"
-                    variants={linkVariants}
+                    className="text-xs font-semibold font-jakarta transition-colors duration-200 tracking-wide whitespace-nowrap text-slate-700 hover:text-petha-amber"
+                    href={link.href}
+                    data-testid={link.testId}
                   >
-                    <LocalizedClientLink
-                      className="text-sm text-white hover:text-luxury-gold transition-colors duration-200 tracking-wide py-2 whitespace-nowrap"
-                      href={link.href}
-                      data-testid={link.testId}
-                      onMouseEnter={() => setHoveredLink(link.href)}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
-                      {link.label}
-                    </LocalizedClientLink>
-                    {hoveredLink === link.href && (
-                      <motion.div
-                        className="absolute -bottom-0.5 left-0 w-full h-[1px] bg-luxury-gold"
-                        layoutId="navIndicator"
-                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                      />
-                    )}
-                  </motion.div>
+                    {link.label}
+                  </LocalizedClientLink>
                 ))}
               </div>
-
-              {/* Currency switcher removed */}
 
               {/* Mobile Search Icon */}
               <div className="small:hidden flex items-center">
                 <button
                   onClick={() => setMobileSearchOpen(true)}
-                  className="p-2 text-inherit hover:text-luxury-gold transition-colors"
+                  className="p-1.5 transition-colors text-slate-800 hover:text-petha-amber"
                   aria-label="Search"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-6 h-6 text-white"
+                    className="w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -474,12 +438,11 @@ const AnimatedHeader = () => {
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
-
                 </button>
               </div>
 
               {/* Cart */}
-              <div className="flex items-center">
+              <div className="flex items-center flex-shrink-0">
                 <CartDropdown />
               </div>
             </div>
@@ -527,7 +490,7 @@ const AnimatedHeader = () => {
               onClick={closeMobileMenu}
             />
             <motion.div
-              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-luxury-ivory z-[60] shadow-xl overflow-hidden"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-petha-cream z-[60] shadow-xl overflow-hidden"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -535,10 +498,10 @@ const AnimatedHeader = () => {
             >
               <div className="flex flex-col h-full w-full">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20 w-full">
-                  <h2 className="font-serif text-xl !text-luxury-charcoal">Menu</h2>
+                  <h2 className="font-cormorant text-xl font-semibold text-petha-text">Menu</h2>
                   <button
                     onClick={closeMobileMenu}
-                    className="p-2 !text-luxury-charcoal hover:text-luxury-gold transition-colors"
+                    className="p-2 text-petha-slate hover:text-petha-amber transition-colors"
                     aria-label="Close menu"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -559,7 +522,7 @@ const AnimatedHeader = () => {
                       >
                         <LocalizedClientLink
                           href={link.href}
-                          className="text-lg font-medium !text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                          className="text-lg font-jakarta font-medium text-petha-slate hover:text-petha-amber transition-colors duration-300"
                           onClick={closeMobileMenu}
                         >
                           {link.label}
@@ -578,7 +541,7 @@ const AnimatedHeader = () => {
                       >
                         <LocalizedClientLink
                           href={link.href}
-                          className="text-lg font-medium !text-luxury-charcoal hover:text-luxury-gold transition-colors duration-300"
+                          className="text-lg font-jakarta font-medium text-petha-slate hover:text-petha-amber transition-colors duration-300"
                           onClick={closeMobileMenu}
                         >
                           {link.label}

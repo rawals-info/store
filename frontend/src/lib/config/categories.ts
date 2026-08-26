@@ -17,7 +17,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   petha: {
     displayName: "Petha",
     handle: "petha",
-    imageSrc: "/images/petha.png",
+    imageSrc: "/hero_petha_square.webp",
   },
   namkeen: {
     displayName: "Namkeen",

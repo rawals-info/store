@@ -6,17 +6,20 @@ import { HttpTypes } from "@medusajs/types"
 import { cache } from "react"
 import { notFound } from "next/navigation"
 
+import { listIndiaRegions } from "@lib/constants/india-region"
+
 export const listRegions = cache(async () => {
-  return sdk.client.fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
-    method: "GET",
-    next: {
-      tags: ["regions"],
-    },
-  })
-    .then(({ regions }) => regions)
-    .catch((err) => {
-      throw new Error(err)
+  try {
+    return await sdk.client.fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
+      method: "GET",
+      next: {
+        tags: ["regions"],
+      },
     })
+      .then(({ regions }) => regions?.length ? regions : listIndiaRegions())
+  } catch (err) {
+    return listIndiaRegions()
+  }
 })
 
 export const retrieveRegion = cache(async (id: string) => {

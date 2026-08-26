@@ -12,6 +12,7 @@ import type { StoreProductReview } from "types/global"
 import FaqAccordion from "@components/FaqAccordion"
 import { getProductFaqs } from "@lib/faq/select"
 import { ProductTrustBadges } from "@components/TrustBadges"
+import Breadcrumb from "@modules/common/components/breadcrumb"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -111,83 +112,91 @@ export default async function ProductTemplate({
         }}
       />
       
-      <div
-        className="content-container py-12 px-4"
-        data-testid="product-container"
-      >
+      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-12">
+        <div
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          data-testid="product-container"
+        >
+          {/* Breadcrumbs */}
+          <Breadcrumb
+            items={[
+              { label: "All Sweets", href: `/${countryCode}/products` },
+              ...(product.categories?.[0]?.name
+                ? [{ label: product.categories[0].name, href: `/${countryCode}/products?category=${product.categories[0].handle}` }]
+                : []),
+              { label: product.title, isCurrent: true },
+            ]}
+            countryCode={countryCode}
+            className="mb-6 rounded-2xl border border-amber-100/90 shadow-xs"
+          />
 
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
-          {/* Left column - Image gallery */}
-          <div className="flex-1 w-full">
-            <Suspense fallback={
-              <div className="aspect-[29/36] w-full bg-gray-100 animate-pulse rounded-lg"></div>
-            }>
-              {/* If the product has no images array, fall back to its thumbnail so that the gallery is never empty */}
-              {(() => {
-                const galleryImages =
-                  product?.images && product.images.length > 0
-                    ? product.images
-                    : product.thumbnail
-                    ? [{ id: `${product.id}-thumbnail`, url: product.thumbnail }]
-                    : []
+          {/* Main Card */}
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+              {/* Left Column: Image Gallery */}
+              <div className="w-full">
+                <Suspense fallback={
+                  <div className="aspect-square w-full bg-amber-50 rounded-3xl animate-pulse" />
+                }>
+                  {(() => {
+                    const galleryImages =
+                      product?.images && product.images.length > 0
+                        ? product.images
+                        : product.thumbnail
+                        ? [{ id: `${product.id}-thumbnail`, url: product.thumbnail }]
+                        : []
 
-                return (
-                  <ImageGallery images={galleryImages} />
-                )
-              })()}
-            </Suspense>
+                    return (
+                      <ImageGallery images={galleryImages} />
+                    )
+                  })()}
+                </Suspense>
+              </div>
+              
+              {/* Right Column: Details & Fast Buy Actions */}
+              <div className="flex flex-col space-y-6">
+                <ProductInfo product={product} reviewData={reviewData} />
+                
+                <div className="pt-6 border-t border-slate-100">
+                  <ProductActions product={product} region={region} />
+                </div>
+                
+                {/* Trust Badges */}
+                <ProductTrustBadges className="mt-4" />
+              </div>
+            </div>
+          </div>
+
+          {/* Product FAQs */}
+          <section className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
+            <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70 mb-2">
+              Freshness &amp; Shipping
+            </span>
+            <h2 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <FaqAccordion faqs={faqs} />
+          </section>
+
+          {/* Reviews Section */}
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
+            <ProductReviews productId={product.id} />
           </div>
           
-          {/* Right column - Product info and actions */}
-          <div className="flex-1">
-            <ProductInfo product={product} reviewData={reviewData} />
-            
-            <div 
-              className="mt-8 pt-4 border-t border-luxury-gold/20"
-            >
-              {/* Directly render ProductActions without an extra server fetch */}
-              <ProductActions product={product} region={region} />
+          {/* Related Sweets & Snacks */}
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm" data-testid="related-products-container">
+            <div className="text-center mb-8">
+              <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70 mb-2">
+                Pair With Fresh Sweets
+              </span>
+              <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900">
+                You May Also Like
+              </h2>
             </div>
-            
-            {/* Trust Badges */}
-            <ProductTrustBadges className="mt-6" />
-            
-            {/* Craftmanship note */}
-            {isLimitedEdition && (
-              <div className="mt-6 py-4 px-5 bg-luxury-gold/10 border-l-2 border-luxury-gold">
-                <p className="text-sm text-luxury-charcoal/80 italic">
-                  <span className="font-semibold not-italic">Limited Edition:</span> This piece is part of a limited collection, with only a select number available. Each piece is individually numbered and comes with a certificate of authenticity.
-                </p>
-              </div>
-            )}
+            <Suspense fallback={<SkeletonRelatedProducts />}>
+              <RelatedProducts product={product} countryCode={countryCode} />
+            </Suspense>
           </div>
-        </div>
-
-      </div>
-
-      {/* Product FAQs */}
-      <section className="content-container my-10">
-        <h2 className="font-display text-2xl lg:text-3xl text-luxury-charcoal mb-4">Frequently Asked Questions</h2>
-        <div className="h-px w-24 bg-luxury-gold mb-6"></div>
-        <FaqAccordion faqs={faqs} />
-      </section>
-
-      <div className="content-container my-16 small:my-32">
-        <ProductReviews productId={product.id} />
-      </div>
-      
-      <div className="bg-luxury-cream/10 py-16">
-        <div
-          className="content-container"
-          data-testid="related-products-container"
-        >
-          <div className="text-center mb-12">
-            <h2 className="font-display text-2xl lg:text-3xl text-luxury-charcoal">You May Also Like</h2>
-            <div className="h-px w-24 bg-luxury-gold mx-auto mt-4"></div>
-          </div>
-          <Suspense fallback={<SkeletonRelatedProducts />}>
-            <RelatedProducts product={product} countryCode={countryCode} />
-          </Suspense>
         </div>
       </div>
       

@@ -1,23 +1,18 @@
 import { Metadata } from "next"
 import { searchProducts } from "@lib/data/search"
-import { getRegion } from "@lib/data/regions"
+import { listProducts } from "@lib/data/products"
 import { getIndiaRegion } from "@lib/constants/india-region"
 import { listCategories } from "@lib/data/categories"
 import { listTags } from "@lib/data/tags"
-import { StoreRegion } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import SearchResultsHeader from "@modules/search/components/search-results-header"
 import { Pagination } from "@modules/store/components/pagination"
-import ProductListSkeleton from "@modules/skeletons/components/product-list-skeleton"
-import { Suspense } from "react"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { Button } from "@medusajs/ui"
-import { redirect } from "next/navigation"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import { sdk } from "@lib/config"
+import Link from "next/link"
+import Breadcrumb from "@modules/common/components/breadcrumb"
+import { Search, Sparkles, ShoppingBag, ArrowRight } from "lucide-react"
 
-// Define a simpler category type
 type Category = {
   id: string
   name?: string
@@ -28,10 +23,10 @@ type Category = {
 }
 
 type SearchPageProps = {
-  params: {
+  params: Promise<{
     countryCode: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     q?: string
     page?: string
     sort?: string
@@ -39,280 +34,243 @@ type SearchPageProps = {
     tags?: string
     price_min?: string
     price_max?: string
-  }
+  }>
 }
 
-// Generate metadata server-side
-export async function generateMetadata({ 
-  params, 
-  searchParams 
-}: SearchPageProps): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
   const { q = "" } = await searchParams
-  
   return {
-    title: q ? `Search results for "${q}"` : "Search Results",
-    description: q ? `Find products matching "${q}"` : "Find products you're looking for",
+    title: q ? `Search Results for "${q}" | Taj Petha Agra` : "Search Authentic Agra Sweets | Taj Petha",
+    description: q ? `Browse authentic Agra petha and snacks matching "${q}".` : "Search our full handcrafted confectionery catalog.",
   }
 }
 
-// Lower limit to avoid over-fetching and reduce TTFB
-const PRODUCT_LIMIT = 32
+const PRODUCT_LIMIT = 24
 
-// Make each part of the page a separate component to avoid params access issues
-async function SearchContent({ 
-  countryCode,
-  query,
-  pageNum,
-  sort,
-  categories: categoryParam,
-  tags: tagParam,
-  price_min,
-  price_max
-}: { 
-  countryCode: string
-  query: string
-  pageNum: string
-  sort?: string
-  categories?: string
-  tags?: string
-  price_min?: string
-  price_max?: string
-}) {
-  const parsedPage = parseInt(pageNum, 10)
+const CATEGORY_TABS = [
+  { label: "✨ All Sweets", href: "/products" },
+  { label: "🍬 Agra Petha", href: "/products?category=petha" },
+  { label: "🥜 Royal Dalmoth", href: "/products?category=dalmoth" },
+  { label: "🌶️ Crispy Namkeen", href: "/products?category=namkeen" },
+  { label: "🎁 Sweet Gift Boxes", href: "/products?category=combo" },
+]
+
+export default async function SearchPage({ params, searchParams }: SearchPageProps) {
+  const { countryCode } = await params
+  const { q = "", page = "1", sort, categories: categoryParam, tags: tagParam, price_min, price_max } = await searchParams
+
+  const query = q.trim()
+  const parsedPage = parseInt(page, 10) || 1
   const offset = (parsedPage - 1) * PRODUCT_LIMIT
+  const region = getIndiaRegion()
 
-  // Fetch region, categories and tags concurrently to reduce total latency
-  const [categories, tags, region] = await Promise.all([
-    listCategories().catch((err) => {
-      console.error("Failed to load categories:", err)
-      return [] as Category[]
-    }),
-    listTags().catch((err) => {
-      console.error("Error fetching tags:", err)
-      return [] as any[]
-    }),
-    // Return hardcoded region as a resolved promise
-    Promise.resolve(getIndiaRegion())
-  ]) as [Category[], any[], StoreRegion | null]
+  // Fetch search results
+  let { products: searchHits, count } = await searchProducts({
+    query,
+    limit: PRODUCT_LIMIT,
+    offset,
+    countryCode,
+    filter: region ? { region_id: region.id } : {},
+  })
 
-  const topCategories = categories.slice(0, 4)
+  // Also fetch bestsellers if 0 results
+  let fallbackProducts: any[] = []
+  if (searchHits.length === 0) {
+    try {
+      const fallbackRes = await listProducts({
+        regionId: region.id,
+        queryParams: { limit: 8 },
+      })
+      fallbackProducts = fallbackRes.response.products || []
+    } catch (e) {}
+  }
 
-  if (!query) {
-    return (
-      <div className="py-10">
-        <div className="content-container">
-          <Suspense fallback={<div className="h-10 w-full bg-luxury-ivory/50 animate-pulse rounded" />}> 
-            <SearchResultsHeader query="" count={0} />
-          </Suspense>
-          <div className="flex flex-col items-center text-center py-12">
-            <h2 className="text-base-regular font-semibold mb-2">No search query</h2>
-            <p className="text-small-regular text-gray-700 mb-6">
-              Please enter a search term to find products
-            </p>
-            <LocalizedClientLink href="/">
-              <Button variant="secondary">Browse all products</Button>
-            </LocalizedClientLink>
+  // Fetch categories and tags for sidebar
+  const [categoriesList, tagsList] = await Promise.all([
+    listCategories().catch(() => [] as Category[]),
+    listTags().catch(() => [] as any[]),
+  ])
+
+  let products = searchHits
+
+  const hasPrice = (product: any): number => {
+    return product.variants?.[0]?.calculated_price?.calculated_amount || 0
+  }
+
+  if (categoryParam) {
+    const catIds = categoryParam.split(",")
+    products = products.filter((p) => p.categories?.some((c: any) => catIds.includes(c.id) || catIds.includes(c.handle)))
+  }
+
+  if (tagParam) {
+    const tagIds = tagParam.split(",")
+    products = products.filter((p) => p.tags?.some((t: any) => tagIds.includes(t.id)))
+  }
+
+  if (price_min || price_max) {
+    const min = price_min ? parseInt(price_min) : 0
+    const max = price_max ? parseInt(price_max) : Number.MAX_SAFE_INTEGER
+    products = products.filter((p) => {
+      const price = hasPrice(p)
+      return price >= min && price <= max
+    })
+  }
+
+  if (sort) {
+    if (sort === "price_asc") {
+      products = [...products].sort((a, b) => hasPrice(a) - hasPrice(b))
+    } else if (sort === "price_desc") {
+      products = [...products].sort((a, b) => hasPrice(b) - hasPrice(a))
+    } else if (sort === "alpha") {
+      products = [...products].sort((a, b) => a.title.localeCompare(b.title))
+    }
+  }
+
+  const prices = products.map((p) => hasPrice(p)).filter(p => p > 0)
+  const minPrice = prices.length ? Math.floor(Math.min(...prices)) : 0
+  const maxPrice = prices.length ? Math.ceil(Math.max(...prices)) : 1000
+
+  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+
+  return (
+    <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-12 font-jakarta">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* Search Header Banner */}
+        <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-8 shadow-sm space-y-4">
+          <Breadcrumb
+            items={[
+              { label: "Search", href: `/${countryCode}/search` },
+              ...(query ? [{ label: `"${query}"`, isCurrent: true }] : [{ label: "All Delicacies", isCurrent: true }]),
+            ]}
+            countryCode={countryCode}
+            className="p-0 bg-transparent border-0"
+          />
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-petha-amber block">
+                Storefront Search
+              </span>
+              <h1 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
+                {query ? `Search Results for "${query}"` : "Search Agra Sweets"}
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">
+                {products.length > 0
+                  ? `Showing ${products.length} matching delicacies found in our Agra kitchen.`
+                  : `No exact sweet matches found for "${query}".`}
+              </p>
+            </div>
+
+            {/* In-page search input */}
+            <form action={`/${countryCode}/search`} method="GET" className="w-full sm:w-80">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  name="q"
+                  defaultValue={query}
+                  placeholder="Search white petha, dalmoth, paan..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-petha-amber focus:bg-white transition-all"
+                />
+              </div>
+            </form>
+          </div>
+
+          {/* Quick Category Filter Pills */}
+          <div className="pt-4 border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {CATEGORY_TABS.map((tab) => (
+              <Link
+                key={tab.label}
+                href={`/${countryCode}${tab.href}`}
+                className="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-slate-50 hover:bg-petha-amber hover:text-white border border-slate-200 transition-all shadow-xs"
+              >
+                {tab.label}
+              </Link>
+            ))}
           </div>
         </div>
-      </div>
-    )
-  }
 
-  // region already fetched above; even if null, proceed with search
+        {/* Search Results Grid with Sidebar */}
+        <div className="flex flex-col small:flex-row small:items-start gap-8">
+          <RefinementList
+            sortBy={sort as SortOptions}
+            categories={categoriesList as any}
+            tags={tagsList}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+          />
 
-  try {    
-    const { products: fetchedProducts, count } = await searchProducts({
-      query,
-      limit: PRODUCT_LIMIT,
-      offset,
-      countryCode,
-      filter: region ? { region_id: region.id } : {},
-    })
-
-    // Apply filtering based on category, tag and price
-    let products = fetchedProducts
-
-    const hasPrice = (product: any): number => {
-      return product.variants?.[0]?.calculated_price?.calculated_amount || 0
-    }
-
-    if (categoryParam) {
-      const catIds = categoryParam.split(",")
-      products = products.filter((p) => p.categories?.some((c) => catIds.includes(c.id)))
-    }
-
-    if (tagParam) {
-      const tagIds = tagParam.split(",")
-      products = products.filter((p) => p.tags?.some((t) => tagIds.includes(t.id)))
-    }
-
-    if (price_min || price_max) {
-      const min = price_min ? parseInt(price_min) : 0
-      const max = price_max ? parseInt(price_max) : Number.MAX_SAFE_INTEGER
-      products = products.filter((p) => {
-        const price = hasPrice(p)
-        return price >= min && price <= max
-      })
-    }
-
-    if (sort) {
-      if (sort === "price_asc") {
-        products = [...products].sort((a, b) => {
-          const pa = hasPrice(a)
-          const pb = hasPrice(b)
-          return pa - pb
-        })
-      } else if (sort === "price_desc") {
-        products = [...products].sort((a, b) => {
-          const pa = hasPrice(a)
-          const pb = hasPrice(b)
-          return pb - pa
-        })
-      } else if (sort === "alpha") {
-        products = [...products].sort((a, b) => a.title.localeCompare(b.title))
-      }
-    }
-
-    // Fetch categories and tags for sidebar
-    let categoriesList: Category[] = []
-    let tagsList: any[] = []
-
-    try {
-      const [categoriesResponse, tagRes] = await Promise.all([
-        sdk.client.fetch<{ product_categories: any[] }>(
-          "/store/product-categories",
-          {
-            query: {
-              limit: 100,
-              fields: "*category_children,*parent_category",
-            },
-          }
-        ),
-        listTags(),
-      ])
-
-      categoriesList = categoriesResponse.product_categories || []
-      tagsList = tagRes
-    } catch (e) {
-      console.error("failed fetching categories/tags", e)
-    }
-
-    // Price range for slider
-    const prices = products.map((p) => hasPrice(p))
-    const minPrice = prices.length ? Math.min(...prices) : 0
-    const maxPrice = prices.length ? Math.max(...prices) : 0
-
-    // --- Trim categories / subcategories to those present in current result set ---
-    const productCategoryIds = new Set<string>()
-    products.forEach((p: any) => p.categories?.forEach((c: any) => productCategoryIds.add(c.id)))
-
-    if (productCategoryIds.size) {
-      const filterCats = (cats: Category[]): Category[] => {
-        return cats
-          .map((cat) => {
-            const child = cat.category_children as Category[] | undefined
-            const filteredChildren = child ? filterCats(child) : []
-            const includeSelf = productCategoryIds.has(cat.id) || filteredChildren.length
-            if (!includeSelf) return null
-            return { ...cat, category_children: filteredChildren } as Category
-          })
-          .filter(Boolean) as Category[]
-      }
-
-      categoriesList = filterCats(categoriesList)
-    }
-
-    const totalPages = Math.ceil(count / PRODUCT_LIMIT)
-
-    return (
-      <div className="py-10">
-        <div className="content-container grid grid-cols-1 lg:grid-cols-[270px_1fr] gap-8">
-          {/* Sidebar */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-20">
-              <RefinementList
-                sortBy={(sort || "created_at") as SortOptions}
-                categories={categoriesList as any}
-                tags={tagsList}
-                minPrice={minPrice}
-                maxPrice={maxPrice}
-                currencyCode={region?.currency_code || ""}
-                productCount={products.length}
-                region={region as any}
-                search
-              />
-            </div>
-          </aside>
-
-          {/* Main section */}
-          <div>
-            <Suspense fallback={<div className="h-10 w-full bg-luxury-ivory/50 animate-pulse rounded" />}> 
-              <SearchResultsHeader query={query} count={count} />
-            </Suspense>
-
-            {count > 0 ? (
+          <div className="flex-1 w-full min-w-0">
+            {products.length > 0 ? (
               <>
-                <Suspense fallback={<ProductListSkeleton count={PRODUCT_LIMIT} />}>
-                  <ul
-                    className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-4 gap-y-8 py-6"
-                    data-testid="search-results-list"
-                  >
-                    {products.map((product) => (
-                      <li key={product.id}>
-                        <Suspense fallback={<div className="aspect-[9/16] bg-luxury-ivory/50 rounded-sm animate-pulse"></div>}>
-                          <ProductPreview 
-                            product={product} 
-                            region={region as any} 
-                          />
-                        </Suspense>
-                      </li>
-                    ))}
-                  </ul>
-                </Suspense>
-                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {products.map((product) => (
+                    <ProductPreview
+                      key={product.id}
+                      product={product}
+                      region={region}
+                    />
+                  ))}
+                </div>
+
                 {totalPages > 1 && (
-                  <Pagination
-                    page={parsedPage}
-                    totalPages={totalPages}
-                    searchParams={new URLSearchParams(Object.entries({
-                      q: query,
-                      sort,
-                      categories: categoryParam,
-                      tags: tagParam,
-                      price_min,
-                      price_max
-                    }).filter(([, v]) => v) as any)}
-                  />
+                  <div className="pt-8">
+                    <Pagination
+                      page={parsedPage}
+                      totalPages={totalPages}
+                      searchParams={new URLSearchParams(Object.entries({
+                        q: query,
+                        sort,
+                        categories: categoryParam,
+                        tags: tagParam,
+                        price_min,
+                        price_max,
+                      }).filter(([, v]) => v) as any)}
+                    />
+                  </div>
                 )}
               </>
             ) : (
-              <div className="flex flex-col items-center text-center py-12">
-                <h2 className="text-base-regular font-semibold mb-2">No results found for "{query}"</h2>
-                <p className="text-small-regular text-gray-700 mb-6">
-                  Try different keywords or browse our collections
-                </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 w-full max-w-lg">
-                  <LocalizedClientLink href="/">
-                    <Button variant="secondary" className="w-full">Browse all products</Button>
-                  </LocalizedClientLink>
-                  <LocalizedClientLink href="/categories">
-                    <Button variant="secondary" className="w-full">View categories</Button>
-                  </LocalizedClientLink>
+              <div className="space-y-8">
+                {/* Friendly Empty Banner */}
+                <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-12 text-center space-y-4 shadow-sm">
+                  <div className="w-14 h-14 rounded-full bg-amber-100 text-petha-amber flex items-center justify-center mx-auto text-2xl shadow-xs">
+                    🔍
+                  </div>
+                  <h3 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900">
+                    No Exact Matches for "{query}"
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+                    We couldn't find sweets matching this exact keyword, but you might love these top-selling authentic Agra delicacies below!
+                  </p>
+                  <div>
+                    <Link
+                      href={`/${countryCode}/products`}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+                    >
+                      <span>Explore All Fresh Sweets</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
-                
-                {topCategories.length > 0 && (
-                  <div className="w-full max-w-lg">
-                    <h3 className="text-base-regular font-medium mb-4">Browse popular categories</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {topCategories.map((category) => (
-                        <LocalizedClientLink 
-                          key={category.id} 
-                          href={`/categories/${category.handle}`}
-                          className="text-sm py-2 px-4 border border-gray-200 hover:border-luxury-gold rounded-md transition-colors"
-                        >
-                          {category.name}
-                        </LocalizedClientLink>
+
+                {/* Bestseller Recommendations */}
+                {fallbackProducts.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-petha-amber" />
+                      <h4 className="font-cormorant text-2xl font-bold text-slate-900">
+                        Trending Royal Agra Delicacies
+                      </h4>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {fallbackProducts.map((p) => (
+                        <ProductPreview
+                          key={p.id}
+                          product={p}
+                          region={region}
+                        />
                       ))}
                     </div>
                   </div>
@@ -321,35 +279,8 @@ async function SearchContent({
             )}
           </div>
         </div>
-      </div>
-    )
-  } catch (error) {
-    console.error("Error during search:", error);
-    return (
-      <div className="py-10">
-        <div className="content-container">
-          <SearchResultsHeader query={query} count={0} />
-          <div className="flex flex-col items-center text-center py-12">
-            <h2 className="text-base-regular font-semibold mb-2">Something went wrong</h2>
-            <p className="text-small-regular text-gray-700 mb-6">
-              We encountered an issue with your search. Please try again later.
-            </p>
-            <LocalizedClientLink href="/">
-              <Button variant="secondary">Return to homepage</Button>
-            </LocalizedClientLink>
-          </div>
-        </div>
-      </div>
-    )
-  }
-}
 
-// Main page component that uses the search content component
-export default async function SearchPage({ params, searchParams }: SearchPageProps) {
-  const { countryCode } = await params
-  const { q = "", page = "1", sort, categories, tags, price_min, price_max } = await searchParams
-  const query = q
-  const pageNum = page
-  
-  return <SearchContent countryCode={countryCode} query={query} pageNum={pageNum} sort={sort} categories={categories} tags={tags} price_min={price_min} price_max={price_max} />
-} 
+      </div>
+    </div>
+  )
+}

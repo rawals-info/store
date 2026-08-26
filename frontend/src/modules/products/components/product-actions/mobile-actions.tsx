@@ -83,87 +83,51 @@ const MobileActions: React.FC<MobileActionsProps> = ({
           leaveTo="opacity-0"
         >
           <div
-            className="bg-white flex flex-col gap-y-3 justify-center items-center text-large-regular p-4 h-full w-full border-t border-gray-200"
+            className="bg-white/95 backdrop-blur-md shadow-2xl border-t border-amber-100 p-3.5 px-4 h-full w-full z-50 flex items-center justify-between gap-3"
             data-testid="mobile-actions"
           >
-            <div className="flex items-center gap-x-2">
-              <span data-testid="mobile-title">{product.title}</span>
-              <span>—</span>
+            {/* Price & Title on Left */}
+            <div className="flex-1 min-w-0">
+              <span className="font-cormorant text-base font-bold text-slate-900 truncate block">
+                {product.title}
+              </span>
               {selectedPrice ? (
-                <div className="flex items-end gap-x-2 text-ui-fg-base">
+                <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-petha-amber">
+                  <span>{selectedPrice.calculated_price}</span>
                   {selectedPrice.price_type === "sale" && (
-                    <p>
-                      <span className="line-through text-small-regular">
-                        {selectedPrice.original_price}
-                      </span>
-                    </p>
+                    <span className="line-through text-xs text-slate-400 font-normal">
+                      {selectedPrice.original_price}
+                    </span>
                   )}
-                  <span
-                    className={clx({
-                      "text-ui-fg-interactive":
-                        selectedPrice.price_type === "sale",
-                    })}
-                  >
-                    {selectedPrice.calculated_price}
-                  </span>
                 </div>
-              ) : (
-                <div></div>
-              )}
+              ) : null}
             </div>
-            
-            {/* Quantity selector */}
-            <div className="flex items-center mb-2">
-              <button 
-                className="w-8 h-8 flex items-center justify-center border border-luxury-charcoal/20 text-luxury-charcoal hover:bg-luxury-cream/50 transition-colors"
-                onClick={decrementQuantity}
-                disabled={quantity <= 1 || optionsDisabled || isAdding}
-              >
-                <span className="text-lg">−</span>
-              </button>
-              
-              <span className="w-12 text-center text-luxury-charcoal">{quantity}</span>
-              
-              <button 
-                className="w-8 h-8 flex items-center justify-center border border-luxury-charcoal/20 text-luxury-charcoal hover:bg-luxury-cream/50 transition-colors"
-                onClick={incrementQuantity}
-                disabled={quantity >= 10 || optionsDisabled || isAdding}
-              >
-                <span className="text-lg">+</span>
-              </button>
-            </div>
-            
-            <div className={clx("grid grid-cols-2 w-full gap-x-4", {
-              "!grid-cols-1": isSimple || product.variants?.length === 1
-            })}>
-              {!isSimple && product.variants && product.variants.length > 1 && <Button
-                onClick={open}
-                variant="secondary"
-                className="w-full"
-                data-testid="mobile-actions-button"
-              >
-                <div className="flex items-center justify-between w-full">
+
+            {/* Action Buttons on Right */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {!isSimple && product.variants && product.variants.length > 1 && (
+                <button
+                  type="button"
+                  onClick={open}
+                  className="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 font-jakarta text-xs font-semibold text-slate-700 flex items-center gap-1 cursor-pointer"
+                  data-testid="mobile-actions-button"
+                >
                   <span>
-                    {variant
-                      ? Object.values(options).join(" / ")
-                      : "Select Options"}
+                    {variant ? Object.values(options).join(" / ") : "Size"}
                   </span>
-                  <ChevronDown />
-                </div>
-              </Button>}
-              <Button
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              )}
+              
+              <button
+                type="button"
                 onClick={handleAddToCart}
                 disabled={Boolean(!inStock || (!variant && product.variants && product.variants.length > 1))}
-                className="w-full"
-                isLoading={isAdding}
+                className="px-5 py-2.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
                 data-testid="mobile-cart-button"
               >
-                {!variant && product.variants && product.variants.length > 1
-                  ? "Select variant"
-                  : !inStock
-                  ? "Out of stock"
-                  : `Add to cart (${quantity})`}
-              </Button>
+                {isAdding ? "Adding..." : !inStock ? "Sold Out" : "+ Add to Cart"}
+              </button>
             </div>
           </div>
         </Transition>

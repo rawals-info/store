@@ -485,37 +485,32 @@ export default async function Home({ params }: HomeProps) {
         countryCode={countryCode}
       />
 
-      {/* Quick links to all products (SEO: reduce orphans) */}
-      {featuredProducts && featuredProducts.length > 0 && (
-        <section className="py-10 bg-white">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-xl font-serif text-luxury-charcoal mb-4">Explore All Products</h2>
-            <div className="flex flex-wrap gap-3">
-              {featuredProducts.slice(0, 50).map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/${countryCode}/products/${p.handle}`}
-                  className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline"
-                >
-                  {p.title}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
-      {/* Major Cities we deliver to (SEO: give inlinks to city pages) */}
-      <section className="py-10 bg-luxury-ivory">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-xl font-serif text-luxury-charcoal mb-4">Fresh Petha Delivery in Major Cities</h2>
-          <div className="flex flex-wrap gap-3">
+      {/* Major Cities Delivery Section (Clean Commercial SEO Chips) */}
+      <section className="py-14 bg-[#FBF9F5] border-t border-amber-100/60" aria-label="City Delivery Locations">
+        <div className="max-w-7xl mx-auto px-5 lg:px-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
+            <div>
+              <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
+                Doorstep Express Delivery
+              </span>
+              <h2 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
+                Fresh Agra Petha Delivered to Your City
+              </h2>
+            </div>
+            <span className="font-jakarta text-xs font-semibold text-emerald-700 bg-emerald-100/70 px-3 py-1 rounded-full w-fit">
+              ✈️ 24-48 hr Express Air Shipping
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2.5">
             {MAJOR_INDIAN_CITIES.slice(0, 16).map((c) => (
               <Link
                 key={c.slug}
                 href={`/${countryCode}/city/${c.slug}`}
-                className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-amber-200/70 hover:border-petha-amber text-xs font-semibold text-slate-700 hover:text-petha-amber hover:shadow-sm transition-all duration-200 font-jakarta"
               >
+                <span className="text-amber-500">📍</span>
                 {c.name}
               </Link>
             ))}
@@ -523,16 +518,52 @@ export default async function Home({ params }: HomeProps) {
         </div>
       </section>
 
-      {/* From our blog (SEO: add canonical inlinks to articles) */}
-      <section className="py-10 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-xl font-serif text-luxury-charcoal mb-4">From Our Blog</h2>
-          <div className="flex flex-wrap gap-3">
-            <Link href={`/${countryCode}/blog/authentic-agra-petha-recipe`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Authentic Agra Petha Recipe</Link>
-            <Link href={`/${countryCode}/blog/health-benefits-petha-namkeen`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Health Benefits of Petha & Namkeen</Link>
-            <Link href={`/${countryCode}/blog/history-agra-petha-heritage`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">History of Agra Petha</Link>
-            <Link href={`/${countryCode}/blog/seasonal-namkeen-guide`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Seasonal Namkeen Guide</Link>
-            <Link href={`/${countryCode}/blog/preservation-techniques-traditional-sweets`} className="text-sm text-luxury-charcoal/80 hover:text-luxury-gold underline-offset-2 hover:underline">Traditional Preservation Techniques</Link>
+      {/* From our Sweet Heritage Blog */}
+      <section className="py-14 bg-white border-t border-slate-100" aria-label="Heritage & Guides">
+        <div className="max-w-7xl mx-auto px-5 lg:px-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
+                Agra Food Stories &amp; Guides
+              </span>
+              <h2 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
+                From Our Master Halwai Blog
+              </h2>
+            </div>
+            <Link
+              href={`/${countryCode}/blog`}
+              className="font-jakarta text-xs font-bold text-petha-amber hover:underline underline-offset-4 hidden sm:inline"
+            >
+              Read All Articles →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { title: "Authentic Agra Petha Recipe & Heritage", slug: "authentic-agra-petha-recipe", tag: "Tradition" },
+              { title: "Health Benefits of Winter Ash Gourd & Petha", slug: "health-benefits-petha-namkeen", tag: "Ayurveda & Health" },
+              { title: "History of Royal Agra Petha & The Mughal Kitchens", slug: "history-agra-petha-heritage", tag: "History" },
+              { title: "Seasonal Namkeen Guide & Festive Pairings", slug: "seasonal-namkeen-guide", tag: "Snacks Guide" },
+              { title: "Traditional Preservation Techniques for 30-Day Freshness", slug: "preservation-techniques-traditional-sweets", tag: "Freshness" },
+            ].map((article) => (
+              <Link
+                key={article.slug}
+                href={`/${countryCode}/blog/${article.slug}`}
+                className="group p-4 rounded-2xl bg-amber-50/40 border border-amber-100 hover:border-amber-300 hover:bg-amber-50 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+              >
+                <div>
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-petha-amber mb-2 font-jakarta bg-white px-2 py-0.5 rounded-md border border-amber-200/60">
+                    {article.tag}
+                  </span>
+                  <h3 className="font-cormorant text-lg font-bold text-slate-900 group-hover:text-petha-amber transition-colors leading-snug">
+                    {article.title}
+                  </h3>
+                </div>
+                <span className="text-xs font-semibold text-petha-amber mt-3 flex items-center gap-1 font-jakarta">
+                  Read Guide →
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

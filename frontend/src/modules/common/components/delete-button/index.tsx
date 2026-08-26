@@ -88,11 +88,9 @@ const DeleteButton = ({
         {isDeleting ? (
           <Spinner className="animate-spin w-4 h-4" />
         ) : (
-          <Trash className="w-4 h-4" />
+          children || <Trash className="w-4 h-4" />
         )}
-        <span className="select-none">
-          {isDeleting ? "Removing..." : children}
-        </span>
+        {isDeleting && <span className="select-none text-xs">Removing...</span>}
       </button>
       
       {/* ✅ Show error message with retry option */}

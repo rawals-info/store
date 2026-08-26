@@ -1,301 +1,227 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { listCategories } from "@lib/data/categories"
-import { listCollections } from "@lib/data/collections"
-import { Text, clx } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import RegionSelector from "@modules/layout/components/region-selector"
-import { listRegions } from "@lib/data/regions"
-import { listIndiaRegions } from "@lib/constants/india-region"
-// Currency switcher removed
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faCcVisa,
   faCcMastercard,
   faCcAmex,
-  faPaypal,
 } from "@fortawesome/free-brands-svg-icons"
 
-export default function Footer() {
-  const [collections, setCollections] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [regions, setRegions] = useState<any[]>([])
-  const [email, setEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [companyName, setCompanyName] = useState("TAJ PETHA")
-  const [companyDescription, setCompanyDescription] = useState("Authentic Agra Petha crafted in small batches since 2013. Fragrant, melt-in-the-mouth bites steeped in heritage.")
-  const defaultSocial: { platform: string; href: string }[] = [
-    { platform: "Instagram", href: "https://www.instagram.com/tajpethaagra" },
-    { platform: "Facebook", href: "https://facebook.com/tajpethaagra" },
-  ]
-  const [socialLinks, setSocialLinks] = useState<{ platform: string; href: string }[]>(defaultSocial)
+const SHOP_LINKS = [
+  { href: "/products?category=petha", label: "Petha" },
+  { href: "/products?category=namkeen", label: "Namkeen" },
+  { href: "/products?category=dalmoth", label: "Dalmoth" },
+  { href: "/products", label: "View All Sweets" },
+]
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const collectionsData = await listCollections({
-        fields: "*products",
-      })
-      setCollections(collectionsData.collections || [])
-      
-      const categoriesData = await listCategories()
-      setCategories(categoriesData || [])
-      
-      const regionsData = listIndiaRegions()
-      setRegions(regionsData || [])
-    }
-    
-    fetchData()
-  }, [])
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsSubmitted(true)
-      setEmail("")
-      
-      // Reset success message after 5 seconds
-      setTimeout(() => {
-        setIsSubmitted(false)
-      }, 5000)
-    }, 1000)
-  }
-  
-  // Animation variants
-  const containerVariants: any = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
-  }
-  
-  const itemVariants: any = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-    }
+const COMPANY_LINKS = [
+  { href: "/about", label: "About Us" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
+]
+
+const SUPPORT_LINKS = [
+  { href: "/shipping", label: "Shipping" },
+  { href: "/returns", label: "Returns & Refunds" },
+  { href: "/faqs", label: "FAQs" },
+  { href: "/terms", label: "Terms & Conditions" },
+  { href: "/privacy", label: "Privacy Policy" },
+]
+
+const SOCIALS = [
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/tajpethaagra",
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+      </svg>
+    ),
+  },
+  {
+    label: "Facebook",
+    href: "https://facebook.com/tajpethaagra",
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+      </svg>
+    ),
+  },
+  {
+    label: "WhatsApp",
+    href: "https://wa.me/919259418994",
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+      </svg>
+    ),
+  },
+]
+
+function FooterCol({ heading, links }: { heading: string; links: { href: string; label: string }[] }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <span className="font-jakarta text-xs font-bold uppercase tracking-[0.18em] text-petha-text">
+        {heading}
+      </span>
+      <ul className="flex flex-col gap-3">
+        {links.map(l => (
+          <li key={l.href}>
+            <LocalizedClientLink
+              href={l.href}
+              className="font-jakarta text-sm text-petha-subtle hover:text-petha-amber transition-colors duration-200"
+            >
+              {l.label}
+            </LocalizedClientLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+import { usePathname } from "next/navigation"
+
+export default function Footer() {
+  const pathname = usePathname()
+  if (pathname?.includes('/checkout')) {
+    return null
   }
 
   return (
-    <footer className="w-full bg-black text-white">
-      {/* Decorative gold pattern removed */}
-      
-      {/* Features section – use the same ivory tone as the page background */}
-      <div className="py-12 bg-luxury-ivory">
-        <div className="content-container">
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={containerVariants}
-          >
-            <motion.div 
-              className="flex flex-col items-center text-center"
-              variants={itemVariants}
-            >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">🥄</div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Artisanal Small Batches</h3>
-              <p className="text-luxury-charcoal/80 text-sm">We cook each batch slowly for melt-in-the-mouth texture.</p>
-            </motion.div>
-            
-            <motion.div 
-              className="flex flex-col items-center text-center"
-              variants={itemVariants}
-            >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">🌱</div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Pure Ingredients</h3>
-              <p className="text-luxury-charcoal/80 text-sm">Only farm-fresh ash gourd, cane sugar & rose water.</p>
-            </motion.div>
-            
-            <motion.div 
-              className="flex flex-col items-center text-center"
-              variants={itemVariants}
-            >
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center mb-4 text-2xl">📦</div>
-              <h3 className="font-serif text-lg mb-2 text-luxury-charcoal">Nationwide Fresh Delivery</h3>
-              <p className="text-luxury-charcoal/80 text-sm">Vacuum-sealed & white-glove packaging for perfect delivery.</p>
-            </motion.div>
-          </motion.div>
+    <footer className="w-full bg-petha-warm border-t border-petha-border" aria-label="Site footer">
+
+      {/* Pre-footer trust strip */}
+      <div className="border-b border-petha-border bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 lg:px-10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+            {[
+              { icon: "🌱", heading: "100% Vegetarian", sub: "No animal-derived ingredients, ever" },
+              { icon: "🛡️", heading: "FSSAI Certified", sub: "Safe, hygienic, government approved" },
+              { icon: "📦", heading: "Vacuum Sealed", sub: "Freshness locked in for 30+ days" },
+              { icon: "🚚", heading: "Pan-India Delivery", sub: "All 28 states in 24–48 hours" },
+            ].map(item => (
+              <div key={item.heading} className="flex flex-col items-center text-center gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-petha-warm flex items-center justify-center text-2xl border border-petha-border">
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="font-jakarta text-sm font-semibold text-petha-text">{item.heading}</p>
+                  <p className="font-jakarta text-xs text-petha-subtle mt-0.5 leading-snug">{item.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      
-      <div className="content-container flex flex-col w-full">
-        <div className="flex flex-col gap-y-12 xsmall:flex-row items-start justify-between py-16">
-          <div className="flex flex-col items-start">
-            <LocalizedClientLink
-              href="/"
-              className="font-serif text-2xl text-luxury-gold mb-4 relative group"
-            >
-              <span>{companyName}</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-500 ease-in-out"></span>
+
+      {/* Main footer body */}
+      <div className="max-w-7xl mx-auto px-5 lg:px-10 py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-12">
+
+          {/* Brand column */}
+          <div className="flex flex-col gap-6">
+            <LocalizedClientLink href="/" className="flex items-center gap-2.5 group w-fit">
+              <Image
+                src="/logo.webp"
+                alt="Taj Petha Logo"
+                width={36}
+                height={36}
+                className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
+              />
+              <span className="font-cormorant text-2xl font-semibold text-petha-text group-hover:text-petha-amber transition-colors tracking-wide">
+                TAJ PETHA
+              </span>
             </LocalizedClientLink>
-            
-            <p className="text-white/80 max-w-xs mb-6">
-              {companyDescription}
+
+            <p className="font-jakarta text-sm text-petha-subtle leading-relaxed max-w-xs">
+              Authentic Agra Petha crafted in small batches since 2013. Fragrant, melt-in-the-mouth bites steeped in heritage — delivered fresh to your door.
             </p>
-            
-            <div className="flex space-x-4 mb-8">
-              {socialLinks.map((social: { platform: string; href: string }) => {
-                const platform = social.platform || "Social"
-                return (
-                  <a 
-                    key={platform}
-                    href={social.href || "#"} 
-                    className="text-white hover:text-luxury-gold transition-colors duration-300 relative group"
-                    aria-label={platform}
-                  >
-                    <span className="sr-only">{platform}</span>
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      {platform === "Instagram" && (
-                        <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                      )}
-                      {platform === "Facebook" && (
-                        <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
-                      )}
-                    </svg>
-                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
-                  </a>
-                )
-              })}
+
+            {/* Social links */}
+            <div className="flex items-center gap-3">
+              {SOCIALS.map(s => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="w-10 h-10 rounded-full border border-petha-border flex items-center justify-center text-petha-subtle hover:text-petha-amber hover:border-petha-amber transition-all duration-200 bg-white"
+                >
+                  {s.icon}
+                </a>
+              ))}
+            </div>
+
+            {/* Contact info */}
+            <div className="flex flex-col gap-2">
+              <a
+                href="https://wa.me/919259418994"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 font-jakarta text-sm text-petha-subtle hover:text-petha-amber transition-colors"
+              >
+                <svg className="w-4 h-4 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                +91 92594 18994
+              </a>
+              <a
+                href="mailto:support@tajpetha.in"
+                className="inline-flex items-center gap-2 font-jakarta text-sm text-petha-subtle hover:text-petha-amber transition-colors"
+              >
+                <svg className="w-4 h-4 text-petha-amber" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                support@tajpetha.in
+              </a>
             </div>
           </div>
-          
-          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-1 sm:grid-cols-3">
-            <div className="flex flex-col gap-y-3">
-              <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                Shop
-              </span>
-              <ul className="grid grid-cols-1 gap-2 text-white">
-                <li>
-                  <LocalizedClientLink href="/categories/petha" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Petha
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/categories/namkeen" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Namkeen
-                  </LocalizedClientLink>
-                </li>
-                {/* <li>
-                  <LocalizedClientLink href="/categories/combo" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Combo
-                  </LocalizedClientLink>
-                </li> */}
-                <li>
-                  <LocalizedClientLink href="/categories/gift-basket" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Gift Basket
-                  </LocalizedClientLink>
-                </li>
-              </ul>
-            </div>
-            
-            <div className="flex flex-col gap-y-3">
-              <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                Company
-              </span>
-              <ul className="grid grid-cols-1 gap-2">
-                <li>
-                  <LocalizedClientLink href="/about" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    About
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/blog" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Blog
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/contact" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Contact
-                  </LocalizedClientLink>
-                </li>
-              </ul>
-            </div>
-            
-            <div className="flex flex-col gap-y-3">
-              <span className="font-serif text-base text-luxury-gold border-b border-luxury-gold/20 pb-1 mb-2">
-                Support
-              </span>
-              <ul className="grid grid-cols-1 gap-2">
-                <li>
-                  <LocalizedClientLink href="/shipping" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Shipping
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/returns" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Returns
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/faqs" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    FAQs
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/terms" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Terms & Conditions
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink href="/privacy" className="text-white hover:text-luxury-gold transition-colors duration-300">
-                    Privacy Policy
-                  </LocalizedClientLink>
-                </li>
-              </ul>
-            </div>
-          </div>
+
+          {/* Nav columns */}
+          <FooterCol heading="Shop" links={SHOP_LINKS} />
+          <FooterCol heading="Company" links={COMPANY_LINKS} />
+          <FooterCol heading="Support" links={SUPPORT_LINKS} />
         </div>
       </div>
-      
-      <div className="border-t border-luxury-lightgold/20 py-6 px-4 sm:px-8 overflow-x-auto">
-        <div className="content-container flex flex-col-reverse gap-y-4 xsmall:flex-row items-center justify-between min-w-max">
-          <div className="text-small-regular text-white/60 flex flex-col gap-1">
-            <span>© 2025 Taj Petha. All rights reserved.</span>
-            <span className="flex items-center gap-1.5 mt-1">
-              Designed & Developed with 
-              <motion.span 
-                animate={{ scale: [1, 1.2, 1] }} 
-                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} 
-                className="text-red-500 inline-block"
-              >
-                ❤️
-              </motion.span> 
-              by 
-              <a 
-                href="https://www.mimctechnologies.com/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-white hover:text-luxury-gold transition-colors duration-300 font-medium relative group"
+
+      {/* Bottom bar */}
+      <div className="border-t border-petha-border py-5">
+        <div className="max-w-7xl mx-auto px-5 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3">
+            <span className="font-jakarta text-xs text-petha-subtle">
+              © {new Date().getFullYear()} Taj Petha. All rights reserved.
+            </span>
+            <span className="hidden sm:block text-petha-border">·</span>
+            <span className="font-jakarta text-xs text-petha-subtle flex items-center gap-1.5">
+              Designed &amp; built with{" "}
+              <motion.span
+                animate={{ scale: [1, 1.25, 1] }}
+                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                className="inline-block"
+              >❤️</motion.span>{" "}
+              by{" "}
+              <a
+                href="https://www.mimctechnologies.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-petha-amber hover:underline"
               >
                 MIMC Technologies
-                <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-luxury-gold group-hover:w-full transition-all duration-300 ease-in-out"></span>
               </a>
             </span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {/* Currency switcher removed */}
-            <div className="hidden xsmall:block h-6 w-px bg-luxury-lightgold/20"></div>
-            <div className="flex items-center gap-x-4 text-2xl text-white opacity-80">
-              <FontAwesomeIcon icon={faCcVisa} />
-              <FontAwesomeIcon icon={faCcMastercard} />
-              <FontAwesomeIcon icon={faCcAmex} />
-              <Image src="/payment-icons/upi.svg" alt="UPI" width={48} height={24} />
-            </div>
+
+          {/* Payment icons */}
+          <div className="flex items-center gap-3 text-petha-subtle">
+            <FontAwesomeIcon icon={faCcVisa} className="text-2xl opacity-60 hover:opacity-100 transition-opacity" />
+            <FontAwesomeIcon icon={faCcMastercard} className="text-2xl opacity-60 hover:opacity-100 transition-opacity" />
+            <FontAwesomeIcon icon={faCcAmex} className="text-2xl opacity-60 hover:opacity-100 transition-opacity" />
+            <Image src="/payment-icons/upi.svg" alt="UPI" width={40} height={20} className="opacity-60 hover:opacity-100 transition-opacity" />
           </div>
         </div>
       </div>
