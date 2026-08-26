@@ -12,33 +12,33 @@ export const metadata: Metadata = {
 
 export default function ShippingPage() {
   return (
-    <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16 font-jakarta">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
         
         {/* Header */}
-        <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-12 shadow-sm text-center">
+        <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs text-center">
           <Breadcrumb
             items={[{ label: "Shipping & Delivery Policy", isCurrent: true }]}
             countryCode="in"
-            className="p-0 bg-transparent border-0 mb-6 justify-center"
+            className="p-0 bg-transparent border-0 mb-3 justify-center"
           />
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-bold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-[11px] font-bold uppercase tracking-wider mb-3">
             <Truck className="w-3.5 h-3.5 text-petha-amber" />
             <span>Pan-India Air Express Logistics</span>
           </div>
 
-          <h1 className="font-cormorant text-4xl sm:text-5xl font-bold text-slate-900 leading-tight">
+          <h1 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 leading-tight">
             Shipping &amp; Fresh Delivery Policy
           </h1>
 
-          <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto">
             Packed fresh daily in Agra and delivered to your doorstep in sealed, food-grade packaging.
           </p>
         </div>
 
         {/* Content Card */}
-        <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-12 shadow-sm space-y-8 text-sm sm:text-base text-slate-700 leading-relaxed">
+        <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-8 shadow-xs space-y-6 text-sm sm:text-base text-slate-700 leading-relaxed">
           
           {/* Quick Perks */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-8 border-b border-slate-100">

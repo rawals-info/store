@@ -84,7 +84,7 @@ export default function CityLandingClient({
       />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-amber-50/80 via-white to-[#FAF8F5] py-12 sm:py-20 border-b border-amber-100/60">
+      <section className="relative overflow-hidden bg-gradient-to-b from-amber-50/80 via-white to-[#FAF8F5] py-8 sm:py-12 border-b border-amber-100/60">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
@@ -194,13 +194,13 @@ export default function CityLandingClient({
       </section>
 
       {/* Main Sweet Menu & Instant Quick Buy Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
           <div>
             <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
               Popular in {city.name}
             </span>
-            <h2 className="font-cormorant text-3xl sm:text-5xl font-bold text-slate-900 mt-1">
+            <h2 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 mt-1">
               Top Agra Delicacies Ordered by {city.name} Residents
             </h2>
           </div>
@@ -283,50 +283,50 @@ export default function CityLandingClient({
       </section>
 
       {/* Why Choose Section for This City */}
-      <section className="py-16 bg-white border-t border-b border-amber-100">
+      <section className="py-8 sm:py-12 bg-white border-t border-b border-amber-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+          <div className="text-center max-w-3xl mx-auto mb-8 space-y-2">
             <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
               The Royal Agra Standard
             </span>
-            <h2 className="font-cormorant text-3xl sm:text-5xl font-bold text-slate-900">
+            <h2 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900">
               Why Sweet Lovers in {city.name} Choose Taj Petha
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#FFFDF9] rounded-3xl p-8 border border-amber-100/90 shadow-sm space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100/90 flex items-center justify-center text-petha-amber">
-                <Award className="w-7 h-7" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#FFFDF9] rounded-3xl p-6 border border-amber-100/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/90 flex items-center justify-center text-petha-amber">
+                <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-cormorant text-2xl font-bold text-slate-900">
+              <h3 className="font-cormorant text-xl font-bold text-slate-900">
                 100% Traditional Agra Halwai Recipe
               </h3>
-              <p className="font-jakarta text-sm text-slate-600 leading-relaxed">
+              <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
                 Handcrafted using heirloom recipes dating back to the Mughal era. Made with fresh ash gourd fruit, pure desi sugar syrup, and real Kashmiri saffron.
               </p>
             </div>
 
-            <div className="bg-[#FFFDF9] rounded-3xl p-8 border border-amber-100/90 shadow-sm space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100/90 flex items-center justify-center text-petha-amber">
-                <ShieldCheck className="w-7 h-7" />
+            <div className="bg-[#FFFDF9] rounded-3xl p-6 border border-amber-100/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/90 flex items-center justify-center text-petha-amber">
+                <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="font-cormorant text-2xl font-bold text-slate-900">
+              <h3 className="font-cormorant text-xl font-bold text-slate-900">
                 0% Chemical Preservatives
               </h3>
-              <p className="font-jakarta text-sm text-slate-600 leading-relaxed">
+              <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
                 Unlike mass-market supermarket sweets, our products contain no artificial sweeteners or preservatives. Pure, healthy, and 100% vegetarian.
               </p>
             </div>
 
-            <div className="bg-[#FFFDF9] rounded-3xl p-8 border border-amber-100/90 shadow-sm space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100/90 flex items-center justify-center text-petha-amber">
-                <Truck className="w-7 h-7" />
+            <div className="bg-[#FFFDF9] rounded-3xl p-6 border border-amber-100/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/90 flex items-center justify-center text-petha-amber">
+                <Truck className="w-6 h-6" />
               </div>
-              <h3 className="font-cormorant text-2xl font-bold text-slate-900">
+              <h3 className="font-cormorant text-xl font-bold text-slate-900">
                 {city.deliveryTime} Express Air Freight
               </h3>
-              <p className="font-jakarta text-sm text-slate-600 leading-relaxed">
+              <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
                 Direct air delivery ensures that the sweet box arriving at your door in {city.name} was made in Agra just hours earlier.
               </p>
             </div>
@@ -335,17 +335,17 @@ export default function CityLandingClient({
       </section>
 
       {/* City FAQs Section */}
-      <section className="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 space-y-2">
+      <section className="py-8 sm:py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8 space-y-1.5">
           <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
             Frequently Asked Questions
           </span>
-          <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900">
+          <h2 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900">
             Agra Petha Delivery in {city.name}
           </h2>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {cityFaqs.map((faq, index) => {
             const isOpen = openFaqIndex === index
 
@@ -357,7 +357,7 @@ export default function CityLandingClient({
                 <button
                   type="button"
                   onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                  className="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-jakarta text-sm sm:text-base font-bold text-slate-900 hover:text-petha-amber transition-colors cursor-pointer"
+                  className="w-full px-5 py-3.5 text-left flex items-center justify-between gap-4 font-jakarta text-sm sm:text-base font-bold text-slate-900 hover:text-petha-amber transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
@@ -373,7 +373,7 @@ export default function CityLandingClient({
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="px-6 pb-5 font-jakarta text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3"
+                      className="px-5 pb-4 font-jakarta text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-2.5"
                     >
                       {faq.a}
                     </motion.div>
@@ -386,7 +386,7 @@ export default function CityLandingClient({
       </section>
 
       {/* Explore Other Delivery Cities */}
-      <section className="py-14 bg-[#FBF9F5] border-t border-amber-100/70">
+      <section className="py-8 sm:py-10 bg-[#FBF9F5] border-t border-amber-100/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-cormorant text-2xl font-bold text-slate-900">

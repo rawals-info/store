@@ -135,7 +135,7 @@ const CartClientWrapper = ({
   }
 
   return (
-    <div className="py-10 lg:py-16 bg-[#FAF8F5]">
+    <div className="py-6 sm:py-10 bg-[#FAF8F5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-testid="cart-container">
         
         {/* Breadcrumb Navigation */}

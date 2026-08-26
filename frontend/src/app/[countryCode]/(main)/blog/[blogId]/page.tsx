@@ -107,8 +107,8 @@ export default async function BlogPost({ params }: BlogPostProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16 font-jakarta">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
           
           {/* Breadcrumb Navigation */}
           <Breadcrumb
@@ -121,16 +121,16 @@ export default async function BlogPost({ params }: BlogPostProps) {
           />
 
           {/* Main Article Header Card */}
-          <article className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-12 shadow-sm space-y-8">
+          <article className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-8 shadow-xs space-y-6">
             
             {/* Meta tags */}
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-bold uppercase tracking-wider">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-[11px] font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
                 <span>{post.category}</span>
               </div>
 
-              <h1 className="font-cormorant text-3xl sm:text-5xl font-bold text-slate-900 leading-tight">
+              <h1 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 leading-tight">
                 {post.title}
               </h1>
 

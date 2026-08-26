@@ -121,8 +121,8 @@ export default function ContactPage({ params }: ContactPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdContact) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16 font-jakarta">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
           
           {/* Breadcrumb Navigation */}
           <Breadcrumb
@@ -132,27 +132,27 @@ export default function ContactPage({ params }: ContactPageProps) {
           />
 
           {/* Header */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-12 shadow-sm text-center relative overflow-hidden">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-bold uppercase tracking-wider mb-4">
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs text-center relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-[11px] font-bold uppercase tracking-wider mb-2.5">
               <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
               <span>Dedicated Agra Sweet Concierge</span>
             </div>
 
-            <h1 className="font-cormorant text-4xl sm:text-6xl font-bold text-slate-900 leading-tight">
+            <h1 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 leading-tight">
               Get in Touch with Taj Petha
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
               Have questions regarding our fresh daily batches, wedding hampers, corporate bulk orders, or your current delivery? Our Agra team is ready to assist you.
             </p>
 
             {/* Quick Action Chips */}
-            <div className="flex flex-wrap justify-center gap-3 mt-8">
+            <div className="flex flex-wrap justify-center gap-2.5 mt-5">
               <a
                 href="https://wa.me/919259418994?text=Hello%20Taj%20Petha%2C%20I%20have%20an%20inquiry%20about%20your%20sweets."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
               >
                 <MessageSquare className="w-4 h-4" />
                 <span>Instant WhatsApp Support</span>
@@ -160,7 +160,7 @@ export default function ContactPage({ params }: ContactPageProps) {
 
               <a
                 href="tel:+919259418994"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
               >
                 <Phone className="w-4 h-4" />
                 <span>Call +91 92594 18994</span>
@@ -168,14 +168,14 @@ export default function ContactPage({ params }: ContactPageProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
             
             {/* Contact & Lead Form */}
-            <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm">
-              <h2 className="font-cormorant text-3xl font-bold text-slate-900 mb-2">
+            <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs">
+              <h2 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
                 Send Us a Message
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mb-8">
+              <p className="text-xs sm:text-sm text-slate-600 mb-6">
                 Fill in the details below and our confectionery team will respond within 2 hours.
               </p>
 
@@ -309,7 +309,7 @@ export default function ContactPage({ params }: ContactPageProps) {
                     <button
                       type="submit"
                       disabled={status === "loading"}
-                      className="w-full bg-petha-amber hover:bg-petha-saffron text-white py-4 px-6 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="w-full bg-petha-amber hover:bg-petha-saffron text-white py-3 px-6 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md hover:shadow-lg active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                       {status === "loading" ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -326,8 +326,8 @@ export default function ContactPage({ params }: ContactPageProps) {
             </div>
 
             {/* Sidebar Contact Info */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="space-y-4">
+              <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-6 shadow-xs space-y-4">
                 <h3 className="font-cormorant text-2xl font-bold text-slate-900">
                   Agra Headquarters
                 </h3>

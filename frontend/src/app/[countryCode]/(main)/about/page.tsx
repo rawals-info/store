@@ -146,35 +146,35 @@ export default async function AboutPage(props: AboutPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
           
           {/* Hero Story Banner */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-14 lg:p-16 shadow-sm text-center relative overflow-hidden">
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-xs text-center relative overflow-hidden">
             <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
             
             {/* Breadcrumb */}
             <Breadcrumb
               items={[{ label: "Our Story & Heritage", isCurrent: true }]}
               countryCode={countryCode}
-              className="p-0 bg-transparent border-0 mb-6 justify-center"
+              className="p-0 bg-transparent border-0 mb-4 justify-center"
             />
 
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-jakarta font-bold uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-jakarta font-bold uppercase tracking-wider mb-3">
               <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
               <span>Agra Heritage Since 2013</span>
             </div>
 
-            <h1 className="font-cormorant text-4xl sm:text-6xl font-bold text-slate-900 leading-tight max-w-3xl mx-auto">
+            <h1 className="font-cormorant text-3xl sm:text-5xl font-bold text-slate-900 leading-tight max-w-3xl mx-auto">
               Preserving Agra’s Royal Sweet Heritage
             </h1>
 
-            <p className="font-jakarta text-sm sm:text-base text-slate-600 mt-4 max-w-2xl mx-auto leading-relaxed">
+            <p className="font-jakarta text-xs sm:text-sm text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
               Experience India’s purest, crystal-translucent Agra Petha. Handcrafted daily in historic Agra by generational halwais using royal Mughal recipes and 100% natural ash gourd.
             </p>
 
             {/* Quick Numbers Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 pt-10 border-t border-slate-100">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-100">
               <div className="p-3">
                 <span className="font-mono text-3xl sm:text-4xl font-bold text-slate-900 block">50k+</span>
                 <span className="text-xs text-slate-500 font-jakarta font-semibold">Happy Sweet Lovers</span>

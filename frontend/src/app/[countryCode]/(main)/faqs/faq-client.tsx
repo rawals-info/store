@@ -132,39 +132,39 @@ export default function FaqClient({ countryCode }: { countryCode: string }) {
   })
 
   return (
-    <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16 font-jakarta">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
         
         {/* Header Hero */}
-        <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-14 shadow-sm text-center relative overflow-hidden">
+        <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs text-center relative overflow-hidden">
           <Breadcrumb
             items={[{ label: "Frequently Asked Questions", isCurrent: true }]}
             countryCode={countryCode}
-            className="p-0 bg-transparent border-0 mb-6 justify-center"
+            className="p-0 bg-transparent border-0 mb-3 justify-center"
           />
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-bold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-[11px] font-bold uppercase tracking-wider mb-2.5">
             <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
             <span>Customer Knowledge Base</span>
           </div>
 
-          <h1 className="font-cormorant text-4xl sm:text-6xl font-bold text-slate-900 leading-tight">
+          <h1 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 leading-tight">
             Frequently Asked Questions
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
             Everything you need to know about our authentic Agra recipes, 30-day vacuum freshness guarantee, pan-India express air dispatch, and bulk gifting.
           </p>
 
           {/* Search Bar */}
-          <div className="mt-8 max-w-lg mx-auto relative">
+          <div className="mt-5 max-w-lg mx-auto relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by keyword (e.g. shelf life, delivery, ingredients, Dalmoth)..."
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-petha-amber focus:bg-white transition-all shadow-inner"
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-petha-amber focus:bg-white transition-all shadow-inner"
             />
           </div>
         </div>

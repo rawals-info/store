@@ -83,8 +83,8 @@ export default async function BlogPage({ params }: { params: Promise<{ countryCo
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-16 font-jakarta">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
           
           {/* Breadcrumb Navigation */}
           <Breadcrumb
@@ -94,63 +94,63 @@ export default async function BlogPage({ params }: { params: Promise<{ countryCo
           />
 
           {/* Header */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-12 shadow-sm text-center relative overflow-hidden">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-xs font-bold uppercase tracking-wider mb-4">
+          <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs text-center relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-[11px] font-bold uppercase tracking-wider mb-2.5">
               <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
               <span>Agra Culinary Journal</span>
             </div>
 
-            <h1 className="font-cormorant text-4xl sm:text-6xl font-bold text-slate-900 leading-tight">
+            <h1 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 leading-tight">
               Petha Chronicles &amp; Royal Recipes
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
               Explore authentic Agra sweet recipes, winter melon health benefits, master halwai techniques, and the royal history of India’s most iconic delicacies.
             </p>
           </div>
 
           {/* Featured Post Card */}
           {featuredPost && (
-            <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm hover:shadow-md transition-shadow">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-amber-100 shadow-inner">
+            <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs hover:shadow-md transition-shadow">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+                <div className="lg:col-span-5 relative aspect-[16/10] rounded-2xl overflow-hidden bg-amber-100 shadow-inner">
                   <Image
                     src={POST_IMAGES[featuredPost.id] || "/hero_petha_square.jpg"}
                     alt={featuredPost.title}
                     fill
                     className="object-cover hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-3 left-3 bg-petha-amber text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-xs">
+                  <div className="absolute top-3 left-3 bg-petha-amber text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
                     Featured Story
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
-                    <span className="text-petha-amber font-bold">{featuredPost.category}</span>
+                <div className="lg:col-span-7 space-y-3">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                    <span className="text-petha-amber font-bold text-[11px] uppercase tracking-wide">{featuredPost.category}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {featuredPost.readTime}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {featuredPost.author}</span>
                   </div>
 
-                  <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900 leading-tight hover:text-petha-amber transition-colors">
+                  <h2 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900 leading-snug hover:text-petha-amber transition-colors">
                     <Link href={`/${countryCode}/blog/${featuredPost.id}`}>
                       {featuredPost.title}
                     </Link>
                   </h2>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-2 sm:line-clamp-3">
                     {featuredPost.excerpt}
                   </p>
 
-                  <div className="pt-2">
+                  <div className="pt-1">
                     <Link
                       href={`/${countryCode}/blog/${featuredPost.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm hover:shadow cursor-pointer"
                     >
-                      <span>Read Full Story</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <span>Read Story</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
