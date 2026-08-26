@@ -35,7 +35,25 @@ module.exports = {
 
   // Generate multiple sitemaps for better SEO organization
   additionalPaths: async () => {
-    // Keep sitemap minimalist to avoid GSC redirect/canonical conflicts
+    const fs = require('fs')
+    const path = require('path')
+
+    // Extract all 159 city slugs dynamically from cities.ts
+    let citySlugs = []
+    try {
+      const citiesFile = fs.readFileSync(path.join(__dirname, 'src/lib/seo/cities.ts'), 'utf8')
+      citySlugs = [...citiesFile.matchAll(/slug:\s*["']([^"']+)["']/g)].map(m => m[1])
+    } catch (e) {
+      console.warn("Could not read cities.ts for sitemap:", e)
+      citySlugs = ['delhi', 'noida', 'gurgaon', 'mumbai', 'bangalore', 'hyderabad', 'chennai', 'pune', 'kolkata', 'ahmedabad', 'kanpur', 'lucknow', 'jaipur', 'surat', 'patna']
+    }
+
+    const cityPaths = citySlugs.map(slug => ({
+      loc: `/in/city/${slug}`,
+      priority: 0.85,
+      changefreq: 'weekly',
+    }))
+
     const basePaths = [
       { loc: '/in', priority: 1.0, changefreq: 'daily' },
       { loc: '/in/products', priority: 0.95, changefreq: 'daily' },
@@ -49,15 +67,7 @@ module.exports = {
       { loc: '/in/privacy', priority: 0.6, changefreq: 'yearly' },
       { loc: '/in/returns', priority: 0.7, changefreq: 'monthly' },
       { loc: '/in/city', priority: 0.9, changefreq: 'daily' },
-      // City landing pages - all major cities
-      { loc: '/in/city/delhi', priority: 0.85, changefreq: 'weekly' },
-      { loc: '/in/city/mumbai', priority: 0.85, changefreq: 'weekly' },
-      { loc: '/in/city/bangalore', priority: 0.85, changefreq: 'weekly' },
-      { loc: '/in/city/hyderabad', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/city/chennai', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/city/pune', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/city/kolkata', priority: 0.8, changefreq: 'weekly' },
-      { loc: '/in/city/ahmedabad', priority: 0.8, changefreq: 'weekly' },
+      ...cityPaths,
     ]
 
     return basePaths.map(p => ({
