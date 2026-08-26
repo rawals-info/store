@@ -78,13 +78,13 @@ const Addresses = ({
       errors["email"] = "Please enter a valid email address"
     }
     
-    // Validate phone format - must be +91 followed by exactly 10 digits
-    const phone = formData.get("shipping_address.phone") as string
-    if (phone) {
-      // Check if it matches +91 followed by exactly 10 digits
-      if (!/^\+91\d{10}$/.test(phone)) {
-        errors["shipping_address.phone"] = "Phone must be +91 followed by exactly 10 digits"
-      }
+    // Validate phone format - must be 10 digits
+    const phone = (formData.get("shipping_address.phone") as string) || ""
+    const digits = phone.replace(/\D/g, "")
+    if (!phone.trim() || digits === "" || digits === "91") {
+      errors["shipping_address.phone"] = "Phone number is required for delivery updates"
+    } else if (digits.length < 10 || (digits.startsWith("91") && digits.length < 12)) {
+      errors["shipping_address.phone"] = "Please enter a valid 10-digit mobile number"
     }
     
     return errors

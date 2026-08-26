@@ -18,10 +18,18 @@ type InputProps = Omit<
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ type, name, label, touched, required, topLabel, className, ...props }, ref) => {
+  ({ type, name, label, touched, required, topLabel, className, errors, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     const [showPassword, setShowPassword] = useState(false)
     const [inputType, setInputType] = useState(type)
+
+    const errorMessage = errors
+      ? (typeof errors[name] === "string" ? errors[name] : null) ||
+        (typeof errors[name.replace("shipping_address.", "")] === "string" ? errors[name.replace("shipping_address.", "")] : null) ||
+        (typeof errors[name.replace("billing_address.", "")] === "string" ? errors[name.replace("billing_address.", "")] : null)
+      : null
+
+    const hasError = Boolean(errorMessage)
 
     useEffect(() => {
       if (type === "password" && showPassword) {
@@ -47,7 +55,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             placeholder=" "
             required={required}
             className={clsx(
-              "pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-white border rounded-md appearance-none focus:outline-none focus:ring-0 luxury-input",
+              "pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-white border rounded-xl appearance-none focus:outline-none focus:ring-0 transition-colors luxury-input",
+              hasError
+                ? "border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:bg-white"
+                : "border-slate-200 focus:border-petha-amber",
               className
             )}
             {...props}
@@ -56,7 +67,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <label
             htmlFor={name}
             onClick={() => inputRef.current?.focus()}
-            className="flex items-center justify-start mx-3 px-1 transition-all absolute duration-300 top-3 -z-1 origin-0 text-gray-700/70 truncate max-w-[85%] pointer-events-none"
+            className={clsx(
+              "flex items-center justify-start mx-3 px-1 transition-all absolute duration-300 top-3 -z-1 origin-0 truncate max-w-[85%] pointer-events-none",
+              hasError ? "text-rose-500" : "text-gray-700/70"
+            )}
           >
             <span className="truncate">{label}</span>
             {required && <span className="text-rose-500 ml-0.5 flex-shrink-0">*</span>}
@@ -71,6 +85,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </button>
           )}
         </div>
+        {hasError && (
+          <p className="text-[11px] text-rose-600 font-semibold font-jakarta mt-1 flex items-center gap-1 animate-fadeIn">
+            <span>⚠️</span>
+            <span>{errorMessage as string}</span>
+          </p>
+        )}
       </div>
     )
   }

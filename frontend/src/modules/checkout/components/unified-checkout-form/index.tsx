@@ -103,16 +103,22 @@ export default function UnifiedCheckoutForm({
       case "shipping_address.last_name":
         return !value.trim() ? "Last name is required" : ""
       case "email":
-        return !value.trim() ? "Email is required" : !/\S+@\S+\.\S+/.test(value) ? "Please enter a valid email" : ""
+        return !value.trim() ? "Email is required" : !/\S+@\S+\.\S+/.test(value) ? "Please enter a valid email address" : ""
       case "shipping_address.phone":
         const digits = value.replace(/\D/g, "")
-        return digits.length < 12 ? "Please enter a complete 10-digit mobile number" : ""
+        if (!value.trim() || digits === "" || digits === "91") {
+          return "Phone number is required for courier delivery updates"
+        }
+        if (digits.length < 10 || (digits.startsWith("91") && digits.length < 12)) {
+          return "Please enter a valid 10-digit mobile number"
+        }
+        return ""
       case "shipping_address.address_1":
-        return !value.trim() ? "Street address is required" : ""
+        return !value.trim() ? "Complete street address is required" : ""
       case "shipping_address.city":
         return !value.trim() ? "City is required" : ""
       case "shipping_address.postal_code":
-        return !value.trim() ? "PIN / Postal code is required" : !/^\d{6}$/.test(value.trim()) ? "Please enter a valid 6-digit PIN code" : ""
+        return !value.trim() ? "6-digit PIN code is required" : !/^\d{6}$/.test(value.trim()) ? "Please enter a valid 6-digit PIN code" : ""
       default:
         return ""
     }
@@ -121,7 +127,18 @@ export default function UnifiedCheckoutForm({
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     const error = validateField(name, value)
-    setFormErrors(prev => ({ ...prev, [name]: error }))
+    setFormErrors(prev => {
+      const updated = { ...prev }
+      if (!error) {
+        delete updated[name]
+      } else {
+        updated[name] = error
+      }
+      return updated
+    })
+    if (error) {
+      setError(null)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -132,19 +149,43 @@ export default function UnifiedCheckoutForm({
     const formData = new FormData(e.currentTarget)
     const errors: Record<string, string> = {}
 
-    for (const [name, value] of Array.from(formData.entries())) {
-      const error = validateField(name, value.toString())
-      if (error) errors[name] = error
+    // Required fields to guarantee complete check
+    const requiredFields = [
+      "shipping_address.first_name",
+      "shipping_address.last_name",
+      "email",
+      "shipping_address.phone",
+      "shipping_address.address_1",
+      "shipping_address.city",
+      "shipping_address.postal_code",
+    ]
+
+    for (const field of requiredFields) {
+      const val = (formData.get(field) as string) || ""
+      const error = validateField(field, val)
+      if (error) errors[field] = error
     }
 
     if (!selectedShippingMethod && shippingMethods && shippingMethods.length > 0) {
-      errors["shipping"] = "Please select a delivery method"
+      errors["shipping"] = "Please select a delivery speed option"
     }
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors)
+      const firstErrorMessage = Object.values(errors)[0]
+      setError(`Please complete all required fields: ${firstErrorMessage}`)
       setIsSubmitting(false)
       setFormTouched(true)
+
+      // Auto-focus and scroll to first invalid field
+      const firstField = Object.keys(errors)[0]
+      setTimeout(() => {
+        const inputElem = document.querySelector(`[name="${firstField}"]`) as HTMLInputElement | null
+        if (inputElem) {
+          inputElem.focus()
+          inputElem.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+      }, 50)
       return
     }
 
