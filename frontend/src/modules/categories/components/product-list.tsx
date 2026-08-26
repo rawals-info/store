@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import Link from "next/link"
+import { STORE_PROMOTION } from "@lib/config/promotions"
 
 const ProductList = ({
   products,
@@ -37,9 +38,15 @@ const ProductList = ({
         <p className="font-jakarta text-xs font-bold text-slate-500 uppercase tracking-wider">
           Showing {products.length} {products.length === 1 ? "Product" : "Products"}
         </p>
-        <span className="text-xs font-semibold text-emerald-700 font-jakarta bg-emerald-50 px-2.5 py-1 rounded-full">
-          ✨ 20% OFF with SWEET20
-        </span>
+        {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+          <span className="text-xs font-semibold text-emerald-700 font-jakarta bg-emerald-50 px-2.5 py-1 rounded-full">
+            ✨ {STORE_PROMOTION.discountPercent}% OFF with {STORE_PROMOTION.code}
+          </span>
+        ) : (
+          <span className="text-xs font-semibold text-emerald-700 font-jakarta bg-emerald-50 px-2.5 py-1 rounded-full">
+            ✨ 100% Authentic Agra Petha
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-6">

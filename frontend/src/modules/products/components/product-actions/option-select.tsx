@@ -3,6 +3,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
 import { formatIndianPrice } from "@lib/util/money"
+import { calculateDiscountedPrice } from "@lib/config/promotions"
 import React from "react"
 
 type OptionSelectProps = {
@@ -50,7 +51,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
           ) as any
 
           const rawAmt = Number(matchingVariant?.calculated_price?.calculated_amount || matchingVariant?.prices?.[0]?.amount || 0)
-          const discAmt = rawAmt > 0 ? Math.round(rawAmt * 0.8 * 100) / 100 : 0
+          const { discountedPrice: discAmt } = calculateDiscountedPrice(rawAmt)
 
           return (
             <button

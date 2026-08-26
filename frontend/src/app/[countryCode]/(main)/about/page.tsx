@@ -373,7 +373,7 @@ export default async function AboutPage(props: AboutPageProps) {
                 href={`/${countryCode}/products`}
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl cursor-pointer"
               >
-                <span>Shop Fresh Agra Sweets (20% OFF with SWEET20)</span>
+                <span>Shop Fresh Agra Sweets &amp; Gift Boxes</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

@@ -66,9 +66,9 @@ const FAQ_DATA: FaqItem[] = [
   {
     id: "faq-6",
     category: "shipping",
-    question: "Is there a minimum order for Free Express Delivery?",
+    question: "Is there a minimum order for Free Shipping?",
     answer:
-      "Yes! All orders above ₹500 qualify for 100% Free Express Nationwide Air Delivery. For smaller trial orders below ₹500, a nominal shipping charge is calculated automatically at checkout.",
+      "Yes! All orders above ₹500 qualify for 100% Free Nationwide Delivery. For smaller trial orders below ₹500, a nominal shipping charge is calculated automatically at checkout.",
   },
   {
     id: "faq-7",

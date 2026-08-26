@@ -30,7 +30,7 @@ export default function OrderAnalyticsTracker({ order }: OrderAnalyticsTrackerPr
       value: order.total || 0,
       currency: order.currency_code || "INR",
       shipping: order.shipping_total || 0,
-      coupon: "SWEET20",
+      coupon: (order as any).promotions?.[0]?.code || (order as any).discounts?.[0]?.code || undefined,
       items,
       city,
       state,

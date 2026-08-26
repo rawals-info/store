@@ -1,6 +1,7 @@
 "use client"
 
 import { convertToLocale } from "@lib/util/money"
+import { STORE_PROMOTION } from "@lib/config/promotions"
 import React from "react"
 
 interface CartTotalsProps {
@@ -54,7 +55,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 
         {!!discount_total && (
           <div className="flex items-center justify-between text-emerald-700 font-semibold">
-            <span>Special Discount (SWEET20)</span>
+            <span>Special Discount ({STORE_PROMOTION.code || "Promo"})</span>
             <span
               className="font-mono text-sm font-bold"
               data-testid="cart-discount"

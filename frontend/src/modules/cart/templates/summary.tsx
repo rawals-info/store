@@ -6,6 +6,7 @@ import DiscountCode from "@modules/checkout/components/discount-code"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 import { trackBeginCheckout } from "@lib/analytics/google-analytics"
+import { STORE_PROMOTION } from "@lib/config/promotions"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart & {
@@ -17,7 +18,7 @@ const Summary = ({ cart }: SummaryProps) => {
   const handleProceedToCheckout = () => {
     trackBeginCheckout({
       total: cart.total || 0,
-      coupon: "SWEET20",
+      coupon: cart.promotions?.[0]?.code || (STORE_PROMOTION.enabled ? STORE_PROMOTION.code : undefined),
       items: (cart.items || []).map((item) => ({
         id: item.id,
         title: item.product_title || item.title || "Agra Petha",
@@ -31,9 +32,11 @@ const Summary = ({ cart }: SummaryProps) => {
     <div className="flex flex-col gap-y-5">
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <h2 className="font-cormorant text-2xl font-bold text-slate-900">Order Summary</h2>
-        <span className="font-jakarta text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-          20% Auto-Applied
-        </span>
+        {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && (
+          <span className="font-jakarta text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+            {STORE_PROMOTION.discountPercent}% Auto-Applied
+          </span>
+        )}
       </div>
       <DiscountCode cart={cart} />
       <div className="h-px bg-slate-100 my-1"></div>

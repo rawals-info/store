@@ -9,6 +9,7 @@ import Image from "next/image"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
+import { calculateDiscountedPrice, getActivePromoCode, STORE_PROMOTION } from "@lib/config/promotions"
 import { useParams, useRouter } from "next/navigation"
 
 interface QuickBuyModalProps {
@@ -86,7 +87,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
   
   const displayPrice = variantPrice || cheapestPrice
   const rawPrice = displayPrice?.calculated_price_number || 249
-  const discountedPrice = Math.round(rawPrice * 0.8 * 100) / 100 // SWEET20 applied (20% off)
+  const { discountedPrice, isDiscounted, savings, discountPercent } = calculateDiscountedPrice(rawPrice)
 
   const handleAddToCart = async () => {
     if (!selectedVariant) return
@@ -103,10 +104,13 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
         throw new Error(res?.error || "Could not add sweet to box")
       }
 
-      try {
-        await applyPromotions(["SWEET20"])
-      } catch (promoError) {
-        console.warn("Coupon note:", promoError)
+      const activePromo = getActivePromoCode()
+      if (activePromo) {
+        try {
+          await applyPromotions([activePromo])
+        } catch (promoError) {
+          console.warn("Coupon note:", promoError)
+        }
       }
 
       // Fire analytics add_to_cart event
@@ -153,9 +157,12 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
         throw new Error(res?.error || "Could not add sweet to box")
       }
 
-      try {
-        await applyPromotions(["SWEET20"])
-      } catch (promoError) {}
+      const activePromo = getActivePromoCode()
+      if (activePromo) {
+        try {
+          await applyPromotions([activePromo])
+        } catch (promoError) {}
+      }
 
       // Fire analytics add_to_cart event
       trackAddToCart({
@@ -241,10 +248,12 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                 />
                 
                 {/* Discount Tag */}
-                <div className="absolute top-3 left-3 z-[2] px-2.5 py-1 rounded-full bg-emerald-600 text-white font-jakarta text-[11px] font-bold shadow-md flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  20% OFF (SWEET20)
-                </div>
+                {isDiscounted && (
+                  <div className="absolute top-3 left-3 z-[2] px-2.5 py-1 rounded-full bg-emerald-600 text-white font-jakarta text-[11px] font-bold shadow-md flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    {discountPercent}% OFF ({STORE_PROMOTION.code})
+                  </div>
+                )}
 
                 {/* Veg Symbol */}
                 <div className="absolute top-3 right-3 z-[2] w-5 h-5 rounded-md bg-white border border-emerald-600 flex items-center justify-center shadow-sm">
@@ -260,16 +269,20 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   </h3>
 
                   {/* Price Row */}
-                  <div className="flex items-baseline gap-2.5 mt-2 mb-3">
+                  <div className="flex items-baseline gap-2.5 mt-2 mb-3 flex-wrap">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-slate-900">
                       ₹{formatIndianPrice(discountedPrice)}
                     </span>
-                    <span className="font-mono text-base text-slate-400 line-through">
-                      ₹{formatIndianPrice(rawPrice)}
-                    </span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-jakarta">
-                      Save ₹{formatIndianPrice(rawPrice - discountedPrice)} (20% OFF)
-                    </span>
+                    {isDiscounted && (
+                      <>
+                        <span className="font-mono text-base text-slate-400 line-through">
+                          ₹{formatIndianPrice(rawPrice)}
+                        </span>
+                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-jakarta">
+                          Save ₹{formatIndianPrice(savings)} ({discountPercent}% OFF)
+                        </span>
+                      </>
+                    )}
                   </div>
 
                   {/* Urgency Strip */}
@@ -297,7 +310,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                         {product.variants.map((variant) => {
                           const vAny = variant as any
                           const rawAmt = Number(vAny?.calculated_price?.calculated_amount || vAny?.prices?.[0]?.amount || 0)
-                          const variantDisc = Math.round(rawAmt * 0.8 * 100) / 100
+                          const { discountedPrice: variantDisc } = calculateDiscountedPrice(rawAmt)
                           const isLargest = product.variants && product.variants.length > 1 && variant.id === product.variants.reduce((max: any, cur: any) => {
                             const curAmt = Number((cur as any)?.calculated_price?.calculated_amount || (cur as any)?.prices?.[0]?.amount || 0)
                             const maxAmt = Number((max as any)?.calculated_price?.calculated_amount || (max as any)?.prices?.[0]?.amount || 0)

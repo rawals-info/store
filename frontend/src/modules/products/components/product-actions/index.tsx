@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { addToCart, applyPromotions } from "@lib/data/cart"
+import { getActivePromoCode, calculateDiscountedPrice } from "@lib/config/promotions"
 import { trackProductView, trackAddToCart } from "@lib/analytics/google-analytics"
 import { isEqual } from "@lib/utils/object-utils"
 import { Minus, Plus, ShoppingBag, Zap, Check, ShieldCheck, Truck, Sparkles } from "lucide-react"
@@ -122,12 +123,18 @@ export default function ProductActions({
         countryCode,
       })
 
-      try {
-        await applyPromotions(["SWEET20"])
-      } catch (e) {}
+      const activePromo = getActivePromoCode()
+      if (activePromo) {
+        try {
+          await applyPromotions([activePromo])
+        } catch (e) {
+          // Gracefully continue if promo code is invalid/expired in backend
+        }
+      }
 
       // Fire analytics add_to_cart event
-      const itemPrice = selectedVariant.calculated_price?.calculated_amount || 249
+      const rawPrice = selectedVariant.calculated_price?.calculated_amount || 249
+      const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
       trackAddToCart({
         id: selectedVariant.id,
         title: product.title || "Agra Petha",
@@ -158,12 +165,18 @@ export default function ProductActions({
         countryCode,
       })
 
-      try {
-        await applyPromotions(["SWEET20"])
-      } catch (e) {}
+      const activePromo = getActivePromoCode()
+      if (activePromo) {
+        try {
+          await applyPromotions([activePromo])
+        } catch (e) {
+          // Gracefully continue if promo code is invalid/expired in backend
+        }
+      }
 
       // Fire analytics add_to_cart event
-      const itemPrice = selectedVariant.calculated_price?.calculated_amount || 249
+      const rawPrice = selectedVariant.calculated_price?.calculated_amount || 249
+      const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
       trackAddToCart({
         id: selectedVariant.id,
         title: product.title || "Agra Petha",

@@ -178,7 +178,7 @@ const CartClientWrapper = ({
                     <div className="mb-6 p-4 rounded-2xl bg-amber-50/70 border border-amber-100 text-xs font-jakarta">
                       {subtotal >= 500 ? (
                         <div className="flex items-center gap-2 text-emerald-700 font-bold">
-                          <span className="text-base">🎉</span> You have unlocked FREE Express Delivery!
+                          <span className="text-base">🎉</span> You have unlocked FREE Shipping!
                         </div>
                       ) : (
                         <div>

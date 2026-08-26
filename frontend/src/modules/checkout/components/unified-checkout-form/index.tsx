@@ -35,7 +35,7 @@ export default function UnifiedCheckoutForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   // Address states
   const [searchAddress, setSearchAddress] = useState(cart?.shipping_address?.address_1 || "")
   const [addressSelected, setAddressSelected] = useState(Boolean(cart?.shipping_address?.address_1))
@@ -58,7 +58,7 @@ export default function UnifiedCheckoutForm({
   const [cardBrand, setCardBrand] = useState<string | null>(null)
   const [cartUpdated, setCartUpdated] = useState(cart)
   const [currentSection, setCurrentSection] = useState<1 | 2>(1)
-  
+
   useEffect(() => {
     const handleCartUpdate = () => {
       window.location.reload()
@@ -128,10 +128,10 @@ export default function UnifiedCheckoutForm({
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
-    
+
     const formData = new FormData(e.currentTarget)
     const errors: Record<string, string> = {}
-    
+
     for (const [name, value] of Array.from(formData.entries())) {
       const error = validateField(name, value.toString())
       if (error) errors[name] = error
@@ -192,7 +192,7 @@ export default function UnifiedCheckoutForm({
       setError(err.message || "Failed to process checkout. Please try again.")
       setIsSubmitting(false)
     }
-    
+
     setFormTouched(true)
   }
 
@@ -204,15 +204,13 @@ export default function UnifiedCheckoutForm({
           <button
             type="button"
             onClick={() => setCurrentSection(1)}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${
-              currentSection === 1
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${currentSection === 1
                 ? "bg-amber-50 border-2 border-petha-amber text-amber-950 font-bold"
                 : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
+              }`}
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-              currentSection === 1 ? "bg-petha-amber text-white" : "bg-emerald-600 text-white"
-            }`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${currentSection === 1 ? "bg-petha-amber text-white" : "bg-emerald-600 text-white"
+              }`}>
               {currentSection === 2 ? <Check className="w-4 h-4" /> : "1"}
             </div>
             <div>
@@ -226,15 +224,13 @@ export default function UnifiedCheckoutForm({
             onClick={() => {
               if (addressSelected) setCurrentSection(2)
             }}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${
-              currentSection === 2
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${currentSection === 2
                 ? "bg-amber-50 border-2 border-petha-amber text-amber-950 font-bold"
                 : "bg-slate-50 text-slate-400 border border-slate-200"
-            }`}
+              }`}
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-              currentSection === 2 ? "bg-petha-amber text-white" : "bg-slate-300 text-slate-600"
-            }`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${currentSection === 2 ? "bg-petha-amber text-white" : "bg-slate-300 text-slate-600"
+              }`}>
               2
             </div>
             <div>
@@ -263,7 +259,7 @@ export default function UnifiedCheckoutForm({
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <input type="hidden" name="same_as_billing" value="on" />
-            
+
             {/* Customer & Address Details */}
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -286,7 +282,7 @@ export default function UnifiedCheckoutForm({
                   onChange={handleFieldChange}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   label="Email Address (for order tracking)"
@@ -298,7 +294,7 @@ export default function UnifiedCheckoutForm({
                   errors={formErrors}
                   onChange={handleFieldChange}
                 />
-                
+
                 <Input
                   label="Mobile Number (+91 XXXXXXXXXX)"
                   name="shipping_address.phone"
@@ -417,18 +413,17 @@ export default function UnifiedCheckoutForm({
                 <Truck className="w-4 h-4 text-petha-amber" />
                 Select Delivery Speed
               </h3>
-              
+
               <RadioGroup value={selectedShippingMethod} onChange={setSelectedShippingMethod}>
                 <div className="space-y-3">
                   {shippingMethods?.map((method: any) => (
                     <Radio
                       key={method.id}
                       value={method.id}
-                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
-                        method.id === selectedShippingMethod
+                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${method.id === selectedShippingMethod
                           ? "border-2 border-petha-amber bg-amber-50/70 shadow-sm"
                           : "border-slate-200 bg-white hover:border-slate-300"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <MedusaRadio checked={method.id === selectedShippingMethod} />
@@ -517,7 +512,7 @@ export default function UnifiedCheckoutForm({
                 <CreditCard className="w-4 h-4 text-petha-amber" />
                 Select Payment Method
               </h3>
-              
+
               {availablePaymentMethods?.length ? (
                 <RadioGroup
                   value={selectedPaymentMethod}
@@ -578,9 +573,9 @@ export default function UnifiedCheckoutForm({
               </button>
 
               <div className="w-full sm:w-auto">
-                <PaymentButton 
-                  cart={cartUpdated} 
-                  data-testid="submit-order-button" 
+                <PaymentButton
+                  cart={cartUpdated}
+                  data-testid="submit-order-button"
                   className="w-full sm:w-auto bg-petha-amber hover:bg-petha-saffron text-white py-4 px-8 rounded-2xl font-jakarta font-bold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-xl cursor-pointer"
                 />
               </div>

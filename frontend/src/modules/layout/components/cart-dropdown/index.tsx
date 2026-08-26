@@ -202,7 +202,7 @@ const CartDropdown = ({
                 </div>
               ) : (
                 <div className="text-slate-600">
-                  Add <span className="font-bold text-petha-amber">₹{500 - Math.round(subtotal)}</span> more for <span className="font-bold text-emerald-700">FREE Express Delivery</span>
+                  Add <span className="font-bold text-petha-amber">₹{500 - Math.round(subtotal)}</span> more for <span className="font-bold text-emerald-700">FREE Delivery</span>
                 </div>
               )}
             </div>

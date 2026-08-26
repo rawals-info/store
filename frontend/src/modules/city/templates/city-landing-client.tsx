@@ -7,6 +7,7 @@ import { CityDeliveryInfo } from "@lib/seo"
 import { trackCityPageView } from "@lib/analytics/google-analytics"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
+import { STORE_PROMOTION, calculateDiscountedPrice } from "@lib/config/promotions"
 import { MapPin, Zap, ShieldCheck, Truck, Sparkles, ChevronRight, Star, Award, HeartHandshake, CheckCircle2, HelpCircle, ChevronDown, PackageCheck, Flame } from "lucide-react"
 import QuickBuyModal from "@components/QuickBuyModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -58,7 +59,11 @@ export default function CityLandingClient({
     },
     {
       q: `Is there free delivery available in ${city.name}?`,
-      a: `Yes! We offer FREE Express Shipping to ${city.name} on all orders above ₹500. You can also use code SWEET20 at checkout for an extra 20% discount on your order.`
+      a: `Yes! We offer FREE Shipping to ${city.name} on all orders above ₹500.${
+        STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code
+          ? ` You can also use code ${STORE_PROMOTION.code} at checkout for an extra ${STORE_PROMOTION.discountPercent}% discount on your order.`
+          : ""
+      }`
     },
     {
       q: `What if my sweet box gets damaged in transit to ${city.name}?`,
@@ -109,10 +114,17 @@ export default function CityLandingClient({
                   <PackageCheck className="w-4 h-4 text-petha-amber" />
                   <span>{city.pinCodesCount} Covered</span>
                 </div>
-                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-600 text-white shadow-xs text-xs font-bold font-jakarta">
-                  <Flame className="w-4 h-4 text-amber-200" />
-                  <span>Use SWEET20 (20% OFF)</span>
-                </div>
+                {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+                  <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-600 text-white shadow-xs text-xs font-bold font-jakarta">
+                    <Flame className="w-4 h-4 text-amber-200" />
+                    <span>Use {STORE_PROMOTION.code} ({STORE_PROMOTION.discountPercent}% OFF)</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-700 text-white shadow-xs text-xs font-bold font-jakarta">
+                    <Sparkles className="w-4 h-4 text-emerald-200" />
+                    <span>100% Authentic Agra Recipe</span>
+                  </div>
+                )}
               </div>
 
               {/* Popular Neighborhoods */}
@@ -206,7 +218,7 @@ export default function CityLandingClient({
           {products.map((product) => {
             const { cheapestPrice } = getProductPrice({ product })
             const rawPrice = cheapestPrice?.calculated_price_number || product.variants?.[0]?.calculated_price?.calculated_amount || 249
-            const discountedPrice = Math.round(rawPrice * 0.8 * 100) / 100
+            const { discountedPrice, isDiscounted, discountPercent } = calculateDiscountedPrice(rawPrice)
 
             return (
               <div
@@ -245,14 +257,16 @@ export default function CityLandingClient({
                     <span className="font-mono text-sm sm:text-lg font-bold text-slate-900 leading-tight">
                       ₹{formatIndianPrice(discountedPrice)}
                     </span>
-                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                      <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
-                        ₹{formatIndianPrice(rawPrice)}
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta whitespace-nowrap">
-                        20% OFF
-                      </span>
-                    </div>
+                    {isDiscounted && (
+                      <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                        <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
+                          ₹{formatIndianPrice(rawPrice)}
+                        </span>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta whitespace-nowrap">
+                          {discountPercent}% OFF
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"

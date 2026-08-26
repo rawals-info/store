@@ -231,7 +231,7 @@ export default async function BlogPage({ params }: { params: Promise<{ countryCo
                 href={`/${countryCode}/products`}
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg cursor-pointer"
               >
-                <span>Shop All Sweets (20% OFF with SWEET20)</span>
+                <span>Explore All Authentic Agra Sweets</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

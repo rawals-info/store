@@ -231,7 +231,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
                 <span className="text-2xl">🌱</span>
                 <div className="text-xs">
                   <p className="font-bold text-slate-900">100% Pure Vegetarian</p>
-                  <p className="text-emerald-700 font-semibold">Free Express Shipping ₹500+</p>
+                  <p className="text-emerald-700 font-semibold">Free Shipping ₹500+</p>
                 </div>
               </div>
             </div>

@@ -311,7 +311,7 @@ export const trackPurchase = (transaction: {
       value: transaction.value,
       currency: transaction.currency || 'INR',
       shipping: transaction.shipping || 0,
-      coupon: transaction.coupon || 'SWEET20',
+      coupon: transaction.coupon,
       items: transaction.items.map((i) => ({
         item_id: i.item_id,
         item_name: i.item_name,
@@ -334,7 +334,7 @@ export const trackPurchase = (transaction: {
       value: transaction.value,
       currency: transaction.currency || 'INR',
       shipping: transaction.shipping || 0,
-      coupon: transaction.coupon || 'SWEET20',
+      coupon: transaction.coupon,
       items: transaction.items.map((i) => ({
         item_id: i.item_id,
         item_name: i.item_name,

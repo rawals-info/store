@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, CheckCircle2, Send, ArrowRight } from "lucide-react"
+import { STORE_PROMOTION } from "@lib/config/promotions"
 
 export default function Newsletter() {
   const [email, setEmail] = useState("")
@@ -92,7 +93,13 @@ export default function Newsletter() {
                     Welcome to the Taj Petha Family!
                   </h3>
                   <p className="font-jakarta text-xs sm:text-sm text-emerald-300/90 max-w-md mx-auto">
-                    Use promo code <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 font-mono font-bold text-emerald-200 border border-emerald-400/30">SWEET20</span> at checkout to enjoy 20% discount on your order!
+                    {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+                      <>
+                        Use promo code <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 font-mono font-bold text-emerald-200 border border-emerald-400/30">{STORE_PROMOTION.code}</span> at checkout to enjoy {STORE_PROMOTION.discountPercent}% discount on your order!
+                      </>
+                    ) : (
+                      <>Thank you for subscribing! We will keep you updated with fresh batch announcements and royal sweet offers.</>
+                    )}
                   </p>
                 </motion.div>
               ) : (

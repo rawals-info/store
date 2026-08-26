@@ -2,6 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Star, Sparkles, ShieldCheck, Clock, Flame, Award, HeartHandshake } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { STORE_PROMOTION } from "@lib/config/promotions"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
@@ -80,10 +81,14 @@ const ProductInfo = ({ product, reviewData }: ProductInfoProps) => {
       <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-amber-500/10 border border-amber-300/70 flex items-center justify-between gap-3 shadow-xs font-jakarta">
         <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-950">
           <span className="text-base">🎁</span>
-          <span>Use coupon <code className="bg-white px-2 py-0.5 rounded-md text-petha-amber font-mono font-bold border border-amber-200 shadow-2xs">SWEET20</code> for 20% OFF</span>
+          {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+            <span>Use coupon <code className="bg-white px-2 py-0.5 rounded-md text-petha-amber font-mono font-bold border border-amber-200 shadow-2xs">{STORE_PROMOTION.code}</code> for {STORE_PROMOTION.discountPercent}% OFF</span>
+          ) : (
+            <span>Handcrafted Daily in Agra • 100% Authentic Recipe</span>
+          )}
         </div>
         <span className="text-[11px] font-bold text-emerald-700 bg-white/90 px-2.5 py-1 rounded-lg border border-emerald-200 whitespace-nowrap hidden sm:inline-block">
-          ⚡ Air Shipped
+          🚚 Free Shipping ₹500+
         </span>
       </div>
 

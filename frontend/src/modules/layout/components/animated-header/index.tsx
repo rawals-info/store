@@ -18,6 +18,7 @@ import CategoryDropdown from "@modules/layout/components/category-dropdown/index
 import { X } from "@medusajs/icons"
 import { Sparkles } from "lucide-react"
 import CountdownTimer from "@components/CountdownTimer"
+import { STORE_PROMOTION } from "@lib/config/promotions"
 
 const AnimatedHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -37,10 +38,12 @@ const AnimatedHeader = () => {
     setBannerDismissed(dismissed)
   }, [])
 
-  // Premium promotional messages - elegant, no emojis
+  // Premium promotional messages - dynamic & elegant
   const promoMessages = [
     "Free Shipping on Orders Above ₹500",
-    "Use code SWEET20 for 20% off your first order",
+    STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code
+      ? `Use code ${STORE_PROMOTION.code} for ${STORE_PROMOTION.discountPercent}% off your order`
+      : "100% Authentic Agra Petha & Gourmet Dalmoth",
     "Handcrafted Fresh Daily in Agra — Delivered Nationwide"
   ]
 
@@ -251,7 +254,11 @@ const AnimatedHeader = () => {
             aria-label="Show royal sweet offers"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
-            <span>Offers • Code: SWEET20</span>
+            <span>
+              {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code
+                ? `Offers • Code: ${STORE_PROMOTION.code}`
+                : "Royal Sweet Offers"}
+            </span>
           </motion.button>
         )}
       </AnimatePresence>

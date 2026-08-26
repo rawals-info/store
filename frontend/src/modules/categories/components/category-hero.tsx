@@ -44,7 +44,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, countryCode = "in
           </div>
           <div className="flex items-center gap-2">
             <Truck className="w-4 h-4 text-petha-amber" />
-            <span className="font-semibold">Free Express Shipping ₹500+</span>
+            <span className="font-semibold">Free Shipping ₹500+</span>
           </div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
