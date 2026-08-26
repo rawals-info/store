@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation"
 import SearchBar from "@modules/search/components/search-bar"
 import CategoryDropdown from "@modules/layout/components/category-dropdown/index"
 import { X } from "@medusajs/icons"
+import { Sparkles } from "lucide-react"
 import CountdownTimer from "@components/CountdownTimer"
 
 const AnimatedHeader = () => {
@@ -65,12 +66,8 @@ const AnimatedHeader = () => {
 
   // Extract country code from pathname
   const countryCode = pathname?.split('/')[1] || 'us'
-  
-  // Hide store header & promotional marquee completely on checkout pages
   const isCheckout = pathname?.includes('/checkout')
-  if (isCheckout) {
-    return null
-  }
+
 
   // Check if we're on the homepage (root country path)
   const isHomePage = pathname?.split('/').length === 2
@@ -170,6 +167,11 @@ const AnimatedHeader = () => {
   // Text color for the header container — consistent slate-800 across all pages
   const getTextColor = () => "text-slate-800"
 
+  // Hide store header & promotional marquee completely on checkout pages
+  if (isCheckout) {
+    return null
+  }
+
   return (
     <>
       {/* Promotional Banner */}
@@ -223,53 +225,33 @@ const AnimatedHeader = () => {
               </div>
             </div>
 
-            {/* Clean Close button */}
+            {/* Sleek Modern Dismiss Button */}
             <button
               onClick={handleBannerDismiss}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/30 hover:bg-black/50 rounded-full transition-all duration-200 z-10 text-white hover:text-amber-200 cursor-pointer"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/20 hover:bg-black/40 text-white/90 hover:text-white flex items-center justify-center transition-all duration-200 z-10 cursor-pointer border border-white/10"
               aria-label="Dismiss banner"
             >
-              <X width={14} height={14} className="text-white" />
+              <X className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Show Banner Button - appears when banner is dismissed */}
+      {/* Modern Floating Offer Pill (Centered when banner is dismissed) */}
       <AnimatePresence>
         {bannerDismissed && (
           <motion.button
             onClick={handleShowBanner}
-            className="fixed top-1 left-1/2 transform -translate-x-1/2 z-[45] bg-luxury-gold hover:bg-luxury-gold/90 text-white text-xs px-2 py-1 rounded-full shadow-lg transition-all duration-200 flex items-center gap-1 border border-luxury-gold/30 hover:border-luxury-gold"
-            initial={{ y: -20, opacity: 0, scale: 0.8 }}
-            animate={{
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              boxShadow: [
-                "0 2px 15px rgba(212, 175, 55, 0.3)",
-                "0 2px 25px rgba(212, 175, 55, 0.5)",
-                "0 2px 15px rgba(212, 175, 55, 0.3)"
-              ]
-            }}
-            exit={{ y: -20, opacity: 0, scale: 0.8 }}
-            transition={{
-              duration: 0.3,
-              ease: [0.25, 1, 0.5, 1],
-              boxShadow: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Show promotional banner again"
+            className="fixed top-2 sm:top-2.5 left-1/2 -translate-x-1/2 z-[45] bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-[11px] font-jakarta font-bold px-3.5 py-1.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-1.5 border border-amber-300/40 cursor-pointer whitespace-nowrap"
+            initial={{ y: -20, x: "-50%", opacity: 0, scale: 0.8 }}
+            animate={{ y: 0, x: "-50%", opacity: 1, scale: 1 }}
+            exit={{ y: -20, x: "-50%", opacity: 0, scale: 0.8 }}
+            whileHover={{ scale: 1.05, x: "-50%" }}
+            whileTap={{ scale: 0.95, x: "-50%" }}
+            aria-label="Show royal sweet offers"
           >
-            <svg width={8} height={8} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 5V19M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="font-medium text-xs hidden sm:inline">Offers</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
+            <span>Offers • Code: SWEET20</span>
           </motion.button>
         )}
       </AnimatePresence>

@@ -213,6 +213,27 @@ export function getProductPrice({
     return getPricesForVariant(cheapestVariant)
   }
 
+  const getCheapestVariant = () => {
+    if (!product || !product.variants?.length) return null
+    return product.variants.reduce((cheapest: any, current: any) => {
+      const getAmt = (v: any) => Number(v.calculated_price?.calculated_amount || v.prices?.[0]?.amount || Number.MAX_VALUE)
+      return getAmt(current) < getAmt(cheapest) ? current : cheapest
+    }, product.variants[0])
+  }
+
+  const getHighestVariant = () => {
+    if (!product || !product.variants?.length) return null
+    return product.variants.reduce((highest: any, current: any) => {
+      const getAmt = (v: any) => Number(v.calculated_price?.calculated_amount || v.prices?.[0]?.amount || 0)
+      return getAmt(current) > getAmt(highest) ? current : highest
+    }, product.variants[0])
+  }
+
+  const highestPrice = () => {
+    const highestV = getHighestVariant()
+    return highestV ? getPricesForVariant(highestV) : null
+  }
+
   const variantPrice = () => {
     if (!product || !variantId) {
       return null
@@ -232,6 +253,10 @@ export function getProductPrice({
   return {
     product,
     cheapestPrice: cheapestPrice(),
+    highestPrice: highestPrice(),
+    cheapestVariant: getCheapestVariant(),
+    highestVariant: getHighestVariant(),
     variantPrice: variantPrice(),
   }
 }
+

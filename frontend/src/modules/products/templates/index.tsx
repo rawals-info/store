@@ -169,10 +169,12 @@ export default async function ProductTemplate({
 
           {/* Product FAQs */}
           <section className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
-            <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70 mb-2">
-              Freshness &amp; Shipping
-            </span>
-            <h2 className="font-cormorant text-2xl sm:text-4xl font-bold text-slate-900 mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-jakarta text-[11px] uppercase tracking-widest text-amber-950 font-bold px-3.5 py-1 rounded-full bg-amber-100/90 border border-amber-200">
+                Freshness &amp; Shipping Guide
+              </span>
+            </div>
+            <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
               Frequently Asked Questions
             </h2>
             <FaqAccordion faqs={faqs} />

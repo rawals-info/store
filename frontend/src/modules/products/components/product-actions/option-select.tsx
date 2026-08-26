@@ -2,6 +2,7 @@
 
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
+import { formatIndianPrice } from "@lib/util/money"
 import React from "react"
 
 type OptionSelectProps = {
@@ -21,20 +22,36 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   title,
   "data-testid": dataTestId,
   disabled,
+  product,
 }) => {
   const filteredOptions = (option.values ?? []).map((v) => v.value)
 
   return (
     <div className="flex flex-col gap-y-2">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-700 font-jakarta">
-        Select {title}:
-      </span>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-700 font-jakarta">
+          Select {title}:
+        </span>
+        <span className="text-[11px] font-semibold text-emerald-700 font-jakarta">
+          💡 Bigger pack = Extra Savings
+        </span>
+      </div>
       <div
-        className="flex flex-wrap gap-2.5"
+        className="flex flex-wrap gap-2"
         data-testid={dataTestId}
       >
-        {filteredOptions.map((v) => {
+        {filteredOptions.map((v, index) => {
           const isSelected = v === current
+          const isLargest = index === filteredOptions.length - 1 && filteredOptions.length > 1
+
+          // Find variant price if available
+          const matchingVariant = product?.variants?.find((variant) =>
+            variant.options?.some((opt) => opt.value === v)
+          ) as any
+
+          const rawAmt = Number(matchingVariant?.calculated_price?.calculated_amount || matchingVariant?.prices?.[0]?.amount || 0)
+          const discAmt = rawAmt > 0 ? Math.round(rawAmt * 0.8 * 100) / 100 : 0
+
           return (
             <button
               type="button"
@@ -42,14 +59,24 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               key={v}
               disabled={disabled}
               className={clx(
-                "px-4 py-2.5 rounded-2xl text-xs font-jakarta font-bold transition-all duration-200 cursor-pointer shadow-sm",
+                "px-3.5 py-2 rounded-xl text-xs font-jakarta font-bold transition-all duration-150 cursor-pointer flex items-center gap-1.5 shadow-xs",
                 isSelected
-                  ? "bg-amber-100/90 border-2 border-petha-amber text-slate-900 ring-2 ring-petha-amber/20"
+                  ? "bg-amber-50 border-2 border-petha-amber text-amber-950 ring-1 ring-petha-amber/20 shadow-sm"
                   : "bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               )}
               data-testid="option-button"
             >
-              {v}
+              <span>{v}</span>
+              {discAmt > 0 && (
+                <span className={`text-[11px] font-mono font-medium ${isSelected ? 'text-amber-800' : 'text-slate-500'}`}>
+                  ₹{formatIndianPrice(discAmt)}
+                </span>
+              )}
+              {isLargest && (
+                <span className="bg-amber-200/90 text-amber-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-tight">
+                  Best Value
+                </span>
+              )}
             </button>
           )
         })}

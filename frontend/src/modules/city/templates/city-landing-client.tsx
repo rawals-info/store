@@ -5,6 +5,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { CityDeliveryInfo } from "@lib/seo"
 import { trackCityPageView } from "@lib/analytics/google-analytics"
+import { getProductPrice } from "@lib/util/get-product-price"
+import { formatIndianPrice } from "@lib/util/money"
 import { MapPin, Zap, ShieldCheck, Truck, Sparkles, ChevronRight, Star, Award, HeartHandshake, CheckCircle2, HelpCircle, ChevronDown, PackageCheck, Flame } from "lucide-react"
 import QuickBuyModal from "@components/QuickBuyModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -202,8 +204,9 @@ export default function CityLandingClient({
         {/* Product Cards Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {products.map((product) => {
-            const rawPrice = product.variants?.[0]?.calculated_price?.calculated_amount || 249
-            const discountedPrice = Math.round(rawPrice * 0.8)
+            const { cheapestPrice } = getProductPrice({ product })
+            const rawPrice = cheapestPrice?.calculated_price_number || product.variants?.[0]?.calculated_price?.calculated_amount || 249
+            const discountedPrice = Math.round(rawPrice * 0.8 * 100) / 100
 
             return (
               <div
@@ -237,19 +240,24 @@ export default function CityLandingClient({
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-mono text-base sm:text-lg font-bold text-slate-900">
-                      ₹{discountedPrice}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-1.5">
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="font-mono text-sm sm:text-lg font-bold text-slate-900 leading-tight">
+                      ₹{formatIndianPrice(discountedPrice)}
                     </span>
-                    <span className="font-mono text-xs text-slate-400 line-through">
-                      ₹{rawPrice}
-                    </span>
+                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                      <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
+                        ₹{formatIndianPrice(rawPrice)}
+                      </span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta whitespace-nowrap">
+                        20% OFF
+                      </span>
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleOpenQuickBuy(product)}
-                    className="px-3.5 py-1.5 rounded-xl bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer"
+                    className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex-shrink-0"
                   >
                     + Add
                   </button>

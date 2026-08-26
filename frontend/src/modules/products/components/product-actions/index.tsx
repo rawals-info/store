@@ -51,25 +51,28 @@ export default function ProductActions({
   }, [product])
 
   useEffect(() => {
-    if (product) {
-      const defaultOptions: Record<string, string | undefined> = {}
-      if (productOptions.length > 0) {
+    if (product && product.variants && product.variants.length > 0) {
+      // Find highest priced variant (e.g. 1kg / Family Pack) so bigger size is selected by default
+      const highestVariant = product.variants.reduce((highest: any, current: any) => {
+        const getAmt = (v: any) => Number(v.calculated_price?.calculated_amount || v.prices?.[0]?.amount || 0)
+        return getAmt(current) > getAmt(highest) ? current : highest
+      }, product.variants[0])
+
+      if (highestVariant?.options && highestVariant.options.length > 0) {
+        const variantOptions = optionsAsKeymap(highestVariant.options)
+        setOptions(variantOptions)
+      } else if (productOptions.length > 0) {
+        const defaultOptions: Record<string, string | undefined> = {}
         productOptions.forEach(option => {
           if (option.values?.length) {
-            defaultOptions[option.id] = option.values[0].value || undefined
+            defaultOptions[option.id] = option.values[option.values.length - 1]?.value || option.values[0]?.value
           }
         })
-        if (product.variants?.length === 1 && product.variants[0].options) {
-          const variantOptions = optionsAsKeymap(product.variants[0].options)
-          Object.assign(defaultOptions, variantOptions)
-        }
         if (Object.keys(defaultOptions).length > 0) {
           setOptions(defaultOptions)
         }
       } else {
-        if (product.variants && product.variants.length > 0) {
-          setManuallySelectedVariant(product.variants[0])
-        }
+        setManuallySelectedVariant(highestVariant)
       }
     }
   }, [product, productOptions])

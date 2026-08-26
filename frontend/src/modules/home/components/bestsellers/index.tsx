@@ -7,6 +7,8 @@ import { useRef, useState, useMemo } from "react"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreviewRating from "@modules/products/components/product-preview/rating-client"
 import QuickBuyModal from "@components/QuickBuyModal"
+import { getProductPrice } from "@lib/util/get-product-price"
+import { formatIndianPrice } from "@lib/util/money"
 
 type BestsellerProps = {
   products: any[]
@@ -36,23 +38,19 @@ function CommercialProductCard({
   const badge = BADGE_CONFIG[index % BADGE_CONFIG.length]
   const [quickBuyOpen, setQuickBuyOpen] = useState(false)
 
-  // Compute display price and original price dynamically
-  const variants = product.variants || []
-  const firstVariant = variants[0]
+  // Compute lowest starting price and original price dynamically
+  const { cheapestPrice, cheapestVariant } = getProductPrice({ product })
   
-  let priceAmount = 0
-  let originalPrice = 0
+  let priceAmount = cheapestPrice?.calculated_price_number || 0
+  let originalPrice = cheapestPrice?.original_price_number || 0
 
-  if (firstVariant?.calculated_price?.calculated_amount) {
-    priceAmount = Number(firstVariant.calculated_price.calculated_amount)
-    if (firstVariant.calculated_price.original_amount) {
-      originalPrice = Number(firstVariant.calculated_price.original_amount)
-    } else {
-      originalPrice = Math.round(priceAmount * 1.2)
-    }
-  } else if (firstVariant?.prices?.[0]?.amount) {
-    priceAmount = Number(firstVariant.prices[0].amount) / 100
-    originalPrice = Math.round(priceAmount * 1.2)
+  if (priceAmount === 0 && cheapestVariant) {
+    priceAmount = Number(cheapestVariant.calculated_price?.calculated_amount || cheapestVariant.prices?.[0]?.amount || 0)
+    originalPrice = priceAmount * 1.2
+  }
+
+  if (originalPrice <= priceAmount && priceAmount > 0) {
+    originalPrice = priceAmount * 1.2
   }
 
   const discountPercent = originalPrice > priceAmount && priceAmount > 0
@@ -118,25 +116,25 @@ function CommercialProductCard({
           </div>
 
           {/* Price & Add to Cart row */}
-          <div className="pt-2 sm:pt-3 border-t border-slate-100 flex items-center justify-between gap-1">
-            <div className="flex flex-col min-w-0">
+          <div className="pt-2 sm:pt-3 border-t border-slate-100 flex items-center justify-between gap-1.5">
+            <div className="flex flex-col min-w-0 flex-1">
               {priceAmount > 0 ? (
                 <>
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-mono text-base sm:text-xl font-bold text-slate-900">
-                      ₹{Math.round(priceAmount)}
-                    </span>
+                  <div className="font-mono text-sm sm:text-lg font-bold text-slate-900 leading-tight">
+                    ₹{formatIndianPrice(priceAmount)}
+                  </div>
+                  <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                     {originalPrice > priceAmount && (
                       <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
-                        ₹{Math.round(originalPrice)}
+                        ₹{formatIndianPrice(originalPrice)}
+                      </span>
+                    )}
+                    {discountPercent > 0 && (
+                      <span className="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta whitespace-nowrap">
+                        {discountPercent}% OFF
                       </span>
                     )}
                   </div>
-                  {discountPercent > 0 && (
-                    <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 font-jakarta">
-                      Save {discountPercent}%
-                    </span>
-                  )}
                 </>
               ) : (
                 <span className="text-xs font-bold text-petha-amber font-jakarta">
@@ -149,10 +147,10 @@ function CommercialProductCard({
             <button
               type="button"
               onClick={() => setQuickBuyOpen(true)}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider flex items-center gap-1 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer active:scale-95 flex-shrink-0"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-[11px] sm:text-xs font-bold uppercase tracking-wider flex items-center gap-0.5 sm:gap-1 shadow-sm hover:shadow transition-all duration-200 cursor-pointer active:scale-95 flex-shrink-0"
             >
               <span className="text-sm font-black leading-none">+</span>
-              ADD
+              <span>ADD</span>
             </button>
           </div>
         </div>

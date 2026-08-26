@@ -8,6 +8,7 @@ import { X, ShoppingBag, Check, Minus, Plus, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { formatIndianPrice } from "@lib/util/money"
 import { useParams, useRouter } from "next/navigation"
 
 interface QuickBuyModalProps {
@@ -51,12 +52,17 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
   const countryCode = useParams().countryCode as string
   const router = useRouter()
 
-  // Set default variant
+  // Set default variant to the bigger size / highest-price pack first
   useEffect(() => {
-    if (product?.variants && product.variants.length > 0 && !selectedVariant) {
-      setSelectedVariant(product.variants[0].id!)
+    if (isOpen && product?.variants && product.variants.length > 0) {
+      const highestVariant = product.variants.reduce((highest: any, current: any) => {
+        const getAmt = (v: any) => Number(v.calculated_price?.calculated_amount || v.prices?.[0]?.amount || 0)
+        return getAmt(current) > getAmt(highest) ? current : highest
+      }, product.variants[0])
+
+      setSelectedVariant(highestVariant?.id || product.variants[0].id!)
     }
-  }, [product, selectedVariant])
+  }, [isOpen, product])
 
   // Track product view when modal opens
   useEffect(() => {
@@ -79,8 +85,8 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
   })
   
   const displayPrice = variantPrice || cheapestPrice
-  const rawPrice = Math.round(displayPrice?.calculated_price_number || 249)
-  const discountedPrice = Math.round(rawPrice * 0.8) // SWEET20 applied
+  const rawPrice = displayPrice?.calculated_price_number || 249
+  const discountedPrice = Math.round(rawPrice * 0.8 * 100) / 100 // SWEET20 applied (20% off)
 
   const handleAddToCart = async () => {
     if (!selectedVariant) return
@@ -256,13 +262,13 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   {/* Price Row */}
                   <div className="flex items-baseline gap-2.5 mt-2 mb-3">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-slate-900">
-                      ₹{discountedPrice}
+                      ₹{formatIndianPrice(discountedPrice)}
                     </span>
                     <span className="font-mono text-base text-slate-400 line-through">
-                      ₹{rawPrice}
+                      ₹{formatIndianPrice(rawPrice)}
                     </span>
                     <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-jakarta">
-                      Save ₹{Math.round(rawPrice - discountedPrice)} (20% OFF)
+                      Save ₹{formatIndianPrice(rawPrice - discountedPrice)} (20% OFF)
                     </span>
                   </div>
 
@@ -279,24 +285,50 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   {/* Size / Variant Options */}
                   {product.variants && product.variants.length > 1 && (
                     <div className="mb-4">
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 font-jakarta">
-                        Select Pack Size:
-                      </label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider font-jakarta">
+                          Select Pack Size:
+                        </label>
+                        <span className="text-[11px] font-semibold text-emerald-700 font-jakarta">
+                          💡 Bigger pack = Extra Savings
+                        </span>
+                      </div>
                       <div className="flex flex-wrap gap-2">
-                        {product.variants.map((variant) => (
-                          <button
-                            key={variant.id}
-                            type="button"
-                            onClick={() => setSelectedVariant(variant.id!)}
-                            className={`px-3.5 py-2 rounded-xl text-xs font-bold font-jakarta transition-all duration-150 cursor-pointer ${
-                              selectedVariant === variant.id
-                                ? 'bg-amber-100 border-2 border-petha-amber text-amber-900 shadow-sm'
-                                : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
-                            }`}
-                          >
-                            {variant.title}
-                          </button>
-                        ))}
+                        {product.variants.map((variant) => {
+                          const vAny = variant as any
+                          const rawAmt = Number(vAny?.calculated_price?.calculated_amount || vAny?.prices?.[0]?.amount || 0)
+                          const variantDisc = Math.round(rawAmt * 0.8 * 100) / 100
+                          const isLargest = product.variants && product.variants.length > 1 && variant.id === product.variants.reduce((max: any, cur: any) => {
+                            const curAmt = Number((cur as any)?.calculated_price?.calculated_amount || (cur as any)?.prices?.[0]?.amount || 0)
+                            const maxAmt = Number((max as any)?.calculated_price?.calculated_amount || (max as any)?.prices?.[0]?.amount || 0)
+                            return curAmt > maxAmt ? cur : max
+                          }, product.variants[0])?.id
+
+                          return (
+                            <button
+                              key={variant.id}
+                              type="button"
+                              onClick={() => setSelectedVariant(variant.id!)}
+                              className={`px-3.5 py-2 rounded-xl text-xs font-bold font-jakarta transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
+                                selectedVariant === variant.id
+                                  ? 'bg-amber-50 border-2 border-petha-amber text-amber-950 shadow-sm'
+                                  : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
+                              }`}
+                            >
+                              <span>{variant.title}</span>
+                              {variantDisc > 0 && (
+                                <span className={`text-[11px] font-mono font-medium ${selectedVariant === variant.id ? 'text-amber-800' : 'text-slate-500'}`}>
+                                  ₹{formatIndianPrice(variantDisc)}
+                                </span>
+                              )}
+                              {isLargest && (
+                                <span className="bg-amber-200/90 text-amber-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-tight">
+                                  Best Value
+                                </span>
+                              )}
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
                   )}
