@@ -267,8 +267,7 @@ export async function addToCart({
         `cart-${cartId}`,
       ])
       
-      const freshCart = await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true })
-      return { success: true, cart: freshCart || finalCart }
+      return { success: true, cart: finalCart }
     } catch (err) {
       console.warn(`[addToCart] Existing cart ${cartId} invalid or completed, creating fresh cart:`, err)
       // Fall through to cart creation
@@ -329,8 +328,7 @@ export async function addToCart({
       `cart-${newCart.id}`,
     ])
     
-    const freshCart = await retrieveCart(newCart.id, CART_FIELDS.FULL, { fresh: true })
-    return { success: true, cart: freshCart || finalCart }
+    return { success: true, cart: finalCart }
   } catch (error) {
     console.error("[addToCart] Error creating cart and line item:", error)
     return {
@@ -435,7 +433,7 @@ export async function updateLineItem({
     console.log(`[Cart] Updating line item ${lineId} to quantity ${quantity}`)
     
     // ✅ FIX: Properly await the entire operation
-    await retryWithBackoff(() => 
+    const result = await retryWithBackoff(() => 
       sdk.store.cart.updateLineItem(cartId, lineId, { quantity }, {}, { 
         ...headers, 
         "Idempotency-Key": randomUUID() 
@@ -451,8 +449,8 @@ export async function updateLineItem({
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    const freshCart = await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true })
-    return { success: true, cart: freshCart }
+    const updatedCart = result?.cart || (await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true }))
+    return { success: true, cart: updatedCart }
   } catch (error) {
     console.error(`[Cart] Failed to update line item ${lineId}:`, error)
     throw medusaError(error)
@@ -478,7 +476,7 @@ export async function deleteLineItem(lineId: string) {
   try {
     console.log(`[Cart] Attempting to delete line item ${lineId} from cart ${cartId}`)
     
-    await retryWithBackoff(() =>
+    const result = await retryWithBackoff(() =>
       sdk.store.cart.deleteLineItem(cartId, lineId, { 
         ...headers, 
         "Idempotency-Key": randomUUID() 
@@ -494,8 +492,8 @@ export async function deleteLineItem(lineId: string) {
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    const freshCart = await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true })
-    return { success: true, cart: freshCart }
+    const updatedCart = (result as any)?.parent || (result as any)?.cart || (await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true }))
+    return { success: true, cart: updatedCart }
   } catch (error) {
     console.error(`[Cart] Failed to delete line item ${lineId}:`, error)
     throw medusaError(error)

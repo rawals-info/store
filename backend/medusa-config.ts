@@ -18,19 +18,21 @@ export default defineConfig({
     databaseDriverOptions:
       process.env.NODE_ENV !== "development"
         ? {
-            // Enable SSL for hosted Postgres providers (Render, Fly.io, Railway, etc.)
+            // Enable SSL if required by connection string, otherwise support CapRover internal Docker networking
             connection: {
-              ssl: { rejectUnauthorized: false },
+              ssl: process.env.DATABASE_URL?.includes("sslmode=require")
+                ? { rejectUnauthorized: false }
+                : false,
             },
-            // Fine-tuned pool to avoid "Connection terminated unexpectedly" on PaaS DBs
+            // Scaled pool for CapRover AWS VPS
             pool: {
-              min: 0,
-              max: 7,
-              idleTimeoutMillis: 30_000,
-              createTimeoutMillis: 300_000,
-              destroyTimeoutMillis: 50_000,
-              reapIntervalMillis: 10_000,
-              createRetryIntervalMillis: 2_000,
+              min: 2,
+              max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX) : 20,
+              idleTimeoutMillis: 10_000,
+              createTimeoutMillis: 10_000,
+              destroyTimeoutMillis: 5_000,
+              reapIntervalMillis: 5_000,
+              createRetryIntervalMillis: 500,
             },
           }
         : {},

@@ -1,3 +1,5 @@
+import { cache } from "react"
+
 export type ActiveStorePromotion = {
   id: string
   code: string
@@ -11,7 +13,7 @@ export type ActiveStorePromotion = {
  * Uses the Secret API Key (MEDUSA_ADMIN_API_TOKEN).
  * No hardcoded strings. If no promotions are active, returns null.
  */
-export async function getActivePromotion(): Promise<ActiveStorePromotion | null> {
+export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion | null> => {
   const backendUrl =
     process.env.MEDUSA_BACKEND_URL ||
     process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
@@ -42,7 +44,6 @@ export async function getActivePromotion(): Promise<ActiveStorePromotion | null>
           "Content-Type": "application/json",
         },
         next: { revalidate: 60, tags: ["promotions"] },
-        cache: "no-store",
       }
     )
 
@@ -83,5 +84,5 @@ export async function getActivePromotion(): Promise<ActiveStorePromotion | null>
     console.error("[getActivePromotion] Failed to fetch active promotion from Admin API:", error)
     return null
   }
-}
+})
 

@@ -9,9 +9,8 @@ type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
-// Set dynamic rendering options for this page
-export const dynamic = "force-dynamic" // Changed to force-dynamic for better dev experience
-export const revalidate = 0
+// ISR caching for high-speed edge delivery with 30-minute background revalidation
+export const revalidate = 1800
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { handle, countryCode } = await props.params

@@ -11,8 +11,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
 }
 
-// Segment config should be a constant, not a function
-export const dynamic = 'force-dynamic'
+export const revalidate = 1800
 
 export default async function StorePage({
   params,
