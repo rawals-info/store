@@ -62,7 +62,12 @@ const CartDropdown = ({
       return acc + (item.quantity || 0)
     }, 0) || 0
 
-  const subtotal = cart?.subtotal ?? 0
+  const itemsSubtotal = (cart?.item_subtotal ?? ((cart?.subtotal ?? 0) - (cart?.shipping_subtotal ?? 0)))
+  const discountTotal = cart?.discount_total ?? 0
+  const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
+  const freeShippingThreshold = 500
+  const isFreeShipping = netItemsTotal >= freeShippingThreshold
+  const neededForFreeShipping = Math.max(0, freeShippingThreshold - Math.round(netItemsTotal))
   const itemRef = useRef<number>(totalItems || 0)
 
   const timedOpen = () => {
@@ -141,11 +146,6 @@ const CartDropdown = ({
     }
   }, [pathname, activeTimer, mutate])
 
-  // Free shipping threshold (₹500)
-  const freeShippingThreshold = 500
-  const currentTotalInINR = subtotal > 100 ? subtotal : subtotal * 100 // adjust if needed
-  const neededForFreeShipping = Math.max(0, freeShippingThreshold - subtotal)
-
   return (
     <div
       className="h-full z-50"
@@ -159,57 +159,56 @@ const CartDropdown = ({
             href="/cart"
             data-testid="nav-cart-link"
           >
-            <div className="relative flex items-center">
-              <svg className="w-5 h-5 text-petha-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-              </svg>
+            <div className="relative">
+              <span className="text-base">🛍️</span>
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2.5 min-w-[18px] h-[18px] px-1 bg-emerald-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold font-jakarta shadow-sm animate-pulse">
+                <span className="absolute -top-1.5 -right-2 bg-petha-amber text-white text-[10px] font-bold rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center border-2 border-white shadow-2xs">
                   {totalItems}
                 </span>
               )}
             </div>
-            <span className="text-xs sm:text-sm font-bold font-jakarta uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-jakarta font-bold uppercase tracking-wider hidden sm:inline-block">
               Cart
             </span>
           </LocalizedClientLink>
         </PopoverButton>
 
         <Transition
-          show={cartDropdownOpen}
           as={Fragment}
+          show={cartDropdownOpen}
           enter="transition ease-out duration-200"
-          enterFrom="opacity-0 translate-y-1 scale-95"
-          enterTo="opacity-100 translate-y-0 scale-100"
+          enterFrom="opacity-0 translate-y-1"
+          enterTo="opacity-100 translate-y-0"
           leave="transition ease-in duration-150"
-          leaveFrom="opacity-100 translate-y-0 scale-100"
-          leaveTo="opacity-0 translate-y-1 scale-95"
+          leaveFrom="opacity-100 translate-y-0"
+          leaveTo="opacity-0 translate-y-1"
         >
           <PopoverPanel
             static
-            className="absolute top-[calc(100%+8px)] right-0 bg-white rounded-3xl border border-amber-100/90 shadow-2xl w-[90vw] max-w-[340px] sm:w-[400px] sm:max-w-[420px] text-slate-800 z-[110] overflow-hidden"
-            data-testid="nav-cart-dropdown"
+            className="absolute right-0 top-full mt-2 w-[340px] sm:w-[380px] bg-white rounded-3xl shadow-2xl border border-amber-200/80 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
           >
             {/* Header */}
-            <div className="px-5 py-4 bg-amber-50/70 border-b border-amber-100/80 flex items-center justify-between">
+            <div className="p-5 bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-amber-500/10 border-b border-amber-200/60 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-lg">🛍️</span>
-                <h3 className="font-cormorant text-xl font-bold text-slate-900">Your Fresh Box</h3>
+                <span className="text-xl">🛍️</span>
+                <h3 className="font-cormorant text-xl font-bold text-slate-900">
+                  Your Fresh Box
+                </h3>
               </div>
-              <span className="font-jakarta text-xs font-bold text-petha-amber">
+              <span className="text-xs font-jakarta font-bold text-petha-amber bg-white px-2.5 py-1 rounded-full border border-amber-200 shadow-2xs">
                 {totalItems} {totalItems === 1 ? "Item" : "Items"}
               </span>
             </div>
 
             {/* Free Delivery Bar */}
             <div className="px-5 py-2.5 bg-[#FFFDF9] border-b border-amber-100/60 text-xs font-jakarta">
-              {subtotal >= 500 ? (
+              {isFreeShipping ? (
                 <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
                   <span>🎉</span> You qualify for FREE Nationwide Delivery!
                 </div>
               ) : (
                 <div className="text-slate-600">
-                  Add <span className="font-bold text-petha-amber">₹{500 - Math.round(subtotal)}</span> more for <span className="font-bold text-emerald-700">FREE Delivery</span>
+                  Add <span className="font-bold text-petha-amber">₹{neededForFreeShipping}</span> more for <span className="font-bold text-emerald-700">FREE Delivery</span>
                 </div>
               )}
             </div>
@@ -271,12 +270,22 @@ const CartDropdown = ({
                 <div className="p-5 bg-amber-50/40 border-t border-amber-100 space-y-3">
                   <div className="flex items-baseline justify-between font-jakarta">
                     <span className="text-xs font-semibold text-slate-600">Subtotal:</span>
-                    <span className="font-mono text-xl font-bold text-slate-900">
-                      {convertToLocale({
-                        amount: subtotal,
-                        currency_code: cartState.currency_code,
-                      })}
-                    </span>
+                    <div className="text-right">
+                      {discountTotal > 0 && (
+                        <span className="text-xs text-slate-400 line-through mr-2 font-mono">
+                          {convertToLocale({
+                            amount: itemsSubtotal,
+                            currency_code: cartState.currency_code,
+                          })}
+                        </span>
+                      )}
+                      <span className="font-mono text-xl font-bold text-slate-900">
+                        {convertToLocale({
+                          amount: netItemsTotal,
+                          currency_code: cartState.currency_code,
+                        })}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 pt-1">

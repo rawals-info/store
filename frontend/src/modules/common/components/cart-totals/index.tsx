@@ -14,15 +14,16 @@ interface CartTotalsProps {
     gift_card_total?: number | null
     currency_code: string
     shipping_subtotal?: number | null
+    promotions?: any[]
   },
   placeholder?: string,
   shippingPlaceholder?: string,
   taxPlaceholder?: string
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ 
-  totals, 
-  placeholder = "Contact for price",
+const CartTotals: React.FC<CartTotalsProps> = ({
+  totals,
+  placeholder = "Continue for price",
   shippingPlaceholder,
   taxPlaceholder
 }) => {
@@ -34,6 +35,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
     discount_total,
     gift_card_total,
     shipping_subtotal,
+    promotions,
   } = totals
 
   // Calculate the itemsSubtotal (products only, excluding shipping)
@@ -42,6 +44,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({
   // Use specific placeholders if provided, otherwise fall back to the general placeholder
   const finalShippingPlaceholder = shippingPlaceholder || placeholder
   const finalTaxPlaceholder = taxPlaceholder || placeholder
+
+  const promoCodeName = promotions?.[0]?.code
 
   return (
     <div>
@@ -55,7 +59,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 
         {!!discount_total && (
           <div className="flex items-center justify-between text-emerald-700 font-semibold">
-            <span>Special Discount ({STORE_PROMOTION.code || "Promo"})</span>
+            <span>Special Discount {promoCodeName ? `(${promoCodeName})` : ""}</span>
             <span
               className="font-mono text-sm font-bold"
               data-testid="cart-discount"

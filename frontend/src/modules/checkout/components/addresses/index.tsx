@@ -106,7 +106,7 @@ const Addresses = ({
       // Form is valid, continue with server action
       startTransition(async () => {
         try {
-          const result = await setAddressesSinglePage(null, formData)
+          const result = await setAddressesSinglePage(formData)
           if (result?.success) {
             setIsEditing(false)
             // Trigger a page refresh to get updated cart data

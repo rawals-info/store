@@ -20,6 +20,7 @@ interface AddressAutocompleteProps {
   label?: string
   value: string
   name?: string
+  required?: boolean
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onSelect: (details: PlaceDetails) => void
 }
@@ -41,6 +42,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   label = "Address",
   value,
   name,
+  required = false,
   onChange,
   onSelect,
 }) => {
@@ -209,7 +211,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       value={value}
       onChange={onChange}
       ref={inputRef}
-      required
+      required={required}
       data-testid="address-autocomplete-input"
     />
   )

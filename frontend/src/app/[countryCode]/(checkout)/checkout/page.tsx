@@ -1,4 +1,7 @@
-import { getCheckoutInitialData } from "@lib/data/checkout"
+import { retrieveCart } from "@lib/data/cart"
+import { retrieveCustomer } from "@lib/data/customer"
+import { listCartShippingMethods } from "@lib/data/fulfillment"
+import { listCartPaymentMethods } from "@lib/data/payment"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
@@ -18,12 +21,25 @@ export const metadata: Metadata = {
 }
 
 export default async function Checkout() {
-  const { cart, customer, shippingMethods, paymentProviders } =
-    await getCheckoutInitialData()
+  const [cart, customer] = await Promise.all([
+    retrieveCart(undefined, undefined as any, { fresh: true }).catch((err) => {
+      console.error("[Checkout Page] Error retrieving cart:", err)
+      return null
+    }),
+    retrieveCustomer().catch((err) => {
+      console.error("[Checkout Page] Error retrieving customer:", err)
+      return null
+    }),
+  ])
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return notFound()
   }
+
+  const [shippingMethods, paymentProviders] = await Promise.all([
+    listCartShippingMethods(cart.id).catch(() => []),
+    listCartPaymentMethods(cart.region?.id ?? cart.region_id ?? "").catch(() => []),
+  ])
 
   return (
     <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-12">

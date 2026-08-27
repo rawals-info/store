@@ -10,12 +10,32 @@ import { addToCart } from "@lib/data/cart"
 import { useParams } from "next/navigation"
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
-  const atAddressStep = !cart?.shipping_address?.address_1 || !cart.email
-  const shippingPlaceholder = atAddressStep ? "Enter your shipping address" : undefined
+  const [currentCart, setCurrentCart] = useState<any>(cart)
   const countryCode = (useParams()?.countryCode as string) || "in"
   const [upsellSnacks, setUpsellSnacks] = useState<any[]>([])
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<string[]>([])
+
+  useEffect(() => {
+    setCurrentCart(cart)
+  }, [cart])
+
+  useEffect(() => {
+    const handleCartUpdate = (e: CustomEvent) => {
+      if (e.detail?.cart) {
+        setCurrentCart(e.detail.cart)
+      }
+    }
+    window.addEventListener("cartUpdated" as any, handleCartUpdate)
+    return () => window.removeEventListener("cartUpdated" as any, handleCartUpdate)
+  }, [])
+
+  const hasShippingMethod = Boolean(
+    (currentCart?.shipping_methods && currentCart.shipping_methods.length > 0) ||
+    (currentCart?.shipping_subtotal !== undefined && currentCart?.shipping_subtotal !== null && currentCart?.shipping_subtotal > 0)
+  )
+  const atAddressStep = (!currentCart?.shipping_address?.address_1 || !currentCart?.email) && !hasShippingMethod
+  const shippingPlaceholder = atAddressStep ? "Enter your shipping address" : "Calculated at checkout"
 
   // Fetch live products for impulse add
   useEffect(() => {
@@ -60,14 +80,14 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
             Order Summary
           </h2>
           <span className="font-jakarta text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-full">
-            {cart?.items?.length || 0} {cart?.items?.length === 1 ? "Item" : "Items"}
+            {currentCart?.items?.length || 0} {currentCart?.items?.length === 1 ? "Item" : "Items"}
           </span>
         </div>
 
         {/* Totals */}
         <div className="py-4">
           <CartTotals 
-            totals={cart} 
+            totals={currentCart} 
             shippingPlaceholder={shippingPlaceholder}
             taxPlaceholder="All taxes included" 
           />

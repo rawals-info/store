@@ -1,5 +1,3 @@
-"use server"
-
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listCartShippingMethods } from "@lib/data/fulfillment"

@@ -694,3 +694,25 @@ button.luxury-btn:hover {
 [data-testid="nav-cart-dropdown"] {
   color: #36454F !important;
 }
+
+/* Seamless Continuous Marquee with Native Pause-on-Hover (never resets to 0) */
+@keyframes tajMarqueeScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-taj-marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: tajMarqueeScroll 42s linear infinite;
+}
+
+.taj-marquee-container:hover .animate-taj-marquee,
+.animate-taj-marquee:hover {
+  animation-play-state: paused;
+}

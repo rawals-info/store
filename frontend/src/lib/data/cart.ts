@@ -15,13 +15,16 @@ import {
   getCartId,
   removeCartId,
   setCartId,
+  getDismissedPromo,
+  setDismissedPromo,
+  clearDismissedPromo,
 } from "./cookies"
 import { getRegion } from "./regions"
 import { getIndiaRegion } from "@lib/constants/india-region"
 import { retryWithBackoff } from "@lib/utils/retry"
 import { withTimeout } from "@lib/utils/retry"
 import { randomUUID } from "crypto"
-import { getActivePromoCode } from "@lib/config/promotions"
+import { getActivePromotion } from "@lib/data/promotions"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -61,7 +64,7 @@ export async function retrieveCart(
       next,
       cache: "no-store", // ✅ FIX: Always disable cache for cart
     })
-    .then(({ cart }) => {
+    .then(async ({ cart }) => {
       // Mark cart items and variants to help identify them in price calculations
       if (cart && cart.items) {
         cart.items = cart.items.map(item => {
@@ -71,6 +74,31 @@ export async function retrieveCart(
           }
           return item;
         });
+
+        // Auto-apply active database promotion if cart has items and no promo applied yet
+        if (cart.items.length > 0 && (!cart.promotions || cart.promotions.length === 0)) {
+          try {
+            const dismissedCode = await getDismissedPromo().catch(() => undefined)
+            const activePromo = await getActivePromotion().catch(() => null)
+            if (
+              activePromo?.code &&
+              activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
+            ) {
+              const promoRes = await sdk.store.cart.update(
+                id,
+                { promo_codes: [activePromo.code] },
+                {},
+                headers
+              ).catch(() => null)
+
+              if (promoRes?.cart) {
+                cart = promoRes.cart
+              }
+            }
+          } catch (promoErr) {
+            // Continue if promo update fails
+          }
+        }
       }
       return cart;
     })
@@ -210,12 +238,17 @@ export async function addToCart({
       )
 
       let finalCart = result.cart
-      const activePromo = getActivePromoCode()
-      if (activePromo && (!finalCart.promotions || finalCart.promotions.length === 0)) {
+      const dismissedCode = await getDismissedPromo().catch(() => undefined)
+      const activePromo = await getActivePromotion().catch(() => null)
+      if (
+        activePromo?.code &&
+        (!finalCart.promotions || finalCart.promotions.length === 0) &&
+        activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
+      ) {
         try {
           const promoRes = await sdk.store.cart.update(
             cartId,
-            { promo_codes: [activePromo] },
+            { promo_codes: [activePromo.code] },
             {},
             headers
           )
@@ -267,12 +300,16 @@ export async function addToCart({
     )
 
     let finalCart = lineItemRes.cart
-    const activePromo = getActivePromoCode()
-    if (activePromo) {
+    const dismissedCode = await getDismissedPromo().catch(() => undefined)
+    const activePromo = await getActivePromotion().catch(() => null)
+    if (
+      activePromo?.code &&
+      activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
+    ) {
       try {
         const promoRes = await sdk.store.cart.update(
           newCart.id,
-          { promo_codes: [activePromo] },
+          { promo_codes: [activePromo.code] },
           {},
           headers
         )
@@ -601,6 +638,7 @@ export async function submitPromotionForm(
     return "Please enter a promotion code."
   }
   try {
+    await clearDismissedPromo()
     await applyPromotions([code])
     // Fetch updated cart fresh to confirm promotion actually applied
     const cart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
@@ -614,6 +652,7 @@ export async function submitPromotionForm(
 }
 
 export async function removePromotion(codeToRemove: string) {
+  await setDismissedPromo(codeToRemove)
   const cart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
   const remaining = (cart?.promotions || [])
     .filter((p) => p.code && p.code.toUpperCase() !== codeToRemove.toUpperCase())

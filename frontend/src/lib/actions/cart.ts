@@ -78,9 +78,8 @@ export async function setAddresses(_prevState: unknown, formData: FormData) {
  * Server Action: Updates the cart with shipping/billing addresses without redirecting
  * for single-page checkout flow.
  */
-export async function setAddressesSinglePage(firstArg: unknown, secondArg?: FormData) {
-  const formData = (secondArg instanceof FormData ? secondArg : (firstArg instanceof FormData ? firstArg : null))
-  if (!formData) {
+export async function setAddressesSinglePage(formData: FormData) {
+  if (!formData || !(formData instanceof FormData)) {
     throw new Error("No form data found when setting addresses")
   }
 

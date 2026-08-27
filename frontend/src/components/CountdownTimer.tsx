@@ -67,15 +67,15 @@ export default function CountdownTimer({ className = "", inline = false }: Fresh
 
   return (
     <div className={`inline-flex items-center gap-1 font-mono text-xs font-bold text-white ${className}`}>
-      <span className="bg-black/20 px-1.5 py-0.5 rounded text-amber-200">
+      <span className="bg-black/35 border border-amber-300/20 px-1.5 py-0.5 rounded text-amber-200 shadow-inner">
         {formatNumber(timeLeft.hours)}h
       </span>
-      <span className="text-white/40">:</span>
-      <span className="bg-black/20 px-1.5 py-0.5 rounded text-amber-200">
+      <span className="text-amber-300/60 font-mono">:</span>
+      <span className="bg-black/35 border border-amber-300/20 px-1.5 py-0.5 rounded text-amber-200 shadow-inner">
         {formatNumber(timeLeft.minutes)}m
       </span>
-      <span className="text-white/40">:</span>
-      <span className="bg-black/20 px-1.5 py-0.5 rounded text-amber-200">
+      <span className="text-amber-300/60 font-mono">:</span>
+      <span className="bg-black/35 border border-amber-300/20 px-1.5 py-0.5 rounded text-amber-200 shadow-inner">
         {formatNumber(timeLeft.seconds)}s
       </span>
     </div>

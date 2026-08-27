@@ -71,9 +71,37 @@ export default function UnifiedCheckoutForm({
   const [cartUpdated, setCartUpdated] = useState(cart)
   const [currentSection, setCurrentSection] = useState<1 | 2>(1)
 
+  const handleShippingMethodChange = (methodId: string) => {
+    setSelectedShippingMethod(methodId)
+    const activeShippingOption = shippingMethods?.find((m: any) => m.id === methodId)
+    const shippingAmount = activeShippingOption?.amount || 0
+    const itemsSubtotal = (cart.item_subtotal ?? ((cart.subtotal ?? 0) - (cart.shipping_subtotal ?? 0)))
+    const discount = cart.discount_total || 0
+    const netTotal = Math.max(0, itemsSubtotal - discount) + shippingAmount
+
+    const liveUpdatedCart: HttpTypes.StoreCart = {
+      ...cart,
+      shipping_subtotal: shippingAmount,
+      shipping_total: shippingAmount,
+      total: netTotal,
+      shipping_methods: [
+        {
+          id: methodId,
+          shipping_option_id: methodId,
+          amount: shippingAmount,
+          name: activeShippingOption?.name || "Standard Shipping",
+        } as any,
+      ],
+    }
+    setCartUpdated(liveUpdatedCart)
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cartUpdated", { detail: { cart: liveUpdatedCart } }))
+    }
+  }
+
   useEffect(() => {
     if (shippingMethods?.length === 1 && !selectedShippingMethod) {
-      setSelectedShippingMethod(shippingMethods[0].id)
+      handleShippingMethodChange(shippingMethods[0].id)
     }
   }, [shippingMethods, selectedShippingMethod])
 
@@ -251,9 +279,16 @@ export default function UnifiedCheckoutForm({
       }
 
       const activeShippingOption = shippingMethods?.find((m: any) => m.id === selectedShippingMethod)
+      const shippingAmount = activeShippingOption?.amount || 0
+      const itemsSubtotal = (cart.item_subtotal ?? ((cart.subtotal ?? 0) - (cart.shipping_subtotal ?? 0)))
+      const discount = cart.discount_total || 0
+      const netTotal = Math.max(0, itemsSubtotal - discount) + shippingAmount
 
       const updatedCart: HttpTypes.StoreCart = {
         ...cart,
+        shipping_subtotal: shippingAmount,
+        shipping_total: shippingAmount,
+        total: netTotal,
         shipping_address: updatedAddress as any,
         billing_address: updatedAddress as any,
         email: formData.get("email") as string,
@@ -262,8 +297,8 @@ export default function UnifiedCheckoutForm({
               {
                 id: selectedShippingMethod,
                 shipping_option_id: selectedShippingMethod,
-                amount: activeShippingOption?.amount || 0,
-                name: activeShippingOption?.name || "Air Express Delivery",
+                amount: shippingAmount,
+                name: activeShippingOption?.name || "Standard Shipping",
               } as any,
             ]
           : cart.shipping_methods || [],
@@ -271,6 +306,9 @@ export default function UnifiedCheckoutForm({
       }
 
       setCartUpdated(updatedCart)
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("cartUpdated", { detail: { cart: updatedCart } }))
+      }
       setSelectedPaymentMethod(chosenProvider)
       setAddressSelected(true)
       setIsSubmitting(false)
@@ -418,13 +456,19 @@ export default function UnifiedCheckoutForm({
 
               {/* Google Address Autocomplete */}
               <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/70 space-y-2">
-                <span className="font-jakarta text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
-                  Quick Address Autocomplete:
+                <span className="font-jakarta text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
+                    Quick Address Autocomplete:
+                  </span>
+                  <span className="text-[11px] font-medium text-amber-800/80 normal-case">
+                    (Optional)
+                  </span>
                 </span>
                 <AddressAutocomplete
-                  label="Search area, apartment, colony, or landmark..."
+                  label="Search area, apartment, colony, or landmark... (Optional)"
                   name="search_address"
+                  required={false}
                   value={searchAddress}
                   onChange={(e) => setSearchAddress(e.target.value)}
                   onSelect={(details: any) => {
@@ -519,7 +563,7 @@ export default function UnifiedCheckoutForm({
                 Select Delivery Speed
               </h3>
 
-              <RadioGroup value={selectedShippingMethod} onChange={setSelectedShippingMethod}>
+              <RadioGroup value={selectedShippingMethod} onChange={handleShippingMethodChange}>
                 <div className="space-y-3">
                   {shippingMethods?.map((method: any) => (
                     <Radio

@@ -92,3 +92,27 @@ export const removeCartId = async () => {
     sameSite: "lax",
   })
 }
+
+export const setDismissedPromo = async (code: string) => {
+  const cookieStore = await cookies()
+  cookieStore.set("_dismissed_promo", code.toUpperCase(), {
+    path: "/",
+    maxAge: 60 * 60 * 24, // 24 hours
+    httpOnly: true,
+    sameSite: "lax",
+  })
+}
+
+export const getDismissedPromo = async (): Promise<string | undefined> => {
+  const cookieStore = await cookies()
+  return cookieStore.get("_dismissed_promo")?.value
+}
+
+export const clearDismissedPromo = async () => {
+  const cookieStore = await cookies()
+  cookieStore.set("_dismissed_promo", "", {
+    path: "/",
+    maxAge: -1,
+    sameSite: "lax",
+  })
+}

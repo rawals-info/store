@@ -79,7 +79,12 @@ const CartClientWrapper = ({
     }
   }
 
-  const subtotal = cart?.subtotal || 0
+  const itemsSubtotal = (cart?.item_subtotal ?? ((cart?.subtotal ?? 0) - (cart?.shipping_subtotal ?? 0)))
+  const discountTotal = cart?.discount_total ?? 0
+  const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
+  const freeShippingThreshold = 500
+  const isFreeShipping = netItemsTotal >= freeShippingThreshold
+  const neededForFreeShipping = Math.max(0, freeShippingThreshold - Math.round(netItemsTotal))
 
   const handleAddUpsell = async (item: any) => {
     if (!item?.variantId) return
@@ -153,19 +158,19 @@ const CartClientWrapper = ({
                   <div className="bg-white rounded-3xl border border-amber-100/90 shadow-sm p-6">
                     {/* Free shipping meter */}
                     <div className="mb-6 p-4 rounded-2xl bg-amber-50/70 border border-amber-100 text-xs font-jakarta">
-                      {subtotal >= 500 ? (
+                      {isFreeShipping ? (
                         <div className="flex items-center gap-2 text-emerald-700 font-bold">
                           <span className="text-base">🎉</span> You have unlocked FREE Shipping!
                         </div>
                       ) : (
                         <div>
                           <p className="text-slate-700 font-semibold mb-1.5">
-                            Add <span className="font-bold text-petha-amber">₹{500 - Math.round(subtotal)}</span> more for <span className="font-bold text-emerald-700">FREE Shipping</span>
+                            Add <span className="font-bold text-petha-amber">₹{neededForFreeShipping}</span> more for <span className="font-bold text-emerald-700">FREE Shipping</span>
                           </p>
                           <div className="w-full h-2 rounded-full bg-amber-200/60 overflow-hidden">
                             <div 
                               className="h-full bg-petha-amber rounded-full transition-all duration-500" 
-                              style={{ width: `${Math.min(100, (subtotal / 500) * 100)}%` }} 
+                              style={{ width: `${Math.min(100, (netItemsTotal / 500) * 100)}%` }} 
                             />
                           </div>
                         </div>
