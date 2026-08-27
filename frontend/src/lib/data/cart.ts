@@ -190,65 +190,55 @@ export async function addToCart({
     return { success: false, error: "Missing variant ID" }
   }
 
-  // Try to fetch an existing cart first to avoid unnecessary creation
-  const existingCart = await retrieveCart()
+  const [cartId, headers] = await Promise.all([
+    getCartId(),
+    getAuthHeaders(),
+  ])
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
-  // No cart yet → create one first, then add line item
-  if (!existingCart) {
-    const [region, authHeaders] = await Promise.all([
-      getIndiaRegion(),
-      getAuthHeaders(),
-    ])
-
-    if (!region) {
-      return { success: false, error: "Region not found" }
-    }
-
-    const combinedHeaders = { ...authHeaders }
-
+  // Fast path: Cart already exists in cookies → add item directly
+  if (cartId) {
     try {
-      const { cart: newCart } = await sdk.store.cart.create(
-        { region_id: region.id },
-        {},
-        combinedHeaders
-      )
-
-      await setCartId(newCart.id)
-
-      const lineItemRes = await sdk.store.cart.createLineItem(
-        newCart.id,
+      const result = await sdk.store.cart.createLineItem(
+        cartId,
         {
           variant_id: variantId,
           quantity,
         },
         {},
-        combinedHeaders
+        headers
       )
 
       const cartCacheTag = await getCacheTag("carts")
       scheduleRevalidates([
         cartCacheTag,
         "cart",
-        `cart-${newCart.id}`,
+        `cart-${cartId}`,
       ])
       
-      return { success: true, cart: lineItemRes.cart }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      }
+      return { success: true, cart: result.cart }
+    } catch (err) {
+      console.warn(`[addToCart] Existing cart ${cartId} invalid or completed, creating fresh cart:`, err)
+      // Fall through to cart creation
     }
   }
 
-  // Cart already exists → add the item via createLineItem
+  // Slow path: First item or stale cart → create new cart and add item
   try {
-    const result = await sdk.store.cart.createLineItem(
-      existingCart.id,
+    const region = getIndiaRegion()
+    if (!region) {
+      return { success: false, error: "Region not found" }
+    }
+
+    const { cart: newCart } = await sdk.store.cart.create(
+      { region_id: region.id },
+      {},
+      headers
+    )
+
+    await setCartId(newCart.id)
+
+    const lineItemRes = await sdk.store.cart.createLineItem(
+      newCart.id,
       {
         variant_id: variantId,
         quantity,
@@ -261,32 +251,15 @@ export async function addToCart({
     scheduleRevalidates([
       cartCacheTag,
       "cart",
-      `cart-${existingCart.id}`,
+      `cart-${newCart.id}`,
     ])
     
-    return { success: true, cart: result.cart }
+    return { success: true, cart: lineItemRes.cart }
   } catch (error) {
-    // If existing cart is completed or invalid, recreate
-    try {
-      const region = getIndiaRegion()
-      const { cart: freshCart } = await sdk.store.cart.create(
-        { region_id: region.id },
-        {},
-        headers
-      )
-      await setCartId(freshCart.id)
-      const freshLineRes = await sdk.store.cart.createLineItem(
-        freshCart.id,
-        { variant_id: variantId, quantity },
-        {},
-        headers
-      )
-      return { success: true, cart: freshLineRes.cart }
-    } catch (retryErr) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to add to cart",
-      }
+    console.error("[addToCart] Error creating cart and line item:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to add item to cart",
     }
   }
 }
@@ -395,18 +368,12 @@ export async function updateLineItem({
     
     console.log(`[Cart] Successfully updated line item ${lineId}`)
     
-    // ✅ FIX: Invalidate caches after successful update
+    // Invalidate caches after successful update
     const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
       getCacheTag("carts"),
       getCacheTag("fulfillment")
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
-    
-    // ✅ Invalidate client-side cart cache
-    if (typeof window !== 'undefined') {
-      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
-      invalidateCartCache()
-    }
     
     return { success: true }
   } catch (error) {
@@ -416,7 +383,7 @@ export async function updateLineItem({
 }
 
 export async function deleteLineItem(lineId: string) {
-  // ✅ Validate inputs
+  // Validate inputs
   if (!lineId) {
     throw new Error("Missing lineItem ID when deleting line item")
   }
@@ -434,30 +401,23 @@ export async function deleteLineItem(lineId: string) {
   try {
     console.log(`[Cart] Attempting to delete line item ${lineId} from cart ${cartId}`)
     
-    // ✅ FIX: Properly await the entire operation
-    await retryWithBackoff(() =>
+    const res = (await retryWithBackoff(() =>
       sdk.store.cart.deleteLineItem(cartId, lineId, { 
         ...headers, 
         "Idempotency-Key": randomUUID() 
       })
-    )
+    )) as any
     
     console.log(`[Cart] Successfully deleted line item ${lineId}`)
     
-    // ✅ FIX: Invalidate caches after successful deletion
+    // Invalidate caches after successful deletion
     const [cartCacheTag, fulfillmentCacheTag] = await Promise.all([
       getCacheTag("carts"),
       getCacheTag("fulfillment")
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    // ✅ Invalidate client-side cart cache
-    if (typeof window !== 'undefined') {
-      const { invalidateCartCache } = await import("@lib/hooks/use-cart")
-      invalidateCartCache()
-    }
-    
-    return { success: true }
+    return { success: true, cart: res?.parent || null }
   } catch (error) {
     console.error(`[Cart] Failed to delete line item ${lineId}:`, error)
     throw medusaError(error)

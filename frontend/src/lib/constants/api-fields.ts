@@ -25,16 +25,16 @@ export const PRODUCT_FIELDS = {
 // Cart fields for different contexts
 export const CART_FIELDS = {
   // Minimal fields for cart count/badge
-  COUNT: "id,items.quantity",
+  COUNT: "id,*items",
   
   // Essential fields for cart dropdown
-  DROPDOWN: "id,*items.product.title,*items.product.handle,*items.product.thumbnail,*items.variant.title,*items.quantity,*items.unit_price,+subtotal,+total",
+  DROPDOWN: "id,*items,*items.variant,*items.variant.product,+subtotal,+total",
   
   // Full fields for cart page and checkout
-  FULL: "*items,*region,*items.product.title,*items.product.handle,*items.product.thumbnail,*items.variant.title,*items.variant.prices,*items.metadata,+items.total,*promotions,+shipping_methods.name,+subtotal,+total,+discount_total,+shipping_subtotal,+shipping_total,+tax_total,+gift_card_total",
+  FULL: "*items,*items.variant,*items.variant.product,*region,*shipping_address,*billing_address,*shipping_methods,*promotions,+subtotal,+total,+discount_total,+shipping_subtotal,+shipping_total,+tax_total",
   
   // Fields for order completion
-  COMPLETE: "id,email,*items,*region,*shipping_address,*billing_address,+subtotal,+total,+discount_total,+shipping_total,+tax_total",
+  COMPLETE: "id,email,*items,*items.variant,*region,*shipping_address,*billing_address,+subtotal,+total,+discount_total,+shipping_total,+tax_total",
 } as const
 
 // Collection fields

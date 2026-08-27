@@ -16,37 +16,16 @@ export const metadata: Metadata = {
 }
 
 export default async function Cart() {
-  // Fetch cart and customer in parallel
-  const [cart, customer] = await parallelFetch([
-    async () => {
-      try {
-        return await retrieveCart(undefined, undefined as any, { fresh: true })
-      } catch (error) {
-        console.error(error)
-        return null
-      }
-    },
-    async () => {
-      try {
-        return await retrieveCustomer()
-      } catch (error) {
-        console.error(error)
-        return null
-      }
-    }
+  const [cart, customer] = await Promise.all([
+    retrieveCart(undefined, undefined, { fresh: true }).catch((err) => {
+      console.error("[Cart Page] Error retrieving cart:", err)
+      return null
+    }),
+    retrieveCustomer().catch((err) => {
+      console.error("[Cart Page] Error retrieving customer:", err)
+      return null
+    }),
   ])
-
-  // Prefetch shipping and payment options in the background to speed-up checkout
-  if (cart) {
-    // Fire and forget – we don't await the result
-    parallelFetch([
-      () => import("@lib/data/fulfillment").then(({ listCartShippingMethods }) => listCartShippingMethods(cart.id)),
-      () => import("@lib/data/payment").then(({ listCartPaymentMethods }) => listCartPaymentMethods(cart.region?.id ?? "")),
-    ], { suppressErrors: true })
-  }
-  
-  // Even if cart is null, we'll render the cart template which will show an empty cart state
-  // instead of showing a 404 error page
 
   return (
     <Suspense fallback={<CartSkeleton />}>

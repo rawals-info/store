@@ -117,19 +117,14 @@ export default function ProductActions({
     setIsAdding(true)
 
     try {
-      await addToCart({
+      const res = await addToCart({
         variantId: selectedVariant.id,
         quantity,
         countryCode,
       })
 
-      const activePromo = getActivePromoCode()
-      if (activePromo) {
-        try {
-          await applyPromotions([activePromo])
-        } catch (e) {
-          // Gracefully continue if promo code is invalid/expired in backend
-        }
+      if (!res?.success) {
+        throw new Error(res?.error || "Failed to add to cart")
       }
 
       // Fire analytics add_to_cart event
@@ -143,9 +138,20 @@ export default function ProductActions({
       })
 
       setAddedToCart(true)
+
+      // Broadcast updated cart to all listeners for instant 0ms sync
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("cartUpdated", { detail: { quantity, forceOpen: true } }))
+        window.dispatchEvent(
+          new CustomEvent("cartUpdated", {
+            detail: {
+              cart: res.cart || null,
+              quantity,
+              forceOpen: true,
+            },
+          })
+        )
       }
+
       setTimeout(() => setAddedToCart(false), 2500)
     } catch (error) {
       console.error("Cart error:", error)
@@ -159,19 +165,14 @@ export default function ProductActions({
     setIsAdding(true)
 
     try {
-      await addToCart({
+      const res = await addToCart({
         variantId: selectedVariant.id,
         quantity,
         countryCode,
       })
 
-      const activePromo = getActivePromoCode()
-      if (activePromo) {
-        try {
-          await applyPromotions([activePromo])
-        } catch (e) {
-          // Gracefully continue if promo code is invalid/expired in backend
-        }
+      if (!res?.success) {
+        throw new Error(res?.error || "Failed to proceed to checkout")
       }
 
       // Fire analytics add_to_cart event
@@ -183,6 +184,18 @@ export default function ProductActions({
         price: itemPrice,
         quantity,
       })
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("cartUpdated", {
+            detail: {
+              cart: res.cart || null,
+              quantity,
+              forceOpen: false,
+            },
+          })
+        )
+      }
 
       router.push(`/${countryCode}/checkout`)
     } catch (error) {

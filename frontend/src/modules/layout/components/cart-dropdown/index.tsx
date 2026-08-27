@@ -41,7 +41,7 @@ const CartDropdown = ({
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
 
   // Use SWR to fetch and auto-revalidate cart
-  const { data: cartState } = (useSWR as any)(
+  const { data: cartState, mutate } = (useSWR as any)(
     "/api/cart",
     fetcher,
     {
@@ -55,7 +55,7 @@ const CartDropdown = ({
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
 
-  const cart = cartState as HttpTypes.StoreCart | null
+  const cart = (cartState || initialCart) as HttpTypes.StoreCart | null
 
   const totalItems =
     cart?.items?.reduce((acc: number, item: any) => {
@@ -114,6 +114,13 @@ const CartDropdown = ({
 
   useEffect(() => {
     const handleCartUpdate = (event: CustomEvent) => {
+      // Instant cache mutation if cart data is provided directly in event
+      if (event.detail?.cart) {
+        mutate(event.detail.cart, false)
+      } else {
+        mutate()
+      }
+
       if (!pathname.includes("/cart") && !pathname.includes("/checkout")) {
         if (event.detail?.forceOpen) {
           if (activeTimer) {
@@ -132,7 +139,7 @@ const CartDropdown = ({
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate as EventListener)
     }
-  }, [pathname, activeTimer])
+  }, [pathname, activeTimer, mutate])
 
   // Free shipping threshold (₹500)
   const freeShippingThreshold = 500

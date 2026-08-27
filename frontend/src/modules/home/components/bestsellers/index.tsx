@@ -60,11 +60,12 @@ function CommercialProductCard({
   return (
     <>
       <motion.div
-        initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ duration: 0.4, delay: (index % 4) * 0.05 }}
-        className="group bg-white rounded-3xl border border-amber-100/80 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+        initial={prefersReduced ? false : { opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "50px" }}
+        transition={{ duration: 0.35, delay: Math.min((index % 4) * 0.04, 0.2) }}
+        whileHover={{ y: -4 }}
+        className="group bg-white rounded-3xl border border-amber-100/80 overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between"
       >
         {/* Top Image area */}
         <div className="relative">
@@ -171,7 +172,7 @@ function CommercialProductCard({
 
 export default function Bestsellers({ products, countryCode, region }: BestsellerProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: "-80px" })
+  const inView = useInView(ref, { once: true, margin: "50px" })
   const prefersReduced = useReducedMotion()
   const [activeTab, setActiveTab] = useState<string>("all")
 
@@ -211,12 +212,7 @@ export default function Bestsellers({ products, countryCode, region }: Bestselle
       <div className="max-w-7xl mx-auto px-5 lg:px-10" ref={ref}>
         
         {/* Section Header */}
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.55 }}
-          className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-4"
-        >
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="font-jakarta text-xs uppercase tracking-[0.2em] text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/80">
@@ -241,7 +237,7 @@ export default function Bestsellers({ products, countryCode, region }: Bestselle
           >
             Browse Full Store ({products.length}) →
           </Link>
-        </motion.div>
+        </div>
 
         {/* Filter Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 no-scrollbar">

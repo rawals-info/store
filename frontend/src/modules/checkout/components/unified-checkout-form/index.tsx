@@ -225,9 +225,17 @@ export default function UnifiedCheckoutForm({
 
       // 3. Determine and Initiate Payment Session
       const chosenProvider = selectedPaymentMethod || initialProvider
-      const paymentResponse = await initiatePaymentSession(cart, {
-        provider_id: chosenProvider,
-      })
+      let paymentCollection = (cartUpdated?.payment_collection || cart.payment_collection)
+      try {
+        const paymentResponse = await initiatePaymentSession(cartUpdated || cart, {
+          provider_id: chosenProvider,
+        })
+        if (paymentResponse?.payment_collection) {
+          paymentCollection = paymentResponse.payment_collection
+        }
+      } catch (payErr: any) {
+        console.warn("[handleSubmit] Payment session warning:", payErr?.message)
+      }
 
       // 4. Construct complete updated cart object with all addresses & methods set
       const updatedAddress = {
@@ -259,7 +267,7 @@ export default function UnifiedCheckoutForm({
               } as any,
             ]
           : cart.shipping_methods || [],
-        payment_collection: paymentResponse?.payment_collection || cart.payment_collection,
+        payment_collection: paymentCollection as any,
       }
 
       setCartUpdated(updatedCart)

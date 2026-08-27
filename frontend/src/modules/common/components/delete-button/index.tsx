@@ -31,23 +31,28 @@ const DeleteButton = ({
     console.log(`[DeleteButton] Starting delete for item ${id}`)
     
     try {
-      // ✅ Call the fixed deleteLineItem function
-      await deleteLineItem(id)
+      // Call the optimized deleteLineItem function
+      const res = await deleteLineItem(id)
       
       console.log(`[DeleteButton] Successfully deleted item ${id}`)
       
-      // ✅ Notify all listeners to refresh cart state
+      // Notify all listeners with the updated cart for instant 0ms sync
       if (typeof window !== "undefined") {
         announceCart({
           // @ts-ignore
           removeItemId: id,
         } as any)
         
-        // Also trigger cartUpdated event for other components
-        window.dispatchEvent(new Event("cartUpdated"))
+        window.dispatchEvent(
+          new CustomEvent("cartUpdated", {
+            detail: {
+              cart: res?.cart || null,
+              forceRefresh: !res?.cart,
+            },
+          })
+        )
       }
     } catch (err) {
-      // ✅ Show detailed error to user
       console.error(`[DeleteButton] Failed to remove item ${id}:`, err)
       
       const errorMessage = err instanceof Error 
@@ -56,9 +61,8 @@ const DeleteButton = ({
       
       setError(errorMessage)
       
-      // Trigger a refresh to reconcile cart state even on error
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("cartUpdated"))
+        window.dispatchEvent(new CustomEvent("cartUpdated", { detail: { forceRefresh: true } }))
       }
       
       // Auto-clear error after 5 seconds

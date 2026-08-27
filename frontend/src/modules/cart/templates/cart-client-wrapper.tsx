@@ -60,10 +60,14 @@ const CartClientWrapper = ({
   const router = useRouter()
 
   useEffect(() => {
-    const handleCartUpdate = async () => {
+    const handleCartUpdate = async (e: Event) => {
+      const customEvent = e as CustomEvent
+      if (customEvent?.detail?.cart) {
+        setCart(customEvent.detail.cart)
+        return
+      }
+
       setIsRefreshing(true)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
       try {
         const cacheBuster = Date.now()
         const response = await fetch(`/api/cart?t=${cacheBuster}`, {
@@ -77,7 +81,9 @@ const CartClientWrapper = ({
         
         if (response.ok) {
           const { cart: updatedCart } = await response.json()
-          setCart(updatedCart)
+          if (updatedCart) {
+            setCart(updatedCart)
+          }
         } else {
           router.refresh()
         }
@@ -95,7 +101,8 @@ const CartClientWrapper = ({
   }, [router])
   
   useEffect(() => {
-    if (initialCart !== cart && initialCart !== undefined) {
+    // Only update if initialCart has items or if cart was not initialized yet
+    if (initialCart && initialCart.items && initialCart.items.length > 0) {
       setCart(initialCart)
     }
   }, [initialCart])
@@ -118,15 +125,20 @@ const CartClientWrapper = ({
           countryCode: "in",
         })
 
-        if (addRes?.success && addRes?.cart) {
-          setCart(addRes.cart)
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("cartUpdated", {
+              detail: {
+                cart: addRes?.cart || null,
+                quantity: 1,
+                forceOpen: false,
+              },
+            })
+          )
         }
       }
-
-      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { quantity: 1, forceOpen: false } }))
-      router.refresh()
-    } catch (error) {
-      console.error("Failed to add pairing sweet to cart:", error)
+    } catch (e) {
+      console.error("Failed to add pairing item:", e)
     } finally {
       setTimeout(() => {
         setAddingUpsell(prev => ({ ...prev, [item.handle]: false }))
