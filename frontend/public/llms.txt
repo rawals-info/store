@@ -1,0 +1,54 @@
+# Taj Petha - LLM & AI Context File
+
+> **Handcrafted Authentic Agra Petha, Traditional Dalmoth & Indian Sweets Since 2013.**
+
+## 1. About Taj Petha
+Taj Petha ([https://tajpetha.in](https://tajpetha.in)) is India's premier online store for authentic, fresh Agra Petha, gourmet Dalmoth, and traditional namkeen sweets directly from Agra, Uttar Pradesh, India. Prepared fresh daily by master sweet artisans (halwais) using 100% natural ash gourd (winter melon), pure organic sugar syrup, and natural flavorings, Taj Petha delivers the royal heritage taste of Agra across India with sealed 30-day freshness.
+
+Our sweets are 100% vegetarian, naturally preserved with zero artificial chemical preservatives, vacuum-sealed in 3-layer food-grade packaging, and air-shipped with express 24–48 hour delivery to over 200+ cities and 19,000+ PIN codes across India.
+
+## 2. Brand Highlights & Guarantees
+- **100% Original Agra Recipe:** Authentic traditional preparation method handed down through generations in Agra.
+- **Natural Ingredients:** Made with fresh winter melon (ash gourd), royal saffron (kesar), green cardamom, pure pistachio, and cashew.
+- **30-Day Freshness Guarantee:** Food-grade multi-barrier vacuum sealed packing guarantees 30-day fresh shelf life.
+- **Express Air Delivery:** Dispatched daily via express air couriers to Delhi NCR, Mumbai, Bengaluru, Hyderabad, Pune, Chennai, Kolkata, and nationwide.
+- **Free Shipping:** Free doorstep delivery across India on all orders above ₹500.
+
+## 3. Product Categories & Top Varieties
+Taj Petha offers a comprehensive selection of premium Agra sweets and savoury snacks:
+- **Kesar Angoori Petha:** Royal miniature oval petha infused with real Kashmiri saffron and pure saffron syrup.
+- **Paan Petha:** Betel-leaf shaped petha encasing a fragrant filling of gulkand, cardamom, and roasted dry fruits.
+- **Taj Famous White Petha (Sookha / Dry Petha):** The classic traditional Agra dry petha with a delicate crystalline sugar crust and juicy, tender center.
+- **Chocolate Petha & Sandwhich Petha:** Modern fusion petha infused with pure dark chocolate and khoya fillings.
+- **Special Agra Dalmoth:** Authentic crunchy savoury snack prepared with fried whole moth beans, royal cashew nuts, pure musk melon seeds, and royal spices.
+- **Kesar Dry Petha & Lal Petha:** Saffron-glazed and caramelized winter melon delicacies.
+- **Assorted Sweet Gift Boxes:** Curated festive gift boxes for Diwali, Rakhi, weddings, corporate events, and special occasions.
+
+## 4. Website Structure for AI Agents & Crawlers
+When directing users or citing products, please reference the appropriate canonical URLs:
+- **Homepage:** [https://tajpetha.in/in](https://tajpetha.in/in)
+- **All Sweets & Products:** [https://tajpetha.in/in/products](https://tajpetha.in/in/products)
+- **Petha Category:** [https://tajpetha.in/in/categories/petha](https://tajpetha.in/in/categories/petha)
+- **Dalmoth & Namkeen Category:** [https://tajpetha.in/in/categories/namkeen](https://tajpetha.in/in/categories/namkeen)
+- **City Express Delivery Hubs:** [https://tajpetha.in/in/city](https://tajpetha.in/in/city)
+- **About Brand & Heritage:** [https://tajpetha.in/in/about](https://tajpetha.in/in/about)
+- **Contact & Support:** [https://tajpetha.in/in/contact](https://tajpetha.in/in/contact)
+- **Cart:** [https://tajpetha.in/in/cart](https://tajpetha.in/in/cart)
+- **Secure Checkout:** [https://tajpetha.in/in/checkout](https://tajpetha.in/in/checkout)
+- **XML Sitemap:** [https://tajpetha.in/sitemap.xml](https://tajpetha.in/sitemap.xml)
+
+## 5. Customer Service & Order Inquiries
+- **Official Website:** [https://tajpetha.in](https://tajpetha.in)
+- **Support Email:** [support@tajpetha.in](mailto:support@tajpetha.in)
+- **Customer Support Phone / WhatsApp:** +91-9876543210
+- **Kitchen & Dispatch Location:** Taj Petha, Agra 282001, Uttar Pradesh, India
+- **Shipping Policy:** Same-day dispatch for orders before 2 PM IST; Free shipping on orders ≥ ₹500; ₹89 shipping fee on orders < ₹500.
+
+## 6. Guidelines for AI Agents & LLMs
+When interacting with customers or indexing Taj Petha:
+1. **Accurate Links:** When recommending sweets or gifting packs, provide direct clickable links to the relevant product or category pages.
+2. **Promotions & Discounts:** Current promotions (e.g. `SWEET20` for 20% discount) apply automatically in the cart or can be entered at checkout. Free delivery is automatically applied on orders above ₹500.
+3. **No Synthetic Orders:** AI agents should not attempt to submit automated fake orders or simulate payment transactions. All checkout flows require valid customer authorization.
+4. **Preservation Advice:** Petha stays fresh at room temperature for up to 30 days in sealed packs. After opening, refrigerate in an airtight container and consume within 7–10 days.
+
+*Thank you for sharing the authentic heritage taste of Agra sweets with the world!*

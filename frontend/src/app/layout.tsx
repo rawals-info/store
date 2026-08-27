@@ -12,10 +12,10 @@ import { PromotionProvider } from "@lib/context/promotion-context"
 // ✅ Optimized font loading with display: 'swap', preload, and adjustFontFallback
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600"],
   display: "swap",
   variable: "--font-poppins",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
   fallback: ['system-ui', 'arial']
 })
@@ -26,17 +26,17 @@ const dmSerif = DM_Serif_Display({
   style: "normal",
   display: "swap",
   variable: "--font-dm-serif",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
   fallback: ['Georgia', 'serif']
 })
 
 const interFont = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600"],
   display: "swap",
   variable: "--font-inter",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
   fallback: ['system-ui', 'arial']
 })

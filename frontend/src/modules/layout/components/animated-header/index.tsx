@@ -180,13 +180,6 @@ const AnimatedHeader = () => {
           boxShadow: headerShadow,
           backgroundColor: headerBg,
         }}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{
-          duration: 0.7,
-          ease: [0.16, 1, 0.3, 1],
-          delay: 0.1
-        }}
       >
         {/* Decorative accent line */}
         <motion.div

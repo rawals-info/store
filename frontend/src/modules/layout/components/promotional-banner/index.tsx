@@ -189,10 +189,9 @@ export default function PromotionalBanner() {
         {!bannerDismissed && (
           <motion.div
             className="fixed top-0 inset-x-0 z-[50] h-12 bg-gradient-to-r from-[#341202] via-[#742b08] to-[#341202] text-white flex items-center overflow-hidden border-b border-amber-400/25 shadow-md select-none"
-            initial={{ y: -48, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -48, opacity: 0 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* Subtle Luxury Golden Ambient Shimmer Overlay */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-400/10 via-transparent to-transparent pointer-events-none" />

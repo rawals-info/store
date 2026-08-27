@@ -48,34 +48,19 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
             </motion.div>
 
             {/* Main headline - Clear, High-Converting, Plain English */}
-            <motion.h1
-              initial={prefersReduced ? false : { opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="font-cormorant text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-[1.1] mb-4"
-            >
+            <h1 className="font-cormorant text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-[1.1] mb-4">
               Order Original
               <br />
               <span className="text-petha-amber">Fresh Agra Petha</span> Online
-            </motion.h1>
+            </h1>
 
             {/* Subheadline */}
-            <motion.p
-              initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.3 }}
-              className="font-jakarta text-base lg:text-lg text-slate-600 max-w-lg leading-relaxed mb-6"
-            >
+            <p className="font-jakarta text-base lg:text-lg text-slate-600 max-w-lg leading-relaxed mb-6">
               Delicious soft Agra Petha, crunchy namkeen &amp; famous Dalmoth made fresh daily with 100% pure ingredients. Vacuum-sealed for doorstep delivery across India in 24–48 hours.
-            </motion.p>
+            </p>
 
             {/* Trust pills */}
-            <motion.div
-              initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.4 }}
-              className="flex flex-wrap gap-2 mb-8"
-            >
+            <div className="flex flex-wrap gap-2 mb-8">
               {TRUST_PILLS.map(p => (
                 <span
                   key={p.label}
@@ -85,15 +70,10 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
                   {p.label}
                 </span>
               ))}
-            </motion.div>
+            </div>
 
             {/* High-Converting CTAs */}
-            <motion.div
-              initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.5 }}
-              className="flex flex-col sm:flex-row gap-3.5"
-            >
+            <div className="flex flex-col sm:flex-row gap-3.5">
               <Link href={shopLink} id="hero-shop-cta">
                 <motion.span
                   whileHover={prefersReduced ? {} : { scale: 1.03 }}
@@ -115,16 +95,11 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
                   Explore Petha Varieties
                 </motion.span>
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           {/* RIGHT: Hero Image Card Showcase */}
-          <motion.div
-            initial={prefersReduced ? false : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.65, delay: 0.3 }}
-            className="relative"
-          >
+          <div className="relative">
             {/* Visual Frame */}
             <div className="relative w-full aspect-[4/3.8] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-amber-50">
               <Image
@@ -132,9 +107,9 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
                 alt="Fresh authentic Agra Petha collection"
                 fill
                 priority
-                sizes="(max-width: 1024px) 100vw, 45vw"
+                sizes="(max-width: 640px) 92vw, (max-width: 1024px) 85vw, 45vw"
                 className="object-cover"
-                quality={90}
+                quality={75}
               />
               
               {/* Bottom gradient overlay */}
@@ -160,7 +135,7 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
