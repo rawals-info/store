@@ -17,7 +17,7 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
 
   return (
     <section
-      className="relative w-full bg-[#FAF8F5] overflow-hidden flex items-center pt-8 lg:pt-12 pb-12 lg:pb-16"
+      className="relative w-full bg-[#FAF8F5] overflow-hidden flex items-center pt-24 sm:pt-28 lg:pt-32 pb-12 lg:pb-16"
       aria-label="Hero section — Taj Petha"
     >
       {/* Warm ambient glow */}
