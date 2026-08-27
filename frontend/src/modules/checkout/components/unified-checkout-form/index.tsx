@@ -71,16 +71,33 @@ export default function UnifiedCheckoutForm({
   const [cartUpdated, setCartUpdated] = useState(cart)
   const [currentSection, setCurrentSection] = useState<1 | 2>(1)
 
+  useEffect(() => {
+    setCartUpdated(cart)
+  }, [cart])
+
+  useEffect(() => {
+    const handleCartUpdate = (e: CustomEvent) => {
+      if (e.detail?.cart) {
+        setCartUpdated(e.detail.cart)
+      }
+    }
+    window.addEventListener("cartUpdated" as any, handleCartUpdate)
+    return () => window.removeEventListener("cartUpdated" as any, handleCartUpdate)
+  }, [])
+
+  const currentItemsSubtotal = (cartUpdated?.item_subtotal ?? ((cartUpdated?.subtotal ?? 0) - (cartUpdated?.shipping_subtotal ?? 0)))
+  const currentDiscount = cartUpdated?.discount_total || 0
+  const currentNetItemsTotal = Math.max(0, currentItemsSubtotal - currentDiscount)
+  const isFreeShippingUnlocked = currentNetItemsTotal >= 500
+
   const handleShippingMethodChange = (methodId: string) => {
     setSelectedShippingMethod(methodId)
     const activeShippingOption = shippingMethods?.find((m: any) => m.id === methodId)
-    const shippingAmount = activeShippingOption?.amount || 0
-    const itemsSubtotal = (cart.item_subtotal ?? ((cart.subtotal ?? 0) - (cart.shipping_subtotal ?? 0)))
-    const discount = cart.discount_total || 0
-    const netTotal = Math.max(0, itemsSubtotal - discount) + shippingAmount
+    const shippingAmount = isFreeShippingUnlocked ? 0 : 89
+    const netTotal = currentNetItemsTotal + shippingAmount
 
     const liveUpdatedCart: HttpTypes.StoreCart = {
-      ...cart,
+      ...cartUpdated,
       shipping_subtotal: shippingAmount,
       shipping_total: shippingAmount,
       total: netTotal,
@@ -103,7 +120,7 @@ export default function UnifiedCheckoutForm({
     if (shippingMethods?.length === 1 && !selectedShippingMethod) {
       handleShippingMethodChange(shippingMethods[0].id)
     }
-  }, [shippingMethods, selectedShippingMethod])
+  }, [shippingMethods, selectedShippingMethod, isFreeShippingUnlocked])
 
   const formatPhoneNumber = (value: string) => {
     let cleaned = value.replace(/[^\d+]/g, "")
@@ -279,13 +296,14 @@ export default function UnifiedCheckoutForm({
       }
 
       const activeShippingOption = shippingMethods?.find((m: any) => m.id === selectedShippingMethod)
-      const shippingAmount = activeShippingOption?.amount || 0
-      const itemsSubtotal = (cart.item_subtotal ?? ((cart.subtotal ?? 0) - (cart.shipping_subtotal ?? 0)))
-      const discount = cart.discount_total || 0
-      const netTotal = Math.max(0, itemsSubtotal - discount) + shippingAmount
+      const itemsSubtotal = (cartUpdated?.item_subtotal ?? ((cartUpdated?.subtotal ?? 0) - (cartUpdated?.shipping_subtotal ?? 0)))
+      const discount = cartUpdated?.discount_total || 0
+      const netItemsTotal = Math.max(0, itemsSubtotal - discount)
+      const shippingAmount = netItemsTotal >= 500 ? 0 : 89
+      const netTotal = netItemsTotal + shippingAmount
 
       const updatedCart: HttpTypes.StoreCart = {
-        ...cart,
+        ...cartUpdated,
         shipping_subtotal: shippingAmount,
         shipping_total: shippingAmount,
         total: netTotal,
@@ -301,7 +319,7 @@ export default function UnifiedCheckoutForm({
                 name: activeShippingOption?.name || "Standard Shipping",
               } as any,
             ]
-          : cart.shipping_methods || [],
+          : cartUpdated?.shipping_methods || [],
         payment_collection: paymentCollection as any,
       }
 
@@ -587,10 +605,7 @@ export default function UnifiedCheckoutForm({
                         </div>
                       </div>
                       <span className="font-mono font-bold text-sm text-slate-900">
-                        {convertToLocale({
-                          amount: method.amount!,
-                          currency_code: cart?.currency_code,
-                        })}
+                        {isFreeShippingUnlocked ? "₹0 (Free)" : "₹89.00"}
                       </span>
                     </Radio>
                   ))}

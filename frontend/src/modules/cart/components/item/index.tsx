@@ -26,13 +26,19 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
     setUpdating(true)
 
     try {
-      await updateLineItem({
+      const res = await updateLineItem({
         lineId: item.id,
         quantity,
       })
       
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("cartUpdated"))
+        window.dispatchEvent(
+          new CustomEvent("cartUpdated", {
+            detail: {
+              cart: res?.cart || null,
+            },
+          })
+        )
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update quantity"

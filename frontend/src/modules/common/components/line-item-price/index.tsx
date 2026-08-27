@@ -14,8 +14,21 @@ const LineItemPrice = ({
   style = "default",
   currencyCode,
 }: LineItemPriceProps) => {
-  const currentPrice = item.total ?? ((item.unit_price ?? 0) * (item.quantity ?? 1))
-  const originalPrice = item.original_total ?? ((item as any).compare_at_unit_price ? (item as any).compare_at_unit_price * (item.quantity ?? 1) : currentPrice)
+  const itemAdjustments =
+    (item as any).adjustments?.reduce(
+      (acc: number, adj: any) => acc + (adj.amount || 0),
+      0
+    ) || (item as any).discount_total || 0
+
+  const unitPrice = item.unit_price ?? 0
+  const quantity = item.quantity ?? 1
+  const originalPrice = item.original_total ?? (unitPrice * quantity)
+
+  let currentPrice = item.total ?? (originalPrice - itemAdjustments)
+  if (itemAdjustments > 0 && currentPrice >= originalPrice) {
+    currentPrice = Math.max(0, originalPrice - itemAdjustments)
+  }
+
   const hasReducedPrice = originalPrice > currentPrice && currentPrice > 0
 
   return (

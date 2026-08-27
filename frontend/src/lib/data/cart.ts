@@ -267,7 +267,8 @@ export async function addToCart({
         `cart-${cartId}`,
       ])
       
-      return { success: true, cart: finalCart }
+      const freshCart = await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true })
+      return { success: true, cart: freshCart || finalCart }
     } catch (err) {
       console.warn(`[addToCart] Existing cart ${cartId} invalid or completed, creating fresh cart:`, err)
       // Fall through to cart creation
@@ -328,7 +329,8 @@ export async function addToCart({
       `cart-${newCart.id}`,
     ])
     
-    return { success: true, cart: finalCart }
+    const freshCart = await retrieveCart(newCart.id, CART_FIELDS.FULL, { fresh: true })
+    return { success: true, cart: freshCart || finalCart }
   } catch (error) {
     console.error("[addToCart] Error creating cart and line item:", error)
     return {
@@ -449,7 +451,8 @@ export async function updateLineItem({
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    return { success: true }
+    const freshCart = await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true })
+    return { success: true, cart: freshCart }
   } catch (error) {
     console.error(`[Cart] Failed to update line item ${lineId}:`, error)
     throw medusaError(error)
@@ -475,12 +478,12 @@ export async function deleteLineItem(lineId: string) {
   try {
     console.log(`[Cart] Attempting to delete line item ${lineId} from cart ${cartId}`)
     
-    const res = (await retryWithBackoff(() =>
+    await retryWithBackoff(() =>
       sdk.store.cart.deleteLineItem(cartId, lineId, { 
         ...headers, 
         "Idempotency-Key": randomUUID() 
       })
-    )) as any
+    )
     
     console.log(`[Cart] Successfully deleted line item ${lineId}`)
     
@@ -491,7 +494,8 @@ export async function deleteLineItem(lineId: string) {
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    return { success: true, cart: res?.parent || null }
+    const freshCart = await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true })
+    return { success: true, cart: freshCart }
   } catch (error) {
     console.error(`[Cart] Failed to delete line item ${lineId}:`, error)
     throw medusaError(error)

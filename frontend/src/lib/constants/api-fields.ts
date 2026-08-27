@@ -28,13 +28,13 @@ export const CART_FIELDS = {
   COUNT: "id,*items",
   
   // Essential fields for cart dropdown
-  DROPDOWN: "id,*items,*items.variant,*items.variant.product,+subtotal,+total",
+  DROPDOWN: "id,*items,*items.adjustments,*items.variant,*items.variant.product,*promotions,+subtotal,+total,+discount_total",
   
   // Full fields for cart page and checkout
-  FULL: "*items,*items.variant,*items.variant.product,*region,*shipping_address,*billing_address,*shipping_methods,*promotions,+subtotal,+total,+discount_total,+shipping_subtotal,+shipping_total,+tax_total",
+  FULL: "*items,*items.adjustments,*items.variant,*items.variant.product,*region,*shipping_address,*billing_address,*shipping_methods,*promotions,+subtotal,+total,+discount_total,+shipping_subtotal,+shipping_total,+tax_total",
   
   // Fields for order completion
-  COMPLETE: "id,email,*items,*items.variant,*region,*shipping_address,*billing_address,+subtotal,+total,+discount_total,+shipping_total,+tax_total",
+  COMPLETE: "id,email,*items,*items.adjustments,*items.variant,*region,*shipping_address,*billing_address,+subtotal,+total,+discount_total,+shipping_total,+tax_total",
 } as const
 
 // Collection fields

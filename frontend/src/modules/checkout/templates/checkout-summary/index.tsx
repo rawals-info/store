@@ -30,12 +30,30 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
     return () => window.removeEventListener("cartUpdated" as any, handleCartUpdate)
   }, [])
 
+  const itemsSubtotal = (currentCart?.item_subtotal ?? ((currentCart?.subtotal ?? 0) - (currentCart?.shipping_subtotal ?? 0)))
+  const discountTotal = currentCart?.discount_total ?? 0
+  const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
+  const isFreeShipping = netItemsTotal >= 500
+
   const hasShippingMethod = Boolean(
     (currentCart?.shipping_methods && currentCart.shipping_methods.length > 0) ||
-    (currentCart?.shipping_subtotal !== undefined && currentCart?.shipping_subtotal !== null && currentCart?.shipping_subtotal > 0)
+    (currentCart?.shipping_subtotal !== undefined && currentCart?.shipping_subtotal !== null && currentCart?.shipping_subtotal > 0) ||
+    isFreeShipping
   )
   const atAddressStep = (!currentCart?.shipping_address?.address_1 || !currentCart?.email) && !hasShippingMethod
-  const shippingPlaceholder = atAddressStep ? "Enter your shipping address" : "Calculated at checkout"
+  const shippingPlaceholder = isFreeShipping 
+    ? "Free shipping" 
+    : (atAddressStep ? "Enter your shipping address" : "Calculated at checkout")
+
+  const dynamicShippingSubtotal = isFreeShipping ? 0 : 89
+  const dynamicTotal = netItemsTotal + dynamicShippingSubtotal
+
+  const displayCart = {
+    ...currentCart,
+    shipping_subtotal: dynamicShippingSubtotal,
+    shipping_total: dynamicShippingSubtotal,
+    total: dynamicTotal,
+  }
 
   // Fetch live products for impulse add
   useEffect(() => {
@@ -87,7 +105,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         {/* Totals */}
         <div className="py-4">
           <CartTotals 
-            totals={currentCart} 
+            totals={displayCart} 
             shippingPlaceholder={shippingPlaceholder}
             taxPlaceholder="All taxes included" 
           />
@@ -97,14 +115,14 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
 
         {/* Items Preview */}
         <div className="py-2">
-          <ItemsPreviewTemplate cart={cart} />
+          <ItemsPreviewTemplate cart={currentCart} />
         </div>
 
         <div className="h-px bg-slate-100 my-4" />
 
         {/* Promo Code Input */}
         <div>
-          <DiscountCode cart={cart} />
+          <DiscountCode cart={currentCart} />
         </div>
       </div>
 

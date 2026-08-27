@@ -12,8 +12,12 @@ type ItemsTemplateProps = {
 }
 
 const ItemsPreviewTemplate = ({ cart }: ItemsTemplateProps) => {
-  const items = cart.items
+  const items = cart?.items
   const hasOverflow = items && items.length > 4
+
+  if (items && items.length === 0) {
+    return null
+  }
 
   return (
     <div
