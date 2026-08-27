@@ -2,7 +2,7 @@
 
 import { setAddressesSinglePage } from "@lib/actions/cart"
 import { setShippingMethod, initiatePaymentSession } from "@lib/data/cart"
-import { isStripe as isStripeFunc, paymentInfoMap, isPaypal as isPaypalFunc } from "@lib/constants"
+import { isStripe as isStripeFunc, paymentInfoMap, isPaypal as isPaypalFunc, isRazorpay as isRazorpayFunc } from "@lib/constants"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { RadioGroup, Radio } from "@headlessui/react"
@@ -13,9 +13,8 @@ import PaymentContainer, { StripeCardContainer } from "@modules/checkout/compone
 import PayPalContainer from "@modules/checkout/components/paypal-container"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentButton from "@modules/checkout/components/payment-button"
-import DiscountCode from "@modules/checkout/components/discount-code"
 import { useState, useEffect } from "react"
-import { MapPin, CreditCard, Check, ArrowRight, ArrowLeft, ShieldCheck, Lock, Sparkles, Truck } from "lucide-react"
+import { MapPin, CreditCard, Check, ArrowRight, ArrowLeft, ShieldCheck, Lock, Sparkles, Truck, Phone, Mail, User, Building } from "lucide-react"
 
 interface UnifiedCheckoutFormProps {
   cart: HttpTypes.StoreCart
@@ -33,6 +32,7 @@ export default function UnifiedCheckoutForm({
   // Form states
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSwitchingPayment, setIsSwitchingPayment] = useState(false)
   const [formTouched, setFormTouched] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -47,32 +47,29 @@ export default function UnifiedCheckoutForm({
     phone: cart?.shipping_address?.phone || "+91",
   })
 
+  // Shipping methods filter
+  const shippingMethods = availableShippingMethods
+    ?.filter((sm: any) => sm.service_zone?.fulfillment_set?.type !== "pickup")
+    ?.filter((sm: any) => sm.name.toLowerCase() !== "express shipping")
+
   // Shipping states
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(
-    cart.shipping_methods?.at(-1)?.shipping_option_id || ""
+    cart.shipping_methods?.at(-1)?.shipping_option_id || shippingMethods?.[0]?.id || ""
   )
 
+  // Initial payment provider detection
+  const initialProvider = 
+    cart.payment_collection?.payment_sessions?.[0]?.provider_id ||
+    availablePaymentMethods?.find((pm: any) => isRazorpayFunc(pm.id) || isStripeFunc(pm.id) || pm.id === "pp_system_default")?.id ||
+    availablePaymentMethods?.[0]?.id ||
+    "pp_system_default"
+
   // Payment states
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(initialProvider)
   const [cardComplete, setCardComplete] = useState(false)
   const [cardBrand, setCardBrand] = useState<string | null>(null)
   const [cartUpdated, setCartUpdated] = useState(cart)
   const [currentSection, setCurrentSection] = useState<1 | 2>(1)
-
-  useEffect(() => {
-    const handleCartUpdate = () => {
-      window.location.reload()
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("cartUpdated", handleCartUpdate)
-      return () => window.removeEventListener("cartUpdated", handleCartUpdate)
-    }
-  }, [])
-
-  const shippingMethods = availableShippingMethods
-    ?.filter((sm: any) => sm.service_zone?.fulfillment_set?.type !== "pickup")
-    ?.filter((sm: any) => sm.name.toLowerCase() !== "express shipping")
 
   useEffect(() => {
     if (shippingMethods?.length === 1 && !selectedShippingMethod) {
@@ -104,7 +101,7 @@ export default function UnifiedCheckoutForm({
         return !value.trim() ? "Last name is required" : ""
       case "email":
         return !value.trim() ? "Email is required" : !/\S+@\S+\.\S+/.test(value) ? "Please enter a valid email address" : ""
-      case "shipping_address.phone":
+      case "shipping_address.phone": {
         const digits = value.replace(/\D/g, "")
         if (!value.trim() || digits === "" || digits === "91") {
           return "Phone number is required for courier delivery updates"
@@ -113,6 +110,7 @@ export default function UnifiedCheckoutForm({
           return "Please enter a valid 10-digit mobile number"
         }
         return ""
+      }
       case "shipping_address.address_1":
         return !value.trim() ? "Complete street address is required" : ""
       case "shipping_address.city":
@@ -126,18 +124,42 @@ export default function UnifiedCheckoutForm({
 
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const error = validateField(name, value)
+    const fieldError = validateField(name, value)
     setFormErrors(prev => {
       const updated = { ...prev }
-      if (!error) {
+      if (!fieldError) {
         delete updated[name]
       } else {
-        updated[name] = error
+        updated[name] = fieldError
       }
       return updated
     })
-    if (error) {
+    if (fieldError) {
       setError(null)
+    }
+  }
+
+  const handlePaymentMethodChange = async (providerId: string) => {
+    setSelectedPaymentMethod(providerId)
+    setError(null)
+    setIsSwitchingPayment(true)
+
+    try {
+      const response = await initiatePaymentSession(cartUpdated, {
+        provider_id: providerId,
+      })
+
+      if (response?.payment_collection) {
+        setCartUpdated((prev: any) => ({
+          ...prev,
+          payment_collection: response.payment_collection,
+        }))
+      }
+    } catch (err: any) {
+      console.error("Failed to update payment method session:", err)
+      setError(err.message || "Failed to switch payment method. Please try again.")
+    } finally {
+      setIsSwitchingPayment(false)
     }
   }
 
@@ -162,8 +184,8 @@ export default function UnifiedCheckoutForm({
 
     for (const field of requiredFields) {
       const val = (formData.get(field) as string) || ""
-      const error = validateField(field, val)
-      if (error) errors[field] = error
+      const fieldError = validateField(field, val)
+      if (fieldError) errors[field] = fieldError
     }
 
     if (!selectedShippingMethod && shippingMethods && shippingMethods.length > 0) {
@@ -190,42 +212,59 @@ export default function UnifiedCheckoutForm({
     }
 
     try {
+      // 1. Save Addresses via Server Action
       const addressResult = await setAddressesSinglePage(formData)
       if (addressResult && !addressResult.success) {
         throw new Error(addressResult.error || "Failed to update address")
       }
 
+      // 2. Set Shipping Method
       if (selectedShippingMethod) {
         await setShippingMethod({ cartId: cart.id, shippingMethodId: selectedShippingMethod })
       }
 
-      const defaultPaymentProvider = availablePaymentMethods?.find(
-        (pm: any) => pm.id === "pp_system_default" || isStripeFunc(pm.id)
-      )?.id || availablePaymentMethods?.[0]?.id || "manual"
-
+      // 3. Determine and Initiate Payment Session
+      const chosenProvider = selectedPaymentMethod || initialProvider
       const paymentResponse = await initiatePaymentSession(cart, {
-        provider_id: defaultPaymentProvider,
+        provider_id: chosenProvider,
       })
 
-      const updatedCart = {
+      // 4. Construct complete updated cart object with all addresses & methods set
+      const updatedAddress = {
+        first_name: (formData.get("shipping_address.first_name") as string) || "",
+        last_name: (formData.get("shipping_address.last_name") as string) || "",
+        address_1: (formData.get("shipping_address.address_1") as string) || "",
+        address_2: (formData.get("shipping_address.address_2") as string) || "",
+        city: (formData.get("shipping_address.city") as string) || "",
+        postal_code: (formData.get("shipping_address.postal_code") as string) || "",
+        province: (formData.get("shipping_address.province") as string) || "",
+        phone: (formData.get("shipping_address.phone") as string) || "",
+        country_code: "in",
+      }
+
+      const activeShippingOption = shippingMethods?.find((m: any) => m.id === selectedShippingMethod)
+
+      const updatedCart: HttpTypes.StoreCart = {
         ...cart,
-        shipping_address: {
-          first_name: formData.get("shipping_address.first_name") as string,
-          last_name: formData.get("shipping_address.last_name") as string,
-          address_1: formData.get("shipping_address.address_1") as string,
-          address_2: formData.get("shipping_address.address_2") as string,
-          city: formData.get("shipping_address.city") as string,
-          postal_code: formData.get("shipping_address.postal_code") as string,
-          province: formData.get("shipping_address.province") as string,
-          phone: formData.get("shipping_address.phone") as string,
-          country_code: "in",
-        } as any,
+        shipping_address: updatedAddress as any,
+        billing_address: updatedAddress as any,
         email: formData.get("email") as string,
-        payment_collection: paymentResponse.payment_collection,
-      } as any
+        shipping_methods: selectedShippingMethod
+          ? [
+              {
+                id: selectedShippingMethod,
+                shipping_option_id: selectedShippingMethod,
+                amount: activeShippingOption?.amount || 0,
+                name: activeShippingOption?.name || "Air Express Delivery",
+              } as any,
+            ]
+          : cart.shipping_methods || [],
+        payment_collection: paymentResponse?.payment_collection || cart.payment_collection,
+      }
 
       setCartUpdated(updatedCart)
-      setSelectedPaymentMethod(defaultPaymentProvider)
+      setSelectedPaymentMethod(chosenProvider)
+      setAddressSelected(true)
       setIsSubmitting(false)
       setCurrentSection(2)
       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -239,24 +278,30 @@ export default function UnifiedCheckoutForm({
 
   return (
     <div className="space-y-6">
-      {/* 2-Step Progress Header */}
-      <div className="bg-white rounded-2xl border border-amber-100/90 p-4 shadow-xs">
+      {/* 2-Step Interactive Header */}
+      <div className="bg-white rounded-3xl border border-amber-100/90 p-3.5 sm:p-4 shadow-xs">
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => setCurrentSection(1)}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${currentSection === 1
-                ? "bg-amber-50 border-2 border-petha-amber text-amber-950 font-bold"
+            className={`flex items-center gap-3 p-3.5 rounded-2xl transition-all cursor-pointer text-left ${
+              currentSection === 1
+                ? "bg-amber-50/90 border-2 border-petha-amber text-amber-950 font-bold shadow-xs"
                 : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
+            }`}
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${currentSection === 1 ? "bg-petha-amber text-white" : "bg-emerald-600 text-white"
-              }`}>
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors ${
+                currentSection === 1
+                  ? "bg-petha-amber text-white shadow-sm"
+                  : "bg-emerald-600 text-white"
+              }`}
+            >
               {currentSection === 2 ? <Check className="w-4 h-4" /> : "1"}
             </div>
             <div>
-              <p className="text-xs font-jakarta uppercase tracking-wider text-slate-400">Step 1</p>
-              <h4 className="text-xs sm:text-sm font-jakarta font-bold">Delivery Address</h4>
+              <p className="text-[11px] font-jakarta uppercase tracking-wider text-slate-400 font-semibold">Step 1</p>
+              <h4 className="text-xs sm:text-sm font-jakarta font-bold text-slate-900">Delivery Address</h4>
             </div>
           </button>
 
@@ -265,18 +310,29 @@ export default function UnifiedCheckoutForm({
             onClick={() => {
               if (addressSelected) setCurrentSection(2)
             }}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${currentSection === 2
-                ? "bg-amber-50 border-2 border-petha-amber text-amber-950 font-bold"
-                : "bg-slate-50 text-slate-400 border border-slate-200"
-              }`}
+            disabled={!addressSelected}
+            className={`flex items-center gap-3 p-3.5 rounded-2xl transition-all text-left ${
+              currentSection === 2
+                ? "bg-amber-50/90 border-2 border-petha-amber text-amber-950 font-bold shadow-xs cursor-pointer"
+                : addressSelected
+                ? "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                : "bg-slate-50/60 text-slate-400 border border-slate-200/60 cursor-not-allowed opacity-75"
+            }`}
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${currentSection === 2 ? "bg-petha-amber text-white" : "bg-slate-300 text-slate-600"
-              }`}>
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                currentSection === 2
+                  ? "bg-petha-amber text-white shadow-sm"
+                  : addressSelected
+                  ? "bg-slate-300 text-slate-700"
+                  : "bg-slate-200 text-slate-400"
+              }`}
+            >
               2
             </div>
             <div>
-              <p className="text-xs font-jakarta uppercase tracking-wider text-slate-400">Step 2</p>
-              <h4 className="text-xs sm:text-sm font-jakarta font-bold">Payment &amp; Place Order</h4>
+              <p className="text-[11px] font-jakarta uppercase tracking-wider text-slate-400 font-semibold">Step 2</p>
+              <h4 className="text-xs sm:text-sm font-jakarta font-bold">Payment &amp; Confirmation</h4>
             </div>
           </button>
         </div>
@@ -284,7 +340,7 @@ export default function UnifiedCheckoutForm({
 
       {/* SECTION 1: Shipping & Delivery */}
       {currentSection === 1 && (
-        <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-amber-100/90 space-y-8">
+        <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-amber-100/90 space-y-8 animate-fadeIn">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 text-amber-900 text-xs font-jakarta font-bold uppercase tracking-wider mb-2">
               <MapPin className="w-3.5 h-3.5 text-petha-amber" />
@@ -294,7 +350,7 @@ export default function UnifiedCheckoutForm({
               Shipping &amp; Customer Details
             </h2>
             <p className="font-jakarta text-xs sm:text-sm text-slate-600 mt-1">
-              Where should we send your fresh Agra sweets?
+              Where should we send your authentic Agra sweets?
             </p>
           </div>
 
@@ -326,7 +382,7 @@ export default function UnifiedCheckoutForm({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Email Address (for order tracking)"
+                  label="Email Address (for order receipt & dispatch tracking)"
                   name="email"
                   type="email"
                   autoComplete="email"
@@ -353,13 +409,13 @@ export default function UnifiedCheckoutForm({
               </div>
 
               {/* Google Address Autocomplete */}
-              <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/60 space-y-2">
+              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/70 space-y-2">
                 <span className="font-jakarta text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
-                  Quick Google Address Search:
+                  Quick Address Autocomplete:
                 </span>
                 <AddressAutocomplete
-                  label="Search area, building or colony..."
+                  label="Search area, apartment, colony, or landmark..."
                   name="search_address"
                   value={searchAddress}
                   onChange={(e) => setSearchAddress(e.target.value)}
@@ -379,7 +435,7 @@ export default function UnifiedCheckoutForm({
 
               <div className="space-y-4 pt-2">
                 <Input
-                  label="Complete House / Flat / Street Address"
+                  label="Complete Flat / House No. / Street Address"
                   name="shipping_address.address_1"
                   autoComplete="address-line1"
                   value={autoFields.address_1}
@@ -391,7 +447,7 @@ export default function UnifiedCheckoutForm({
                   }}
                 />
                 <Input
-                  label="Landmark / Apartment / Suite (Optional)"
+                  label="Landmark / Suite / Floor (Optional)"
                   name="shipping_address.address_2"
                   autoComplete="address-line2"
                   defaultValue={cart?.shipping_address?.address_2 || ""}
@@ -426,7 +482,7 @@ export default function UnifiedCheckoutForm({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Input
-                    label="State / Region"
+                    label="State / Province"
                     name="shipping_address.province"
                     autoComplete="address-level1"
                     value={autoFields.province}
@@ -441,7 +497,7 @@ export default function UnifiedCheckoutForm({
                     name="country_display"
                     value="India (Nationwide)"
                     disabled
-                    className="text-slate-500 bg-slate-100 cursor-not-allowed"
+                    className="text-slate-500 bg-slate-100 cursor-not-allowed font-medium"
                   />
                   <input type="hidden" name="shipping_address.country_code" value="in" />
                 </div>
@@ -461,10 +517,11 @@ export default function UnifiedCheckoutForm({
                     <Radio
                       key={method.id}
                       value={method.id}
-                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${method.id === selectedShippingMethod
+                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
+                        method.id === selectedShippingMethod
                           ? "border-2 border-petha-amber bg-amber-50/70 shadow-sm"
                           : "border-slate-200 bg-white hover:border-slate-300"
-                        }`}
+                      }`}
                     >
                       <div className="flex items-center gap-3">
                         <MedusaRadio checked={method.id === selectedShippingMethod} />
@@ -501,7 +558,10 @@ export default function UnifiedCheckoutForm({
               className="w-full bg-petha-amber hover:bg-petha-saffron text-white py-4 px-6 rounded-2xl font-jakarta font-bold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Saving &amp; Initializing Payment...</span>
+                </div>
               ) : (
                 <>
                   <span>Continue to Secure Payment</span>
@@ -515,7 +575,7 @@ export default function UnifiedCheckoutForm({
 
       {/* SECTION 2: Payment & Final Order Confirmation */}
       {currentSection === 2 && (
-        <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-amber-100/90 space-y-8">
+        <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-amber-100/90 space-y-8 animate-fadeIn">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-900 text-xs font-jakarta font-bold uppercase tracking-wider mb-2">
               <Lock className="w-3.5 h-3.5 text-emerald-600" />
@@ -531,19 +591,27 @@ export default function UnifiedCheckoutForm({
 
           <div className="space-y-6">
             {/* Delivery address mini-recap */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-jakarta">
-              <div>
-                <span className="text-slate-500 block">Delivering to:</span>
-                <span className="font-bold text-slate-800">
-                  {cartUpdated.shipping_address?.first_name} {cartUpdated.shipping_address?.last_name} · {cartUpdated.shipping_address?.city}, {cartUpdated.shipping_address?.postal_code}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-jakarta">
+              <div className="space-y-0.5">
+                <span className="text-slate-400 uppercase tracking-wider font-semibold text-[10px] block">Delivering to</span>
+                <span className="font-bold text-slate-900 text-sm block">
+                  {cartUpdated.shipping_address?.first_name} {cartUpdated.shipping_address?.last_name}
+                </span>
+                <span className="text-slate-600 block">
+                  {cartUpdated.shipping_address?.address_1}
+                  {cartUpdated.shipping_address?.address_2 ? `, ${cartUpdated.shipping_address?.address_2}` : ""},{" "}
+                  {cartUpdated.shipping_address?.city}, {cartUpdated.shipping_address?.postal_code}
+                </span>
+                <span className="text-slate-500 font-mono block">
+                  {cartUpdated.shipping_address?.phone} · {cartUpdated.email}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setCurrentSection(1)}
-                className="text-petha-amber font-bold hover:underline cursor-pointer"
+                className="self-start sm:self-center text-petha-amber font-bold hover:underline cursor-pointer flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200/60"
               >
-                Edit Address
+                <span>Edit Address</span>
               </button>
             </div>
 
@@ -557,7 +625,7 @@ export default function UnifiedCheckoutForm({
               {availablePaymentMethods?.length ? (
                 <RadioGroup
                   value={selectedPaymentMethod}
-                  onChange={setSelectedPaymentMethod}
+                  onChange={handlePaymentMethodChange}
                 >
                   <div className="space-y-3">
                     {availablePaymentMethods.map((paymentMethod) => (
@@ -595,6 +663,15 @@ export default function UnifiedCheckoutForm({
                 </div>
               )}
             </div>
+
+            {isSwitchingPayment && (
+              <div className="flex items-center gap-2 text-xs font-jakarta text-petha-amber font-medium">
+                <div className="w-4 h-4 border-2 border-petha-amber border-t-transparent rounded-full animate-spin" />
+                <span>Updating payment provider...</span>
+              </div>
+            )}
+
+            <ErrorMessage error={error} />
 
             {/* Terms confirmation */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 font-jakarta">

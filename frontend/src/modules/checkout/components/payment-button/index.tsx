@@ -45,22 +45,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           className={className}
         />
       )
-    case isManual(paymentSession?.provider_id):
-      return (
-        <ManualTestPaymentButton 
-          notReady={notReady} 
-          data-testid={dataTestId}
-          className={className}
-        />
-      )
-    case isPaypal(paymentSession?.provider_id):
-      return (
-        <ManualTestPaymentButton
-          notReady={notReady}
-          data-testid={dataTestId}
-          className={className}
-        />
-      )
     case isRazorpay(paymentSession?.provider_id):
       return (
         <RazorpayPaymentButton
@@ -69,13 +53,26 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           cart={cart}
         />
       )
+    case isManual(paymentSession?.provider_id):
+    case isPaypal(paymentSession?.provider_id):
     default: {
+      // If customer details & shipping are ready, always enable order placement
+      if (!notReady) {
+        return (
+          <ManualTestPaymentButton 
+            notReady={false} 
+            data-testid={dataTestId}
+            className={className}
+          />
+        )
+      }
+
       let label = "Select a payment method"
 
       // Fine-grained hints for earlier steps
       if (!cart?.shipping_address || !cart?.billing_address || !cart?.email) {
         label = "Enter shipping information"
-      } else if ((cart.shipping_methods?.length ?? 0) < 1) {
+      } else if ((cart?.shipping_methods?.length ?? 0) < 1) {
         label = "Select a delivery method"
       }
 

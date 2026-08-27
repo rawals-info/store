@@ -95,22 +95,32 @@ export const RazorpayPaymentButton = ({
       setErrorMessage(err.message || "Razorpay initialization error")
       setSubmitting(false)
     }
-  }, [Razorpay, cart, session.amount, orderData?.razorpayOrder?.id])
+  }, [Razorpay, cart, session.amount, orderData?.razorpayOrder?.id, session?.data])
+
+  const orderId = orderData?.razorpayOrder?.id || (session?.data as any)?.id || (session?.data as any)?.order_id
 
   return (
     <>
-      <Button
+      <button
+        type="button"
         disabled={
           submitting ||
           notReady ||
-          !orderData?.razorpayOrder?.id ||
-          orderData?.razorpayOrder?.id === ""
+          !orderId
         }
         onClick={handlePayment}
-        isLoading={submitting}
+        data-testid="razorpay-payment-button"
+        className="w-full sm:w-auto bg-petha-amber hover:bg-petha-saffron text-white py-4 px-8 rounded-2xl font-jakarta font-bold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-xl cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        {submitting ? <Spinner /> : "Checkout"}
-      </Button>
+        {submitting ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <span>Processing Payment...</span>
+          </>
+        ) : (
+          <span>Pay &amp; Place Order</span>
+        )}
+      </button>
       {errorMessage && (
         <ErrorMessage error={errorMessage} data-testid="razorpay-error" />
       )}
