@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, CheckCircle2, Send, ArrowRight } from "lucide-react"
-import { STORE_PROMOTION } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 
 export default function Newsletter() {
+  const { activePromo } = usePromotion()
   const [email, setEmail] = useState("")
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
@@ -68,7 +69,7 @@ export default function Newsletter() {
 
             {/* Headline */}
             <h2 className="font-cormorant text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
-              Get 20% OFF Your First Agra Sweets Order
+              Get {activePromo?.discountPercent ? `${activePromo.discountPercent}%` : "Exclusive"} OFF Your First Agra Sweets Order
             </h2>
 
             {/* Description */}
@@ -93,9 +94,9 @@ export default function Newsletter() {
                     Welcome to the Taj Petha Family!
                   </h3>
                   <p className="font-jakarta text-xs sm:text-sm text-emerald-300/90 max-w-md mx-auto">
-                    {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+                    {activePromo?.code && activePromo.discountPercent > 0 ? (
                       <>
-                        Use promo code <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 font-mono font-bold text-emerald-200 border border-emerald-400/30">{STORE_PROMOTION.code}</span> at checkout to enjoy {STORE_PROMOTION.discountPercent}% discount on your order!
+                        Use promo code <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 font-mono font-bold text-emerald-200 border border-emerald-400/30">{activePromo.code}</span> at checkout to enjoy {activePromo.discountPercent}% discount on your order!
                       </>
                     ) : (
                       <>Thank you for subscribing! We will keep you updated with fresh batch announcements and royal sweet offers.</>

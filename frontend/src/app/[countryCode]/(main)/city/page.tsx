@@ -66,7 +66,7 @@ export default async function CityDirectoryPage({
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "name": "Taj Petha Express Delivery Locations Across India",
-    "description": "Authentic Agra Petha and sweets delivery network covering all major Indian cities with 24–48 hour express air shipping.",
+    "description": "Authentic Agra Petha and sweets delivery network covering all major Indian cities with 24–48 hour Express Shipping.",
     "url": `https://tajpetha.in/${countryCode}/city`,
     "provider": {
       "@type": "SweetShop",

@@ -42,8 +42,8 @@ export async function generateMetadata({
   }
 
   const canonical = `https://tajpetha.in/${countryCode}/city/${citySlug}`
-  const title = `Order Fresh Agra Petha in ${city.name} | Fast Doorstep Delivery - Taj Petha`
-  const description = `Order fresh original Agra Petha, Dalmoth, and Namkeen online in ${city.name}. Handcrafted daily in Agra, vacuum packed for 30-day freshness, and air-shipped fast. Free delivery on orders above ₹500.`
+  const title = `Buy Original Agra Petha Online in ${city.name} | Fresh Sweets Home Delivery - Taj Petha`
+  const description = `Order fresh original Agra Petha, famous Dalmoth, and Namkeen online in ${city.name}. Handcrafted daily in Agra, vacuum packed for 30-day freshness, express delivered to your doorstep. Free shipping on orders above ₹500.`
 
   return {
     title,
@@ -56,7 +56,13 @@ export async function generateMetadata({
       `buy agra petha in ${city.name}`,
       `best sweet shop in ${city.name}`,
       `fresh dalmoth online ${city.name}`,
-      `agra sweets home delivery ${city.name}`
+      `agra sweets home delivery ${city.name}`,
+      `order petha online in ${city.name}`,
+      `original agra petha home delivery ${city.name}`,
+      `famous agra petha near me ${city.name}`,
+      `kesar petha delivery ${city.name}`,
+      `pan petha delivery ${city.name}`,
+      `agra namkeen online ${city.name}`,
     ]),
     openGraph: {
       title,
@@ -134,25 +140,25 @@ export default async function CityPage({ params }: CityPageProps) {
           ...(hasPromo ? { "description": `Save ${activePromo!.discountPercent}% with code ${activePromo!.code}` } : {}),
           "priceSpecification": hasPromo
             ? [
-                {
-                  "@type": "UnitPriceSpecification",
-                  "priceType": "https://schema.org/ListPrice",
-                  "price": rawAmount.toFixed(2),
-                  "priceCurrency": "INR"
-                },
-                {
-                  "@type": "UnitPriceSpecification",
-                  "priceType": "https://schema.org/Discount",
-                  "price": discounted.toFixed(2),
-                  "priceCurrency": "INR",
-                  "description": `with code ${activePromo!.code}`
-                }
-              ]
-            : {
-                "@type": "PriceSpecification",
+              {
+                "@type": "UnitPriceSpecification",
+                "priceType": "https://schema.org/ListPrice",
                 "price": rawAmount.toFixed(2),
                 "priceCurrency": "INR"
+              },
+              {
+                "@type": "UnitPriceSpecification",
+                "priceType": "https://schema.org/Discount",
+                "price": discounted.toFixed(2),
+                "priceCurrency": "INR",
+                "description": `with code ${activePromo!.code}`
               }
+            ]
+            : {
+              "@type": "PriceSpecification",
+              "price": rawAmount.toFixed(2),
+              "priceCurrency": "INR"
+            }
         }
       })
     }
@@ -167,7 +173,7 @@ export default async function CityPage({ params }: CityPageProps) {
         "name": `Do you deliver fresh authentic Agra Petha to ${city.name}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `Yes! We deliver fresh, authentic Agra Petha across ${city.name} with same-day dispatch and express air shipping.`
+          "text": `Yes! We deliver fresh, authentic Agra Petha across ${city.name} with same-day dispatch and Express Shipping.`
         }
       },
       {

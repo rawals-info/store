@@ -1,7 +1,6 @@
 "use client"
 
 import { convertToLocale } from "@lib/util/money"
-import { STORE_PROMOTION } from "@lib/config/promotions"
 import React from "react"
 
 interface CartTotalsProps {

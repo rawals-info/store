@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X, Sparkles, Truck, Award, Copy, Check, Flame, ShieldCheck, ChevronRight } from "lucide-react"
 import CountdownTimer from "@components/CountdownTimer"
 import { usePromotion } from "@lib/context/promotion-context"
-import { STORE_PROMOTION } from "@lib/config/promotions"
 
 interface BannerItem {
   id: string
@@ -21,9 +20,9 @@ export default function PromotionalBanner() {
   const [activeMobileIndex, setActiveMobileIndex] = useState(0)
   const { activePromo } = usePromotion()
 
-  // Dynamic promotion from Medusa backend / central store config (NO hardcoding)
-  const promoCode = activePromo?.code || (STORE_PROMOTION.enabled && STORE_PROMOTION.code ? STORE_PROMOTION.code : null)
-  const promoDiscount = activePromo?.discountPercent || (STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent ? STORE_PROMOTION.discountPercent : 0)
+  // Dynamic promotion from Medusa backend (NO hardcoding)
+  const promoCode = activePromo?.code || null
+  const promoDiscount = activePromo?.discountPercent || 0
 
   // Initialize dismissed state from localStorage
   useEffect(() => {

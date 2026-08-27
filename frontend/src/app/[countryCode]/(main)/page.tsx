@@ -505,7 +505,7 @@ export default async function Home({ params }: HomeProps) {
               </h2>
             </div>
             <span className="font-jakarta text-xs font-semibold text-emerald-700 bg-emerald-100/70 px-3 py-1 rounded-full w-fit">
-              ✈️ 24-48 hr Express Air Shipping
+              ✈️ 24-48 hr Express Shipping
             </span>
           </div>
 

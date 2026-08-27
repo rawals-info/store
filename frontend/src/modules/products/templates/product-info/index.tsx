@@ -1,8 +1,10 @@
+"use client"
+
 import { HttpTypes } from "@medusajs/types"
 import { Star, Sparkles, ShieldCheck, Clock, Flame, Award, HeartHandshake } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { STORE_PROMOTION } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
@@ -13,6 +15,7 @@ type ProductInfoProps = {
 }
 
 const ProductInfo = ({ product, reviewData }: ProductInfoProps) => {
+  const { activePromo } = usePromotion()
   // Extract features and materials from product description if they exist
   const descriptionLines = product.description?.split('\n') || []
   const bulletLineRegex = /^([*\-]|•)\s+/
@@ -81,8 +84,8 @@ const ProductInfo = ({ product, reviewData }: ProductInfoProps) => {
       <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-amber-500/10 border border-amber-300/70 flex items-center justify-between gap-3 shadow-xs font-jakarta">
         <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-950">
           <span className="text-base">🎁</span>
-          {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
-            <span>Use coupon <code className="bg-white px-2 py-0.5 rounded-md text-petha-amber font-mono font-bold border border-amber-200 shadow-2xs">{STORE_PROMOTION.code}</code> for {STORE_PROMOTION.discountPercent}% OFF</span>
+          {activePromo?.code && activePromo.discountPercent > 0 ? (
+            <span>Use coupon <code className="bg-white px-2 py-0.5 rounded-md text-petha-amber font-mono font-bold border border-amber-200 shadow-2xs">{activePromo.code}</code> for {activePromo.discountPercent}% OFF</span>
           ) : (
             <span>Handcrafted Daily in Agra • 100% Authentic Recipe</span>
           )}

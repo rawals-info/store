@@ -11,7 +11,6 @@ import { HttpTypes } from "@medusajs/types"
 import Trash from "@modules/common/icons/trash"
 import ErrorMessage from "../error-message"
 import { SubmitButton } from "../submit-button"
-import { STORE_PROMOTION } from "@lib/config/promotions"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
@@ -122,7 +121,7 @@ React.useEffect(() => {
                   id="promotion-input"
                   name="code"
                   type="text"
-                  placeholder={STORE_PROMOTION.code ? `e.g. ${STORE_PROMOTION.code}` : "Enter coupon code"}
+                  placeholder="Enter coupon code"
                   autoFocus={false}
                   ref={inputRef}
                   data-testid="discount-input"

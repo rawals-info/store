@@ -147,7 +147,7 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
                     🍬
                   </div>
                   <div>
-                    <p className="font-jakarta text-xs font-bold text-slate-900">Agra GI-Tagged Authentic Petha</p>
+                    <p className="font-jakarta text-xs font-bold text-slate-900">Original Agra Petha &amp; Sweets</p>
                     <p className="font-jakarta text-[11px] text-emerald-700 font-semibold">100% Pure &amp; Naturally Preserved</p>
                   </div>
                 </div>

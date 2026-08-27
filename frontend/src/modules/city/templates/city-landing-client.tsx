@@ -7,7 +7,7 @@ import { CityDeliveryInfo } from "@lib/seo"
 import { trackCityPageView } from "@lib/analytics/google-analytics"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
-import { STORE_PROMOTION, calculateDiscountedPrice } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 import { MapPin, Zap, ShieldCheck, Truck, Sparkles, ChevronRight, Star, Award, HeartHandshake, CheckCircle2, HelpCircle, ChevronDown, PackageCheck, Flame } from "lucide-react"
 import QuickBuyModal from "@components/QuickBuyModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -27,6 +27,7 @@ export default function CityLandingClient({
   countryCode,
   products,
 }: CityLandingClientProps) {
+  const { activePromo, calculatePrice } = usePromotion()
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
   const [quickBuyOpen, setQuickBuyOpen] = useState(false)
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
@@ -60,8 +61,8 @@ export default function CityLandingClient({
     {
       q: `Is there free delivery available in ${city.name}?`,
       a: `Yes! We offer FREE Shipping to ${city.name} on all orders above ₹500.${
-        STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code
-          ? ` You can also use code ${STORE_PROMOTION.code} at checkout for an extra ${STORE_PROMOTION.discountPercent}% discount on your order.`
+        activePromo?.code && activePromo.discountPercent > 0
+          ? ` You can also use code ${activePromo.code} at checkout for an extra ${activePromo.discountPercent}% discount on your order.`
           : ""
       }`
     },
@@ -114,10 +115,10 @@ export default function CityLandingClient({
                   <PackageCheck className="w-4 h-4 text-petha-amber" />
                   <span>{city.pinCodesCount} Covered</span>
                 </div>
-                {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+                {activePromo?.code && activePromo.discountPercent > 0 ? (
                   <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-600 text-white shadow-xs text-xs font-bold font-jakarta">
                     <Flame className="w-4 h-4 text-amber-200" />
-                    <span>Use {STORE_PROMOTION.code} ({STORE_PROMOTION.discountPercent}% OFF)</span>
+                    <span>Use {activePromo.code} ({activePromo.discountPercent}% OFF)</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-700 text-white shadow-xs text-xs font-bold font-jakarta">
@@ -159,7 +160,7 @@ export default function CityLandingClient({
                   />
                   <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-emerald-600 text-white font-jakarta text-xs font-bold shadow-md flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>GI Heritage Authenticity</span>
+                    <span>100% Original Agra Sweet</span>
                   </div>
                   <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-sm text-white font-mono text-xs font-bold">
                     {city.rating} ({city.ordersCount})
@@ -168,12 +169,12 @@ export default function CityLandingClient({
 
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-600 font-jakarta border-b border-slate-100 pb-3">
-                    <span>Dispatch Origin:</span>
-                    <span className="text-petha-amber">🏛️ Agra Heritage Kitchen</span>
+                    <span>Made Fresh At:</span>
+                    <span className="text-petha-amber">👨‍🍳 Agra Kitchen (Daily Batch)</span>
                   </div>
                   <div className="flex items-center justify-between text-xs font-bold text-slate-600 font-jakarta border-b border-slate-100 pb-3">
-                    <span>Transit Mode:</span>
-                    <span className="text-slate-900">✈️ Express Air Cargo</span>
+                    <span>Delivery Speed:</span>
+                    <span className="text-slate-900">⚡ Express Air Shipping (24–48h)</span>
                   </div>
                   <div className="flex items-center justify-between text-xs font-bold text-slate-600 font-jakarta">
                     <span>Destination:</span>
@@ -218,7 +219,7 @@ export default function CityLandingClient({
           {products.map((product) => {
             const { cheapestPrice } = getProductPrice({ product })
             const rawPrice = cheapestPrice?.calculated_price_number || Number(product.variants?.[0]?.calculated_price?.calculated_amount || 0)
-            const { discountedPrice, isDiscounted, discountPercent } = calculateDiscountedPrice(rawPrice)
+            const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawPrice)
 
             return (
               <div

@@ -1,7 +1,9 @@
+"use client"
+
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import Link from "next/link"
-import { STORE_PROMOTION } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 
 const ProductList = ({
   products,
@@ -12,6 +14,8 @@ const ProductList = ({
   region: HttpTypes.StoreRegion
   countryCode?: string
 }) => {
+  const { activePromo } = usePromotion()
+
   if (!products || products.length === 0) {
     return (
       <div className="bg-white rounded-3xl border border-amber-100/90 p-8 sm:p-12 text-center space-y-4">
@@ -38,9 +42,9 @@ const ProductList = ({
         <p className="font-jakarta text-xs font-bold text-slate-500 uppercase tracking-wider">
           Showing {products.length} {products.length === 1 ? "Product" : "Products"}
         </p>
-        {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code ? (
+        {activePromo?.code && activePromo.discountPercent > 0 ? (
           <span className="text-xs font-semibold text-emerald-700 font-jakarta bg-emerald-50 px-2.5 py-1 rounded-full">
-            ✨ {STORE_PROMOTION.discountPercent}% OFF with {STORE_PROMOTION.code}
+            ✨ {activePromo.discountPercent}% OFF with {activePromo.code}
           </span>
         ) : (
           <span className="text-xs font-semibold text-emerald-700 font-jakarta bg-emerald-50 px-2.5 py-1 rounded-full">
