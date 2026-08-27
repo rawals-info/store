@@ -18,7 +18,7 @@ const Summary = ({ cart }: SummaryProps) => {
   const handleProceedToCheckout = () => {
     trackBeginCheckout({
       total: cart.total || 0,
-      coupon: cart.promotions?.[0]?.code || (STORE_PROMOTION.enabled ? STORE_PROMOTION.code : undefined),
+      coupon: (cart.promotions?.[0]?.code || (STORE_PROMOTION.enabled ? STORE_PROMOTION.code : undefined)) || undefined,
       items: (cart.items || []).map((item) => ({
         id: item.id,
         title: item.product_title || item.title || "Agra Petha",
