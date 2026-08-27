@@ -1,121 +1,102 @@
 export type QA = { question: string; answer: string }
 
-// Centralized FAQs for product pages. Keys should match category or collection handles (lowercase).
-// These answers are written in plain text for maximum SEO friendliness and FAQ rich results.
+// Centralized FAQs for product pages & Google FAQ Rich Snippets.
+// Written in clear, high-converting plain English to resolve customer hesitations.
 export const CATEGORY_FAQS: Record<string, QA[]> = {
   petha: [
     {
-      question: "How should I serve petha?",
+      question: "How fresh will the Agra Petha be when it arrives?",
       answer:
-        "Enjoy petha as a dessert after meals, a chilled snack, or as a sweet accompaniment to evening tea. Kesar and Angoori variants pair well with warm milk.",
+        "Every batch is prepared fresh daily in our Agra kitchen. We use airtight, food-grade vacuum sealing with moisture absorbers to guarantee your petha arrives soft, juicy, and with 30-day fresh taste.",
     },
     {
-      question: "What is the shelf life and how do I store it?",
+      question: "Is this original authentic Agra Petha?",
       answer:
-        "Unopened petha stays fresh for 10–12 days in a cool, dry place. After opening, refrigerate in an airtight container and consume within 5–7 days for best taste.",
+        "Yes! Our master halwais handcraft authentic Agra Petha using pure winter melon (ash gourd), sulfur-free cane sugar, and real Kashmiri saffron. No artificial syrups or preservatives.",
     },
     {
-      question: "What packaging do you use?",
+      question: "Is your Petha 100% pure vegetarian?",
       answer:
-        "Eco‑friendly, food‑grade plastic with tamper‑evident sealing. The packaging is designed to prevent moisture and preserve freshness during transit.",
+        "Yes, 100% pure vegetarian and FSSAI food-safety certified. Prepared in a dedicated hygienic sweet kitchen with pure natural ingredients.",
     },
     {
-      question: "Do you offer fast shipping?",
+      question: "How long does delivery take and is shipping free?",
       answer:
-        "Yes. Orders placed before noon are typically dispatched the same day. Expedited and express delivery options are available at checkout across India.",
+        "We dispatch orders daily via express air cargo. Deliveries to Delhi NCR take 24 hours; other cities take 24–48 hours. All orders above ₹500 get Free Express Shipping across India.",
+    },
+    {
+      question: "What if my sweet box gets damaged in transit?",
+      answer:
+        "We provide a 100% Damage-Proof Replacement Guarantee. If your box is damaged by the courier, we will immediately send you a free fresh replacement or a full refund — zero hassle.",
     },
   ],
 
   namkeen: [
     {
-      question: "What is the best way to enjoy namkeen?",
+      question: "How do you keep Agra Namkeen crispy during delivery?",
       answer:
-        "Namkeen is perfect with evening chai, as a light snack, or alongside sweets like petha to balance flavors at small gatherings and parties.",
+        "We pack all namkeen in multi-layer moisture-barrier pouches with nitrogen-sealed fresh locking to ensure it arrives super crispy and fresh.",
     },
     {
-      question: "How spicy is it?",
+      question: "What is the shelf life of Namkeen & Dalmoth?",
       answer:
-        "Most variants are medium‑spiced for everyday snacking. Mild and extra‑spicy options are clearly labeled on the pack and product page.",
+        "Our namkeen and Dalmoth stay fresh and crunchy for 45–60 days when stored in an airtight container away from heat and direct sunlight.",
     },
     {
-      question: "How do you keep namkeen crisp during shipping?",
+      question: "Is the namkeen mild or spicy?",
       answer:
-        "We use eco‑friendly moisture‑barrier pouches and nitrogen flushing where applicable. Keep sealed and store in a cool, dry place to retain crunch.",
+        "Our Dalmoth and namkeen are balanced with traditional savory Agra spices. They are perfectly flavorful for daily evening tea and family snacking.",
     },
     {
-      question: "What are the shipping timelines?",
+      question: "Do you offer free delivery across India?",
       answer:
-        "Same‑day dispatch on most orders. Expedited shipping options are available; exact timelines are shown at checkout based on your pincode.",
+        "Yes, all orders above ₹500 qualify for Free Express Delivery across India with 24-hour kitchen dispatch.",
     },
   ],
 
   dalmoth: [
     {
+      question: "What makes authentic Agra Dalmoth special?",
+      answer:
+        "Authentic Agra Dalmoth is made with crispy fried whole brown lentils (moth beans), spicy gram flour sev, and premium fried cashews, seasoned with authentic royal spice blend.",
+    },
+    {
       question: "How long does Dalmoth stay fresh?",
       answer:
-        "Dalmoth stays crisp for 30–45 days when stored in an airtight container away from heat, sunlight, and moisture.",
+        "It stays perfectly crunchy for 45–60 days in an airtight container. We pack each box fresh on the day of dispatch.",
     },
     {
-      question: "Is Dalmoth spicy?",
+      question: "How fast is shipping to my city?",
       answer:
-        "It has a balanced heat profile with a savory spice blend. If you prefer milder options, look for the mild label on select variants.",
+        "Orders are dispatched within 24 hours using express air delivery, reaching most cities across India in 24 to 48 hours.",
     },
     {
-      question: "What packaging is used?",
+      question: "What is your damage replacement guarantee?",
       answer:
-        "Eco‑friendly, nitrogen‑flushed packs help maintain crunch and flavor during storage and delivery.",
-    },
-    {
-      question: "Do you offer express delivery?",
-      answer:
-        "Yes. We provide same‑day dispatch on business days and offer expedited shipping during checkout.",
+        "If your package arrives damaged or unsealed, contact our support team and we will send a free replacement box immediately.",
     },
   ],
 
-  // combo1: [ // commented out
-  //   {
-  //     question: "What's included in the combo?",
-  //     answer:
-  //       "Carefully curated petha and namkeen combinations for gifting and personal use. Exact items are listed on the product page under 'In the Box'.",
-  //   },
-  //   {
-  //     question: "Is it suitable for gifting?",
-  //     answer:
-  //       "Absolutely. Combos are packed securely with protective cushioning and can include a personalized message on request.",
-  //   },
-  //   {
-  //     question: "How soon can a gift combo be delivered?",
-  //     answer:
-  //       "Same‑day dispatch for orders placed before noon, with expedited shipping options at checkout for faster delivery.",
-  //   },
-  //   {
-  //     question: "How should I store the contents?",
-  //     answer:
-  //       "Keep petha refrigerated after opening and namkeen sealed in a cool, dry place. Refer to each pack for detailed instructions.",
-  //   },
-  // ],
-
-  // Fallback FAQs used when no specific category/collection match is found
   default: [
     {
-      question: "Do you offer same‑day dispatch?",
+      question: "How fresh will my sweets and snacks be?",
       answer:
-        "Yes, orders placed before 12 PM IST are usually dispatched the same business day, subject to availability.",
+        "All products are freshly prepared daily in Agra, vacuum-sealed for 30-day freshness, and dispatched via express air delivery across India.",
     },
     {
-      question: "Is expedited shipping available?",
+      question: "Are your products 100% pure vegetarian?",
       answer:
-        "We provide multiple express options at checkout. Estimated delivery time is shown after you enter your pincode.",
+        "Yes, 100% pure vegetarian, FSSAI certified, made with pure natural ingredients and zero artificial chemicals.",
     },
     {
-      question: "What packaging do you use?",
+      question: "Do you offer free delivery?",
       answer:
-        "Eco‑friendly, food‑safe packaging designed to maintain freshness and prevent damage during transit.",
+        "Yes! Free express shipping is automatically applied to all orders above ₹500 at checkout.",
     },
     {
-      question: "What is your return or replacement policy?",
+      question: "What is your return and replacement policy?",
       answer:
-        "In the rare event of transit damage or quality issues, we offer quick replacements. Please see the Returns page for full details.",
+        "We have a 100% fresh guarantee. If your order arrives damaged or unsatisfactory, we offer immediate free replacements or full refunds.",
     },
   ],
-} 
+}

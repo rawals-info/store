@@ -17,15 +17,19 @@ export async function generateMetadata({
   const canonical = `https://tajpetha.in/${countryCode}/city`
 
   return {
-    title: "Agra Petha & Dalmoth Express Delivery in 200+ Cities Across India | Taj Petha",
+    title: "Agra Petha & Sweets Home Delivery Across India | All Cities - Taj Petha",
     description:
-      "Order authentic GI-heritage Agra Petha, crunchy Dalmoth, and royal sweets delivered fresh to your city across India in 24–48 hours. 100% pure vegetarian, hygienic vacuum packaging.",
+      "Order fresh original Agra Petha, crunchy Dalmoth, and Namkeen delivered straight to your doorstep across 200+ cities in India in 24–48 hours. 100% pure vegetarian with guaranteed 30-day freshness.",
     keywords: [
+      "buy petha online",
       "agra petha delivery india",
+      "original agra petha",
+      "best petha to buy",
       "buy petha online all cities",
       "petha home delivery",
       "authentic agra sweets express delivery",
-      "order agra petha delhi mumbai bangalore hyderabad"
+      "order agra petha delhi mumbai bangalore hyderabad",
+      "agra sweets delivery nationwide"
     ],
     openGraph: {
       title: "Agra Petha Express Delivery Across India | Taj Petha",

@@ -47,16 +47,16 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
               </span>
             </motion.div>
 
-            {/* Main headline - 100% Rock-Solid & Stable */}
+            {/* Main headline - Clear, High-Converting, Plain English */}
             <motion.h1
               initial={prefersReduced ? false : { opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="font-cormorant text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-[1.1] mb-4"
             >
-              Taste the Authentic
+              Order Original
               <br />
-              <span className="text-petha-amber">Heritage</span> of Agra Petha
+              <span className="text-petha-amber">Fresh Agra Petha</span> Online
             </motion.h1>
 
             {/* Subheadline */}
@@ -66,7 +66,7 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
               transition={{ duration: 0.55, delay: 0.3 }}
               className="font-jakarta text-base lg:text-lg text-slate-600 max-w-lg leading-relaxed mb-6"
             >
-              Melt-in-mouth Agra Petha, fresh crispy namkeen &amp; royal Dalmoth crafted with pure ingredients and vacuum-sealed for doorstep delivery across India in 24–48 hours.
+              Delicious soft Agra Petha, crunchy namkeen &amp; famous Dalmoth made fresh daily with 100% pure ingredients. Vacuum-sealed for doorstep delivery across India in 24–48 hours.
             </motion.p>
 
             {/* Trust pills */}

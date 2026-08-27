@@ -35,12 +35,10 @@ const Footer = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <Heading level="h2" className="font-display text-3xl mb-4 text-luxury-charcoal">
-            The Art of <span className="text-luxury-gold">Petha Craftsmanship</span>
+            Fresh &amp; Authentic <span className="text-luxury-gold">Agra Petha</span>
           </Heading>
           <Text className="text-luxury-charcoal/80 text-base-regular leading-relaxed max-w-2xl mx-auto">
-            Each piece in our collection is meticulously Hand-Made by master sweet makers who have perfected their craft over generations. 
-            From the initial selection of the finest ash gourd to the final crystallization, our commitment to excellence and attention to detail 
-            ensures that every petha is a delightful treat worthy of your palate.
+            Handcrafted daily in small batches by master sweet makers in Agra. Made with 100% pure ash gourd, sulfur-free cane sugar, and real saffron, vacuum-packed for 30-day fresh taste delivered straight to your doorstep.
           </Text>
         </motion.div>
 
@@ -54,7 +52,7 @@ const Footer = () => {
           >
             <Heading level="h3" className="text-xl mb-4 font-display text-luxury-gold">Taj Petha</Heading>
             <Text className="text-luxury-charcoal/80 mb-6 leading-relaxed">
-              Exquisite Hand-Made Agra pethas that transform moments into expressions of authentic sweet tradition.
+              Order fresh, original Agra Petha and crispy namkeen online with fast nationwide express delivery and 100% replacement guarantee.
             </Text>
             <div className="flex space-x-5">
               <motion.a 

@@ -9,13 +9,19 @@ import Link from "next/link"
 import { MAJOR_INDIAN_CITIES } from "@lib/seo"
 
 const baseMetadata: Metadata = {
-  title: "Buy Authentic Agra Petha Online | Fresh Namkeen | Taj Petha India",
-  description: "Buy authentic Agra petha online with same-day dispatch. India's #1 trusted petha store. Fresh, hygienic, traditional recipes. Free shipping ₹500+. Order now!",
+  title: "Buy Original Agra Petha Online | Fresh Agra Sweets & Dalmoth - Taj Petha",
+  description: "Order fresh original Agra Petha online directly from master Agra halwais. Soft white petha, kesar petha, spicy dalmoth & namkeen. Fast air express delivery across India with free shipping above ₹500.",
   keywords: [
-    // High-intent commercial keywords
+    // Top High-Intent Commercial Keywords
     "buy petha online",
+    "agra petha",
+    "original agra petha",
+    "best petha to buy",
     "buy agra petha",
     "order petha online",
+    "famous agra petha sweet shop",
+    "buy dalmoth namkeen online",
+    "best agra sweets online",
     "petha online shopping",
     "buy authentic agra petha",
     "agra petha online order",

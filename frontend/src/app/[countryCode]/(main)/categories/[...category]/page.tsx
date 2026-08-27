@@ -80,43 +80,44 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // Properly await params before using them - Next.js 15 requirement
   const paramsData = await params;
   const category = paramsData.category;
 
   try {
-    // Use the last part of the category path as the handle
     const categoryHandle = category[category.length - 1];
-    const categoryObj = await getCachedCategory(categoryHandle);
+    let categoryObj = await getCachedCategory(categoryHandle);
 
     if (!categoryObj) {
-      // Try to find a similar category before giving up
       const similarCategory = await findSimilarCategory(categoryHandle);
-      
       if (similarCategory) {
-        return {
-          title: `${similarCategory.name} | Taj Petha`,
-          description: 'description' in similarCategory && similarCategory.description 
-            ? similarCategory.description 
-            : `Browse our exclusive ${similarCategory.name.toLowerCase()} collection of authentic Agra pethas, Hand-Made with traditional recipes.`,
-        };
+        categoryObj = similarCategory as any;
       }
-      
-      return {
-        title: "Category | Taj Petha",
-        description: "Browse our exclusive collection of authentic Agra pethas, Hand-Made with traditional recipes passed down through generations.",
-      };
     }
 
+    const categoryName = categoryObj?.name || "Agra Sweets"
+    const title = `Buy Authentic ${categoryName} Online | Fresh Agra Preparation - Taj Petha`
+    const description =
+      categoryObj?.description ||
+      `Shop fresh authentic ${categoryName} online. Handcrafted daily in Agra with 100% pure ingredients, airtight packaging for 30-day freshness, and fast express air delivery across India.`
+
     return {
-      title: `${categoryObj.name} | Taj Petha`,
-      description: categoryObj.description || `Browse our exclusive ${categoryObj.name.toLowerCase()} collection of authentic Agra pethas, Hand-Made with traditional recipes.`,
+      title,
+      description,
+      keywords: [
+        `buy ${categoryName.toLowerCase()} online`,
+        `authentic agra ${categoryName.toLowerCase()}`,
+        `best ${categoryName.toLowerCase()} to buy`,
+        "buy petha online",
+        "agra petha",
+        "original agra sweets",
+        "fresh sweets delivery",
+      ],
     }
   } catch (error) {
     console.error("Error generating metadata:", error);
     return {
-      title: "Category | Taj Petha",
-      description: "Browse our exclusive collection of authentic Agra pethas, Hand-Made with traditional recipes passed down through generations.",
+      title: "Buy Authentic Agra Petha & Sweets Online | Taj Petha",
+      description: "Browse our fresh collection of authentic Agra pethas and crispy namkeen, handcrafted daily with pure ingredients.",
     }
   }
 }

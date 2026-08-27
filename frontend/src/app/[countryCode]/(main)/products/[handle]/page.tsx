@@ -33,7 +33,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const ogImage: string | undefined = md?.og_image
 
     // Compose high-converting SEO title and description with fallbacks
-    const baseTitle = seoTitle || `Buy ${product.title} Online | 100% Authentic Agra Petha | Taj Petha`
+    const baseTitle = seoTitle || `Buy ${product.title} Online (Fresh Agra Preparation) | Taj Petha`
     const descriptionRaw =
       seoDescription ||
       product.description ||
@@ -54,12 +54,17 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     const keywords: string[] = [
       ...(seoKeywords || []),
+      `buy ${product.title.toLowerCase()} online`,
+      `original ${product.title.toLowerCase()}`,
+      `best ${product.title.toLowerCase()} to buy`,
       product.title,
       ...(product.categories?.map((c) => c.name) || []),
       ...(product.tags?.map((t) => t.value || "") || []),
-      "buy online",
+      "buy petha online",
+      "agra petha",
       "fresh petha",
       "hygienic packing",
+      "free delivery sweets",
     ].filter(Boolean)
 
     return {

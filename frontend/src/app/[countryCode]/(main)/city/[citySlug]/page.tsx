@@ -42,17 +42,21 @@ export async function generateMetadata({
   }
 
   const canonical = `https://tajpetha.in/${countryCode}/city/${citySlug}`
-  const title = `Authentic Agra Petha & Sweets Delivery in ${city.name} | 24-48h Express | Taj Petha`
-  const description = `Order fresh, GI-heritage Agra Petha, Dalmoth, and Indian sweets online in ${city.name}. Air-shipped daily from Agra with vacuum sealing. ${city.pinCodesCount} covered. Free shipping above ₹500.`
+  const title = `Order Fresh Agra Petha in ${city.name} | Fast Doorstep Delivery - Taj Petha`
+  const description = `Order fresh original Agra Petha, Dalmoth, and Namkeen online in ${city.name}. Handcrafted daily in Agra, vacuum packed for 30-day freshness, and air-shipped fast. Free delivery on orders above ₹500.`
 
   return {
     title,
     description,
     keywords: city.keywords.concat([
+      `buy petha online in ${city.name}`,
+      `agra petha in ${city.name}`,
+      `best petha to buy ${city.name}`,
       `${city.name} petha delivery`,
       `buy agra petha in ${city.name}`,
       `best sweet shop in ${city.name}`,
-      `fresh dalmoth online ${city.name}`
+      `fresh dalmoth online ${city.name}`,
+      `agra sweets home delivery ${city.name}`
     ]),
     openGraph: {
       title,
