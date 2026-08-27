@@ -8,6 +8,7 @@ import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema } from "@lib/seo"
 import { getProductReviewSummary, getProductReviews } from "@lib/data/products"
+import { getActivePromotion } from "@lib/data/promotions"
 import type { StoreProductReview } from "types/global"
 import FaqAccordion from "@components/FaqAccordion"
 import { getProductFaqs } from "@lib/faq/select"
@@ -70,8 +71,11 @@ export default async function ProductTemplate({
     console.log("Could not fetch reviews; proceeding without defaults")
   }
 
-  // Generate product schema for SEO with dynamic review data & real reviews
-  const productSchema = generateProductSchema(product, region, countryCode, reviewData, reviewList)
+  // Fetch live active promotion for Google Merchant discount schema
+  const activePromo = await getActivePromotion()
+
+  // Generate product schema for SEO with dynamic review data & real reviews & discount rich snippets
+  const productSchema = generateProductSchema(product, region, countryCode, reviewData, reviewList, activePromo)
   
   // Generate breadcrumb schema
   const breadcrumbs = [

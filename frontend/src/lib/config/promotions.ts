@@ -1,34 +1,36 @@
 /**
- * Central Store Promotion Configuration & Helper Engine
+ * Central Store Promotion Helper Engine
  *
- * Provides a single source of truth for promotions across the store.
- * Allows changing promo code, discount percentage, or toggling promotions
- * via environment variables or central config without breaking cart, checkout,
- * or causing deceptive pricing.
+ * Dynamic promotion engine: Reads live promotions directly from Medusa database.
+ * No hardcoded promo strings or environment variables.
  */
 
 export interface PromoConfig {
-  code: string
+  code: string | null
   discountPercent: number
   enabled: boolean
   description: string
 }
 
+// Backward-compatible fallback object (defaults to null/0 to prevent hardcoding)
 export const STORE_PROMOTION: PromoConfig = {
-  code: (process.env.NEXT_PUBLIC_DEFAULT_PROMO_CODE || "SWEET20").trim(),
-  discountPercent: Math.max(0, Math.min(100, Number(process.env.NEXT_PUBLIC_DEFAULT_PROMO_PERCENT || 20))),
-  enabled: process.env.NEXT_PUBLIC_ENABLE_AUTO_PROMO !== "false",
-  description: "Special Sweet Discount",
+  code: null,
+  discountPercent: 0,
+  enabled: true,
+  description: "Live Sweet Promotion",
 }
 
 /**
- * Calculates discounted price based on active promotion configuration.
- * If promotion is disabled or discountPercent is 0, returns the raw price as discounted price.
+ * Calculates discounted price based on a dynamic promotion.
+ * If no active promo is passed, returns the raw price as standard without discount.
  */
-export const calculateDiscountedPrice = (rawPrice: number) => {
+export const calculateDiscountedPrice = (
+  rawPrice: number,
+  promo?: { code: string; discountPercent: number } | null
+) => {
   const safeRaw = isNaN(rawPrice) || rawPrice <= 0 ? 0 : rawPrice
-  
-  if (!STORE_PROMOTION.enabled || STORE_PROMOTION.discountPercent <= 0 || !STORE_PROMOTION.code) {
+
+  if (!promo || promo.discountPercent <= 0 || !promo.code) {
     return {
       rawPrice: safeRaw,
       discountedPrice: safeRaw,
@@ -39,7 +41,7 @@ export const calculateDiscountedPrice = (rawPrice: number) => {
     }
   }
 
-  const multiplier = 1 - STORE_PROMOTION.discountPercent / 100
+  const multiplier = 1 - promo.discountPercent / 100
   const discounted = Math.round(safeRaw * multiplier * 100) / 100
   const savings = Math.round((safeRaw - discounted) * 100) / 100
 
@@ -47,28 +49,11 @@ export const calculateDiscountedPrice = (rawPrice: number) => {
     rawPrice: safeRaw,
     discountedPrice: discounted,
     savings,
-    discountPercent: STORE_PROMOTION.discountPercent,
+    discountPercent: promo.discountPercent,
     isDiscounted: savings > 0,
-    promoCode: STORE_PROMOTION.code,
+    promoCode: promo.code,
   }
 }
 
-/**
- * Returns active promo code if enabled, or null if disabled.
- */
-export const getActivePromoCode = (): string | null => {
-  if (STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code) {
-    return STORE_PROMOTION.code
-  }
-  return null
-}
-
-/**
- * Returns promo badge text (e.g. "Save 20% with SWEET20")
- */
-export const getPromoBadgeText = (): string => {
-  if (STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code) {
-    return `Save ${STORE_PROMOTION.discountPercent}% with ${STORE_PROMOTION.code}`
-  }
-  return "Fresh Agra Sweets"
-}
+export const getActivePromoCode = (): string | null => null
+export const getPromoBadgeText = (): string => "Fresh Agra Sweets"

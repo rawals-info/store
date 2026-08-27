@@ -1,7 +1,7 @@
 "use client"
 
 import React, { Component, ReactNode } from "react"
-import { Button } from "@medusajs/ui"
+import Link from "next/link"
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -15,9 +15,8 @@ interface ErrorBoundaryState {
 }
 
 /**
- * Error Boundary Component
- * Catches React errors and prevents white screens
- * ✅ Added for production stability
+ * Luxury Error Boundary Component
+ * Catches React errors and presents a premium, graceful fallback UI
  */
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -26,21 +25,14 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    // Update state so the next render will show the fallback UI
     return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error Boundary caught an error:', error, errorInfo)
+    if (process.env.NODE_ENV === "development") {
+      console.error("[Taj Petha Error Boundary]:", error, errorInfo)
     }
-    
-    // Call optional error handler
     this.props.onError?.(error, errorInfo)
-    
-    // In production, you might want to log to an error reporting service
-    // Example: Sentry.captureException(error)
   }
 
   handleReset = () => {
@@ -49,63 +41,65 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render() {
     if (this.state.hasError) {
-      // Custom fallback UI
       if (this.props.fallback) {
         return this.props.fallback
       }
 
-      // Default fallback UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-luxury-cream/20 px-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="mb-6">
-              <svg
-                className="w-16 h-16 mx-auto text-luxury-gold"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+        <div className="min-h-[80vh] flex items-center justify-center bg-[#FAF8F5] px-4 py-16">
+          <div className="max-w-lg w-full bg-white rounded-3xl border border-amber-200/90 shadow-2xl p-8 sm:p-10 text-center relative overflow-hidden">
+            {/* Ambient Background Glow */}
+            <div className="absolute -top-16 -right-16 w-36 h-36 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-petha-amber/10 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Icon */}
+            <div className="relative mx-auto w-20 h-20 mb-6 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-amber-100 animate-ping opacity-25" />
+              <div className="w-20 h-20 rounded-2xl bg-amber-50 border border-amber-200/80 shadow-sm flex items-center justify-center text-3xl">
+                🍬
+              </div>
             </div>
-            
-            <h2 className="font-display text-2xl text-luxury-charcoal mb-3">
-              Oops! Something went wrong
+
+            {/* Headings */}
+            <span className="font-jakarta text-xs uppercase tracking-[0.2em] font-bold text-petha-amber inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200/60 mb-3">
+              Fresh Batch Assurance
+            </span>
+            <h2 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900 leading-tight mb-3">
+              Something Paused in Our Kitchen
             </h2>
-            
-            <p className="text-luxury-charcoal/70 mb-6">
-              We encountered an unexpected error. Don't worry, our team has been notified.
+
+            <p className="font-jakarta text-sm text-slate-600 mb-6 leading-relaxed max-w-sm mx-auto">
+              We encountered a temporary hiccup preparing this view. Don&apos;t worry, your sweet cart is completely safe.
             </p>
-            
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-left">
-                <p className="font-mono text-xs text-red-800 break-words">
+
+            {/* Developer Details in Development Mode */}
+            {process.env.NODE_ENV === "development" && this.state.error && (
+              <div className="mb-6 p-3.5 bg-slate-900 rounded-2xl border border-slate-800 text-left overflow-x-auto shadow-inner">
+                <div className="flex items-center gap-1.5 mb-1 text-[10px] uppercase font-bold tracking-wider text-amber-400">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" /> Dev Trace
+                </div>
+                <p className="font-mono text-xs text-slate-200 break-words">
                   {this.state.error.message}
                 </p>
               </div>
             )}
-            
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <button
+                type="button"
                 onClick={this.handleReset}
-                className="bg-luxury-gold hover:bg-luxury-gold/90 text-white"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-lg active:scale-98 cursor-pointer text-center"
               >
-                Try Again
-              </Button>
-              
-              <Button
-                onClick={() => window.location.href = '/'}
-                variant="secondary"
-                className="border-luxury-gold text-luxury-charcoal hover:bg-luxury-gold/10"
+                🔄 Refresh &amp; Try Again
+              </button>
+
+              <Link
+                href="/in"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-slate-800 border border-amber-200 font-jakarta text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-center"
               >
-                Go Home
-              </Button>
+                ← Back to Sweet Store
+              </Link>
             </div>
           </div>
         </div>
@@ -117,4 +111,3 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 }
 
 export default ErrorBoundary
-

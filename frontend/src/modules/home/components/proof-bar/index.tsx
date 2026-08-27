@@ -5,7 +5,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion"
 
 const STATS = [
   { target: 50000, suffix: "+", label: "Happy Customers", prefix: "" },
-  { target: 4.8, suffix: "★", label: "Avg. Rating", prefix: "", decimals: 1 },
+  { target: 4.9, suffix: "★", label: "Avg. Rating", prefix: "", decimals: 1 },
   { target: 100, suffix: "%", label: "Pure Vegetarian", prefix: "" },
   { target: 24, suffix: "hr", label: "Fresh Dispatch", prefix: "" },
   { target: 12, suffix: "+", label: "Authentic Varieties", prefix: "" },

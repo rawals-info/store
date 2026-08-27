@@ -7,7 +7,7 @@ const resolveBaseUrl = () => {
   }
 
   // Client side – prefer compiled Vite env, otherwise fall back to current origin
-  const viteUrl = (typeof window !== "undefined" && (window as any).__VITE_BACKEND_URL__) || (process.env as any).VITE_MEDUSA_BACKEND_URL
+  const viteUrl = import.meta.env.VITE_MEDUSA_BACKEND_URL
   if (viteUrl && viteUrl.length > 0) {
     return viteUrl
   }
@@ -22,4 +22,4 @@ export const sdk = new Medusa({
   auth: {
     type: "session",
   },
-}) 
+})

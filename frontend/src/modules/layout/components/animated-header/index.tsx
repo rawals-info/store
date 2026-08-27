@@ -38,11 +38,28 @@ const AnimatedHeader = () => {
     setBannerDismissed(dismissed)
   }, [])
 
-  // Premium promotional messages - dynamic & elegant
+  const [activePromo, setActivePromo] = useState<{ code: string; discountPercent: number } | null>(null)
+
+  // Fetch live active promotion from Medusa backend dynamically
+  useEffect(() => {
+    fetch("/api/promotions/active")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.promotion && data.promotion.code && data.promotion.discountPercent > 0) {
+          setActivePromo({
+            code: data.promotion.code,
+            discountPercent: data.promotion.discountPercent,
+          })
+        }
+      })
+      .catch((err) => console.error("Error loading active promotion:", err))
+  }, [])
+
+  // Premium promotional messages - dynamic & elegant from live database
   const promoMessages = [
     "Free Shipping on Orders Above ₹500",
-    STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && STORE_PROMOTION.code
-      ? `Use code ${STORE_PROMOTION.code} for ${STORE_PROMOTION.discountPercent}% off your order`
+    activePromo
+      ? `Use code ${activePromo.code} for ${activePromo.discountPercent}% off your order`
       : "100% Authentic Agra Petha & Gourmet Dalmoth",
     "Handcrafted Fresh Daily in Agra — Delivered Nationwide"
   ]

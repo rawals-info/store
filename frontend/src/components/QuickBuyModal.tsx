@@ -11,8 +11,11 @@ import Image from "next/image"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
-import { calculateDiscountedPrice, getActivePromoCode, STORE_PROMOTION } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 import { useParams, useRouter } from "next/navigation"
+
+import AddedToCartModal, { AddedItemDetails } from "./AddedToCartModal"
+import { triggerPackingSweetBox } from "./PackingSweetBoxOverlay"
 
 interface QuickBuyModalProps {
   product: HttpTypes.StoreProduct
@@ -21,44 +24,39 @@ interface QuickBuyModalProps {
   onClose: () => void
 }
 
-// Popular pairing recommendations for upsell
-const UPSELL_SNACKS = [
-  {
-    title: "Special Agra Dalmoth",
-    handle: "dalmoth",
-    price: "₹220",
-    image: "/images/dalmoth.webp",
-    tag: "Authentic Dalmoth",
-  },
-  {
-    title: "Special Masala Peanuts",
-    handle: "masala-peanuts",
-    price: "₹140",
-    image: "/images/namkeen.webp",
-    tag: "Crispy Namkeen",
-  },
-  {
-    title: "Kesar Dry Petha",
-    handle: "kesar-dry-petha",
-    price: "₹240",
-    image: "/hero_petha_square.webp",
-    tag: "Royal Sweet",
-  },
-]
-
 export default function QuickBuyModal({ product, region, isOpen, onClose }: QuickBuyModalProps) {
   const [mounted, setMounted] = useState(false)
-  const [quantity, setQuantity] = useState(1)
   const [selectedVariant, setSelectedVariant] = useState<string>("")
+  const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [showAddedModal, setShowAddedModal] = useState(false)
+  const [addedItemDetails, setAddedItemDetails] = useState<AddedItemDetails | null>(null)
+  const [pairings, setPairings] = useState<any[]>([])
   const [addedUpsell, setAddedUpsell] = useState<Record<string, boolean>>({})
-  const countryCode = (useParams()?.countryCode as string) || "in"
+  const [addingUpsell, setAddingUpsell] = useState<Record<string, boolean>>({})
+  
+  const params = useParams()
   const router = useRouter()
+  const countryCode = (params?.countryCode as string) || "in"
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Fetch live pairings from Medusa database on modal open
+  useEffect(() => {
+    if (isOpen && pairings.length === 0) {
+      fetch(`/api/products/popular?limit=6&countryCode=${countryCode}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.products) {
+            setPairings(data.products)
+          }
+        })
+        .catch((err) => console.error("Error loading pairings:", err))
+    }
+  }, [isOpen, countryCode, pairings.length])
 
   // Lock background body scroll & add escape key listener when open
   useEffect(() => {
@@ -80,7 +78,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
   useEffect(() => {
     if (isOpen && product?.variants && product.variants.length > 0) {
       const highestVariant = product.variants.reduce((highest: any, current: any) => {
-        const getAmt = (v: any) => Number(v.calculated_price?.calculated_amount || v.prices?.[0]?.amount || 0)
+        const getAmt = (v: any) => Number(v.calculated_price?.calculated_amount || (v as any).prices?.[0]?.amount || 0)
         return getAmt(current) > getAmt(highest) ? current : highest
       }, product.variants[0])
 
@@ -89,14 +87,10 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
   }, [isOpen, product])
 
   // Calculate price based on selected variant
-  const { cheapestPrice, variantPrice } = getProductPrice({ 
-    product, 
-    variantId: selectedVariant 
-  })
-  
-  const displayPrice = variantPrice || cheapestPrice
-  const rawPrice = displayPrice?.calculated_price_number || 249
-  const { discountedPrice, isDiscounted, savings, discountPercent } = calculateDiscountedPrice(rawPrice)
+  const { calculatePrice } = usePromotion()
+  const activeVariant = product?.variants?.find((v) => v.id === selectedVariant) || product?.variants?.[0]
+  const rawPrice = Number(activeVariant?.calculated_price?.calculated_amount || (activeVariant as any)?.prices?.[0]?.amount || 0)
+  const { discountedPrice, isDiscounted, savings, discountPercent, promoCode } = calculatePrice(rawPrice)
 
   // Track product view when modal opens
   useEffect(() => {
@@ -114,6 +108,15 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
     if (!selectedVariant) return
 
     setIsAdding(true)
+
+    // Fire analytics add_to_cart event
+    trackAddToCart({
+      id: selectedVariant,
+      title: product.title || "Agra Petha",
+      price: discountedPrice,
+      quantity,
+    })
+
     try {
       const res = await addToCart({
         variantId: selectedVariant,
@@ -125,30 +128,27 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
         throw new Error(res?.error || "Could not add sweet to box")
       }
 
-      // Fire analytics add_to_cart event
-      trackAddToCart({
-        id: selectedVariant,
+      // Close quick buy modal and show AddedToCart luxury modal
+      onClose()
+      setAddedItemDetails({
         title: product.title || "Agra Petha",
+        variantTitle: activeVariant?.title || "Standard Box",
+        thumbnail: product.thumbnail || "",
         price: discountedPrice,
         quantity,
+        subtotal: res.cart?.subtotal || undefined,
       })
+      setShowAddedModal(true)
+      setQuantity(1)
 
-      setShowSuccess(true)
-      
-      if (typeof window !== 'undefined') {
+      // Open dropdown WITH the populated cart payload
+      if (typeof window !== 'undefined' && res?.cart) {
         window.dispatchEvent(new CustomEvent('cartUpdated', {
-          detail: { cart: res.cart || null, quantity, forceOpen: true }
+          detail: { cart: res.cart, quantity, forceOpen: false }
         }))
       }
-
-      setTimeout(() => {
-        onClose()
-        setShowSuccess(false)
-        setQuantity(1)
-      }, 1200)
     } catch (error) {
       console.error("Failed to add to cart:", error)
-      alert("Could not add item to cart. Please try again.")
     } finally {
       setIsAdding(false)
     }
@@ -191,35 +191,36 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
     }
   }
 
-  const handleAddUpsell = async (upsellTitle: string) => {
+  const handleAddUpsell = async (pair: any) => {
+    if (!pair?.variantId) return
+    setAddingUpsell(prev => ({ ...prev, [pair.id]: true }))
+    triggerPackingSweetBox(true, `Adding ${pair.title} to box ✨`)
     try {
-      const res = await fetch(`/api/search-suggest?q=${encodeURIComponent(upsellTitle)}&countryCode=${countryCode}`)
-      const data = await res.json()
-      const matchedProd = data.products?.[0]
-      const variantId = matchedProd?.variants?.[0]?.id
-
-      if (variantId) {
-        const addRes = await addToCart({
-          variantId,
-          quantity: 1,
-          countryCode,
-        })
-        setAddedUpsell(prev => ({ ...prev, [upsellTitle]: true }))
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('cartUpdated', {
-            detail: { cart: addRes?.cart || null, quantity: 1, forceOpen: false }
-          }))
-        }
+      const addRes = await addToCart({
+        variantId: pair.variantId,
+        quantity: 1,
+        countryCode,
+      })
+      setAddedUpsell(prev => ({ ...prev, [pair.id]: true }))
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cartUpdated', {
+          detail: { cart: addRes?.cart || null, quantity: 1, forceOpen: false }
+        }))
       }
     } catch (e) {
       console.error("Failed to add upsell sweet:", e)
+    } finally {
+      setAddingUpsell(prev => ({ ...prev, [pair.id]: false }))
+      triggerPackingSweetBox(false)
     }
   }
 
   if (!mounted || !product) return null
 
-  return createPortal(
-    <AnimatePresence>
+  return (
+    <>
+      {createPortal(
+        <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
           {/* Backdrop with smooth blur */}
@@ -240,6 +241,43 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
             transition={{ type: "spring", damping: 26, stiffness: 360, mass: 0.8 }}
             className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-amber-100/90 flex flex-col max-h-[90vh] overflow-hidden my-auto z-10"
           >
+            {/* COMPACT SLEEK FLOATING LOADING CARD */}
+            <AnimatePresence>
+              {isAdding && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] z-40 flex items-center justify-center p-4"
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, y: 10 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.9, y: 10 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                    className="bg-[#FFFDF9] rounded-2xl border border-amber-200/90 shadow-2xl px-5 py-4 flex items-center gap-3.5 max-w-xs w-auto text-left"
+                  >
+                    <div className="relative flex-shrink-0">
+                      <div className="w-9 h-9 rounded-full border-2 border-amber-200 border-t-petha-amber animate-spin" />
+                      <span className="absolute inset-0 flex items-center justify-center text-sm">
+                        🍬
+                      </span>
+                    </div>
+
+                    <div className="min-w-0">
+                      <h4 className="font-jakarta text-xs font-bold text-slate-900 leading-tight">
+                        Packing Sweet Box...
+                      </h4>
+                      <p className="font-jakarta text-[10px] text-slate-500 truncate mt-0.5">
+                        Securing fresh batch guarantee ✨
+                      </p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Header Bar */}
             <div className="sticky top-0 bg-white/95 backdrop-blur-xs border-b border-slate-100 px-5 py-4 flex items-center justify-between z-30 shadow-xs rounded-t-3xl">
               <div className="flex items-center gap-2">
@@ -274,7 +312,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   {isDiscounted && (
                     <div className="absolute top-3 left-3 z-[2] px-2.5 py-1 rounded-full bg-emerald-600 text-white font-jakarta text-[11px] font-bold shadow-md flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
-                      {discountPercent}% OFF ({STORE_PROMOTION.code})
+                      {discountPercent}% OFF {promoCode ? `(${promoCode})` : ""}
                     </div>
                   )}
 
@@ -333,7 +371,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                           {product.variants.map((variant) => {
                             const vAny = variant as any
                             const rawAmt = Number(vAny?.calculated_price?.calculated_amount || vAny?.prices?.[0]?.amount || 0)
-                            const { discountedPrice: variantDisc } = calculateDiscountedPrice(rawAmt)
+                            const { discountedPrice: variantDisc } = calculatePrice(rawAmt)
                             const isLargest = product.variants && product.variants.length > 1 && variant.id === product.variants.reduce((max: any, cur: any) => {
                               const curAmt = Number((cur as any)?.calculated_price?.calculated_amount || (cur as any)?.prices?.[0]?.amount || 0)
                               const maxAmt = Number((max as any)?.calculated_price?.calculated_amount || (max as any)?.prices?.[0]?.amount || 0)
@@ -401,7 +439,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                     {showSuccess ? (
                       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 flex items-center justify-center gap-2 text-emerald-800 font-jakarta font-bold text-sm">
                         <Check className="w-5 h-5 text-emerald-600" />
-                        Added to Cart with 20% Discount!
+                        Added to Sweet Box {discountPercent > 0 ? `with ${discountPercent}% Discount!` : "Successfully!"}
                       </div>
                     ) : (
                       <>
@@ -446,45 +484,59 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {UPSELL_SNACKS.filter(u => u.title !== product.title).slice(0, 3).map((item) => (
-                    <div
-                      key={item.title}
-                      className="p-2.5 rounded-2xl bg-amber-50/40 border border-amber-100 hover:border-amber-200 flex items-center justify-between gap-2"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0">
-                          <Image
-                            src={item.image}
-                            alt={item.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-jakarta text-xs font-bold text-slate-900 truncate">
-                            {item.title}
-                          </p>
-                          <p className="font-mono text-[11px] font-semibold text-petha-amber">
-                            {item.price}
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleAddUpsell(item.title)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold font-jakarta transition-colors flex-shrink-0 cursor-pointer ${
-                          addedUpsell[item.title]
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-white border border-amber-300 hover:bg-petha-amber hover:text-white text-slate-800"
-                        }`}
+                {pairings.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {pairings.filter((u: any) => u.title !== product.title).slice(0, 3).map((item: any) => (
+                      <div
+                        key={item.id}
+                        className="p-2.5 rounded-2xl bg-amber-50/40 border border-amber-100 hover:border-amber-200 flex items-center justify-between gap-2"
                       >
-                        {addedUpsell[item.title] ? "✓ Added" : "+ Add"}
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0">
+                            <Image
+                              src={item.thumbnail || "/hero_image.webp"}
+                              alt={item.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-jakarta text-xs font-bold text-slate-900 truncate">
+                              {item.title}
+                            </p>
+                            <p className="font-mono text-[11px] font-semibold text-petha-amber">
+                              {item.priceFormatted || `₹${item.price}`}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          disabled={addingUpsell[item.id] || addedUpsell[item.id]}
+                          onClick={() => handleAddUpsell(item)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold font-jakarta transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+                            addedUpsell[item.id]
+                              ? "bg-emerald-100 text-emerald-800"
+                              : addingUpsell[item.id]
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-white border border-amber-300 hover:bg-petha-amber hover:text-white text-slate-800"
+                          }`}
+                        >
+                          {addingUpsell[item.id] ? (
+                            <>
+                              <div className="w-3 h-3 rounded-full border-2 border-amber-600 border-t-transparent animate-spin" />
+                              <span>Packing...</span>
+                            </>
+                          ) : addedUpsell[item.id] ? (
+                            "✓ Added"
+                          ) : (
+                            "+ Add"
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Trust Footer */}
@@ -499,6 +551,16 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
       )}
     </AnimatePresence>,
     document.body
+  )}
+
+  <AddedToCartModal
+    isOpen={showAddedModal}
+    isAdding={isAdding}
+    item={addedItemDetails}
+    countryCode={countryCode}
+    onClose={() => setShowAddedModal(false)}
+  />
+  </>
   )
 }
 

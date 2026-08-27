@@ -32,9 +32,9 @@ const Summary = ({ cart }: SummaryProps) => {
     <div className="flex flex-col gap-y-5">
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <h2 className="font-cormorant text-2xl font-bold text-slate-900">Order Summary</h2>
-        {STORE_PROMOTION.enabled && STORE_PROMOTION.discountPercent > 0 && (
+        {cart.promotions && cart.promotions.length > 0 && (
           <span className="font-jakarta text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-            {STORE_PROMOTION.discountPercent}% Auto-Applied
+            🎉 {cart.promotions[0]?.code || "Discount"} Applied
           </span>
         )}
       </div>

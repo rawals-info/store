@@ -13,6 +13,8 @@ import { trackProductView, trackAddToCart } from "@lib/analytics/google-analytic
 import { isEqual } from "@lib/utils/object-utils"
 import { Minus, Plus, ShoppingBag, Zap, Check, ShieldCheck, Truck, Sparkles } from "lucide-react"
 
+import AddedToCartModal, { AddedItemDetails } from "@components/AddedToCartModal"
+
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
@@ -36,6 +38,8 @@ export default function ProductActions({
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [addedModalOpen, setAddedModalOpen] = useState(false)
+  const [addedItemDetails, setAddedItemDetails] = useState<AddedItemDetails | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [manuallySelectedVariant, setManuallySelectedVariant] = useState<HttpTypes.StoreProductVariant | undefined>()
   
@@ -59,53 +63,43 @@ export default function ProductActions({
         return getAmt(current) > getAmt(highest) ? current : highest
       }, product.variants[0])
 
-      if (highestVariant?.options && highestVariant.options.length > 0) {
-        const variantOptions = optionsAsKeymap(highestVariant.options)
-        setOptions(variantOptions)
-      } else if (productOptions.length > 0) {
-        const defaultOptions: Record<string, string | undefined> = {}
-        productOptions.forEach(option => {
-          if (option.values?.length) {
-            defaultOptions[option.id] = option.values[option.values.length - 1]?.value || option.values[0]?.value
-          }
-        })
-        if (Object.keys(defaultOptions).length > 0) {
-          setOptions(defaultOptions)
-        }
-      } else {
-        setManuallySelectedVariant(highestVariant)
-      }
+      const initialOptions = optionsAsKeymap(highestVariant.options)
+      setOptions(initialOptions)
+      setManuallySelectedVariant(highestVariant)
     }
-  }, [product, productOptions])
+  }, [product])
 
   const selectedVariant = useMemo(() => {
-    if (manuallySelectedVariant) return manuallySelectedVariant
-    if (!product.variants || product.variants.length === 0) return
-
-    if (product.options && product.options.length > 0) {
-      const variant = product.variants.find((v) => {
-        const variantOptions = optionsAsKeymap(v.options)
-        return isEqual(variantOptions, options)
-      })
-      return variant || product.variants[0]
+    if (!product.variants || product.variants.length === 0) {
+      return undefined
     }
-    return product.variants[0]
-  }, [product, options, manuallySelectedVariant])
+
+    if (manuallySelectedVariant) {
+      return manuallySelectedVariant
+    }
+
+    return product.variants.find((v) => {
+      const variantOptions = optionsAsKeymap(v.options)
+      return isEqual(variantOptions, options)
+    })
+  }, [product.variants, options, manuallySelectedVariant])
 
   // Track product view on mount
   useEffect(() => {
-    if (product) {
-      const price = selectedVariant?.calculated_price?.calculated_amount || 249
+    if (product && selectedVariant) {
+      const rawPrice = Number(selectedVariant.calculated_price?.calculated_amount || (selectedVariant as any)?.prices?.[0]?.amount || 0)
+      const { discountedPrice } = calculateDiscountedPrice(rawPrice)
       trackProductView({
         id: product.id,
         title: product.title || "Agra Petha",
         handle: product.handle,
-        price,
+        price: discountedPrice,
       })
     }
-  }, [product?.id])
+  }, [product?.id, selectedVariant?.id])
 
   const setOptionValue = (optionId: string, value: string) => {
+    setManuallySelectedVariant(undefined)
     setOptions((prev) => ({
       ...prev,
       [optionId]: value,
@@ -114,7 +108,28 @@ export default function ProductActions({
 
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return
+
+    const rawPrice = Number(selectedVariant.calculated_price?.calculated_amount || (selectedVariant as any)?.prices?.[0]?.amount || 0)
+    const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
+
+    // Open Adding Modal
+    setAddedItemDetails({
+      title: product.title || "Agra Petha",
+      variantTitle: selectedVariant.title || "Standard Box",
+      thumbnail: product.thumbnail || selectedVariant.product?.thumbnail || "",
+      price: itemPrice,
+      quantity,
+    })
+    setAddedModalOpen(true)
     setIsAdding(true)
+
+    // Fire analytics add_to_cart event
+    trackAddToCart({
+      id: selectedVariant.id,
+      title: product.title || "Agra Petha",
+      price: itemPrice,
+      quantity,
+    })
 
     try {
       const res = await addToCart({
@@ -124,37 +139,30 @@ export default function ProductActions({
       })
 
       if (!res?.success) {
-        throw new Error(res?.error || "Failed to add to cart")
+        throw new Error(res?.error || "Could not add sweet to box")
       }
 
-      // Fire analytics add_to_cart event
-      const rawPrice = selectedVariant.calculated_price?.calculated_amount || 249
-      const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
-      trackAddToCart({
-        id: selectedVariant.id,
-        title: product.title || "Agra Petha",
-        price: itemPrice,
-        quantity,
-      })
+      // Update Added Modal with populated cart data
+      setAddedItemDetails(prev => prev ? {
+        ...prev,
+        subtotal: res.cart?.subtotal || undefined,
+      } : null)
 
-      setAddedToCart(true)
-
-      // Broadcast updated cart to all listeners for instant 0ms sync
-      if (typeof window !== "undefined") {
+      // Sync mini-cart state
+      if (typeof window !== "undefined" && res?.cart) {
         window.dispatchEvent(
           new CustomEvent("cartUpdated", {
             detail: {
-              cart: res.cart || null,
+              cart: res.cart,
               quantity,
-              forceOpen: true,
+              forceOpen: false,
             },
           })
         )
       }
-
-      setTimeout(() => setAddedToCart(false), 2500)
     } catch (error) {
-      console.error("Cart error:", error)
+      console.error("Failed to add to cart:", error)
+      setAddedModalOpen(false)
     } finally {
       setIsAdding(false)
     }
@@ -162,8 +170,8 @@ export default function ProductActions({
 
   const handleBuyNow = async () => {
     if (!selectedVariant?.id) return
-    setIsAdding(true)
 
+    setIsAdding(true)
     try {
       const res = await addToCart({
         variantId: selectedVariant.id,
@@ -176,7 +184,7 @@ export default function ProductActions({
       }
 
       // Fire analytics add_to_cart event
-      const rawPrice = selectedVariant.calculated_price?.calculated_amount || 249
+      const rawPrice = Number(selectedVariant.calculated_price?.calculated_amount || (selectedVariant as any)?.prices?.[0]?.amount || 0)
       const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
       trackAddToCart({
         id: selectedVariant.id,
@@ -351,6 +359,15 @@ export default function ProductActions({
         isAdding={isAdding}
         show={!inView}
         optionsDisabled={disabled || false}
+      />
+
+      {/* Added to Box Luxury Modal */}
+      <AddedToCartModal
+        isOpen={addedModalOpen}
+        isAdding={isAdding}
+        item={addedItemDetails}
+        countryCode={countryCode}
+        onClose={() => setAddedModalOpen(false)}
       />
     </div>
   )

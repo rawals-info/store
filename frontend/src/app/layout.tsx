@@ -6,6 +6,8 @@ import { Analytics } from '@vercel/analytics/react'
 import Script from "next/script";
 import "styles/globals.css"
 import { Poppins, DM_Serif_Display, Inter, Playfair_Display, Cormorant_Garamond, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
+import PackingSweetBoxOverlay from "@components/PackingSweetBoxOverlay"
+import { PromotionProvider } from "@lib/context/promotion-context"
 
 // ✅ Optimized font loading with display: 'swap', preload, and adjustFontFallback
 const poppins = Poppins({
@@ -397,7 +399,12 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <Analytics />
         <SpeedInsights />
 
-        <main className="relative">{props.children}</main>
+        {/* Universal Luxury Sweet Box Packing Loading Overlay */}
+        <PackingSweetBoxOverlay />
+
+        <PromotionProvider>
+          <main className="relative">{props.children}</main>
+        </PromotionProvider>
       </body>
     </html>
   )

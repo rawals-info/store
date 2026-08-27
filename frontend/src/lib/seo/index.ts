@@ -172,7 +172,8 @@ export const generateProductSchema = (
   region: HttpTypes.StoreRegion,
   countryCode: string,
   reviewData?: { average_rating: number; count: number },
-  reviews?: import("../../types/global").StoreProductReview[]
+  reviews?: import("../../types/global").StoreProductReview[],
+  activePromo?: { code: string; discountPercent: number } | null
 ) => {
   const baseUrl = getBaseURL()
   const toAbsoluteUrl = (url: string) =>
@@ -221,9 +222,16 @@ export const generateProductSchema = (
   }
 
   const amountMinorUnits = findBestVariantAmountMinorUnits()
-  // Align stock logic with storefront/cart behavior:
-  // In stock if ANY variant either doesn't manage inventory, allows backorder,
-  // or has a positive inventory quantity.
+  const rawNumericPrice = typeof amountMinorUnits === 'number' && !Number.isNaN(amountMinorUnits) ? Number(amountMinorUnits) : 0
+  const currencyCode = region?.currency_code?.toUpperCase() || "INR"
+
+  // Compute dynamic Google Search Discount Schema if a promo is active
+  const hasPromo = Boolean(activePromo && activePromo.code && activePromo.discountPercent > 0 && rawNumericPrice > 0)
+  const listPriceFormatted = rawNumericPrice > 0 ? rawNumericPrice.toFixed(2) : "0.00"
+  const discountedNumeric = hasPromo ? Math.round(rawNumericPrice * (1 - activePromo!.discountPercent / 100) * 100) / 100 : rawNumericPrice
+  const finalPrice = rawNumericPrice > 0 ? (hasPromo ? discountedNumeric.toFixed(2) : listPriceFormatted) : "0.00"
+
+  // Align stock logic with storefront/cart behavior
   const isInStock = (product.variants || []).some((variant: any) => {
     if (!variant) return false
     if (variant.allow_backorder) return true
@@ -234,14 +242,9 @@ export const generateProductSchema = (
   const productCategory = product.categories?.[0]?.name || product.collection?.title || "Indian Sweets"
   const primaryVariant = product.variants?.[0]
 
-  // Use dynamic review data if available; avoid fake defaults that can trigger warnings
+  // Use dynamic review data if available
   const ratingValue = typeof reviewData?.average_rating === 'number' ? reviewData.average_rating : 0
   const reviewCount = typeof reviewData?.count === 'number' ? reviewData.count : 0
-
-  // Convert to major units for schema.org price
-  const finalPrice = typeof amountMinorUnits === 'number' && !Number.isNaN(amountMinorUnits)
-    ? Number(amountMinorUnits).toFixed(2)
-    : "0.00"
 
   // Format priceValidUntil properly (30 days from now)
   const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -252,12 +255,12 @@ export const generateProductSchema = (
     {
       "@type": "PropertyValue",
       "name": "Freshness",
-      "value": "Made fresh daily"
+      "value": "Made fresh daily in Agra"
     },
     {
       "@type": "PropertyValue",
       "name": "Packaging",
-      "value": "Hygienic packaging"
+      "value": "Airtight vacuum sealed"
     }
   ]
 
@@ -312,22 +315,39 @@ export const generateProductSchema = (
     "offers": {
       "@type": "Offer",
       "price": finalPrice,
-      "priceCurrency": region?.currency_code?.toUpperCase() || "INR",
+      "priceCurrency": currencyCode,
       "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "validFrom": new Date().toISOString().split('T')[0],
       "priceValidUntil": priceValidUntil,
       "itemCondition": "https://schema.org/NewCondition",
       "url": `${baseUrl}/${countryCode}/products/${product.handle}`,
+      ...(hasPromo ? { "description": `Save ${activePromo!.discountPercent}% with code ${activePromo!.code}` } : {}),
       "seller": {
         "@type": "Organization",
         "name": "Taj Petha",
         "@id": `${baseUrl}/#organization`
       },
-      "priceSpecification": {
-        "@type": "PriceSpecification",
-        "price": finalPrice,
-        "priceCurrency": region?.currency_code?.toUpperCase() || "INR"
-      },
+      "priceSpecification": hasPromo
+        ? [
+            {
+              "@type": "UnitPriceSpecification",
+              "priceType": "https://schema.org/ListPrice",
+              "price": listPriceFormatted,
+              "priceCurrency": currencyCode
+            },
+            {
+              "@type": "UnitPriceSpecification",
+              "priceType": "https://schema.org/Discount",
+              "price": finalPrice,
+              "priceCurrency": currencyCode,
+              "description": `with code ${activePromo!.code}`
+            }
+          ]
+        : {
+            "@type": "PriceSpecification",
+            "price": finalPrice,
+            "priceCurrency": currencyCode
+          },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",
         "applicableCountry": "IN",
@@ -351,7 +371,7 @@ export const generateProductSchema = (
           "shippingRate": {
             "@type": "MonetaryAmount",
             "value": "0.00",
-            "currency": region?.currency_code?.toUpperCase() || "INR"
+            "currency": currencyCode
           },
           "deliveryTime": {
             "@type": "ShippingDeliveryTime",

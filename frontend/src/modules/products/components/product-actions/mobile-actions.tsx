@@ -65,7 +65,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     return variantPrice || cheapestPrice || null
   }, [price])
 
-  const rawNum = selectedPrice?.calculated_price_number || 249
+  const rawNum = selectedPrice?.calculated_price_number || 0
   const { discountedPrice, isDiscounted } = calculateDiscountedPrice(rawNum)
 
   const isSimple = isSimpleProduct(product)

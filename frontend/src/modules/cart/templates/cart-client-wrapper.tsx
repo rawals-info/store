@@ -11,41 +11,7 @@ import { HttpTypes } from "@medusajs/types"
 import { ProductTrustBadges } from "@components/TrustBadges"
 import { addToCart } from "@lib/data/cart"
 import Breadcrumb from "@modules/common/components/breadcrumb"
-
-const UPSELL_PRODUCTS = [
-  {
-    title: "Special Agra Dalmoth",
-    handle: "dalmoth",
-    price: "₹220",
-    image: "/images/dalmoth.webp",
-    tag: "Signature Snack",
-    variantId: "variant_01JZMK1P7V9J664Y7G5Y7A1B1A",
-  },
-  {
-    title: "Kesar Angoori Petha",
-    handle: "kesar-angoori-petha",
-    price: "₹260",
-    image: "/hero_petha_square.webp",
-    tag: "Royal Juicy Sweet",
-    variantId: "variant_01K21PYF6X8K7B5G8H9J2A4C6E",
-  },
-  {
-    title: "Special Masala Peanuts",
-    handle: "masala-peanuts",
-    price: "₹140",
-    image: "/images/namkeen.webp",
-    tag: "Crispy Namkeen",
-    variantId: "variant_01JZMK5X3E1L2K3J4H5G6F7E8D",
-  },
-  {
-    title: "Chocolate Petha",
-    handle: "chocolate-petha",
-    price: "₹280",
-    image: "/images/combo.webp",
-    tag: "Kids Favorite",
-    variantId: "variant_01JZMJVZ9J2H3K4L5P6Q7R8S9T",
-  },
-]
+import { triggerPackingSweetBox } from "@components/PackingSweetBoxOverlay"
 
 const CartClientWrapper = ({
   initialCart,
@@ -54,95 +20,94 @@ const CartClientWrapper = ({
   initialCart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
 }) => {
-  const [cart, setCart] = useState(initialCart)
+  const [cart, setCart] = useState<HttpTypes.StoreCart | null>(initialCart)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [addingUpsell, setAddingUpsell] = useState<Record<string, boolean>>({})
+  const [upsellProducts, setUpsellProducts] = useState<any[]>([])
   const router = useRouter()
 
+  // Fetch dynamic pairing products from backend
   useEffect(() => {
-    const handleCartUpdate = async (e: Event) => {
-      const customEvent = e as CustomEvent
-      if (customEvent?.detail?.cart) {
-        setCart(customEvent.detail.cart)
-        return
-      }
-
-      setIsRefreshing(true)
-      try {
-        const cacheBuster = Date.now()
-        const response = await fetch(`/api/cart?t=${cacheBuster}`, {
-          credentials: 'include',
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
-          }
-        })
-        
-        if (response.ok) {
-          const { cart: updatedCart } = await response.json()
-          if (updatedCart) {
-            setCart(updatedCart)
-          }
-        } else {
-          router.refresh()
+    fetch("/api/products/popular?limit=4&countryCode=in")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.products) {
+          setUpsellProducts(data.products)
         }
-      } catch (error) {
-        router.refresh()
-      } finally {
-        setIsRefreshing(false)
-      }
-    }
+      })
+      .catch((err) => console.error("Error loading cart upsells:", err))
+  }, [])
 
-    window.addEventListener('cartUpdated', handleCartUpdate)
-    return () => {
-      window.removeEventListener('cartUpdated', handleCartUpdate)
-    }
-  }, [router])
-  
+  // Sync state if server prop changes
   useEffect(() => {
-    // Only update if initialCart has items or if cart was not initialized yet
-    if (initialCart && initialCart.items && initialCart.items.length > 0) {
+    if (initialCart) {
       setCart(initialCart)
     }
   }, [initialCart])
 
+  // Real-time listener for cart changes dispatched anywhere in the app
+  useEffect(() => {
+    const handleCartUpdate = (e: CustomEvent) => {
+      if (e.detail?.cart) {
+        setCart(e.detail.cart)
+      } else {
+        refreshCart()
+      }
+    }
+
+    window.addEventListener("cartUpdated" as any, handleCartUpdate)
+    return () => {
+      window.removeEventListener("cartUpdated" as any, handleCartUpdate)
+    }
+  }, [])
+
+  // Refresh cart from server directly if needed
+  const refreshCart = async () => {
+    try {
+      setIsRefreshing(true)
+      const res = await fetch("/api/cart")
+      if (res.ok) {
+        const data = await res.json()
+        if (data.cart) {
+          setCart(data.cart)
+        }
+      }
+    } catch (e) {
+      console.error("Failed to refresh cart in client:", e)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
+
   const subtotal = cart?.subtotal || 0
 
-  const handleAddUpsell = async (item: typeof UPSELL_PRODUCTS[0]) => {
-    setAddingUpsell(prev => ({ ...prev, [item.handle]: true }))
+  const handleAddUpsell = async (item: any) => {
+    if (!item?.variantId) return
+    setAddingUpsell(prev => ({ ...prev, [item.id]: true }))
+    triggerPackingSweetBox(true, `Adding ${item.title} to sweet box ✨`)
     try {
-      // Find matching product in catalog to get real variant ID
-      const res = await fetch(`/api/search-suggest?q=${encodeURIComponent(item.title)}&countryCode=in`)
-      const data = await res.json()
-      const matchedProd = data.products?.[0]
-      const variantId = matchedProd?.variants?.[0]?.id
+      const addRes = await addToCart({
+        variantId: item.variantId,
+        quantity: 1,
+        countryCode: "in",
+      })
 
-      if (variantId) {
-        const addRes = await addToCart({
-          variantId,
-          quantity: 1,
-          countryCode: "in",
-        })
-
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("cartUpdated", {
-              detail: {
-                cart: addRes?.cart || null,
-                quantity: 1,
-                forceOpen: false,
-              },
-            })
-          )
-        }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("cartUpdated", {
+            detail: {
+              cart: addRes?.cart || null,
+              quantity: 1,
+              forceOpen: false,
+            },
+          })
+        )
       }
     } catch (e) {
       console.error("Failed to add pairing item:", e)
     } finally {
-      setTimeout(() => {
-        setAddingUpsell(prev => ({ ...prev, [item.handle]: false }))
-      }, 1500)
+      setAddingUpsell(prev => ({ ...prev, [item.id]: false }))
+      triggerPackingSweetBox(false)
     }
   }
 
@@ -232,44 +197,51 @@ const CartClientWrapper = ({
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {UPSELL_PRODUCTS.map((prod) => (
-                  <div
-                    key={prod.handle}
-                    className="p-4 rounded-2xl bg-[#FFFDF9] border border-amber-100/80 hover:border-amber-300 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0">
-                        <Image
-                          src={prod.image}
-                          alt={prod.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="inline-block text-[10px] font-bold uppercase text-petha-amber font-jakarta">
-                          {prod.tag}
-                        </span>
-                        <h4 className="font-cormorant text-base font-bold text-slate-900 truncate">
-                          {prod.title}
-                        </h4>
-                        <p className="font-mono text-sm font-bold text-slate-900">
-                          {prod.price}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddUpsell(prod)}
-                      className="w-full py-2 rounded-xl bg-white hover:bg-petha-amber hover:text-white border border-amber-300 text-slate-800 font-jakarta text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm text-center"
+              {upsellProducts.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {upsellProducts.map((prod: any) => (
+                    <div
+                      key={prod.id}
+                      className="p-4 rounded-2xl bg-[#FFFDF9] border border-amber-100/80 hover:border-amber-300 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
                     >
-                      {addingUpsell[prod.handle] ? "✓ Added to Box" : "+ Add to Order"}
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0">
+                          <Image
+                            src={prod.thumbnail || "/hero_image.webp"}
+                            alt={prod.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="inline-block text-[10px] font-bold uppercase text-petha-amber font-jakarta">
+                            Fresh Agra
+                          </span>
+                          <h4 className="font-cormorant text-base font-bold text-slate-900 truncate">
+                            {prod.title}
+                          </h4>
+                          <p className="font-mono text-sm font-bold text-slate-900">
+                            {prod.priceFormatted || `₹${prod.price}`}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={addingUpsell[prod.id]}
+                        onClick={() => handleAddUpsell(prod)}
+                        className={`w-full py-2 rounded-xl border border-amber-300 text-slate-800 font-jakarta text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm text-center ${
+                          addingUpsell[prod.id]
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-white hover:bg-petha-amber hover:text-white"
+                        }`}
+                      >
+                        {addingUpsell[prod.id] ? "Adding to Box..." : "+ Add to Order"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ) : (

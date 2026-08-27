@@ -3,25 +3,21 @@
 import React from "react"
 import { CalculatedVariant } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
-import { calculateDiscountedPrice } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 
 export default function PreviewPrice({
   price,
 }: {
   price: CalculatedVariant
 }) {
+  const { calculatePrice } = usePromotion()
+
   if (!price || !price.calculated_price || price.calculated_price_number === 0) {
-    return (
-      <div className="font-mono flex flex-col items-start">
-        <span className="font-bold text-sm text-slate-800">
-          ₹249
-        </span>
-      </div>
-    )
+    return null
   }
 
-  const rawNum = price.calculated_price_number || 249
-  const { discountedPrice, isDiscounted, discountPercent } = calculateDiscountedPrice(rawNum)
+  const rawNum = price.calculated_price_number || 0
+  const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawNum)
 
   return (
     <div className="flex flex-col items-start">

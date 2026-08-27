@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { generateCityPageMetadata, MAJOR_INDIAN_CITIES } from "@lib/seo"
 import { getHomepageProducts } from "@lib/data/products"
+import { getActivePromotion } from "@lib/data/promotions"
 import CityLandingClient from "@modules/city/templates/city-landing-client"
 
 interface CityPageProps {
@@ -84,6 +85,8 @@ export default async function CityPage({ params }: CityPageProps) {
   const { featuredProducts } = await getHomepageProducts(countryCode)
   const products = featuredProducts || []
 
+  const activePromo = await getActivePromotion()
+
   // City-specific LocalBusiness Schema
   const citySchema = {
     "@context": "https://schema.org",
@@ -108,18 +111,46 @@ export default async function CityPage({ params }: CityPageProps) {
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": `Agra Sweets Delivery in ${city.name}`,
-      "itemListElement": products.map((prod: any, i: number) => ({
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Product",
-          "name": prod.title,
-          "description": prod.description || `Fresh Agra ${prod.title} delivered to ${city.name}`,
-          "url": `https://tajpetha.in/${countryCode}/products/${prod.handle}`
-        },
-        "price": prod.variants?.[0]?.calculated_price?.calculated_amount || 249,
-        "priceCurrency": "INR",
-        "availability": "https://schema.org/InStock"
-      }))
+      "itemListElement": products.map((prod: any, i: number) => {
+        const rawAmount = Number(prod.variants?.[0]?.calculated_price?.calculated_amount || (prod.variants?.[0] as any)?.prices?.[0]?.amount || 0)
+        const hasPromo = Boolean(activePromo && activePromo.discountPercent > 0 && rawAmount > 0)
+        const discounted = hasPromo ? Math.round(rawAmount * (1 - activePromo!.discountPercent / 100) * 100) / 100 : rawAmount
+
+        return {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": prod.title,
+            "description": prod.description || `Fresh Agra ${prod.title} delivered to ${city.name}`,
+            "url": `https://tajpetha.in/${countryCode}/products/${prod.handle}`
+          },
+          "price": discounted > 0 ? discounted.toFixed(2) : "0.00",
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock",
+          ...(hasPromo ? { "description": `Save ${activePromo!.discountPercent}% with code ${activePromo!.code}` } : {}),
+          "priceSpecification": hasPromo
+            ? [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "priceType": "https://schema.org/ListPrice",
+                  "price": rawAmount.toFixed(2),
+                  "priceCurrency": "INR"
+                },
+                {
+                  "@type": "UnitPriceSpecification",
+                  "priceType": "https://schema.org/Discount",
+                  "price": discounted.toFixed(2),
+                  "priceCurrency": "INR",
+                  "description": `with code ${activePromo!.code}`
+                }
+              ]
+            : {
+                "@type": "PriceSpecification",
+                "price": rawAmount.toFixed(2),
+                "priceCurrency": "INR"
+              }
+        }
+      })
     }
   }
 

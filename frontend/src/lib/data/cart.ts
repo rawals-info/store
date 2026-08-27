@@ -21,6 +21,7 @@ import { getIndiaRegion } from "@lib/constants/india-region"
 import { retryWithBackoff } from "@lib/utils/retry"
 import { withTimeout } from "@lib/utils/retry"
 import { randomUUID } from "crypto"
+import { getActivePromoCode } from "@lib/config/promotions"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -208,6 +209,24 @@ export async function addToCart({
         headers
       )
 
+      let finalCart = result.cart
+      const activePromo = getActivePromoCode()
+      if (activePromo && (!finalCart.promotions || finalCart.promotions.length === 0)) {
+        try {
+          const promoRes = await sdk.store.cart.update(
+            cartId,
+            { promo_codes: [activePromo] },
+            {},
+            headers
+          )
+          if (promoRes?.cart) {
+            finalCart = promoRes.cart
+          }
+        } catch (promoErr) {
+          // Continue if promo is not active on backend
+        }
+      }
+
       const cartCacheTag = await getCacheTag("carts")
       scheduleRevalidates([
         cartCacheTag,
@@ -215,7 +234,7 @@ export async function addToCart({
         `cart-${cartId}`,
       ])
       
-      return { success: true, cart: result.cart }
+      return { success: true, cart: finalCart }
     } catch (err) {
       console.warn(`[addToCart] Existing cart ${cartId} invalid or completed, creating fresh cart:`, err)
       // Fall through to cart creation
@@ -247,6 +266,24 @@ export async function addToCart({
       headers
     )
 
+    let finalCart = lineItemRes.cart
+    const activePromo = getActivePromoCode()
+    if (activePromo) {
+      try {
+        const promoRes = await sdk.store.cart.update(
+          newCart.id,
+          { promo_codes: [activePromo] },
+          {},
+          headers
+        )
+        if (promoRes?.cart) {
+          finalCart = promoRes.cart
+        }
+      } catch (promoErr) {
+        // Continue if promo is not active on backend
+      }
+    }
+
     const cartCacheTag = await getCacheTag("carts")
     scheduleRevalidates([
       cartCacheTag,
@@ -254,7 +291,7 @@ export async function addToCart({
       `cart-${newCart.id}`,
     ])
     
-    return { success: true, cart: lineItemRes.cart }
+    return { success: true, cart: finalCart }
   } catch (error) {
     console.error("[addToCart] Error creating cart and line item:", error)
     return {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import DiscountCode from "@modules/checkout/components/discount-code"
 import CartTotals from "@modules/common/components/cart-totals"
@@ -9,50 +9,39 @@ import Image from "next/image"
 import { addToCart } from "@lib/data/cart"
 import { useParams } from "next/navigation"
 
-const UPSELL_SNACKS = [
-  {
-    id: "prod_dalmoth",
-    title: "Special Agra Dalmoth",
-    price: 249,
-    image: "/images/dalmoth.webp",
-    weight: "400g Crispy Namkeen",
-  },
-  {
-    id: "prod_peanuts",
-    title: "Special Masala Peanuts",
-    price: 199,
-    image: "/images/namkeen.webp",
-    weight: "250g Crunchy Snack",
-  },
-]
-
 const CheckoutSummary = ({ cart }: { cart: any }) => {
   const atAddressStep = !cart?.shipping_address?.address_1 || !cart.email
   const shippingPlaceholder = atAddressStep ? "Enter your shipping address" : undefined
   const countryCode = (useParams()?.countryCode as string) || "in"
+  const [upsellSnacks, setUpsellSnacks] = useState<any[]>([])
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<string[]>([])
 
-  const handleQuickAdd = async (item: typeof UPSELL_SNACKS[0]) => {
+  // Fetch live products for impulse add
+  useEffect(() => {
+    fetch(`/api/products/popular?limit=2&countryCode=${countryCode}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.products) {
+          setUpsellSnacks(data.products)
+        }
+      })
+      .catch((err) => console.error("Error loading checkout cross-sells:", err))
+  }, [countryCode])
+
+  const handleQuickAdd = async (item: any) => {
+    if (!item?.variantId) return
     setAddingId(item.id)
     try {
-      // Fetch matching product to get valid variant ID
-      const res = await fetch(`/api/search-suggest?q=${encodeURIComponent(item.title)}&countryCode=${countryCode}`)
-      const data = await res.json()
-      const matchedProd = data.products?.[0]
-      const variantId = matchedProd?.variants?.[0]?.id
-
-      if (variantId) {
-        const addRes = await addToCart({
-          variantId,
-          quantity: 1,
-          countryCode,
-        })
-        if (addRes?.success) {
-          setAddedIds((prev) => [...prev, item.id])
-          if (typeof window !== "undefined") {
-            window.location.reload()
-          }
+      const addRes = await addToCart({
+        variantId: item.variantId,
+        quantity: 1,
+        countryCode,
+      })
+      if (addRes?.success) {
+        setAddedIds((prev) => [...prev, item.id])
+        if (typeof window !== "undefined") {
+          window.location.reload()
         }
       }
     } catch (e) {
@@ -100,59 +89,61 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
       </div>
 
       {/* Cross-Sell / Impulse Snack Row */}
-      <div className="w-full bg-amber-50/70 border border-amber-200/80 rounded-3xl p-5 space-y-3">
-        <div className="flex items-center gap-1.5 text-xs font-jakarta font-bold text-amber-900 uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
-          <span>Add Royal Agra Snacks (Best with Petha):</span>
-        </div>
+      {upsellSnacks.length > 0 && (
+        <div className="w-full bg-amber-50/70 border border-amber-200/80 rounded-3xl p-5 space-y-3">
+          <div className="flex items-center gap-1.5 text-xs font-jakarta font-bold text-amber-900 uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
+            <span>Add Royal Agra Snacks (Best with Petha):</span>
+          </div>
 
-        <div className="space-y-2.5">
-          {UPSELL_SNACKS.map((snack) => {
-            const isAdded = addedIds.includes(snack.id)
-            return (
-              <div
-                key={snack.id}
-                className="flex items-center justify-between p-2.5 bg-white rounded-2xl border border-amber-200/60 shadow-xs"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl overflow-hidden relative bg-amber-100/50 flex-shrink-0">
-                    <Image src={snack.image} alt={snack.title} fill className="object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="font-jakarta text-xs font-bold text-slate-800 leading-tight">
-                      {snack.title}
-                    </h4>
-                    <p className="font-jakarta text-[11px] text-slate-500">
-                      ₹{snack.price} · {snack.weight}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickAdd(snack)}
-                  disabled={isAdded || addingId === snack.id}
-                  className={`px-3 py-1.5 rounded-xl font-jakarta text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
-                    isAdded
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-amber-100 hover:bg-petha-amber hover:text-white text-amber-950"
-                  }`}
+          <div className="space-y-2.5">
+            {upsellSnacks.map((snack: any) => {
+              const isAdded = addedIds.includes(snack.id)
+              return (
+                <div
+                  key={snack.id}
+                  className="flex items-center justify-between p-2.5 bg-white rounded-2xl border border-amber-200/60 shadow-xs"
                 >
-                  {isAdded ? (
-                    <>
-                      <Check className="w-3 h-3 text-emerald-600" /> Added
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-3 h-3" /> + Add
-                    </>
-                  )}
-                </button>
-              </div>
-            )
-          })}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden relative bg-amber-100/50 flex-shrink-0">
+                      <Image src={snack.thumbnail || "/hero_image.webp"} alt={snack.title} fill className="object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-jakarta text-xs font-bold text-slate-800 leading-tight truncate">
+                        {snack.title}
+                      </h4>
+                      <p className="font-jakarta text-[11px] text-slate-500">
+                        {snack.priceFormatted || `₹${snack.price}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickAdd(snack)}
+                    disabled={isAdded || addingId === snack.id}
+                    className={`px-3 py-1.5 rounded-xl font-jakarta text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 flex-shrink-0 ${
+                      isAdded
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-amber-100 hover:bg-petha-amber hover:text-white text-amber-950"
+                    }`}
+                  >
+                    {isAdded ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-600" /> Added
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3 h-3" /> + Add
+                      </>
+                    )}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Trust & Guarantee Box */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-2 text-xs font-jakarta text-slate-600">

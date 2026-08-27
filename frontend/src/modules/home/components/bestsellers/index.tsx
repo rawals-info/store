@@ -9,6 +9,7 @@ import ProductPreviewRating from "@modules/products/components/product-preview/r
 import QuickBuyModal from "@components/QuickBuyModal"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
+import { usePromotion } from "@lib/context/promotion-context"
 
 type BestsellerProps = {
   products: any[]
@@ -38,24 +39,11 @@ function CommercialProductCard({
   const badge = BADGE_CONFIG[index % BADGE_CONFIG.length]
   const [quickBuyOpen, setQuickBuyOpen] = useState(false)
 
-  // Compute lowest starting price and original price dynamically
+  const { calculatePrice } = usePromotion()
   const { cheapestPrice, cheapestVariant } = getProductPrice({ product })
   
-  let priceAmount = cheapestPrice?.calculated_price_number || 0
-  let originalPrice = cheapestPrice?.original_price_number || 0
-
-  if (priceAmount === 0 && cheapestVariant) {
-    priceAmount = Number(cheapestVariant.calculated_price?.calculated_amount || cheapestVariant.prices?.[0]?.amount || 0)
-    originalPrice = priceAmount * 1.2
-  }
-
-  if (originalPrice <= priceAmount && priceAmount > 0) {
-    originalPrice = priceAmount * 1.2
-  }
-
-  const discountPercent = originalPrice > priceAmount && priceAmount > 0
-    ? Math.round(((originalPrice - priceAmount) / originalPrice) * 100)
-    : 15
+  const rawPrice = cheapestPrice?.calculated_price_number || Number(cheapestVariant?.calculated_price?.calculated_amount || (cheapestVariant as any)?.prices?.[0]?.amount || 0)
+  const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawPrice)
 
   return (
     <>
@@ -119,23 +107,21 @@ function CommercialProductCard({
           {/* Price & Add to Cart row */}
           <div className="pt-2 sm:pt-3 border-t border-slate-100 flex items-center justify-between gap-1.5">
             <div className="flex flex-col min-w-0 flex-1">
-              {priceAmount > 0 ? (
+              {rawPrice > 0 ? (
                 <>
                   <div className="font-mono text-sm sm:text-lg font-bold text-slate-900 leading-tight">
-                    ₹{formatIndianPrice(priceAmount)}
+                    ₹{formatIndianPrice(isDiscounted ? discountedPrice : rawPrice)}
                   </div>
-                  <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                    {originalPrice > priceAmount && (
+                  {isDiscounted && (
+                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                       <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
-                        ₹{formatIndianPrice(originalPrice)}
+                        ₹{formatIndianPrice(rawPrice)}
                       </span>
-                    )}
-                    {discountPercent > 0 && (
                       <span className="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta whitespace-nowrap">
                         {discountPercent}% OFF
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <span className="text-xs font-bold text-petha-amber font-jakarta">

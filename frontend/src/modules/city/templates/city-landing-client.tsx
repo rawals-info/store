@@ -217,7 +217,7 @@ export default function CityLandingClient({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {products.map((product) => {
             const { cheapestPrice } = getProductPrice({ product })
-            const rawPrice = cheapestPrice?.calculated_price_number || product.variants?.[0]?.calculated_price?.calculated_amount || 249
+            const rawPrice = cheapestPrice?.calculated_price_number || Number(product.variants?.[0]?.calculated_price?.calculated_amount || 0)
             const { discountedPrice, isDiscounted, discountPercent } = calculateDiscountedPrice(rawPrice)
 
             return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -15,33 +15,21 @@ const POPULAR_CATEGORIES = [
   { label: "City Express Delivery", href: "/in/city", emoji: "⚡" },
 ]
 
-const RECOMMENDATIONS = [
-  {
-    title: "Taj Famous White Petha",
-    handle: "taj-famous-white-petha",
-    price: "₹199",
-    image: "/hero_petha_square.webp",
-    tag: "Authentic Bestseller",
-  },
-  {
-    title: "Special Agra Dalmoth",
-    handle: "special-agra-dalmoth",
-    price: "₹249",
-    image: "/images/dalmoth.webp",
-    tag: "Crispy Cashew Delight",
-  },
-  {
-    title: "Kesar Angoori Petha",
-    handle: "kesar-angoori-petha",
-    price: "₹260",
-    image: "/hero_petha_square.webp",
-    tag: "Pure Saffron Syrup",
-  },
-]
-
 export default function NotFoundView() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [recommendations, setRecommendations] = useState<any[]>([])
   const router = useRouter()
+
+  useEffect(() => {
+    fetch("/api/products/popular?limit=3&countryCode=in")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.products) {
+          setRecommendations(data.products)
+        }
+      })
+      .catch((err) => console.error("Error loading 404 recommendations:", err))
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,50 +117,52 @@ export default function NotFoundView() {
         </div>
 
         {/* 3 Popular Delicacies Quick Recommendations */}
-        <div className="pt-6 border-t border-amber-100/80">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-cormorant text-xl font-bold text-slate-900">
-              Fresh Agra Delicacies You Might Crave:
-            </span>
-            <Link
-              href="/in/products"
-              className="text-xs font-bold text-petha-amber hover:text-petha-saffron font-jakarta flex items-center gap-1"
-            >
-              <span>View All Menu</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {RECOMMENDATIONS.map((item) => (
+        {recommendations.length > 0 && (
+          <div className="pt-6 border-t border-amber-100/80">
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-cormorant text-xl font-bold text-slate-900">
+                Fresh Agra Delicacies You Might Crave:
+              </span>
               <Link
-                key={item.handle}
-                href={`/in/products/${item.handle}`}
-                className="group bg-white rounded-2xl p-3 border border-amber-100/90 shadow-sm hover:shadow-md hover:border-amber-300 transition-all flex items-center gap-3 text-left"
+                href="/in/products"
+                className="text-xs font-bold text-petha-amber hover:text-petha-saffron font-jakarta flex items-center gap-1"
               >
-                <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-amber-50 border border-amber-100 flex-shrink-0">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[10px] font-bold text-petha-amber uppercase block font-jakarta">
-                    {item.tag}
-                  </span>
-                  <h4 className="font-cormorant text-base font-bold text-slate-900 truncate">
-                    {item.title}
-                  </h4>
-                  <span className="font-mono text-xs font-bold text-slate-800">
-                    {item.price}
-                  </span>
-                </div>
+                <span>View All Menu</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
-            ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {recommendations.map((item: any) => (
+                <Link
+                  key={item.id}
+                  href={`/in/products/${item.handle}`}
+                  className="group bg-white rounded-2xl p-3 border border-amber-100/90 shadow-sm hover:shadow-md hover:border-amber-300 transition-all flex items-center gap-3 text-left"
+                >
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-amber-50 border border-amber-100 flex-shrink-0">
+                    <Image
+                      src={item.thumbnail || "/hero_image.webp"}
+                      alt={item.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-bold text-petha-amber uppercase block font-jakarta">
+                      Fresh Batch
+                    </span>
+                    <h4 className="font-cormorant text-base font-bold text-slate-900 truncate">
+                      {item.title}
+                    </h4>
+                    <span className="font-mono text-xs font-bold text-slate-800">
+                      {item.priceFormatted || `₹${item.price}`}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">

@@ -1,36 +1,23 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 
 const TRUST_PILLS = [
   { icon: "🌱", label: "100% Vegetarian" },
   { icon: "🛡️", label: "FSSAI Certified" },
   { icon: "📦", label: "Same-Day Dispatch" },
-  { icon: "⭐", label: "4.8★ Rated" },
+  { icon: "⭐", label: "4.9★ Rated" },
 ]
-
-const WORDS = ["Heritage", "Legend", "Freshness", "Tradition"]
 
 export default function HeroV2({ countryCode }: { countryCode: string }) {
   const prefersReduced = useReducedMotion()
-  const [wordIdx, setWordIdx] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setWordIdx(i => (i + 1) % WORDS.length)
-    }, 2500)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [])
-
   const shopLink = `/${countryCode}/products`
 
   return (
     <section
-      className="relative w-full bg-[#FAF8F5] overflow-hidden flex items-center pt-24 lg:pt-32 pb-16 lg:pb-24"
+      className="relative w-full bg-[#FAF8F5] overflow-hidden flex items-center pt-8 lg:pt-12 pb-12 lg:pb-16"
       aria-label="Hero section — Taj Petha"
     >
       {/* Warm ambient glow */}
@@ -60,7 +47,7 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
               </span>
             </motion.div>
 
-            {/* Main headline */}
+            {/* Main headline - 100% Rock-Solid & Stable */}
             <motion.h1
               initial={prefersReduced ? false : { opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -69,21 +56,7 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
             >
               Taste the Authentic
               <br />
-              <span className="relative inline-block text-petha-amber">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={wordIdx}
-                    initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{ duration: 0.35 }}
-                    className="inline-block"
-                  >
-                    {WORDS[wordIdx]}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
-              {" "}of Agra Petha
+              <span className="text-petha-amber">Heritage</span> of Agra Petha
             </motion.h1>
 
             {/* Subheadline */}

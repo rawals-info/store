@@ -1,6 +1,8 @@
+"use client"
+
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
-import { calculateDiscountedPrice } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 import { HttpTypes } from "@medusajs/types"
 
 export default function ProductPrice({
@@ -10,6 +12,8 @@ export default function ProductPrice({
   product: HttpTypes.StoreProduct
   variantId?: string
 }) {
+  const { calculatePrice } = usePromotion()
+
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
     variantId,
@@ -21,8 +25,8 @@ export default function ProductPrice({
     return <div className="block w-32 h-8 bg-slate-100 rounded animate-pulse" />
   }
 
-  const rawNum = selectedPrice.calculated_price_number || 249
-  const { discountedPrice, isDiscounted, discountPercent } = calculateDiscountedPrice(rawNum)
+  const rawNum = selectedPrice.calculated_price_number || 0
+  const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawNum)
 
   return (
     <div className="flex flex-col gap-1">

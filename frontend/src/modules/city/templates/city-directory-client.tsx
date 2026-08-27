@@ -294,7 +294,7 @@ export default function CityDirectoryClient({
 
                   <div className="mt-4 pt-3 border-t border-amber-100 flex items-center justify-between">
                     <span className="font-mono text-base sm:text-lg font-bold text-slate-900">
-                      ₹{product.variants?.[0]?.calculated_price?.calculated_amount || 249}
+                      ₹{product.variants?.[0]?.calculated_price?.calculated_amount ? Number(product.variants[0].calculated_price.calculated_amount) : ""}
                     </span>
                     <button
                       type="button"
