@@ -3,11 +3,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { ShoppingBag, Sparkles, ArrowRight, ShieldCheck, Truck, Award } from "lucide-react"
 import { addToCart } from "@lib/data/cart"
+import { formatIndianPrice } from "@lib/util/money"
+import { usePromotion } from "@lib/context/promotion-context"
 
 const EmptyCartMessage = () => {
   const [featuredSweets, setFeaturedSweets] = useState<any[]>([])
   const [addingItem, setAddingItem] = useState<Record<string, boolean>>({})
   const [addedItem, setAddedItem] = useState<Record<string, boolean>>({})
+  const { calculatePrice } = usePromotion()
 
   useEffect(() => {
     fetch("/api/products/popular?limit=3&countryCode=in")
@@ -100,10 +103,10 @@ const EmptyCartMessage = () => {
             {featuredSweets.map((sweet: any) => (
               <div
                 key={sweet.id}
-                className="p-4 rounded-3xl bg-white border border-amber-100 hover:border-amber-300 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                className="p-4 rounded-3xl bg-white border border-amber-200/60 hover:border-amber-400 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
               >
                 <div className="space-y-3">
-                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-amber-50 border border-amber-100">
+                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-amber-50 border border-amber-200/60">
                     <Image
                       src={sweet.thumbnail || "/hero_image.webp"}
                       alt={sweet.title}
@@ -122,9 +125,26 @@ const EmptyCartMessage = () => {
                     <p className="font-jakarta text-xs text-slate-500 line-clamp-2 mt-1">
                       {sweet.description || "Authentic freshly prepared Agra delicacy."}
                     </p>
-                    <p className="font-mono text-sm font-bold text-slate-900 mt-2">
-                      {sweet.priceFormatted || `₹${sweet.price}`}
-                    </p>
+                    {(() => {
+                      const sweetPromo = calculatePrice(sweet.price)
+                      return (
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <span className="font-mono text-sm font-bold text-slate-900">
+                            ₹{formatIndianPrice(sweetPromo.discountedPrice)}
+                          </span>
+                          {sweetPromo.isDiscounted && (
+                            <>
+                              <span className="font-mono text-xs text-slate-400 line-through">
+                                ₹{formatIndianPrice(sweet.price)}
+                              </span>
+                              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-jakarta">
+                                {sweetPromo.discountPercent}% OFF
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )
+                    })()}
                   </div>
                 </div>
 

@@ -133,8 +133,8 @@ const ProductPreview = ({
           </div>
 
           {/* Price & Quick Add Button */}
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
-            <div>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+            <div className="min-w-0">
               {cheapestPrice ? (
                 <div className="font-mono text-sm sm:text-base font-bold text-slate-900">
                   <PreviewPrice price={cheapestPrice} />
@@ -147,10 +147,10 @@ const ProductPreview = ({
             <button
               type="button"
               onClick={handleQuickBuy}
-              className="px-3 py-1.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer"
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer whitespace-nowrap flex-shrink-0"
             >
-              <ShoppingBag className="w-3 h-3" />
-              <span>+ Add</span>
+              <ShoppingBag className="w-3 h-3 flex-shrink-0" />
+              <span className="whitespace-nowrap">+ Add</span>
             </button>
           </div>
         </div>

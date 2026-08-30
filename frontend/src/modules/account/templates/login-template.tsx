@@ -16,7 +16,7 @@ const LoginTemplate = () => {
   const [currentView, setCurrentView] = useState<LOGIN_VIEW>(LOGIN_VIEW.SIGN_IN)
 
   return (
-    <div className="min-h-[85vh] bg-[#FAF8F5] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-jakarta">
+    <div className="w-full flex items-center justify-center py-8 sm:py-14 px-4 sm:px-6 lg:px-8 font-jakarta">
       <div className="w-full max-w-md space-y-6">
         
         {/* Brand Crest */}
@@ -35,7 +35,7 @@ const LoginTemplate = () => {
         </div>
 
         {/* Auth Card */}
-        <div className="bg-white rounded-3xl border border-amber-100/90 p-8 shadow-sm space-y-6">
+        <div className="bg-white rounded-3xl border border-amber-200/60 p-7 sm:p-9 shadow-xs space-y-6">
           
           {/* Switcher Tabs */}
           <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl">

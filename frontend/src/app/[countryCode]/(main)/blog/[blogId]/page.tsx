@@ -107,8 +107,8 @@ export default async function BlogPost({ params }: BlogPostProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
+      <div className="w-full py-6 sm:py-10 font-jakarta">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           
           {/* Breadcrumb Navigation */}
           <Breadcrumb
@@ -117,11 +117,11 @@ export default async function BlogPost({ params }: BlogPostProps) {
               { label: post.title, isCurrent: true },
             ]}
             countryCode={countryCode}
-            className="rounded-2xl border border-amber-100/90 shadow-xs"
+            className="rounded-2xl border border-amber-200/60 shadow-xs bg-white/70 backdrop-blur-xs"
           />
 
           {/* Main Article Header Card */}
-          <article className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-8 shadow-xs space-y-6">
+          <article className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-10 shadow-xs space-y-6">
             
             {/* Meta tags */}
             <div className="space-y-3">

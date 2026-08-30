@@ -146,11 +146,11 @@ export default async function AboutPage(props: AboutPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10">
+      <div className="w-full py-6 sm:py-10 font-jakarta">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
           
           {/* Hero Story Banner */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-xs text-center relative overflow-hidden">
+          <div className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-10 shadow-xs text-center relative overflow-hidden">
             <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
             
             {/* Breadcrumb */}

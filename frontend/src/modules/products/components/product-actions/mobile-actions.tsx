@@ -88,12 +88,12 @@ const MobileActions: React.FC<MobileActionsProps> = ({
           leaveTo="opacity-0 translate-y-full"
         >
           <div
-            className="bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.15)] border-t border-slate-200 p-3 px-4 w-full flex items-center justify-between gap-3"
+            className="bg-white/95 backdrop-blur-md shadow-[0_-8px_30px_rgba(0,0,0,0.12)] border-t border-amber-200/80 p-3 px-4 w-full flex items-center justify-between gap-2.5"
             data-testid="mobile-actions"
           >
             {/* Price & Title on Left */}
             <div className="flex-1 min-w-0">
-              <span className="font-cormorant text-sm sm:text-base font-bold text-slate-900 truncate block">
+              <span className="font-jakarta text-xs sm:text-sm font-bold text-slate-900 truncate block">
                 {product.title}
               </span>
               <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-slate-900">
@@ -112,13 +112,13 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 <button
                   type="button"
                   onClick={open}
-                  className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-jakarta text-xs font-semibold text-slate-800 flex items-center gap-1 cursor-pointer shadow-xs active:scale-95"
+                  className="px-2.5 py-2 rounded-xl border border-amber-200 bg-amber-50/60 font-jakarta text-xs font-semibold text-slate-800 flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95 flex-shrink-0"
                   data-testid="mobile-actions-button"
                 >
-                  <span className="truncate max-w-[80px]">
-                    {variant ? variant.title || Object.values(options).join(" / ") : "Size"}
+                  <span className="truncate max-w-[85px]">
+                    {variant ? variant.title || Object.values(options).join(" / ") : "Select Pack"}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                  <ChevronDown className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
                 </button>
               )}
               
@@ -126,7 +126,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 type="button"
                 onClick={handleAddToCart}
                 disabled={Boolean(!inStock || (!variant && product.variants && product.variants.length > 1))}
-                className="px-4 sm:px-5 py-2.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                className="px-4 sm:px-5 py-2.5 rounded-full bg-petha-amber hover:bg-petha-saffron text-white font-jakarta text-xs font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1 whitespace-nowrap flex-shrink-0"
                 data-testid="mobile-cart-button"
               >
                 {isAdding ? (

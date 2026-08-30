@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { formatIndianPrice } from "@lib/util/money"
 
 export const revalidate = 300 // Cache for 5 minutes
 
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
         handle: prod.handle,
         thumbnail: prod.thumbnail,
         price: priceNum,
-        priceFormatted: cheapestPrice?.calculated_price || (priceNum > 0 ? `₹${priceNum}` : ""),
+        priceFormatted: priceNum > 0 ? `₹${formatIndianPrice(priceNum)}` : "",
         variantId: cheapestVariant?.id || prod.variants?.[0]?.id,
         description: prod.description || "",
       }

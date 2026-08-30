@@ -61,11 +61,10 @@ export default function MainLayout({
     <ErrorBoundary>
       <div
         className={clx(
-          isHomePage ? "w-full overflow-x-hidden" : "content-container overflow-x-hidden",
-          // Add top padding for banner space (48px banner height) only when banner is visible
+          "w-full overflow-x-hidden",
           {
-            "pt-12": bannerVisible, // This is equivalent to 48px for the banner
-            "pb-6 sm:pb-10": !isHomePage, // Only bottom padding for non-home pages
+            "pt-12": bannerVisible,
+            "pb-6 sm:pb-10": !isHomePage,
           }
         )}
       >

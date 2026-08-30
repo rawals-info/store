@@ -15,18 +15,18 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
 }) => {
   if (!customer) {
     return (
-      <div className="min-h-[85vh] bg-[#FAF8F5]" data-testid="account-page">
+      <div className="w-full" data-testid="account-page">
         {children}
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] py-8 sm:py-12 font-jakarta" data-testid="account-page">
+    <div className="w-full font-jakarta" data-testid="account-page">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Main Dashboard Card */}
-        <div className="bg-white rounded-3xl border border-amber-100/90 shadow-sm p-6 sm:p-10">
+        <div className="bg-white rounded-3xl border border-amber-200/60 shadow-sm p-6 sm:p-10">
           <div className="grid grid-cols-1 small:grid-cols-[240px_1fr] gap-8 items-start">
             <div className="border-b small:border-b-0 small:border-r border-slate-100 pb-6 small:pb-0 small:pr-6">
               <AccountNav customer={customer} />

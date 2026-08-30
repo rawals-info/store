@@ -116,7 +116,7 @@ export default async function ProductTemplate({
         }}
       />
       
-      <div className="bg-[#FAF8F5] min-h-screen py-8 sm:py-12">
+      <div className="w-full py-6 sm:py-10">
         <div
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           data-testid="product-container"
@@ -131,16 +131,16 @@ export default async function ProductTemplate({
               { label: product.title, isCurrent: true },
             ]}
             countryCode={countryCode}
-            className="mb-6 rounded-2xl border border-amber-100/90 shadow-xs"
+            className="mb-6 rounded-2xl border border-amber-200/60 shadow-xs bg-white/70 backdrop-blur-xs"
           />
 
           {/* Main Card with Commercial 5-Col/7-Col B2C Layout */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-8 shadow-xs mb-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          <div className="bg-white rounded-3xl border border-amber-200/60 p-5 sm:p-8 lg:p-10 shadow-xs mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               {/* Left Column: Image Gallery (Compact, Proportional) */}
-              <div className="w-full lg:col-span-5 max-w-[440px] mx-auto lg:max-w-none">
+              <div className="w-full lg:col-span-5 max-w-[460px] mx-auto lg:max-w-none">
                 <Suspense fallback={
-                  <div className="aspect-square w-full bg-amber-50 rounded-2xl animate-pulse" />
+                  <div className="aspect-square w-full bg-amber-50/70 rounded-2xl animate-pulse" />
                 }>
                   {(() => {
                     const galleryImages =
@@ -157,7 +157,7 @@ export default async function ProductTemplate({
                 </Suspense>
               </div>
               
-              {/* Right Column: Details, Description & Fast Buy Actions (Spacious) */}
+              {/* Right Column: Details, Description & Fast Buy Actions */}
               <div className="w-full lg:col-span-7 flex flex-col space-y-6">
                 <ProductInfo product={product} reviewData={reviewData} />
                 
@@ -172,7 +172,7 @@ export default async function ProductTemplate({
           </div>
 
           {/* Product FAQs */}
-          <section className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
+          <section className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-10 shadow-xs mb-12">
             <div className="flex items-center gap-2 mb-2">
               <span className="font-jakarta text-[11px] uppercase tracking-widest text-amber-950 font-bold px-3.5 py-1 rounded-full bg-amber-100/90 border border-amber-200">
                 Freshness &amp; Shipping Guide
@@ -185,12 +185,12 @@ export default async function ProductTemplate({
           </section>
 
           {/* Reviews Section */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm mb-12">
+          <div className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-10 shadow-xs mb-12">
             <ProductReviews productId={product.id} />
           </div>
           
           {/* Related Sweets & Snacks */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-6 sm:p-10 shadow-sm" data-testid="related-products-container">
+          <div className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-10 shadow-xs" data-testid="related-products-container">
             <div className="text-center mb-8">
               <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold inline-block px-3 py-1 rounded-full bg-amber-100/70 mb-2">
                 Pair With Fresh Sweets

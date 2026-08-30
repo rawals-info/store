@@ -13,7 +13,7 @@ export default async function AccountPageLayout({
   const customer = await retrieveCustomer().catch(() => null)
 
   return (
-    <div className="luxury-pattern py-6 min-h-[calc(100vh-64px)]">
+    <div className="w-full py-4 sm:py-8 min-h-[calc(100vh-64px)]">
       <AccountLayout customer={customer}>
         {customer ? dashboard : login}
         <Toaster />

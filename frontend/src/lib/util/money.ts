@@ -11,12 +11,13 @@ type ConvertToLocaleParams = {
 
 export const formatIndianPrice = (amount: number, forceDecimals = false): string => {
   if (amount === undefined || amount === null || isNaN(amount)) return "0"
-  const hasPaise = Math.round(amount * 100) % 100 !== 0
-  const minDigits = forceDecimals ? 2 : (hasPaise ? 2 : 0)
   
+  const hasDecimals = Math.abs(amount % 1) > 0.001
+  const shouldShowDecimals = forceDecimals || hasDecimals
+
   return new Intl.NumberFormat("en-IN", {
-    minimumFractionDigits: minDigits,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: shouldShowDecimals ? 2 : 0,
+    maximumFractionDigits: shouldShowDecimals ? 2 : 0,
   }).format(amount)
 }
 
@@ -24,7 +25,7 @@ export const convertToLocale = ({
   amount,
   currency_code,
   minimumFractionDigits,
-  maximumFractionDigits = 2,
+  maximumFractionDigits,
   locale = "en-IN",
 }: ConvertToLocaleParams) => {
   // Handle invalid inputs
@@ -44,20 +45,21 @@ export const convertToLocale = ({
   // Normalize currency code to uppercase to avoid formatting errors
   currency_code = currency_code.toUpperCase()
   
-  // Check if amount has paise / cents
-  const hasPaise = Math.round(amount * 100) % 100 !== 0
-  const minDigits = minimumFractionDigits !== undefined ? minimumFractionDigits : (hasPaise ? 2 : 0)
+  const isINR = currency_code === "INR" || locale === "en-IN"
+  const hasDecimals = Math.abs(amount % 1) > 0.001
+
+  const minDigits = minimumFractionDigits !== undefined ? minimumFractionDigits : (hasDecimals ? 2 : 0)
+  const maxDigits = maximumFractionDigits !== undefined ? maximumFractionDigits : (hasDecimals ? 2 : 0)
   
   try {
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: currency_code,
-      currencyDisplay: currency_code.toUpperCase() === 'USD' ? 'code' : 'symbol',
       minimumFractionDigits: minDigits,
-      maximumFractionDigits: maximumFractionDigits ?? 2,
+      maximumFractionDigits: maxDigits,
     }).format(amount)
   } catch (error) {
-    console.error("Error formatting currency:", error)
-    return `${amount.toFixed(hasPaise ? 2 : 0)} ${currency_code}`
+    console.error("Currency formatting error:", error)
+    return `${currency_code} ${amount}`
   }
 }

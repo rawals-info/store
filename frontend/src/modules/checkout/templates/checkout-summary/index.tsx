@@ -8,6 +8,8 @@ import { ShieldCheck, Truck, Sparkles, Plus, Check } from "lucide-react"
 import Image from "next/image"
 import { addToCart } from "@lib/data/cart"
 import { useParams } from "next/navigation"
+import { usePromotion } from "@lib/context/promotion-context"
+import { formatIndianPrice } from "@lib/util/money"
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
   const [currentCart, setCurrentCart] = useState<any>(cart)
@@ -15,6 +17,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
   const [upsellSnacks, setUpsellSnacks] = useState<any[]>([])
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<string[]>([])
+  const { calculatePrice } = usePromotion()
 
   useEffect(() => {
     setCurrentCart(cart)
@@ -92,12 +95,12 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
   return (
     <div className="sticky top-20 flex flex-col gap-y-6">
       {/* Order Summary Card */}
-      <div className="w-full bg-white flex flex-col p-6 sm:p-8 rounded-3xl shadow-sm border border-amber-100/90">
+      <div className="w-full bg-white flex flex-col p-6 sm:p-8 rounded-3xl shadow-xs border border-amber-200/60">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <h2 className="font-cormorant text-2xl font-bold text-slate-900">
             Order Summary
           </h2>
-          <span className="font-jakarta text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-full">
+          <span className="font-jakarta text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-full border border-amber-200/60">
             {currentCart?.items?.length || 0} {currentCart?.items?.length === 1 ? "Item" : "Items"}
           </span>
         </div>
@@ -137,6 +140,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
           <div className="space-y-2.5">
             {upsellSnacks.map((snack: any) => {
               const isAdded = addedIds.includes(snack.id)
+              const snackPrice = calculatePrice(snack.price)
               return (
                 <div
                   key={snack.id}
@@ -150,9 +154,21 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
                       <h4 className="font-jakarta text-xs font-bold text-slate-800 leading-tight truncate">
                         {snack.title}
                       </h4>
-                      <p className="font-jakarta text-[11px] text-slate-500">
-                        {snack.priceFormatted || `₹${snack.price}`}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="font-mono text-xs font-bold text-slate-900">
+                          ₹{formatIndianPrice(snackPrice.discountedPrice)}
+                        </span>
+                        {snackPrice.isDiscounted && (
+                          <>
+                            <span className="font-mono text-[10px] text-slate-400 line-through">
+                              ₹{formatIndianPrice(snack.price)}
+                            </span>
+                            <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta">
+                              {snackPrice.discountPercent}% OFF
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -184,14 +200,14 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
       )}
 
       {/* Trust & Guarantee Box */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-2 text-xs font-jakarta text-slate-600">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 space-y-2 text-xs font-jakarta text-slate-600">
         <div className="flex items-center gap-2">
           <Truck className="w-4 h-4 text-petha-amber flex-shrink-0" />
-          <span>Express Nationwide Air Dispatch in 24h</span>
+          <span>Express Nationwide Dispatch</span>
         </div>
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-          <span>30-Day Freshness Guarantee (Vacuum Sealed)</span>
+          <span>Freshness Guarantee</span>
         </div>
       </div>
     </div>

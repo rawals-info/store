@@ -83,18 +83,18 @@ export default async function BlogPage({ params }: { params: Promise<{ countryCo
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
       />
 
-      <div className="bg-[#FAF8F5] min-h-screen py-6 sm:py-10 font-jakarta">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
+      <div className="w-full py-6 sm:py-10 font-jakarta">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           
           {/* Breadcrumb Navigation */}
           <Breadcrumb
             items={[{ label: "Culinary Journal & Blog", isCurrent: true }]}
             countryCode={countryCode}
-            className="rounded-2xl border border-amber-100/90 shadow-xs"
+            className="rounded-2xl border border-amber-200/60 shadow-xs bg-white/70 backdrop-blur-xs"
           />
 
           {/* Header */}
-          <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs text-center relative overflow-hidden">
+          <div className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-8 shadow-xs text-center relative overflow-hidden">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-950 text-[11px] font-bold uppercase tracking-wider mb-2.5">
               <Sparkles className="w-3.5 h-3.5 text-petha-amber" />
               <span>Agra Culinary Journal</span>
@@ -111,7 +111,7 @@ export default async function BlogPage({ params }: { params: Promise<{ countryCo
 
           {/* Featured Post Card */}
           {featuredPost && (
-            <div className="bg-white rounded-3xl border border-amber-100/90 p-5 sm:p-7 shadow-xs hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-3xl border border-amber-200/60 p-5 sm:p-7 shadow-xs hover:shadow-md transition-shadow">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
                 <div className="lg:col-span-5 relative aspect-[16/10] rounded-2xl overflow-hidden bg-amber-100 shadow-inner">
                   <Image
@@ -168,7 +168,7 @@ export default async function BlogPage({ params }: { params: Promise<{ countryCo
               {otherPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="bg-white rounded-3xl border border-amber-100/90 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+                  className="bg-white rounded-3xl border border-amber-200/60 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
                 >
                   <div className="space-y-4">
                     <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-amber-50 shadow-inner">

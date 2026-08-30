@@ -16,13 +16,16 @@ import { usePathname } from "next/navigation"
 import SearchBar from "@modules/search/components/search-bar"
 import CategoryDropdown from "@modules/layout/components/category-dropdown/index"
 import PromotionalBanner from "@modules/layout/components/promotional-banner"
+import { usePromotion } from "@lib/context/promotion-context"
 
 const AnimatedHeader = () => {
+  const { activePromo } = usePromotion()
   const [isScrolled, setIsScrolled] = useState(false)
   const [regions, setRegions] = useState<StoreRegion[]>([])
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [mobilePethaOpen, setMobilePethaOpen] = useState(false)
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false)
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const { scrollY } = useScroll()
@@ -360,93 +363,264 @@ const AnimatedHeader = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile menu overlay - Set max width to viewport width */}
+      {/* Mobile menu overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
+            {/* Backdrop Blur */}
             <motion.div
-              className="fixed inset-0 bg-luxury-charcoal/50 backdrop-blur-sm z-[50] w-screen"
+              className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[70] w-screen"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeMobileMenu}
             />
+
+            {/* Mobile Drawer */}
             <motion.div
-              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-petha-cream z-[60] shadow-xl overflow-hidden"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-[#FAF8F5] z-[80] shadow-2xl overflow-hidden flex flex-col border-l border-amber-200/80 rounded-l-3xl"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 20, stiffness: 100 }}
+              transition={{ type: "spring", damping: 25, stiffness: 220 }}
             >
-              <div className="flex flex-col h-full w-full">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-luxury-lightgold/20 w-full">
-                  <h2 className="font-cormorant text-xl font-semibold text-petha-text">Menu</h2>
-                  <button
-                    onClick={closeMobileMenu}
-                    className="p-2 text-petha-slate hover:text-petha-amber transition-colors"
-                    aria-label="Close menu"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                  </button>
-                </div>
-                <div className="flex-1 overflow-y-auto py-6 px-6 w-full">
-                  <nav className="flex flex-col gap-y-6 w-full">
-                    {(navLinks || []).filter(l => l.href !== "/categories" && l.label?.toLowerCase() !== "categories").map((link, i) => (
-                      <motion.div
-                        key={link.href}
-                        custom={i}
-                        initial="closed"
-                        animate="open"
-                        variants={menuVariants}
-                        className="w-full"
-                      >
-                        <LocalizedClientLink
-                          href={link.href}
-                          className="text-lg font-jakarta font-medium text-petha-slate hover:text-petha-amber transition-colors duration-300"
-                          onClick={closeMobileMenu}
-                        >
-                          {link.label}
-                        </LocalizedClientLink>
-                      </motion.div>
-                    ))}
-                    <div className="h-px w-full bg-luxury-lightgold/20 my-2" />
-                    {(rightLinks || []).map((link, i) => (
-                      <motion.div
-                        key={link.href}
-                        custom={i + navLinks.length}
-                        initial="closed"
-                        animate="open"
-                        variants={menuVariants}
-                        className="w-full"
-                      >
-                        <LocalizedClientLink
-                          href={link.href}
-                          className="text-lg font-jakarta font-medium text-petha-slate hover:text-petha-amber transition-colors duration-300"
-                          onClick={closeMobileMenu}
-                        >
-                          {link.label}
-                        </LocalizedClientLink>
-                      </motion.div>
-                    ))}
-                  </nav>
-                  <div className="h-px w-full bg-luxury-lightgold/20 my-6" />
-                  <div className="flex flex-col gap-y-6 w-full">
-                    {/* Add Search to mobile menu */}
-                    <motion.div
-                      custom={navLinks.length + rightLinks.length}
-                      initial="closed"
-                      animate="open"
-                      variants={menuVariants}
-                      className="w-full"
-                    >
-                      <SearchBar autoSearch={true} useCharcoal={true} />
-                    </motion.div>
-
-                    {/* Currency switcher removed */}
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-6 py-4.5 bg-white border-b border-amber-200/60 flex-shrink-0">
+                <div>
+                  <div className="font-cormorant text-2xl font-bold text-slate-900 tracking-wider">
+                    TAJ PETHA
+                  </div>
+                  <div className="text-[10px] font-bold text-amber-700 uppercase tracking-widest font-jakarta -mt-0.5">
+                    Original Agra Sweets
                   </div>
                 </div>
+                <button
+                  onClick={closeMobileMenu}
+                  className="w-9 h-9 rounded-full bg-amber-50 border border-amber-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-amber-100 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-5 font-jakarta">
+                
+                {/* Search Bar */}
+                <div className="bg-white rounded-2xl p-2 border border-amber-200/80 shadow-2xs">
+                  <Suspense fallback={<div className="h-10 w-full bg-amber-50/50 rounded-xl" />}>
+                    <SearchBar autoSearch={true} useCharcoal={true} />
+                  </Suspense>
+                </div>
+
+                {/* Promo Code Card */}
+                {activePromo?.code && activePromo.discountPercent > 0 && (
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/15 border border-amber-300/80 flex items-center justify-between gap-2 shadow-2xs">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
+                      <span>🎁</span>
+                      <span>Use code <strong className="font-mono text-petha-amber bg-white px-1.5 py-0.5 rounded border border-amber-200">{activePromo.code}</strong> for {activePromo.discountPercent}% OFF</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Primary Sweet Navigation Categories */}
+                <div className="space-y-1.5 bg-white p-3 rounded-2xl border border-amber-200/60 shadow-2xs">
+                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 px-3 py-1">
+                    Sweets &amp; Collections
+                  </div>
+
+                  <LocalizedClientLink
+                    href="/products"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-amber-50/80 text-slate-800 hover:text-petha-amber font-semibold text-sm transition-colors group"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-base">✨</span>
+                      <span>All Sweets Catalog</span>
+                    </span>
+                    <span className="text-xs text-amber-700 font-bold bg-amber-100/80 px-2 py-0.5 rounded-full">
+                      All Items
+                    </span>
+                  </LocalizedClientLink>
+
+                  {/* Petha Dropdown Section */}
+                  <div className="border-t border-slate-100 pt-1.5">
+                    <button
+                      onClick={() => setMobilePethaOpen(!mobilePethaOpen)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-amber-50/80 text-slate-800 hover:text-petha-amber font-semibold text-sm transition-colors"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className="text-base">🍬</span>
+                        <span>Agra Petha Varieties</span>
+                      </span>
+                      <svg
+                        className={clx("w-4 h-4 text-slate-400 transition-transform duration-200", {
+                          "rotate-180 text-amber-700": mobilePethaOpen,
+                        })}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    <AnimatePresence>
+                      {mobilePethaOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden pl-9 pr-3 py-1 space-y-1 text-xs"
+                        >
+                          <LocalizedClientLink
+                            href="/products?category=petha"
+                            onClick={closeMobileMenu}
+                            className="block py-1.5 text-slate-600 hover:text-petha-amber font-medium"
+                          >
+                            • View All Petha
+                          </LocalizedClientLink>
+                          <LocalizedClientLink
+                            href="/products/kesar-angoori-petha"
+                            onClick={closeMobileMenu}
+                            className="block py-1.5 text-slate-600 hover:text-petha-amber font-medium"
+                          >
+                            • Kesar Angoori Petha
+                          </LocalizedClientLink>
+                          <LocalizedClientLink
+                            href="/products/taj-famous-white-petha"
+                            onClick={closeMobileMenu}
+                            className="block py-1.5 text-slate-600 hover:text-petha-amber font-medium"
+                          >
+                            • Classic Dry Petha
+                          </LocalizedClientLink>
+                          <LocalizedClientLink
+                            href="/products/paan-petha"
+                            onClick={closeMobileMenu}
+                            className="block py-1.5 text-slate-600 hover:text-petha-amber font-medium"
+                          >
+                            • Royal Paan Petha
+                          </LocalizedClientLink>
+                          <LocalizedClientLink
+                            href="/products/chocolate-petha"
+                            onClick={closeMobileMenu}
+                            className="block py-1.5 text-slate-600 hover:text-petha-amber font-medium"
+                          >
+                            • Chocolate Petha
+                          </LocalizedClientLink>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <LocalizedClientLink
+                    href="/products?category=dalmoth"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-amber-50/80 text-slate-800 hover:text-petha-amber font-semibold text-sm transition-colors border-t border-slate-100"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-base">🥜</span>
+                      <span>Royal Dalmoth</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold">Cashew Blend</span>
+                  </LocalizedClientLink>
+
+                  <LocalizedClientLink
+                    href="/products?category=namkeen"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-amber-50/80 text-slate-800 hover:text-petha-amber font-semibold text-sm transition-colors border-t border-slate-100"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-base">🌶️</span>
+                      <span>Crispy Namkeen</span>
+                    </span>
+                  </LocalizedClientLink>
+
+                  <LocalizedClientLink
+                    href="/city"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-amber-50/80 text-slate-800 hover:text-petha-amber font-semibold text-sm transition-colors border-t border-slate-100"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-base">📍</span>
+                      <span>City Delivery Hub</span>
+                    </span>
+                    <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                      160+ Cities
+                    </span>
+                  </LocalizedClientLink>
+                </div>
+
+                {/* Secondary Links: Our Story & Blog */}
+                <div className="space-y-1 bg-white p-3 rounded-2xl border border-amber-200/60 shadow-2xs">
+                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 px-3 py-1">
+                    About &amp; Guides
+                  </div>
+
+                  <LocalizedClientLink
+                    href="/about"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-amber-50/80 text-slate-700 hover:text-petha-amber font-medium text-sm transition-colors"
+                  >
+                    <span>🏛️</span>
+                    <span>Our Agra Kitchen Story</span>
+                  </LocalizedClientLink>
+
+                  <LocalizedClientLink
+                    href="/blog"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-amber-50/80 text-slate-700 hover:text-petha-amber font-medium text-sm transition-colors"
+                  >
+                    <span>📖</span>
+                    <span>Sweets &amp; Gifting Blog</span>
+                  </LocalizedClientLink>
+                </div>
+
+                {/* Customer Account & Support Links */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  <LocalizedClientLink
+                    href="/account"
+                    onClick={closeMobileMenu}
+                    className="p-3 bg-white border border-amber-200/60 rounded-2xl text-center hover:border-amber-400 transition-all shadow-2xs block"
+                  >
+                    <div className="text-base mb-1">👤</div>
+                    <div className="text-xs font-bold text-slate-800">My Account</div>
+                    <div className="text-[10px] text-slate-500">Track Orders</div>
+                  </LocalizedClientLink>
+
+                  <LocalizedClientLink
+                    href="/contact"
+                    onClick={closeMobileMenu}
+                    className="p-3 bg-white border border-amber-200/60 rounded-2xl text-center hover:border-amber-400 transition-all shadow-2xs block"
+                  >
+                    <div className="text-base mb-1">💬</div>
+                    <div className="text-xs font-bold text-slate-800">Help &amp; FAQs</div>
+                    <div className="text-[10px] text-slate-500">Customer Care</div>
+                  </LocalizedClientLink>
+                </div>
+
+                {/* WhatsApp Halwai Support Button */}
+                <a
+                  href="https://wa.me/919876543210?text=Hi%20Taj%20Petha,%20I%20have%20a%20question%20about%20sweets%20delivery"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold font-jakarta flex items-center justify-center gap-2 shadow-xs transition-colors"
+                >
+                  <span>💬</span>
+                  <span>Chat with Halwai on WhatsApp</span>
+                </a>
+
+                {/* Trust Guarantee Strip */}
+                <div className="pt-2 flex items-center justify-center gap-3 text-[10px] font-bold text-slate-500">
+                  <span>🌱 100% Pure Veg</span>
+                  <span>•</span>
+                  <span>⚡ Air Express</span>
+                  <span>•</span>
+                  <span>🛡️ 30-Day Fresh</span>
+                </div>
+
               </div>
             </motion.div>
           </>

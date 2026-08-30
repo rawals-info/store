@@ -27,6 +27,7 @@ type AddedToCartModalProps = {
 }
 
 import { triggerPackingSweetBox } from "@components/PackingSweetBoxOverlay"
+import { usePromotion } from "@lib/context/promotion-context"
 
 export default function AddedToCartModal({
   isOpen,
@@ -40,6 +41,7 @@ export default function AddedToCartModal({
   const [addingUpsell, setAddingUpsell] = useState<Record<string, boolean>>({})
   const [addedUpsell, setAddedUpsell] = useState<Record<string, boolean>>({})
   const [extraSubtotal, setExtraSubtotal] = useState(0)
+  const { calculatePrice } = usePromotion()
 
   useEffect(() => {
     setMounted(true)
@@ -193,11 +195,27 @@ export default function AddedToCartModal({
                       <p className="font-jakarta text-[11px] text-slate-500">
                         {item.variantTitle || "Standard Box"} · Qty: {item.quantity}
                       </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="font-mono text-sm font-bold text-slate-900">
-                          ₹{formatIndianPrice(item.price * item.quantity)}
-                        </span>
-                      </div>
+                      {(() => {
+                        const itemRaw = item.price * item.quantity
+                        const itemPromo = calculatePrice(itemRaw)
+                        return (
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="font-mono text-sm sm:text-base font-bold text-slate-900">
+                              ₹{formatIndianPrice(itemPromo.discountedPrice)}
+                            </span>
+                            {itemPromo.isDiscounted && (
+                              <div className="flex items-center gap-1">
+                                <span className="font-mono text-xs text-slate-400 line-through">
+                                  ₹{formatIndianPrice(itemRaw)}
+                                </span>
+                                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta">
+                                  {itemPromo.discountPercent}% OFF
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
                     </div>
                   </div>
 
@@ -227,55 +245,60 @@ export default function AddedToCartModal({
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        {pairings.filter((u: any) => u.title !== item.title).slice(0, 3).map((pair: any) => (
-                          <div
-                            key={pair.id}
-                            className="p-2 rounded-xl bg-white border border-amber-100 hover:border-amber-200 flex items-center justify-between sm:flex-col sm:items-start gap-2 shadow-2xs"
-                          >
-                            <div className="flex items-center sm:flex-col sm:items-start gap-2 min-w-0">
-                              <div className="relative w-9 h-9 sm:w-full sm:h-16 rounded-lg overflow-hidden bg-amber-50 flex-shrink-0">
-                                <Image
-                                  src={pair.thumbnail || "/hero_image.webp"}
-                                  alt={pair.title}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-jakarta text-[11px] font-bold text-slate-900 truncate">
-                                  {pair.title}
-                                </p>
-                                <p className="font-mono text-[10px] font-semibold text-petha-amber">
-                                  {pair.priceFormatted || `₹${pair.price}`}
-                                </p>
-                              </div>
-                            </div>
-
-                            <button
-                              type="button"
-                              disabled={addingUpsell[pair.id] || addedUpsell[pair.id]}
-                              onClick={() => handleAddUpsell(pair)}
-                              className={`w-auto sm:w-full py-1 px-2.5 rounded-lg text-[10px] font-bold font-jakarta transition-all flex items-center justify-center gap-1 cursor-pointer flex-shrink-0 ${
-                                addedUpsell[pair.id]
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : addingUpsell[pair.id]
-                                  ? "bg-amber-100 text-amber-800"
-                                  : "bg-amber-50 hover:bg-petha-amber hover:text-white text-slate-800 border border-amber-200/80"
-                              }`}
+                        {pairings.filter((u: any) => u.title !== item.title).slice(0, 3).map((pair: any) => {
+                          const pairPromo = calculatePrice(pair.price)
+                          return (
+                            <div
+                              key={pair.id}
+                              className="p-2 rounded-xl bg-white border border-amber-100 hover:border-amber-200 flex items-center justify-between sm:flex-col sm:items-start gap-2 shadow-2xs"
                             >
-                              {addingUpsell[pair.id] ? (
-                                <>
-                                  <div className="w-2.5 h-2.5 rounded-full border-2 border-amber-600 border-t-transparent animate-spin" />
-                                  <span>Packing...</span>
-                                </>
-                              ) : addedUpsell[pair.id] ? (
-                                "✓ Added"
-                              ) : (
-                                "+ Add"
-                              )}
-                            </button>
-                          </div>
-                        ))}
+                              <div className="flex items-center sm:flex-col sm:items-start gap-2 min-w-0">
+                                <div className="relative w-9 h-9 sm:w-full sm:h-16 rounded-lg overflow-hidden bg-amber-50 flex-shrink-0">
+                                  <Image
+                                    src={pair.thumbnail || "/hero_image.webp"}
+                                    alt={pair.title}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-jakarta text-[11px] font-bold text-slate-900 truncate">
+                                    {pair.title}
+                                  </p>
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-mono text-[11px] font-bold text-slate-900">
+                                      ₹{formatIndianPrice(pairPromo.discountedPrice)}
+                                    </span>
+                                    {pairPromo.isDiscounted && (
+                                      <span className="font-mono text-[9px] text-slate-400 line-through">
+                                        ₹{formatIndianPrice(pair.price)}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                disabled={addingUpsell[pair.id] || addedUpsell[pair.id]}
+                                onClick={() => handleAddUpsell(pair)}
+                                className={`w-auto sm:w-full py-1 px-2.5 rounded-lg text-[10px] font-bold font-jakarta transition-all flex items-center justify-center gap-1 cursor-pointer flex-shrink-0 ${
+                                  addedUpsell[pair.id]
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : addingUpsell[pair.id]
+                                    ? "bg-amber-100 text-amber-800"
+                                    : "bg-amber-50 hover:bg-petha-amber hover:text-white text-slate-800 border border-amber-200/80"
+                                }`}
+                              >
+                                {addedUpsell[pair.id]
+                                  ? "✓ Added"
+                                  : addingUpsell[pair.id]
+                                  ? "Adding..."
+                                  : "+ Add"}
+                              </button>
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   )}
