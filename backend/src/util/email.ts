@@ -15,7 +15,7 @@ if (process.env.BREVO_API_KEY) {
 }
 
 /**
- * High-end commercial luxury email template for Taj Petha
+ * Commercial luxury email wrapper for Taj Petha
  * Perfectly responsive, cross-client tested (Gmail, Apple Mail, Outlook, Mobile)
  */
 export function buildLuxuryTemplate(title: string, body: string, subtitle?: string) {
@@ -31,15 +31,16 @@ export function buildLuxuryTemplate(title: string, body: string, subtitle?: stri
   </style>
   <![endif]-->
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
     
     body {
       margin: 0;
       padding: 0;
-      background-color: #F4EFEA;
+      background-color: #F5EFEB;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
       -webkit-text-size-adjust: none;
+      color: #1E293B;
     }
     
     table {
@@ -57,42 +58,50 @@ export function buildLuxuryTemplate(title: string, body: string, subtitle?: stri
     }
     
     .cta-button {
-      background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
-      color: #FFFFFF !important;
-      text-decoration: none;
-      padding: 15px 32px;
-      border-radius: 9999px;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
       display: inline-block;
-      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+      background: #D97706;
+      color: #FFFFFF !important;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 15px 32px;
+      border-radius: 12px;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.28);
     }
     
     .whatsapp-button {
-      background-color: #F0FDF4;
-      border: 1px solid #BBF7D0;
-      color: #166534 !important;
-      text-decoration: none;
-      padding: 12px 22px;
-      border-radius: 9999px;
-      font-weight: 700;
-      font-size: 12px;
       display: inline-block;
+      background-color: #22C55E;
+      color: #FFFFFF !important;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      text-decoration: none;
     }
 
-    @media only screen and (max-width: 600px) {
+    @media only screen and (max-width: 620px) {
       .container {
         width: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
       }
       .content-padding {
-        padding: 20px 16px !important;
+        padding: 24px 18px !important;
       }
       .two-col {
         display: block !important;
         width: 100% !important;
-        padding: 0 0 14px 0 !important;
+        box-sizing: border-box !important;
+        margin-bottom: 12px !important;
+      }
+      .two-col-gap {
+        display: none !important;
       }
       .header-title {
         font-size: 28px !important;
@@ -100,79 +109,54 @@ export function buildLuxuryTemplate(title: string, body: string, subtitle?: stri
     }
   </style>
 </head>
-<body style="background-color: #F4EFEA; margin: 0; padding: 24px 12px;">
+<body style="background-color: #F5EFEB; margin: 0; padding: 32px 0;">
 
-  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#F4EFEA">
-    <tr>
-      <td align="center">
-        
-        <!-- Main Container -->
-        <table class="container" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #FFFFFF; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 1px solid #EAE3D9;">
-          
-          <!-- Top Royal Bar -->
-          <tr>
-            <td height="6" style="background: linear-gradient(90deg, #F59E0B, #D97706, #78350F, #D97706, #F59E0B);"></td>
-          </tr>
+  <center>
+    <table class="container" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #FFFFFF; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(45, 24, 7, 0.08); border: 1px solid #EAE1D5; text-align: left;">
+      
+      <!-- Brand Header -->
+      <tr>
+        <td style="background-color: #FAF8F5; padding: 28px 32px 24px 32px; text-align: center; border-bottom: 1px solid #EFE8DE;">
+          <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center">
+                <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 700; color: #0F172A; letter-spacing: 3px; text-transform: uppercase; line-height: 1;">
+                  TAJ PETHA
+                </div>
+                <div style="font-size: 10px; font-weight: 700; color: #B45309; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px;">
+                  ${subtitle || "Original Agra Sweet Kitchen • Direct Fresh Dispatch"}
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
 
-          <!-- Header Section -->
-          <tr>
-            <td align="center" style="padding: 34px 32px 26px 32px; background-color: #0F172A; background-image: radial-gradient(circle at 50% 0%, #1E293B 0%, #0F172A 100%);">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center">
-                    
-                    <div style="display: inline-block; padding: 4px 14px; border-radius: 9999px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); margin-bottom: 12px;">
-                      <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 700; color: #FCD34D; letter-spacing: 2px; text-transform: uppercase;">
-                        🏛️ Authentic Agra Master Kitchen
-                      </span>
-                    </div>
+      <!-- Content Body -->
+      <tr>
+        <td style="padding: 36px 32px;" class="content-padding">
+          ${body}
+        </td>
+      </tr>
 
-                    <h1 class="header-title" style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 34px; font-weight: 700; color: #FFFFFF; letter-spacing: 3px; line-height: 1.1;">
-                      TAJ PETHA
-                    </h1>
-                    <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 13px; font-style: italic; color: #FCD34D; letter-spacing: 1.5px; margin-top: 4px;">
-                      ${subtitle || "Royal Confectionery Since 1952"}
-                    </div>
+      <!-- Luxury Brand Footer -->
+      <tr>
+        <td style="background-color: #FAF8F5; padding: 28px 32px; text-align: center; border-top: 1px solid #EFE8DE;">
+          <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">
+            Taj Petha
+          </div>
+          <div style="font-size: 11px; color: #64748B; line-height: 1.6;">
+            Handcrafted with pride in Agra 282001, Uttar Pradesh, India<br>
+            Official Store: <a href="https://tajpetha.in" style="color: #D97706; font-weight: 600; text-decoration: none;">https://tajpetha.in</a> &bull; Email: <a href="mailto:support@tajpetha.in" style="color: #D97706; font-weight: 600; text-decoration: none;">support@tajpetha.in</a>
+          </div>
+          <div style="font-size: 10px; color: #94A3B8; margin-top: 12px;">
+            &copy; ${new Date().getFullYear()} Taj Petha. All rights reserved. 100% Vegetarian Authentic Sweets.
+          </div>
+        </td>
+      </tr>
 
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Gold Line -->
-          <tr>
-            <td height="1" style="background-color: #FDE68A;"></td>
-          </tr>
-
-          <!-- Content Body -->
-          <tr>
-            <td style="padding: 24px 32px 32px 32px;" class="content-padding">
-              ${body}
-            </td>
-          </tr>
-
-          <!-- Royal Trust Footer -->
-          <tr>
-            <td style="padding: 28px 32px; background-color: #0F172A; text-align: center;">
-              <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 700; color: #FCD34D; letter-spacing: 2px;">
-                TAJ PETHA
-              </div>
-              <div style="font-size: 11px; color: #94A3B8; margin-top: 4px;">
-                Handcrafted in Agra, Uttar Pradesh, India &bull; Delivered Fresh Pan-India
-              </div>
-              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #1E293B; font-size: 11px; color: #64748B; line-height: 1.8;">
-                Have questions? Email us at <a href="mailto:support@tajpetha.in" style="color: #F59E0B; text-decoration: none;">support@tajpetha.in</a><br>
-                &copy; ${new Date().getFullYear()} Taj Petha. All rights reserved.
-              </div>
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
+    </table>
+  </center>
 
 </body>
 </html>`
@@ -195,49 +179,17 @@ export function buildHeroStatusCard({
   badgeText?: string
 }) {
   return `
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 22px; background: #FFFDF9; border: 1px solid #FDE68A; border-radius: 20px; box-shadow: 0 4px 16px rgba(217, 119, 6, 0.06);">
-      <tr>
-        <td style="padding: 24px 24px; text-align: center;">
-          <div style="width: 52px; height: 52px; border-radius: 50%; background-color: #ECFDF5; border: 2px solid #6EE7B7; text-align: center; line-height: 50px; margin: 0 auto 12px auto; font-size: 24px;">
-            ${icon}
-          </div>
-          <h2 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 700; color: #1E293B; line-height: 1.2;">
-            ${title}
-          </h2>
-          <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748B; font-weight: 500; line-height: 1.6;">
-            ${subtitle}
-          </p>
-
-          ${
-            orderId || badgeText
-              ? `
-            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed #E2E8F0;">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  ${
-                    orderId
-                      ? `<td align="left" style="font-size: 12px; color: #64748B;">
-                          Order ID: <strong style="font-family: monospace; font-size: 14px; color: #D97706;">#${orderId}</strong>
-                        </td>`
-                      : ""
-                  }
-                  ${
-                    badgeText
-                      ? `<td align="right">
-                          <span style="display: inline-block; padding: 4px 10px; border-radius: 9999px; background-color: #ECFDF5; color: #065F46; font-size: 11px; font-weight: 700;">
-                            ${badgeText}
-                          </span>
-                        </td>`
-                      : ""
-                  }
-                </tr>
-              </table>
-            </div>`
-              : ""
-          }
-        </td>
-      </tr>
-    </table>
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div style="display: inline-block; background-color: #FEF3C7; border: 1px solid #FDE68A; color: #92400E; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 14px; border-radius: 9999px; margin-bottom: 12px;">
+        ${badgeText} ${orderId ? `&bull; Order #${orderId}` : ""}
+      </div>
+      <h1 style="margin: 0 0 10px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 34px; font-weight: 700; color: #0F172A; line-height: 1.15;">
+        ${title}
+      </h1>
+      <p style="margin: 0 auto; font-size: 14px; color: #64748B; line-height: 1.6; max-width: 460px;">
+        ${subtitle}
+      </p>
+    </div>
   `
 }
 
@@ -246,7 +198,7 @@ export function buildHeroStatusCard({
  */
 export function buildOrderDetailsBox(content: string) {
   return `
-    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+    <div style="background-color: #FAF8F5; border: 1px solid #EFE8DE; border-radius: 16px; padding: 20px; margin: 20px 0;">
       ${content}
     </div>
   `
@@ -263,12 +215,12 @@ export function buildInfoBox(
   const styles = {
     amber: { bg: "#FFFBEB", border: "#FDE68A", title: "#92400E" },
     emerald: { bg: "#ECFDF5", border: "#A7F3D0", title: "#065F46" },
-    slate: { bg: "#F8FAFC", border: "#E2E8F0", title: "#1E293B" },
+    slate: { bg: "#FAF8F5", border: "#EFE8DE", title: "#1E293B" },
   }[type]
 
   return `
     <div style="background: ${styles.bg}; border: 1px solid ${styles.border}; border-radius: 16px; padding: 18px 20px; margin: 18px 0;">
-      <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 800; color: ${styles.title}; margin: 0 0 8px 0; letter-spacing: 1px; text-transform: uppercase;">
+      <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800; color: ${styles.title}; margin: 0 0 8px 0; letter-spacing: 1px; text-transform: uppercase;">
         ${title}
       </h3>
       <div style="font-size: 13px; color: #334155; line-height: 1.6;">
@@ -282,7 +234,7 @@ export function buildInfoBox(
  * Helper: Section heading
  */
 export function buildSectionHeading(text: string) {
-  return `<h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 700; color: #0F172A; margin: 24px 0 12px 0; letter-spacing: 1px; text-transform: uppercase;">${text}</h2>`
+  return `<h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 700; color: #0F172A; margin: 24px 0 12px 0; letter-spacing: 0.5px;">${text}</h2>`
 }
 
 /**
@@ -312,7 +264,10 @@ export function buildLink(href: string, text: string) {
 export function buildButton(href: string, text: string, variant: "primary" | "whatsapp" = "primary") {
   if (variant === "whatsapp") {
     return `
-      <div style="text-align: center; margin: 20px 0;">
+      <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px 20px; text-align: center; margin: 24px 0;">
+        <div style="font-size: 12.5px; color: #475569; font-weight: 600; margin-bottom: 10px;">
+          Have questions or need assistance with your order?
+        </div>
         <a href="${href}" class="whatsapp-button">
           💬 ${text}
         </a>
@@ -323,7 +278,7 @@ export function buildButton(href: string, text: string, variant: "primary" | "wh
   return `
     <div style="text-align: center; margin: 24px 0;">
       <a href="${href}" class="cta-button">
-        ${text}
+        ${text} &rarr;
       </a>
     </div>
   `
@@ -347,9 +302,9 @@ export function buildList(items: string[]) {
  */
 export function buildSignOff(name: string = "The Taj Petha Family") {
   return `
-    <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #E2E8F0;">
+    <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #EFE8DE;">
       <p style="font-size: 13px; color: #64748B; margin: 0; line-height: 1.6;">
-        With royal regards,<br>
+        With warm regards,<br>
         <strong style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; color: #0F172A; font-style: italic;">${name}</strong>
       </p>
     </div>

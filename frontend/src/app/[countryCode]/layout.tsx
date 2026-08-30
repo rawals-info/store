@@ -2,6 +2,7 @@ import React, { Suspense } from "react"
 import Footer from "@modules/layout/templates/footer"
 import AnimatedHeader from "@modules/layout/components/animated-header"
 import PrefetchProvider from "@modules/layout/components/prefetch-provider"
+import DiscountPopup from "@modules/layout/components/discount-popup"
 import { listIndiaRegions } from "@lib/constants/india-region"
 import { dataFetchingConfig } from "@lib/config"
 
@@ -43,6 +44,7 @@ export default async function StoreLayout({
           {children}
         </div>
         <Footer />
+        <DiscountPopup />
       </div>
     </PrefetchProvider>
   )

@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const products = (response?.products || []).map((prod) => {
       const { cheapestPrice, cheapestVariant } = getProductPrice({ product: prod })
       const priceNum = cheapestPrice?.calculated_price_number || Number(cheapestVariant?.calculated_price?.calculated_amount || 0)
-      
+
       return {
         id: prod.id,
         title: prod.title,
