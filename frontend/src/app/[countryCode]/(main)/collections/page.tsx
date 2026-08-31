@@ -1,5 +1,3 @@
-"use server"
-
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import { getIndiaRegion } from "@lib/constants/india-region"
