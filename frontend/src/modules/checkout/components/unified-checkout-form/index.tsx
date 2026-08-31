@@ -103,7 +103,8 @@ export default function UnifiedCheckoutForm({
   const handleShippingMethodChange = (methodId: string) => {
     setSelectedShippingMethod(methodId)
     const activeShippingOption = shippingMethods?.find((m: any) => m.id === methodId)
-    const shippingAmount = isFreeShippingUnlocked ? 0 : 89
+    const defaultRate = Number(activeShippingOption?.amount ?? 89)
+    const shippingAmount = isFreeShippingUnlocked ? 0 : defaultRate
     const netTotal = currentNetItemsTotal + shippingAmount
 
     const liveUpdatedCart: HttpTypes.StoreCart = {
@@ -392,7 +393,9 @@ export default function UnifiedCheckoutForm({
     }
   }
 
-  const finalPayAmount = currentNetItemsTotal + (isFreeShippingUnlocked ? 0 : 89)
+  const selectedShippingOption = shippingMethods?.find((m: any) => m.id === selectedShippingMethod) || shippingMethods?.[0]
+  const currentShippingPrice = isFreeShippingUnlocked ? 0 : Number(selectedShippingOption?.amount ?? cartUpdated?.shipping_subtotal ?? cartUpdated?.shipping_total ?? 0)
+  const finalPayAmount = currentNetItemsTotal + currentShippingPrice
 
   return (
     <div className="w-full font-jakarta text-slate-800 space-y-6" id="checkout-form-top">
@@ -724,7 +727,7 @@ export default function UnifiedCheckoutForm({
                       </div>
                     </div>
                     <span className="font-mono font-bold text-sm text-slate-900">
-                      {isFreeShippingUnlocked ? "FREE" : "₹89"}
+                      {isFreeShippingUnlocked ? "FREE" : (Number(method.amount || 0) === 0 ? "FREE" : `₹${formatIndianPrice(method.amount || 0)}`)}
                     </span>
                   </div>
                 )

@@ -48,7 +48,8 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
     ? "Free shipping" 
     : (atAddressStep ? "Enter your shipping address" : "Calculated at checkout")
 
-  const dynamicShippingSubtotal = isFreeShipping ? 0 : 89
+  const rawShippingMethodAmount = currentCart?.shipping_methods?.[0]?.amount ?? currentCart?.shipping_subtotal ?? currentCart?.shipping_total ?? 0
+  const dynamicShippingSubtotal = isFreeShipping ? 0 : Number(rawShippingMethodAmount)
   const dynamicTotal = netItemsTotal + dynamicShippingSubtotal
 
   const displayCart = {
