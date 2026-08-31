@@ -134,7 +134,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
         title: product.title || "Agra Petha",
         variantTitle: activeVariant?.title || "Standard Box",
         thumbnail: product.thumbnail || "",
-        price: discountedPrice,
+        price: rawPrice,
         quantity,
         subtotal: res.cart?.subtotal || undefined,
       })

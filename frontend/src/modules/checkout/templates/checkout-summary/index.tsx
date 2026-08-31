@@ -33,7 +33,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
     return () => window.removeEventListener("cartUpdated" as any, handleCartUpdate)
   }, [])
 
-  const itemsSubtotal = (currentCart?.item_subtotal ?? ((currentCart?.subtotal ?? 0) - (currentCart?.shipping_subtotal ?? 0)))
+  const itemsSubtotal = (currentCart?.item_subtotal ?? (currentCart?.subtotal ?? 0))
   const discountTotal = currentCart?.discount_total ?? 0
   const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
   const isFreeShipping = netItemsTotal >= 500

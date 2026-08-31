@@ -94,7 +94,7 @@ export default function UnifiedCheckoutForm({
     return () => window.removeEventListener("cartUpdated" as any, handleCartUpdate)
   }, [])
 
-  const currentItemsSubtotal = (cartUpdated?.item_subtotal ?? ((cartUpdated?.subtotal ?? 0) - (cartUpdated?.shipping_subtotal ?? 0)))
+  const currentItemsSubtotal = (cartUpdated?.item_subtotal ?? (cartUpdated?.subtotal ?? 0))
   const currentDiscount = cartUpdated?.discount_total || 0
   const currentNetItemsTotal = Math.max(0, currentItemsSubtotal - currentDiscount)
   const isFreeShippingUnlocked = currentNetItemsTotal >= 500

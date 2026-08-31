@@ -61,7 +61,7 @@ const CartDropdown = ({
       return acc + (item.quantity || 0)
     }, 0) || 0
 
-  const itemsSubtotal = (cart?.item_subtotal ?? ((cart?.subtotal ?? 0) - (cart?.shipping_subtotal ?? 0)))
+  const itemsSubtotal = (cart?.item_subtotal ?? (cart?.subtotal ?? 0))
   const discountTotal = cart?.discount_total ?? 0
   const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
   const freeShippingThreshold = 500

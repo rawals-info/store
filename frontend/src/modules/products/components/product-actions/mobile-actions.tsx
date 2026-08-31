@@ -8,7 +8,7 @@ import X from "@modules/common/icons/x"
 
 import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
-import { calculateDiscountedPrice } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 import OptionSelect from "./option-select"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
@@ -38,6 +38,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
 }) => {
   const { state, open, close } = useToggleState()
   const [quantity, setQuantity] = useState(1)
+  const { calculatePrice } = usePromotion()
 
   const incrementQuantity = () => {
     if (quantity < 10) {
@@ -66,7 +67,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   }, [price])
 
   const rawNum = selectedPrice?.calculated_price_number || 0
-  const { discountedPrice, isDiscounted } = calculateDiscountedPrice(rawNum)
+  const { discountedPrice, isDiscounted } = calculatePrice(rawNum)
 
   const isSimple = isSimpleProduct(product)
 

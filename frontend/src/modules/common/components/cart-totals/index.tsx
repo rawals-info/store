@@ -38,7 +38,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
   } = totals
 
   // Calculate the itemsSubtotal (products only, excluding shipping)
-  const itemsSubtotal = (subtotal ?? 0) - (shipping_subtotal ?? 0)
+  const itemsSubtotal = (totals as any).item_subtotal ?? (subtotal ?? 0)
 
   // Use specific placeholders if provided, otherwise fall back to the general placeholder
   const finalShippingPlaceholder = shippingPlaceholder || placeholder

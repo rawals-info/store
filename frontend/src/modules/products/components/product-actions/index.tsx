@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { addToCart, applyPromotions } from "@lib/data/cart"
-import { getActivePromoCode, calculateDiscountedPrice } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 import { trackProductView, trackAddToCart } from "@lib/analytics/google-analytics"
 import { isEqual } from "@lib/utils/object-utils"
 import { Minus, Plus, ShoppingBag, Zap, Check, ShieldCheck, Truck, Sparkles } from "lucide-react"
@@ -84,11 +84,13 @@ export default function ProductActions({
     })
   }, [product.variants, options, manuallySelectedVariant])
 
+  const { calculatePrice } = usePromotion()
+
   // Track product view on mount
   useEffect(() => {
     if (product && selectedVariant) {
       const rawPrice = Number(selectedVariant.calculated_price?.calculated_amount || (selectedVariant as any)?.prices?.[0]?.amount || 0)
-      const { discountedPrice } = calculateDiscountedPrice(rawPrice)
+      const { discountedPrice } = calculatePrice(rawPrice)
       trackProductView({
         id: product.id,
         title: product.title || "Agra Petha",
@@ -96,7 +98,7 @@ export default function ProductActions({
         price: discountedPrice,
       })
     }
-  }, [product?.id, selectedVariant?.id])
+  }, [product?.id, selectedVariant?.id, calculatePrice])
 
   const setOptionValue = (optionId: string, value: string) => {
     setManuallySelectedVariant(undefined)
@@ -110,14 +112,14 @@ export default function ProductActions({
     if (!selectedVariant?.id) return
 
     const rawPrice = Number(selectedVariant.calculated_price?.calculated_amount || (selectedVariant as any)?.prices?.[0]?.amount || 0)
-    const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
+    const { discountedPrice: itemPrice } = calculatePrice(rawPrice)
 
     // Open Adding Modal
     setAddedItemDetails({
       title: product.title || "Agra Petha",
       variantTitle: selectedVariant.title || "Standard Box",
       thumbnail: product.thumbnail || selectedVariant.product?.thumbnail || "",
-      price: itemPrice,
+      price: rawPrice,
       quantity,
     })
     setAddedModalOpen(true)
@@ -185,7 +187,7 @@ export default function ProductActions({
 
       // Fire analytics add_to_cart event
       const rawPrice = Number(selectedVariant.calculated_price?.calculated_amount || (selectedVariant as any)?.prices?.[0]?.amount || 0)
-      const { discountedPrice: itemPrice } = calculateDiscountedPrice(rawPrice)
+      const { discountedPrice: itemPrice } = calculatePrice(rawPrice)
       trackAddToCart({
         id: selectedVariant.id,
         title: product.title || "Agra Petha",
