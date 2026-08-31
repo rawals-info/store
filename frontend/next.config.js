@@ -11,8 +11,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    //optimizeCss: true,
-    optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion']
+    optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion', 'lodash', '@fortawesome/react-fontawesome', '@radix-ui/react-accordion']
   },
   compress: true,
   images: {

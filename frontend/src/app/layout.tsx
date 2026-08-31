@@ -56,7 +56,7 @@ const cormorant = Cormorant_Garamond({
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-cormorant",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
   fallback: ['Georgia', 'serif']
 })
@@ -66,7 +66,7 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
   variable: "--font-jakarta",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
   fallback: ['system-ui', 'arial']
 })
