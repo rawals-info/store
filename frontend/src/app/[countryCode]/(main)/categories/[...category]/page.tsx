@@ -21,7 +21,7 @@ type Props = {
 
 // Use a more conservative caching strategy
 export const dynamic = 'force-static'
-export const revalidate = 300 // Cache for 5 minutes; category pages change less often
+export const revalidate = 3600 // 1 hour fallback (webhook invalidates immediately on changes)
 
 // Cache category data to prevent redundant fetches
 const getCachedCategory = cache(async (handle: string) => {

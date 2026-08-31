@@ -2,6 +2,8 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { ShoppingCart, Truck, Shield, Star, Clock, Gift, CheckCircle2 } from "lucide-react"
 
+export const dynamic = "force-static"
+
 export async function generateMetadata({ params }: { params: { countryCode: string } }): Promise<Metadata> {
     const { countryCode } = await params
     const canonical = `https://tajpetha.in/${countryCode}/buy-petha-online`

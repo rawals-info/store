@@ -5,12 +5,38 @@ import ProductTemplate from "@modules/products/templates"
 import { Suspense } from "react"
 import SkeletonProductPage from "@modules/skeletons/templates/skeleton-product-page"
 
+import { listProducts } from "@lib/data/products"
+import { listIndiaRegions } from "@lib/constants/india-region"
+
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
-// ISR caching for high-speed edge delivery with 30-minute background revalidation
-export const revalidate = 1800
+// 1-hour ISR fallback (on-demand webhook provides instant invalidation on changes)
+export const revalidate = 3600
+
+export async function generateStaticParams() {
+  const regions = listIndiaRegions()
+  const countryCodes = regions.flatMap((r) => r.countries?.map((c) => c.iso_2?.toLowerCase() || "in") || ["in"])
+
+  try {
+    const { response } = await listProducts({
+      queryParams: { limit: 100, fields: "handle" },
+    })
+
+    const handles = response?.products?.map((p) => p.handle).filter(Boolean) as string[] || []
+
+    return countryCodes.flatMap((countryCode) =>
+      handles.map((handle) => ({
+        countryCode,
+        handle,
+      }))
+    )
+  } catch (error) {
+    console.error("Failed to generate static params for products:", error)
+    return []
+  }
+}
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { handle, countryCode } = await props.params

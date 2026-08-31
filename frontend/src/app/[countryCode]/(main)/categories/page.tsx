@@ -6,12 +6,19 @@ import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import Link from "next/link"
 
+import { listIndiaRegions } from "@lib/constants/india-region"
+
 export const metadata: Metadata = {
   title: "Explore Sweet Categories | Authentic Agra Petha & Namkeen | Taj Petha",
   description: "Browse all Agra sweet and snack categories: Kesar Petha, Dry Petha, Paan Petha, Agra Dalmoth, Crispy Namkeen, and Gift Hampers. Fresh daily dispatch across India.",
 }
 
-export const revalidate = 300
+export const revalidate = 3600
+
+export async function generateStaticParams() {
+  const regions = listIndiaRegions()
+  return regions.flatMap((r) => r.countries?.map((c) => ({ countryCode: c.iso_2?.toLowerCase() || "in" })) || [{ countryCode: "in" }])
+}
 
 export default async function Categories(props: {
   params: Promise<{ countryCode: string }>

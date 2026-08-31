@@ -43,7 +43,7 @@ export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion |
           Authorization: authHeader,
           "Content-Type": "application/json",
         },
-        next: { revalidate: 60, tags: ["promotions"] },
+        next: { revalidate: 86400, tags: ["promotions"] },
       }
     )
 

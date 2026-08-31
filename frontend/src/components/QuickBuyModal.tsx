@@ -13,6 +13,7 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import { formatIndianPrice } from "@lib/util/money"
 import { usePromotion } from "@lib/context/promotion-context"
 import { useParams, useRouter } from "next/navigation"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 import AddedToCartModal, { AddedItemDetails } from "./AddedToCartModal"
 import { triggerPackingSweetBox } from "./PackingSweetBoxOverlay"
@@ -35,6 +36,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
   const [pairings, setPairings] = useState<any[]>([])
   const [addedUpsell, setAddedUpsell] = useState<Record<string, boolean>>({})
   const [addingUpsell, setAddingUpsell] = useState<Record<string, boolean>>({})
+  const [cartProductIds, setCartProductIds] = useState<Set<string>>(new Set())
 
   const params = useParams()
   const router = useRouter()
@@ -44,10 +46,41 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
     setMounted(true)
   }, [])
 
-  // Fetch live pairings from Medusa database on modal open
+  // Sync cart items so pairing recommendations never duplicate what is already in cart
+  useEffect(() => {
+    const handleCartUpdate = (e: CustomEvent) => {
+      if (e.detail?.cart?.items) {
+        const ids = new Set<string>(
+          e.detail.cart.items.map((i: any) => i.variant?.product_id || i.product_id || i.product_handle).filter(Boolean)
+        )
+        setCartProductIds(ids)
+      }
+    }
+
+    if (isOpen) {
+      fetch("/api/cart")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.cart?.items) {
+            const ids = new Set<string>(
+              data.cart.items.map((i: any) => i.variant?.product_id || i.product_id || i.product_handle).filter(Boolean)
+            )
+            setCartProductIds(ids)
+          }
+        })
+        .catch(() => null)
+    }
+
+    window.addEventListener("cartUpdated" as any, handleCartUpdate)
+    return () => {
+      window.removeEventListener("cartUpdated" as any, handleCartUpdate)
+    }
+  }, [isOpen])
+
+  // Fetch dynamic pairings pool from Medusa database on modal open
   useEffect(() => {
     if (isOpen && pairings.length === 0) {
-      fetch(`/api/products/popular?limit=6&countryCode=${countryCode}`)
+      fetch(`/api/products/popular?limit=16&countryCode=${countryCode}`)
         .then((res) => res.json())
         .then((data) => {
           if (data?.products) {
@@ -215,6 +248,17 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
     }
   }
 
+  // Filter out current modal product and items already in cart or just added
+  const visiblePairings = pairings
+    .filter((u: any) => {
+      if (!u || !u.id) return false
+      if (u.id === product.id || u.handle === product.handle || u.title === product.title) return false
+      if (cartProductIds.has(u.id) || (u.handle && cartProductIds.has(u.handle))) return false
+      if (addedUpsell[u.id]) return false
+      return true
+    })
+    .slice(0, 3)
+
   if (!mounted || !product) return null
 
   return (
@@ -346,57 +390,52 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                           )}
                         </div>
 
-                        {/* Urgency Strip */}
-                        <div className="bg-amber-50/80 border border-amber-200/70 rounded-2xl p-2.5 mb-4 flex items-center justify-between text-xs font-jakarta">
-                          <span className="text-amber-900 font-semibold flex items-center gap-1.5">
-                            <span>⚡</span> Fresh Batch Made Today
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="px-2.5 py-0.5 text-[10px] font-jakarta font-bold uppercase tracking-wider bg-amber-100/80 text-amber-800 rounded-full flex items-center gap-1">
+                            ⚡ Fresh Batch Made Today
                           </span>
-                          <span className="text-emerald-700 font-bold">
+                          <span className="px-2.5 py-0.5 text-[10px] font-jakarta font-bold uppercase tracking-wider bg-blue-50 text-blue-700 rounded-full flex items-center gap-1">
                             ✈️ Ships in 24h
                           </span>
                         </div>
 
-                        {/* Size / Variant Options */}
-                        {product.variants && product.variants.length > 1 && (
-                          <div className="mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider font-jakarta">
-                                Select Pack Size:
-                              </label>
-                              <span className="text-[11px] font-semibold text-emerald-700 font-jakarta">
-                                💡 Bigger pack = Extra Savings
+                        {/* Variant Selection Buttons */}
+                        {product.variants && product.variants.length > 0 && (
+                          <div className="space-y-2 mb-4">
+                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider font-jakarta flex items-center gap-1.5">
+                              <span>Select Pack Size:</span>
+                              <span className="text-[10px] text-emerald-600 font-semibold lowercase">
+                                (💡 Bigger pack = Extra Savings)
                               </span>
-                            </div>
+                            </label>
                             <div className="flex flex-wrap gap-2">
-                              {product.variants.map((variant) => {
-                                const vAny = variant as any
-                                const rawAmt = Number(vAny?.calculated_price?.calculated_amount || vAny?.prices?.[0]?.amount || 0)
-                                const { discountedPrice: variantDisc } = calculatePrice(rawAmt)
-                                const isLargest = product.variants && product.variants.length > 1 && variant.id === product.variants.reduce((max: any, cur: any) => {
-                                  const curAmt = Number((cur as any)?.calculated_price?.calculated_amount || (cur as any)?.prices?.[0]?.amount || 0)
-                                  const maxAmt = Number((max as any)?.calculated_price?.calculated_amount || (max as any)?.prices?.[0]?.amount || 0)
-                                  return curAmt > maxAmt ? cur : max
+                              {product.variants.map((v: any) => {
+                                const isSelected = v.id === selectedVariant
+                                const vRaw = Number(v.calculated_price?.calculated_amount || v.prices?.[0]?.amount || 0)
+                                const vPromo = calculatePrice(vRaw)
+                                const isHighest = v.id === product.variants?.reduce((h: any, c: any) => {
+                                  const getA = (x: any) => Number(x.calculated_price?.calculated_amount || x.prices?.[0]?.amount || 0)
+                                  return getA(c) > getA(h) ? c : h
                                 }, product.variants[0])?.id
 
                                 return (
                                   <button
-                                    key={variant.id}
+                                    key={v.id}
                                     type="button"
-                                    onClick={() => setSelectedVariant(variant.id!)}
-                                    className={`px-3.5 py-2 rounded-xl text-xs font-bold font-jakarta transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${selectedVariant === variant.id
-                                        ? 'bg-amber-50 border-2 border-petha-amber text-amber-950 shadow-sm'
-                                        : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300'
-                                      }`}
+                                    onClick={() => setSelectedVariant(v.id)}
+                                    className={`px-3.5 py-2 rounded-xl text-xs font-jakarta font-semibold border transition-all flex items-center gap-2 cursor-pointer ${
+                                      isSelected
+                                        ? "bg-amber-50 border-amber-500 text-amber-900 shadow-xs ring-1 ring-amber-500/20"
+                                        : "bg-white border-slate-200 text-slate-700 hover:border-amber-300"
+                                    }`}
                                   >
-                                    <span>{variant.title}</span>
-                                    {variantDisc > 0 && (
-                                      <span className={`text-[11px] font-mono font-medium ${selectedVariant === variant.id ? 'text-amber-800' : 'text-slate-500'}`}>
-                                        ₹{formatIndianPrice(variantDisc)}
-                                      </span>
-                                    )}
-                                    {isLargest && (
-                                      <span className="bg-amber-200/90 text-amber-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-tight">
-                                        Best Value
+                                    <span className="font-bold">{v.title}</span>
+                                    <span className="font-mono font-bold text-slate-900">
+                                      ₹{formatIndianPrice(vPromo.discountedPrice)}
+                                    </span>
+                                    {isHighest && (
+                                      <span className="text-[9px] font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-jakarta">
+                                        BEST VALUE
                                       </span>
                                     )}
                                   </button>
@@ -406,26 +445,26 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                           </div>
                         )}
 
-                        {/* Quantity Stepper */}
-                        <div className="mb-5">
-                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 font-jakarta">
+                        {/* Quantity Selector */}
+                        <div className="flex items-center gap-3 mb-6">
+                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider font-jakarta">
                             Quantity:
-                          </label>
-                          <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50/50 p-1">
+                          </span>
+                          <div className="flex items-center border border-slate-200 rounded-xl bg-white p-1">
                             <button
                               type="button"
                               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                              className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+                              className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
-                            <span className="font-mono text-sm font-bold w-10 text-center text-slate-900">
+                            <span className="w-8 text-center font-mono font-bold text-sm text-slate-800">
                               {quantity}
                             </span>
                             <button
                               type="button"
-                              onClick={() => setQuantity(Math.min(10, quantity + 1))}
-                              className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+                              onClick={() => setQuantity(quantity + 1)}
+                              className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -433,12 +472,12 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                         </div>
                       </div>
 
-                      {/* Primary CTA Buttons */}
+                      {/* Action Buttons */}
                       <div className="space-y-2.5">
-                        {showSuccess ? (
-                          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 flex items-center justify-center gap-2 text-emerald-800 font-jakarta font-bold text-sm">
-                            <Check className="w-5 h-5 text-emerald-600" />
-                            Added to Sweet Box {discountPercent > 0 ? `with ${discountPercent}% Discount!` : "Successfully!"}
+                        {isAdding ? (
+                          <div className="w-full bg-amber-50 text-petha-amber py-3.5 rounded-2xl font-jakarta font-bold text-sm flex items-center justify-center gap-2 border border-amber-200">
+                            <div className="w-4 h-4 border-2 border-petha-amber border-t-transparent rounded-full animate-spin" />
+                            <span>Adding to sweet box...</span>
                           </div>
                         ) : (
                           <>
@@ -446,22 +485,15 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                               type="button"
                               onClick={handleBuyNow}
                               disabled={isAdding}
-                              className="w-full bg-petha-amber hover:bg-petha-saffron text-white py-3.5 px-6 rounded-2xl font-jakarta font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                              className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white py-3.5 px-6 rounded-2xl font-jakarta font-bold text-sm uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                             >
-                              {isAdding ? (
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <>
-                                  <ShoppingBag className="w-4 h-4" />
-                                  Buy Now · Instant Checkout
-                                </>
-                              )}
+                              <ShoppingBag className="w-4 h-4" />
+                              <span>Buy Now · Instant Checkout</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={handleAddToCart}
-                              disabled={isAdding}
                               className="w-full bg-white hover:bg-amber-50 text-slate-900 border-2 border-slate-200 hover:border-petha-amber py-3 px-6 rounded-2xl font-jakarta font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
                             >
                               + Add to Sweet Box
@@ -473,69 +505,82 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   </div>
 
                   {/* UPSELL: Frequently Paired Agra Sweets & Snacks */}
-                  <div className="pt-5 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-jakarta text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                        <span>🎁</span> Frequently Added Together:
-                      </span>
-                      <span className="text-[11px] text-emerald-600 font-semibold font-jakarta">
-                        Eligible for Free Shipping
-                      </span>
-                    </div>
-
-                    {pairings.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        {pairings.filter((u: any) => u.title !== product.title).slice(0, 3).map((item: any) => (
-                          <div
-                            key={item.id}
-                            className="p-2.5 rounded-2xl bg-amber-50/40 border border-amber-100 hover:border-amber-200 flex items-center justify-between gap-2"
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0">
-                                <Image
-                                  src={item.thumbnail || "/hero_image.webp"}
-                                  alt={item.title}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-jakarta text-xs font-bold text-slate-900 truncate">
-                                  {item.title}
-                                </p>
-                                <p className="font-mono text-[11px] font-semibold text-petha-amber">
-                                  {item.priceFormatted || `₹${item.price}`}
-                                </p>
-                              </div>
-                            </div>
-
-                            <button
-                              type="button"
-                              disabled={addingUpsell[item.id] || addedUpsell[item.id]}
-                              onClick={() => handleAddUpsell(item)}
-                              className={`px-3 py-1 rounded-lg text-xs font-bold font-jakarta transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${addedUpsell[item.id]
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : addingUpsell[item.id]
-                                    ? "bg-amber-100 text-amber-800"
-                                    : "bg-white border border-amber-300 hover:bg-petha-amber hover:text-white text-slate-800"
-                                }`}
-                            >
-                              {addingUpsell[item.id] ? (
-                                <>
-                                  <div className="w-3 h-3 rounded-full border-2 border-amber-600 border-t-transparent animate-spin" />
-                                  <span>Packing...</span>
-                                </>
-                              ) : addedUpsell[item.id] ? (
-                                "✓ Added"
-                              ) : (
-                                "+ Add"
-                              )}
-                            </button>
-                          </div>
-                        ))}
+                  {visiblePairings.length > 0 && (
+                    <div className="pt-5 border-t border-slate-100">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-jakarta text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                          <span>🎁</span> Frequently Added Together:
+                        </span>
+                        <span className="text-[11px] text-emerald-600 font-semibold font-jakarta">
+                          Eligible for Free Shipping
+                        </span>
                       </div>
-                    )}
-                  </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        {visiblePairings.map((item: any) => {
+                          const itemPromo = calculatePrice(item.price)
+                          return (
+                            <div
+                              key={item.id}
+                              className="p-2.5 rounded-2xl bg-amber-50/40 border border-amber-100 hover:border-amber-200 flex items-center justify-between gap-2"
+                            >
+                              <LocalizedClientLink
+                                href={`/products/${item.handle}`}
+                                onClick={onClose}
+                                className="flex items-center gap-2.5 min-w-0 flex-1 group cursor-pointer"
+                              >
+                                <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0 group-hover:border-petha-amber transition-colors shadow-2xs">
+                                  <Image
+                                    src={item.thumbnail || "/hero_image.webp"}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-jakarta text-[11px] font-bold text-slate-900 leading-tight group-hover:text-petha-amber transition-colors">
+                                    {item.title}
+                                  </p>
+                                  <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                    <span className="font-mono text-[11px] font-bold text-petha-amber">
+                                      ₹{formatIndianPrice(itemPromo.discountedPrice)}
+                                    </span>
+                                    {itemPromo.isDiscounted && (
+                                      <>
+                                        <span className="font-mono text-[9px] text-slate-400 line-through">
+                                          ₹{formatIndianPrice(item.price)}
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </LocalizedClientLink>
+
+                              <button
+                                type="button"
+                                disabled={addingUpsell[item.id] || addedUpsell[item.id]}
+                                onClick={() => handleAddUpsell(item)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-bold font-jakarta transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer ${
+                                  addingUpsell[item.id]
+                                    ? "bg-amber-100 text-amber-800"
+                                    : "bg-white border border-amber-300 hover:bg-petha-amber hover:text-white text-slate-800 active:scale-95"
+                                }`}
+                              >
+                                {addingUpsell[item.id] ? (
+                                  <>
+                                    <div className="w-3 h-3 rounded-full border-2 border-amber-600 border-t-transparent animate-spin" />
+                                    <span>Adding...</span>
+                                  </>
+                                ) : (
+                                  "+ Add"
+                                )}
+                              </button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Trust Footer */}
                   <div className="flex flex-wrap items-center justify-center gap-6 pt-3 border-t border-slate-100 text-[11px] font-jakarta font-semibold text-slate-500">
@@ -551,6 +596,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
         document.body
       )}
 
+      {/* Added to Cart Success Luxury Modal */}
       <AddedToCartModal
         isOpen={showAddedModal}
         isAdding={isAdding}

@@ -5,6 +5,8 @@ import Image from "next/image"
 import { blogPosts } from "@lib/blog/posts"
 import { Sparkles, Clock, User, ArrowRight, BookOpen, Tag } from "lucide-react"
 
+export const dynamic = "force-static"
+
 export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await params
   const canonical = `https://tajpetha.in/${countryCode}/blog`

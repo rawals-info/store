@@ -15,6 +15,8 @@ import { Sparkles, Truck, ShieldCheck } from "lucide-react"
 
 import Breadcrumb from "@modules/common/components/breadcrumb"
 
+export const revalidate = 3600
+
 export async function generateMetadata({ params }: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await params
   return {

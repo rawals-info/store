@@ -5,13 +5,20 @@ import { notFound } from "next/navigation"
 import { getRegion } from "@lib/data/regions"
 import { getIndiaRegion } from "@lib/constants/india-region"
 
+import { listIndiaRegions } from "@lib/constants/india-region"
+
 export const metadata: Metadata = {
   title: "Store",
   description: "Explore our exclusive collection of authentic Agra petha sweets.",
   robots: { index: true, follow: true, "max-image-preview": 'large', "max-snippet": -1, "max-video-preview": -1 },
 }
 
-export const revalidate = 1800
+export const revalidate = 3600
+
+export async function generateStaticParams() {
+  const regions = listIndiaRegions()
+  return regions.flatMap((r) => r.countries?.map((c) => ({ countryCode: c.iso_2?.toLowerCase() || "in" })) || [{ countryCode: "in" }])
+}
 
 export default async function StorePage({
   params,

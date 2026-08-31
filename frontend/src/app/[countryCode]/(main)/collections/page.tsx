@@ -6,10 +6,19 @@ import { getIndiaRegion } from "@lib/constants/india-region"
 import { notFound } from "next/navigation"
 import CollectionPreview from "@modules/collections/components/collection-preview"
 
+import { listIndiaRegions } from "@lib/constants/india-region"
+
+export const revalidate = 3600
+
+export async function generateStaticParams() {
+  const regions = listIndiaRegions()
+  return regions.flatMap((r) => r.countries?.map((c) => ({ countryCode: c.iso_2?.toLowerCase() || "in" })) || [{ countryCode: "in" }])
+}
+
 interface CollectionsPageProps {
-  params: {
+  params: Promise<{
     countryCode: string
-  }
+  }>
 }
 
 export default async function CollectionsPage(props: CollectionsPageProps) {

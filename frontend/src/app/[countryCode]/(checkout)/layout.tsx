@@ -36,8 +36,8 @@ export default function CheckoutLayout({
       </main>
 
       {/* Trust Footer */}
-      <footer className="py-6 border-t border-slate-200/60 text-center text-xs text-slate-500 bg-white">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="pt-6 pb-24 sm:pb-6 border-t border-slate-200/60 text-center text-xs text-slate-500 bg-white">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span>© {new Date().getFullYear()} Taj Petha Agra. Authentic Royal Confectioners.</span>
           <div className="flex items-center gap-4 text-slate-600">
             <span>🌱 100% Pure Vegetarian</span>

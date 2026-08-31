@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 import { listCollections } from "@lib/data/collections";
-import { getIndiaRegion } from "@lib/constants/india-region";
+import { getIndiaRegion, listIndiaRegions } from "@lib/constants/india-region";
 import { getCachedCategories } from "@modules/home/components/categories";
 import { getHomepageProducts, getProductReviewSummary, getProductReviews } from "@lib/data/products";
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
@@ -426,7 +426,12 @@ const faqSchema = {
   ]
 };
 
-export const revalidate = 1800;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const regions = listIndiaRegions()
+  return regions.flatMap((r) => r.countries?.map((c) => ({ countryCode: c.iso_2?.toLowerCase() || "in" })) || [{ countryCode: "in" }])
+}
 
 export default async function Home({ params }: HomeProps) {
   const { countryCode } = await params;

@@ -25,7 +25,7 @@ const getProducts = cache(
       query: { ...queryParams, region_id: regionId, fields },
       next: {
         tags: ["products"],
-        revalidate: 1800, // 30 minutes aggressive caching
+        revalidate: 3600, // 1 hour ISR fallback (webhook is primary)
       },
       cache: "force-cache",
     });
@@ -245,7 +245,7 @@ export const getProductData = cache(
           fields: PRODUCT_FIELDS.DETAIL // Use detailed fields for product pages
         },
         next: {
-          revalidate: 1800, // 30 minutes for product data
+          revalidate: 3600, // 1 hour for product data
           tags: ["products", `product-handle-${handle}`],
         },
         cache: "force-cache",
@@ -317,6 +317,7 @@ export const getProductReviews = async ({
 
   const next = {
     ...(await getCacheOptions(`product-reviews-${productId}`)),
+    revalidate: 86400, // 1 day cache for reviews
   }
 
   try {
@@ -354,6 +355,7 @@ export const getProductReviewSummary = async (productId: string) => {
 
   const next = {
     ...(await getCacheOptions(`product-review-summary-${productId}`)),
+    revalidate: 86400, // 1 day cache for review summary
   }
 
   try {

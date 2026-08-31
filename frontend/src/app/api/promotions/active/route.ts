@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getActivePromotion } from "@lib/data/promotions"
 
-export const revalidate = 60 // 60 seconds cache
+export const revalidate = 86400 // 1 day cache for promotions metadata
 
 export async function GET() {
   try {

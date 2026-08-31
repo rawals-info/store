@@ -14,6 +14,7 @@ import Breadcrumb from "@modules/common/components/breadcrumb"
 import { triggerPackingSweetBox } from "@components/PackingSweetBoxOverlay"
 import { usePromotion } from "@lib/context/promotion-context"
 import { formatIndianPrice } from "@lib/util/money"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const CartClientWrapper = ({
   initialCart,
@@ -55,9 +56,9 @@ const CartClientWrapper = ({
     }
   }, [cart?.items?.length, activePromo?.code, cart?.promotions?.length])
 
-  // Fetch dynamic pairing products from backend
+  // Fetch dynamic pairing products pool from backend
   useEffect(() => {
-    fetch("/api/products/popular?limit=4&countryCode=in")
+    fetch("/api/products/popular?limit=16&countryCode=in")
       .then((res) => res.json())
       .then((data) => {
         if (data?.products) {
@@ -145,6 +146,27 @@ const CartClientWrapper = ({
     }
   }
 
+  // Deduplicate and filter out products already in cart
+  const cartProductIds = new Set(
+    (cart?.items || []).map((i: any) => i.variant?.product_id || i.product_id || i.product_handle).filter(Boolean)
+  )
+  const cartVariantIds = new Set(
+    (cart?.items || []).map((i: any) => i.variant_id).filter(Boolean)
+  )
+  const cartHandles = new Set(
+    (cart?.items || []).map((i: any) => i.product_handle).filter(Boolean)
+  )
+
+  const visibleUpsellProducts = upsellProducts
+    .filter((prod: any) => {
+      if (!prod || !prod.id) return false
+      if (cartProductIds.has(prod.id)) return false
+      if (prod.handle && cartHandles.has(prod.handle)) return false
+      if (prod.variantId && cartVariantIds.has(prod.variantId)) return false
+      return true
+    })
+    .slice(0, 4)
+
   return (
     <div className="w-full py-6 sm:py-10 font-jakarta">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-testid="cart-container">
@@ -178,80 +200,91 @@ const CartClientWrapper = ({
                     <SignInPrompt />
                   </div>
                 )}
+
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <h1 className="font-cormorant text-3xl sm:text-4xl font-bold text-slate-900">
+                    Your Agra Sweet Box
+                  </h1>
+                  <span className="font-jakarta text-xs font-semibold text-petha-amber bg-amber-50 border border-amber-200/60 px-3 py-1 rounded-full">
+                    {cart.items.reduce((acc, item) => acc + item.quantity, 0)} {cart.items.reduce((acc, item) => acc + item.quantity, 0) === 1 ? 'item' : 'items'}
+                  </span>
+                </div>
+
                 <ItemsTemplate cart={cart} />
               </div>
 
-              {/* Right: Summary Sticky Box */}
-              <div className="relative">
-                <div className="sticky top-28 space-y-6">
-                  <div className="bg-white rounded-3xl border border-amber-200/60 shadow-xs p-6">
-                    {/* Free shipping meter */}
-                    <div className="mb-6 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 text-xs font-jakarta">
-                      {isFreeShipping ? (
-                        <div className="flex items-center gap-2 text-emerald-700 font-bold">
-                          <span className="text-base">🎉</span> You have unlocked FREE Shipping!
+              {/* Right: Summary & Free Shipping Progress */}
+              <div className="space-y-6">
+                <div className="bg-white rounded-3xl border border-amber-200/60 shadow-xs p-5 sm:p-6 space-y-6">
+                  {/* Free Shipping Meter */}
+                  <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/60 text-xs font-jakarta">
+                    {isFreeShipping ? (
+                      <div className="flex items-center gap-2 text-emerald-700 font-bold">
+                        <span className="text-base">🎉</span> You have unlocked FREE Shipping!
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-slate-700 font-semibold mb-1.5">
+                          Add <span className="font-bold text-petha-amber">₹{neededForFreeShipping}</span> more for <span className="font-bold text-emerald-700">FREE Shipping</span>
+                        </p>
+                        <div className="w-full h-2 rounded-full bg-amber-200/60 overflow-hidden">
+                          <div 
+                            className="h-full bg-petha-amber rounded-full transition-all duration-500" 
+                            style={{ width: `${Math.min(100, (netItemsTotal / 500) * 100)}%` }} 
+                          />
                         </div>
-                      ) : (
-                        <div>
-                          <p className="text-slate-700 font-semibold mb-1.5">
-                            Add <span className="font-bold text-petha-amber">₹{neededForFreeShipping}</span> more for <span className="font-bold text-emerald-700">FREE Shipping</span>
-                          </p>
-                          <div className="w-full h-2 rounded-full bg-amber-200/60 overflow-hidden">
-                            <div 
-                              className="h-full bg-petha-amber rounded-full transition-all duration-500" 
-                              style={{ width: `${Math.min(100, (netItemsTotal / 500) * 100)}%` }} 
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <Summary cart={cart as any} />
+                      </div>
+                    )}
                   </div>
-                  
-                  {/* Trust Badges */}
-                  <ProductTrustBadges />
+
+                  <Summary cart={cart as any} />
                 </div>
+                
+                {/* Trust Badges */}
+                <ProductTrustBadges />
               </div>
             </div>
 
             {/* UPSELL: Complete Your Agra Sweet Box */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-amber-200/60 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
-                <div>
-                  <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
-                    Pairing Recommendations
+            {visibleUpsellProducts.length > 0 && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-amber-200/60 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
+                  <div>
+                    <span className="font-jakarta text-xs uppercase tracking-widest text-petha-amber font-bold">
+                      Pairing Recommendations
+                    </span>
+                    <h3 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5">
+                      Complete Your Sweet Box with Agra Snacks
+                    </h3>
+                  </div>
+                  <span className="font-jakarta text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 w-fit">
+                    ✨ Handcrafted Fresh Daily
                   </span>
-                  <h3 className="font-cormorant text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5">
-                    Complete Your Sweet Box with Agra Snacks
-                  </h3>
                 </div>
-                <span className="font-jakarta text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 w-fit">
-                  ✨ Handcrafted Fresh Daily
-                </span>
-              </div>
 
-              {upsellProducts.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {upsellProducts.map((prod: any) => (
+                  {visibleUpsellProducts.map((prod: any) => (
                     <div
                       key={prod.id}
                       className="p-4 rounded-2xl bg-[#FFFDF9] border border-amber-200/60 hover:border-amber-400 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
                     >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0">
+                      <LocalizedClientLink
+                        href={`/products/${prod.handle}`}
+                        className="flex items-center gap-3 mb-3 group cursor-pointer"
+                      >
+                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white border border-amber-200/60 flex-shrink-0 group-hover:border-petha-amber transition-colors shadow-2xs">
                           <Image
                             src={prod.thumbnail || "/hero_image.webp"}
                             alt={prod.title}
                             fill
-                            className="object-cover"
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                         <div className="min-w-0">
                           <span className="inline-block text-[10px] font-bold uppercase text-petha-amber font-jakarta">
                             Fresh Agra
                           </span>
-                          <h4 className="font-cormorant text-base font-bold text-slate-900 truncate">
+                          <h4 className="font-cormorant text-base font-bold text-slate-900 truncate group-hover:text-petha-amber transition-colors">
                             {prod.title}
                           </h4>
                           {(() => {
@@ -275,16 +308,16 @@ const CartClientWrapper = ({
                             )
                           })()}
                         </div>
-                      </div>
+                      </LocalizedClientLink>
 
                       <button
                         type="button"
                         disabled={addingUpsell[prod.id]}
                         onClick={() => handleAddUpsell(prod)}
-                        className={`w-full py-2 rounded-xl border border-amber-300 text-slate-800 font-jakarta text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm text-center ${
+                        className={`w-full py-2 rounded-xl border border-amber-300 text-slate-800 font-jakarta text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs text-center ${
                           addingUpsell[prod.id]
                             ? "bg-amber-100 text-amber-800"
-                            : "bg-white hover:bg-petha-amber hover:text-white"
+                            : "bg-white hover:bg-petha-amber hover:text-white active:scale-98"
                         }`}
                       >
                         {addingUpsell[prod.id] ? "Adding to Box..." : "+ Add to Order"}
@@ -292,8 +325,8 @@ const CartClientWrapper = ({
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="bg-white rounded-3xl border border-amber-200/60 p-6 sm:p-10 shadow-xs">

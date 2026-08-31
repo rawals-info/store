@@ -21,8 +21,7 @@ type Props = {
 
 // Set dynamic rendering options for this page
 export const dynamic = "force-static"
-// Fix the config field issue by using a number directly
-export const revalidate = 600
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   // Fetch only collections, use hardcoded regions

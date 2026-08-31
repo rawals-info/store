@@ -7,6 +7,8 @@ import { Sparkles, ShieldCheck, Truck, Leaf, Award, HeartHandshake, CheckCircle2
 
 import Breadcrumb from "@modules/common/components/breadcrumb"
 
+export const dynamic = "force-static"
+
 interface AboutPageProps {
   params: Promise<{
     countryCode: string
