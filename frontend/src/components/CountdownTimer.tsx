@@ -59,9 +59,19 @@ export default function CountdownTimer({ className = "", inline = false }: Fresh
 
   if (!isMounted) {
     return (
-      <span className={`font-mono text-xs font-bold text-amber-200 ${className}`}>
-        --h : --m : --s
-      </span>
+      <div className={`inline-flex items-center gap-1 font-mono text-xs font-bold text-white ${className}`}>
+        <span className="bg-black/35 border border-amber-300/20 px-1.5 py-0.5 rounded text-amber-200 shadow-inner">
+          14h
+        </span>
+        <span className="text-amber-300/60 font-mono">:</span>
+        <span className="bg-black/35 border border-amber-300/20 px-1.5 py-0.5 rounded text-amber-200 shadow-inner">
+          00m
+        </span>
+        <span className="text-amber-300/60 font-mono">:</span>
+        <span className="bg-black/35 border border-amber-300/20 px-1.5 py-0.5 rounded text-amber-200 shadow-inner">
+          00s
+        </span>
+      </div>
     )
   }
 

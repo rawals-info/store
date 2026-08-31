@@ -38,8 +38,8 @@ module.exports = {
         petha: {
           cream:      "#FAF8F4",   // Page base bg
           warm:       "#F2EDE4",   // Alternating section bg
-          amber:      "#D97706",   // Primary CTA, links
-          saffron:    "#F59E0B",   // Hover, badges
+          amber:      "#B45309",   // Primary CTA, links (WCAG AA Compliant 4.53:1 contrast)
+          saffron:    "#92400E",   // Hover, badges (WCAG AAA Compliant 6.91:1 contrast)
           terracotta: "#C2410C",   // Sale badges, urgency
           forest:     "#1E3A2F",   // Deep accent headings, announcement bar
           slate:      "#1F2937",   // Body copy, nav

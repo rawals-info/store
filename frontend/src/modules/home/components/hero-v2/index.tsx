@@ -36,9 +36,9 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
           <div className="flex flex-col">
             {/* Eyebrow badge */}
             <motion.div
-              initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              initial={prefersReduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
               className="flex items-center gap-2 mb-5"
             >
               <span className="px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200/60 font-jakarta text-xs uppercase tracking-wider text-petha-amber font-bold flex items-center gap-1.5 shadow-sm">

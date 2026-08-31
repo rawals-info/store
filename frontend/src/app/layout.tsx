@@ -9,7 +9,6 @@ import { Poppins, DM_Serif_Display, Inter, Playfair_Display, Cormorant_Garamond,
 import PackingSweetBoxOverlay from "@components/PackingSweetBoxOverlay"
 import { PromotionProvider } from "@lib/context/promotion-context"
 
-// ✅ Optimized font loading with display: 'swap', preload, and adjustFontFallback
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "600"],
@@ -51,7 +50,6 @@ const playfair = Playfair_Display({
   fallback: ['Georgia', 'Times New Roman', 'serif']
 })
 
-// New B2C typography system
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -304,14 +302,10 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable} ${cormorant.variable} ${jakarta.variable} ${jetbrains.variable}`}>
       <head>
-        {/* Preload critical resources to reduce HTTP requests */}
-        <link rel="preload" href="/hero_image.webp" as="image" />
         <meta property="og:site_name" content="Taj Petha" />
 
         {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
-        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-        {/* Preconnects removed to avoid unnecessary 3rd-party warmups unless scripts are used */}
 
         {/* Optimized favicon and app icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -365,7 +359,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
 
         {/* External analytics scripts are loaded centrally in GoogleAnalytics component */}
 
-        {/* Enhanced Schema Markup */}
+        {/* Enhanced Schema Markup with WebMCP AI Agent Actions */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -384,27 +378,8 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        {/* Microsoft Clarity */}
-        <script
-          type="text/javascript"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(c,l,a,r,i,t,y){
-                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "yacrhanzm7");
-            `
-          }}
-        />
       </head>
       <body suppressHydrationWarning={true}>
-        {/* Google Tag Manager (noscript) */}
-        <noscript dangerouslySetInnerHTML={{
-          __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NFH57XTD"
-          height="0" width="0" style="display:none;visibility:hidden"></iframe>`
-        }} />
-
         {/* Analytics Scripts */}
         <GoogleAnalytics />
 
