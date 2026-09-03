@@ -2,7 +2,7 @@
 
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 
 // Configuration & IDs
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'
@@ -14,7 +14,30 @@ declare global {
     gtag?: (...args: any[]) => void
     dataLayer?: any[]
     fbq?: (...args: any[]) => void
+    clarity?: (...args: any[]) => void
   }
+}
+
+/**
+ * Determines whether real production analytics and session recording should fire.
+ * Returns TRUE only when:
+ * 1. process.env.NODE_ENV is 'production'
+ * 2. Hostname is NOT localhost, 127.0.0.1, private LAN, or test preview.
+ */
+export const isProductionTrackingEnabled = (): boolean => {
+  if (typeof window === 'undefined') {
+    return process.env.NODE_ENV === 'production'
+  }
+  const hostname = window.location.hostname
+  const isLocal =
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname.startsWith('192.168.') ||
+    hostname.startsWith('10.') ||
+    hostname.endsWith('.local')
+
+  return process.env.NODE_ENV === 'production' && !isLocal
 }
 
 // First-touch attribution helper
@@ -63,11 +86,14 @@ export const recordFirstTouch = (pathname: string, searchParams: URLSearchParams
 // DataLayer Dispatcher Helper
 export const pushDataLayer = (payload: Record<string, any>) => {
   if (typeof window !== 'undefined') {
+    if (!isProductionTrackingEnabled()) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📊 [Dev Mock dataLayer]', payload)
+      }
+      return
+    }
     window.dataLayer = window.dataLayer || []
     window.dataLayer.push(payload)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📊 [Analytics dataLayer]', payload)
-    }
   }
 }
 
@@ -88,6 +114,13 @@ function NavigationListener() {
     // Record First Touch & UTM attribution
     if (searchParams) {
       recordFirstTouch(pathname, searchParams)
+    }
+
+    if (!isProductionTrackingEnabled()) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🧭 [Dev Mock Navigation]', fullUrl)
+      }
+      return
     }
 
     const attribution = getAttributionData()
@@ -133,6 +166,13 @@ export const trackProductView = (product: {
   price: number
   city?: string
 }) => {
+  if (!isProductionTrackingEnabled()) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Dev Mock trackProductView]', product.title, product.price)
+    }
+    return
+  }
+
   const attribution = getAttributionData()
 
   // Google Analytics view_item
@@ -185,6 +225,13 @@ export const trackAddToCart = (item: {
   quantity: number
   category?: string
 }) => {
+  if (!isProductionTrackingEnabled()) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Dev Mock trackAddToCart]', item.title, item.price, 'qty:', item.quantity)
+    }
+    return
+  }
+
   const totalValue = item.price * item.quantity
   const attribution = getAttributionData()
 
@@ -242,6 +289,13 @@ export const trackBeginCheckout = (cart: {
   }>
   coupon?: string
 }) => {
+  if (!isProductionTrackingEnabled()) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Dev Mock trackBeginCheckout]', cart.total, 'items:', cart.items.length)
+    }
+    return
+  }
+
   const attribution = getAttributionData()
 
   // Google Analytics begin_checkout
@@ -253,10 +307,13 @@ export const trackBeginCheckout = (cart: {
       items: cart.items.map((i) => ({
         item_id: i.id || i.title,
         item_name: i.title,
+        item_category: 'Agra Petha',
         quantity: i.quantity,
         price: i.price,
       })),
       first_touch_landing: attribution.firstLandingPage,
+      utm_source: attribution.utmSource,
+      utm_campaign: attribution.utmCampaign,
     })
   }
 
@@ -270,10 +327,12 @@ export const trackBeginCheckout = (cart: {
       items: cart.items.map((i) => ({
         item_id: i.id || i.title,
         item_name: i.title,
+        item_category: 'Agra Petha',
         quantity: i.quantity,
         price: i.price,
       })),
     },
+    attribution,
   })
 
   // Meta Pixel InitiateCheckout
@@ -302,6 +361,13 @@ export const trackPurchase = (transaction: {
   city?: string
   state?: string
 }) => {
+  if (!isProductionTrackingEnabled()) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Dev Mock trackPurchase]', transaction.transaction_id, transaction.value)
+    }
+    return
+  }
+
   const attribution = getAttributionData()
 
   // Google Analytics purchase
@@ -361,6 +427,10 @@ export const trackPurchase = (transaction: {
 }
 
 export const trackCityPageView = (cityName: string, region: string) => {
+  if (!isProductionTrackingEnabled()) {
+    return
+  }
+
   pushDataLayer({
     event: 'city_page_view',
     city_name: cityName,
@@ -370,6 +440,22 @@ export const trackCityPageView = (cityName: string, region: string) => {
 
 // Master Analytics Scripts Component
 export function GoogleAnalytics() {
+  const [enabled, setEnabled] = useState(false)
+
+  useEffect(() => {
+    if (isProductionTrackingEnabled()) {
+      setEnabled(true)
+    } else if (process.env.NODE_ENV === 'development') {
+      console.log(
+        '🛡️ [Analytics] Localhost/Development environment detected — Google Analytics, GTM, and Microsoft Clarity scripts are disabled to prevent test pollution.'
+      )
+    }
+  }, [])
+
+  if (!enabled) {
+    return null
+  }
+
   return (
     <>
       <Suspense fallback={null}>
@@ -424,4 +510,5 @@ export default {
   trackCityPageView,
   getAttributionData,
   pushDataLayer,
+  isProductionTrackingEnabled,
 }

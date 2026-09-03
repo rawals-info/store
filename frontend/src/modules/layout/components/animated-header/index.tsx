@@ -168,7 +168,7 @@ const AnimatedHeader = () => {
 
       <motion.header
         className={clx(
-          "fixed inset-x-0 z-[40] group transition-colors duration-500 w-full overflow-visible",
+          "fixed inset-x-0 z-[50] group transition-colors duration-500 w-full overflow-visible",
           {
             "border-b": isScrolled,
             "border-petha-border": isScrolled && isHomePage,
