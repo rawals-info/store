@@ -241,6 +241,9 @@ module.exports = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-5px)" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         ring: "ring 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
@@ -259,6 +262,7 @@ module.exports = {
         leave: "leave 150ms ease-in forwards",
         "elegant-pulse": "elegant-pulse 3s ease-in-out infinite",
         "gentle-float": "gentle-float 6s ease-in-out infinite",
+        shimmer: "shimmer 1.5s infinite linear",
       },
       boxShadow: {
         'luxury-sm': '0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(212, 175, 55, 0.1)',

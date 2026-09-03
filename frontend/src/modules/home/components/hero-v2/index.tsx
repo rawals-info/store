@@ -1,8 +1,5 @@
-"use client"
-
 import Image from "next/image"
 import Link from "next/link"
-import { motion, useReducedMotion } from "framer-motion"
 
 const TRUST_PILLS = [
   { icon: "🌱", label: "100% Vegetarian" },
@@ -12,7 +9,6 @@ const TRUST_PILLS = [
 ]
 
 export default function HeroV2({ countryCode }: { countryCode: string }) {
-  const prefersReduced = useReducedMotion()
   const shopLink = `/${countryCode}/products`
 
   return (
@@ -35,17 +31,12 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
           {/* LEFT: Commercial Pitch & CTAs */}
           <div className="flex flex-col">
             {/* Eyebrow badge */}
-            <motion.div
-              initial={prefersReduced ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center gap-2 mb-5"
-            >
+            <div className="flex items-center gap-2 mb-5">
               <span className="px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200/60 font-jakarta text-xs uppercase tracking-wider text-petha-amber font-bold flex items-center gap-1.5 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
                 Fresh Batch Made Daily in Agra
               </span>
-            </motion.div>
+            </div>
 
             {/* Main headline - Clear, High-Converting, Plain English */}
             <h1 className="font-cormorant text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-[1.1] mb-4">
@@ -74,26 +65,19 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
 
             {/* High-Converting CTAs */}
             <div className="flex flex-col sm:flex-row gap-3.5">
-              <Link href={shopLink} id="hero-shop-cta">
-                <motion.span
-                  whileHover={prefersReduced ? {} : { scale: 1.03 }}
-                  whileTap={prefersReduced ? {} : { scale: 0.98 }}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-petha-amber text-white font-jakarta font-bold text-sm tracking-wide shadow-lg hover:bg-petha-saffron transition-all duration-200 cursor-pointer"
-                >
+              <Link href={shopLink} id="hero-shop-cta" className="inline-block">
+                <span className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-petha-amber text-white font-jakarta font-bold text-sm tracking-wide shadow-lg hover:bg-petha-saffron hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer w-full sm:w-auto">
                   Order Fresh Sweets Now
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
-                </motion.span>
+                </span>
               </Link>
 
-              <Link href={`/${countryCode}/categories/petha`} id="hero-explore-cta">
-                <motion.span
-                  whileHover={prefersReduced ? {} : { scale: 1.02 }}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white border-2 border-amber-300 text-slate-800 font-jakarta font-bold text-sm tracking-wide hover:border-petha-amber hover:text-petha-amber transition-all duration-200 cursor-pointer shadow-sm"
-                >
+              <Link href={`/${countryCode}/categories/petha`} id="hero-explore-cta" className="inline-block">
+                <span className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white border-2 border-amber-300 text-slate-800 font-jakarta font-bold text-sm tracking-wide hover:border-petha-amber hover:text-petha-amber hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm w-full sm:w-auto">
                   Explore Petha Varieties
-                </motion.span>
+                </span>
               </Link>
             </div>
           </div>
@@ -141,3 +125,4 @@ export default function HeroV2({ countryCode }: { countryCode: string }) {
     </section>
   )
 }
+

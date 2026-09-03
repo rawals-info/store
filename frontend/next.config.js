@@ -11,7 +11,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion', 'lodash', '@fortawesome/react-fontawesome', '@radix-ui/react-accordion']
+    optimizePackageImports: ['@medusajs/ui', 'lucide-react', 'framer-motion', 'lodash', '@fortawesome/react-fontawesome', '@radix-ui/react-accordion'],
   },
   compress: true,
   images: {
@@ -258,35 +258,6 @@ const nextConfig = {
       { source: '/in/hi', destination: '/in' },
     ]
   },
-
-  webpack: (config, { dev, isServer }) => {
-    // Optimize bundle for SEO-critical resources
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          default: false,
-          vendors: false,
-          // SEO-critical chunk
-          seo: {
-            name: 'seo',
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/](@medusajs|next)[\\/]/,
-            priority: 10,
-            enforce: true,
-          },
-          // UI components chunk
-          ui: {
-            name: 'ui',
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/](framer-motion|lucide-react)[\\/]/,
-            priority: 5,
-          }
-        }
-      }
-    }
-    return config
-  }
 }
 
 module.exports = nextConfig

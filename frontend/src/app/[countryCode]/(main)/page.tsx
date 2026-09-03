@@ -1,10 +1,13 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 import { listCollections } from "@lib/data/collections";
 import { getIndiaRegion, listIndiaRegions } from "@lib/constants/india-region";
 import { getCachedCategories } from "@modules/home/components/categories";
 import { getHomepageProducts, getProductReviewSummary, getProductReviews } from "@lib/data/products";
+import HeroV2 from "@modules/home/components/hero-v2";
 import HomeClientWrapper from "@modules/home/components/home-client-wrapper";
+import HomepageSkeleton from "@modules/skeletons/components/homepage-skeleton";
 import Link from "next/link"
 import { MAJOR_INDIAN_CITIES } from "@lib/seo"
 
@@ -494,12 +497,18 @@ export default async function Home({ params }: HomeProps) {
         }}
       />
 
-      <HomeClientWrapper
-        featuredProducts={featuredProducts}
-        categories={categories}
-        region={region}
-        countryCode={countryCode}
-      />
+      {/* 1. Instant Server-Rendered Hero Section (Instant LCP & zero JS delay) */}
+      <HeroV2 countryCode={countryCode} />
+
+      {/* 2. Client-Hydrated Dynamic Sections with on-brand Skeleton fallback */}
+      <Suspense fallback={<HomepageSkeleton />}>
+        <HomeClientWrapper
+          featuredProducts={featuredProducts}
+          categories={categories}
+          region={region}
+          countryCode={countryCode}
+        />
+      </Suspense>
 
 
       {/* Major Cities Delivery Section (Clean Commercial SEO Chips) */}

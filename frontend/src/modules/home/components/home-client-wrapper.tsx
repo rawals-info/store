@@ -1,7 +1,6 @@
 "use client"
 
 import { HttpTypes } from "@medusajs/types"
-import HeroV2 from "./hero-v2"
 import ProofBar from "./proof-bar"
 import Bestsellers from "./bestsellers"
 import CategoryStrip from "./category-strip"
@@ -26,9 +25,6 @@ export default function HomeClientWrapper({
 }: HomeClientWrapperProps) {
   return (
     <div className="w-full overflow-hidden bg-[#FAF8F5]">
-      {/* 1. Hero Banner */}
-      <HeroV2 countryCode={countryCode} />
-
       {/* 2. Social proof stats bar */}
       <ProofBar />
 
