@@ -24,11 +24,11 @@ export default async function StorePage({
   params,
   searchParams,
 }: {
-  params: { countryCode: string }
-  searchParams: { sortBy?: SortOptions; page?: string }
+  params: Promise<{ countryCode: string }>
+  searchParams: Promise<{ sortBy?: SortOptions; page?: string }>
 }) {
-  // Get the country code from params
-  const countryCode = params.countryCode
+  const { countryCode } = await params
+  const { sortBy, page } = await searchParams
   
   // Verify the region exists
   const region = getIndiaRegion()
@@ -36,10 +36,6 @@ export default async function StorePage({
   if (!region) {
     return notFound()
   }
-  
-  // Get sort and pagination parameters
-  const sortBy = searchParams.sortBy
-  const page = searchParams.page
   
   return (
     <StoreTemplate

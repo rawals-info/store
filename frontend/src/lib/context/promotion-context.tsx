@@ -38,7 +38,7 @@ const PromotionContext = createContext<PromotionContextType>({
 
 export function PromotionProvider({ children }: { children: React.ReactNode }) {
   const [activePromo, setActivePromo] = useState<ActivePromo | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     fetch("/api/promotions/active")
@@ -54,7 +54,6 @@ export function PromotionProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to fetch active promotion:", err)
         setActivePromo(null)
       })
-      .finally(() => setIsLoading(false))
   }, [])
 
   const calculatePrice = (rawPrice: number) => {

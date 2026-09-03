@@ -21,7 +21,7 @@ import { usePromotion } from "@lib/context/promotion-context"
 const AnimatedHeader = () => {
   const { activePromo } = usePromotion()
   const [isScrolled, setIsScrolled] = useState(false)
-  const [regions, setRegions] = useState<StoreRegion[]>([])
+  const regions = listIndiaRegions()
   const [hoveredLink, setHoveredLink] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
@@ -137,15 +137,6 @@ const AnimatedHeader = () => {
 
     window.addEventListener("scroll", updateScrollState)
     return () => window.removeEventListener("scroll", updateScrollState)
-  }, [])
-
-  // Fetch regions
-  useEffect(() => {
-    const fetchRegions = async () => {
-      const regionsData = listIndiaRegions()
-      setRegions(regionsData)
-    }
-    fetchRegions()
   }, [])
 
   // Close mobile menu when navigating

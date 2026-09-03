@@ -5,80 +5,27 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
 import Script from "next/script";
 import "styles/globals.css"
-import { Poppins, DM_Serif_Display, Inter, Playfair_Display, Cormorant_Garamond, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google"
 import PackingSweetBoxOverlay from "@components/PackingSweetBoxOverlay"
 import { PromotionProvider } from "@lib/context/promotion-context"
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  display: "swap",
-  variable: "--font-poppins",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['system-ui', 'arial']
-})
-
-const dmSerif = DM_Serif_Display({
-  subsets: ["latin"],
-  weight: "400",
-  style: "normal",
-  display: "swap",
-  variable: "--font-dm-serif",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['Georgia', 'serif']
-})
-
-const interFont = Inter({
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  display: "swap",
-  variable: "--font-inter",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['system-ui', 'arial']
-})
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-playfair",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['Georgia', 'Times New Roman', 'serif']
-})
-
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-cormorant",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['Georgia', 'serif']
+  preload: true,
+  fallback: ['Georgia', 'serif'],
 })
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-jakarta",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['system-ui', 'arial']
-})
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-  variable: "--font-jetbrains",
-  preload: false,
-  adjustFontFallback: true,
-  fallback: ['Menlo', 'Monaco', 'monospace']
+  preload: true,
+  fallback: ['system-ui', 'arial'],
 })
 
 
@@ -300,7 +247,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   const enableServiceWorker = process.env.NEXT_PUBLIC_ENABLE_SW === 'true'
   const isProd = process.env.NODE_ENV === 'production'
   return (
-    <html lang="en-IN" data-mode="light" className={`${poppins.variable} ${dmSerif.variable} ${interFont.variable} ${playfair.variable} ${cormorant.variable} ${jakarta.variable} ${jetbrains.variable}`}>
+    <html lang="en-IN" data-mode="light" className={`${cormorant.variable} ${jakarta.variable}`}>
       <head>
         <meta property="og:site_name" content="Taj Petha" />
 
