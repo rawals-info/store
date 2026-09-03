@@ -235,6 +235,7 @@ Unlike modern commercial potato chips fried in processed oils, authentic [Specia
         answer: "Raw Ash Gourd juice is celebrated in naturopathy and Ayurveda for aiding glucose metabolism, but traditional cooked petha contains added sugar."
       }
     ],
+    productHandles: ["white-petha"],
     relatedProducts: [
       {
         name: "Taj Famous White Petha",
@@ -243,6 +244,254 @@ Unlike modern commercial potato chips fried in processed oils, authentic [Specia
         description: "Firm, low moisture, minimal residual syrup",
         emoji: "🍬",
         badge: "Low Fat"
+      }
+    ]
+  },
+  {
+    id: "is-petha-eaten-in-vrat-fasting-navratri-ekadashi",
+    title: "Is Agra Petha Allowed in Fasting (Vrat)? Navratri, Shivratri & Ekadashi Fast Rules Explained",
+    excerpt: "Comprehensive guide to eating Agra Petha during Hindu fasts like Navratri, Maha Shivratri, Janmashtami, and Ekadashi. Ingredients, grain-free rules, and purity standards.",
+    quickAnswer: "Yes, 100% authentic Agra Dry White Petha is completely allowed during Hindu fasts (Vrat/Upvas) including Navratri, Shivratri, Janmashtami, and Ekadashi. Traditional petha is made strictly from Ash Gourd (Petha Kaddu / Winter Melon) and pure cane sugar, containing zero cereal grains, pulses, onion, garlic, or animal fats.",
+    content: `During sacred Hindu fasting observances such as **Chaitra & Sharad Navratri, Maha Shivratri, Nirjala & Devshayani Ekadashi, and Janmashtami**, devotees observe strict dietary codes (*Vrat Ka Khana / Falahari Ahar*).
+
+Finding authentic, pure sweet options that comply with religious purity standards can often be confusing. Among India's vast repertoire of mithai, **authentic Agra Petha is one of the purest fasting-compliant sweets**.
+
+---
+
+## The 3 Reasons Why Agra Petha is 100% Vrat-Compliant (Falahari)
+
+### 1. Pure Fruit & Vegetable Base (*Phalahar*)
+In Ayurvedic and Vedic dietary categorization, the base ingredient of petha—**Ash Gourd (*Kushmanda / Benincasa hispida*)**—is classified as a premier *Sattvic fruit vegetable*. It belongs to the gourd family and is revered in temple offerings and sacred rituals.
+
+### 2. Zero Cereal Grains, Cornstarch, or Maida
+Unlike sweets like *Soan Papdi*, *Gulab Jamun*, or commercial biscuits that contain wheat flour (*Maida*), semolina (*Suji*), or cereal starches, traditional [Taj Famous White Petha](/in/products/white-petha) contains **zero prohibited grains**.
+
+### 3. Dairy-Free & Zero Animal Gelatin
+Many commercial packaged jellies and confectionery candies use animal bone gelatin or artificial stabilizers. Authentic Agra Petha relies exclusively on natural vegetable fiber and osmotic cane sugar crystallization.
+
+---
+
+## Vrat Compatibility Across Major Indian Fasts
+
+| Fasting Occasion | Can You Eat Petha? | Recommended Petha Variant | Why Devotees Choose It |
+| :--- | :--- | :--- | :--- |
+| **Navratri (9 Days)** | **YES (100% Falahari)** | [Taj Famous White Petha](/in/products/white-petha) | Provides instant clean glucose during long fasting hours. |
+| **Maha Shivratri** | **YES** | [Kesar Angoori Petha](/in/products/kesar-angoori-petha) | Pure saffron infusion honors Lord Shiva offerings. |
+| **Ekadashi (All 24 Fasts)**| **YES (Zero Grains)** | [Taj Famous White Petha](/in/products/white-petha) | Free from rice, wheat, and pulses (*Anna Dosh*). |
+| **Janmashtami** | **YES** | [Kesar Dry Petha](/in/products/kesar-dry-petha) | Traditional sweet offered for midnight bhog. |
+| **Karwa Chauth / Teej** | **YES (Sargi & Parana)** | [Paan Petha](/in/products/pan-petha) | Digestive relief after a day of waterless fasting. |
+
+---
+
+## 3 Rules to Ensure Your Fasting Petha is 100% Pure
+1. **Avoid Industrial Counterfeits:** Cheap roadside vendors sometimes add corn syrup or artificial food coloring to speed up production. Always buy directly from reputed Agra confectioners like [Taj Petha](/in/products/white-petha).
+2. **Choose Dry or Kesar Petha for Temple Bhog:** Dry white petha and pure Kashmiri saffron petha are the purest traditional choices for deity prasad.
+3. **Store in Clean Vrat-Dedicated Containers:** Keep your fasting sweets separate from grain-based pantry items to maintain ritual sanctity.`,
+    author: "Siddharth Rawal",
+    publishDate: "2025-01-10",
+    readTime: "9 min read",
+    category: "Health & Nutrition",
+    tags: [
+      "petha in fast",
+      "can we eat petha in navratri vrat",
+      "ekadashi sweets",
+      "vrat ka khana",
+      "falahari sweets",
+      "is petha allowed in shivratri fast"
+    ],
+    targetKeywords: [
+      "can we eat petha in fast",
+      "is agra petha allowed in navratri vrat",
+      "falahari sweets agra petha",
+      "can i eat petha on ekadashi"
+    ],
+    image: "/images/blogs/vrat-fasting-petha.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "Is Agra Petha considered Falahari for Navratri?",
+        answer: "Yes. Agra Petha is made exclusively from Ash Gourd (a fruit-vegetable) and pure sugar, making it 100% Falahari and safe for Navratri fasting."
+      },
+      {
+        question: "Can we eat Petha on Ekadashi fast?",
+        answer: "Yes, because authentic petha contains zero grains, wheat, or pulses, which are strictly avoided on Ekadashi."
+      },
+      {
+        question: "Does Agra Petha contain onion, garlic, or animal fats?",
+        answer: "No. Traditional Agra Petha is 100% vegetarian, sattvic, and free of onion, garlic, gelatin, or animal derivatives."
+      }
+    ],
+    productHandles: ["white-petha", "kesar-dry-petha"],
+    relatedProducts: [
+      {
+        name: "Taj Famous White Petha",
+        handle: "white-petha",
+        price: "₹289.99",
+        description: "100% Falahari, pure ash gourd, zero grains",
+        emoji: "🪔",
+        badge: "Vrat Special"
+      },
+      {
+        name: "Kesar Dry Petha",
+        handle: "kesar-dry-petha",
+        price: "₹299.99",
+        description: "Infused with pure Kashmiri saffron for holy bhog",
+        emoji: "🍯",
+        badge: "Pure Bhog"
+      }
+    ]
+  },
+  {
+    id: "petha-for-acidity-kidney-stones-ayurvedic-remedies",
+    title: "Ash Gourd (Petha) for Acidity, Kidney Health & Natural Detox: Ayurvedic Wellness Insights",
+    excerpt: "Explore why Ash Gourd (Petha Kaddu) is revered in Ayurveda for kidney health, urinary tract detoxification, and rapid relief from acid reflux and stomach ulcers.",
+    quickAnswer: "Ash Gourd (the base vegetable of Agra Petha) is celebrated in Ayurveda as 'Kushmanda'—a potent natural alkalizer and diuretic. Its high potassium and alkaline juice neutralize stomach acid within minutes and assist the kidneys in flushing metabolic uric acid and micro-calculi.",
+    content: `In ancient Ayurvedic pharmacology (*Dravyaguna Vijnana*), few botanicals are praised as lavishly as **Kushmanda (*Benincasa hispida* / Ash Gourd / Petha Kaddu)**. Classical treatises including the *Charaka Samhita* and *Sushruta Samhita* designate it as a premier *Rasayana* (rejuvenating tonic) and *Medhya* (cognitive enhancer).
+
+While modern sweet shops focus primarily on its delightful flavor, understanding the therapeutic foundation of **Ash Gourd** reveals why traditional [Agra White Petha](/in/products/white-petha) has been consumed as an after-meal digestive for centuries.
+
+---
+
+## 1. Fast Natural Relief for Acidity & Peptic Ulcers
+- **Alkaline pH Balance:** Ash Gourd is one of the most alkaline vegetables on Earth. Its natural mineral composition rapidly neutralizes hydrochloric acid in hyperactive gastric juices.
+- **Protective Mucosal Layer:** Natural bio-mucilage coats the delicate stomach lining, providing soothing relief for heartburn, acid reflux, and chronic gastritis.
+
+---
+
+## 2. Kidney Health, Urinary Cleansing & Detoxification
+- **Natural Diuretic Action:** High potassium and bio-available water stimulate kidney filtration, increasing urinary output to flush dissolved toxins.
+- **Uric Acid & Crystal Prevention:** Regular consumption of ash gourd helps prevent the accumulation of calcium oxalate crystals, lowering the risk of urinary gravel and kidney stones.
+
+---
+
+## 3. Calming Internal Heat (*Pitta Shamak Action*)
+During scorching summer months or after consuming heavy, fiery curries, internal body heat (*Pitta dosha*) can cause skin breakouts, burning sensations, and fatigue.
+- Eating a small piece of authentic, chilled [White Petha](/in/products/white-petha) or [Kesar Angoori Petha](/in/products/kesar-angoori-petha) acts as an instant internal coolant (*Sheetala Virya*).
+
+---
+
+## How to Incorporate Petha into a Digestive Routine
+1. **Post-Meal Palate Cleanser:** Enjoy 1 piece of Dry Petha after heavy lunches to ignite digestive enzymes without sluggish dairy fats.
+2. **Ayurvedic Summer Tonic:** Pair a small cube of white petha with a glass of cool mint-infused water during hot afternoons.`,
+    author: "Dr. Vivek Sharma, Nutritionist",
+    publishDate: "2025-01-14",
+    readTime: "9 min read",
+    category: "Health & Nutrition",
+    tags: [
+      "petha for kidney health",
+      "ash gourd benefits for acidity",
+      "ayurvedic petha benefits",
+      "alkaline food petha",
+      "petha for stomach heat",
+      "kushmanda rasayana"
+    ],
+    targetKeywords: [
+      "petha for acidity and digestion",
+      "ash gourd benefits for kidney stones",
+      "is petha good for stomach ulcers",
+      "ayurvedic health benefits of agra petha"
+    ],
+    image: "/images/blogs/health-benefits-petha.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "Why does Petha help with hyperacidity and heartburn?",
+        answer: "Ash Gourd is naturally alkaline, which chemically neutralizes excess hydrochloric acid in the stomach and soothes irritated mucosal tissue."
+      },
+      {
+        question: "Is Petha good for kidney health?",
+        answer: "Yes. Ash Gourd has natural diuretic properties that assist the kidneys in flushing metabolic waste, urea, and excess salts."
+      }
+    ],
+    productHandles: ["white-petha", "kesar-angoori-petha"],
+    relatedProducts: [
+      {
+        name: "Taj Famous White Petha",
+        handle: "white-petha",
+        price: "₹289.99",
+        description: "Pure ash gourd, alkaline, cooling sweet",
+        emoji: "🍬",
+        badge: "Natural Coolant"
+      },
+      {
+        name: "Kesar Angoori Petha",
+        handle: "kesar-angoori-petha",
+        price: "₹299.99",
+        description: "Enriched with digestive Kashmiri saffron",
+        emoji: "🍯",
+        badge: "Ayurvedic Blend"
+      }
+    ]
+  },
+  {
+    id: "can-pregnant-women-eat-petha-nutrition-safety",
+    title: "Eating Agra Petha During Pregnancy: Nutritional Benefits, Safe Portions & Facts",
+    excerpt: "Is it safe to eat Agra Petha while pregnant? Discover the nutritional benefits of ash gourd, safe daily portions, nausea relief, and halwai hygiene standards.",
+    quickAnswer: "Yes, pregnant women can safely eat authentic Agra Dry White Petha in moderate portions (1 to 2 pieces a day). Ash Gourd is naturally rich in folic acid, potassium, and vitamin C, and its natural cooling properties help relieve morning sickness, hyperacidity, and pregnancy-related fluid retention.",
+    content: `During pregnancy, sudden sweet cravings are natural, but expectant mothers must be mindful of food safety, artificial preservatives, and gestational blood sugar balance.
+
+**Agra Petha is one of the safest traditional sweets during pregnancy** because authentic recipes use only fresh winter melon and pure sugar without chemical food colors, artificial emulsifiers, or heavy trans fats.
+
+---
+
+## 4 Remarkable Benefits of Petha for Expectant Mothers
+
+### 1. Relief from Morning Sickness & Nausea
+The natural sweetness and clean cardamom aroma of a small piece of chilled [White Petha](/in/products/white-petha) helps calm gastric nausea and morning sickness during the first and second trimesters.
+
+### 2. Combating Pregnancy Heartburn & Reflux
+As the growing baby places pressure on the digestive tract, acid reflux becomes a common daily complaint. Ash Gourd's alkaline juice neutralizes stomach acid naturally without synthetic antacids.
+
+### 3. Reducing Water Retention & Swelling (*Edema*)
+The potassium-rich profile of ash gourd supports healthy electrolyte balance and gentle kidney filtration, helping reduce pregnancy puffiness in the feet and hands.
+
+### 4. Zero Trans-Fats & Zero Ghee Load
+Unlike deep-fried or heavy mawa sweets that cause digestive sluggishness and excessive weight gain, petha contains less than 0.5% fat.
+
+---
+
+## Safe Consumption Guidelines for Pregnant Women
+- **Portion Control:** 1 to 2 pieces per day (approx. 30–50g) is ideal for satisfying sweet cravings.
+- **Gestational Diabetes Caution:** If you have been diagnosed with Gestational Diabetes Mellitus (GDM), consult your obstetrician before consuming any sugar-based sweets.
+- **Always Choose Certified Vacuum-Sealed Batches:** Only purchase sweets packaged under food-grade vacuum seals from verified confectioners like [Taj Petha](/in/products/white-petha) to ensure absolute microbial hygiene.`,
+    author: "Dr. Vivek Sharma, Nutritionist",
+    publishDate: "2025-01-18",
+    readTime: "8 min read",
+    category: "Health & Nutrition",
+    tags: [
+      "petha during pregnancy",
+      "can pregnant women eat petha",
+      "safe sweets in pregnancy",
+      "petha for morning sickness",
+      "ash gourd pregnancy benefits"
+    ],
+    targetKeywords: [
+      "can we eat petha in pregnancy",
+      "is agra petha safe during pregnancy",
+      "petha for nausea in pregnancy",
+      "healthy indian sweets for pregnant women"
+    ],
+    image: "/images/blogs/petha-calories-guide.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "Can I eat Agra Petha in my first trimester?",
+        answer: "Yes. In moderation (1 piece), dry petha is safe and often helps alleviate morning nausea and acidity."
+      },
+      {
+        question: "Does Agra Petha contain artificial preservatives or chemicals?",
+        answer: "Authentic Taj Petha contains only Ash Gourd, sugar, and natural spices like cardamom and saffron with zero artificial additives."
+      }
+    ],
+    productHandles: ["white-petha"],
+    relatedProducts: [
+      {
+        name: "Taj Famous White Petha",
+        handle: "white-petha",
+        price: "₹289.99",
+        description: "100% pure ash gourd, zero fat, safe and natural",
+        emoji: "🍬",
+        badge: "Pure & Safe"
       }
     ]
   }

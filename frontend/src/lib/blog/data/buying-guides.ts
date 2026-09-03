@@ -383,10 +383,6 @@ Here is a side-by-side comparative analysis of their nutritional content, shelf-
     featured: false,
     faqs: [
       {
-        question: "What is the minimum order quantity (MOQ) for corporate branded hampers?",
-        answer: "Custom branded corporate packaging starts at an MOQ of 25 boxes, with tiered volume pricing for orders above 100+ units."
-      },
-      {
         question: "Can you deliver directly to multiple employee home addresses across India?",
         answer: "Yes, simply share your address spreadsheet and our logistics team handles individual dispatch with tracking IDs."
       }
@@ -407,6 +403,407 @@ Here is a side-by-side comparative analysis of their nutritional content, shelf-
         description: "Royal saffron sweet box for VIP executive gifting",
         emoji: "👑",
         badge: "Executive"
+      }
+    ]
+  },
+  {
+    id: "original-panchhi-petha-vs-taj-petha-authenticity-guide",
+    title: "How to Identify Original Agra Petha: The Complete Authenticity & Counterfeit Guide (2025)",
+    excerpt: "Learn how to spot authentic Agra petha vs fake roadside duplicates. Proven texture tests, packaging signals, and kitchen verification secrets from Agra masters.",
+    quickAnswer: "Authentic Agra Petha is identifiable by 4 core traits: (1) Crystalline translucence that lets light pass through without opaque white chalkiness, (2) Firm yet juicy vegetable chew from pure Ash Gourd rather than rubbery cornstarch, (3) Clean single-thread cane sugar syrup with pure green cardamom seeds, and (4) Sealed tamper-proof vacuum packaging directly dispatched from verified Agra kitchens.",
+    content: `Agra is world-renowned for the Taj Mahal and its 350-year-old culinary masterpiece: **Agra Petha**. However, with over 1,500 roadside vendors and railway stalls claiming to sell "Original Panchhi" or "Famous Agra Petha", counterfeit sweets have flooded transit hubs.
+
+Low-grade copies frequently use adulterated glucose syrups, chemical bleaching agents, and unripe gourds. Here is your definitive **2025 Authenticity Verification Guide** to ensure you only taste genuine Agra craftsmanship.
+
+---
+
+## 4 Tests to Identify Genuine Agra Petha
+
+### 1. The Light Translucency Test (*Pardarsi Pariksha*)
+Hold a cube of [Taj Famous White Petha](/in/products/white-petha) against a light source.
+- **Genuine Petha:** Translucent, glass-like clarity with faint golden refraction. You can see the delicate natural plant fibers inside.
+- **Counterfeit / Fake:** Opaque milky white with a chalky coating, caused by artificial cornstarch glazes or chemical bleaching.
+
+### 2. The Texture & Bite Test (*Pulp Integrity*)
+Take a gentle bite into the sweet.
+- **Genuine Petha:** Crisp outer surface that gives way to a soft, juicy interior bursting with natural melon nectar (*melt-in-mouth texture*).
+- **Counterfeit / Fake:** Rubbery, gummy, or excessively hard, indicating old stock or improper lime blanching.
+
+### 3. The Aroma & Flavor Profile
+- **Genuine Petha:** Clean floral sweetness accompanied by freshly crushed green cardamom and kewra water.
+- **Counterfeit / Fake:** Overwhelmingly pungent synthetic vanilla/rose essences used to mask stale vegetable sourness.
+
+### 4. Direct Kitchen Dispatch vs Warehouse Stock
+Real petha has a limited ambient window once exposed to air. Always order from confectioners that prepare morning batches and seal them in **food-grade nitrogen-flushed vacuum packs** like [Taj Petha](/in/products).
+
+---
+
+## Authenticity Comparison Chart
+
+| Feature | Authentic Taj Petha (Agra Direct) | Roadside / Railway Stall Copies |
+| :--- | :--- | :--- |
+| **Vegetable Base** | 100% Mature Ash Gourd (*Petha Kaddu*) | Immature gourds or pumpkin blends |
+| **Sugar Quality** | Single-thread pure cane sugar syrup | Industrial liquid glucose / high-fructose corn syrup |
+| **Aromatics** | Pure Kashmiri saffron, green cardamom | Synthetic chemical fragrance compounds |
+| **Packaging** | Food-grade airtight vacuum barrier | Open unsealed cardboard boxes |
+| **Shelf Life** | 45–60 days natural room temperature | 7–10 days (risk of sour fermentation) |`,
+    author: "Siddharth Rawal",
+    publishDate: "2025-01-22",
+    readTime: "10 min read",
+    category: "Buying Guides",
+    tags: [
+      "how to identify original agra petha",
+      "original panchhi petha agra online",
+      "real vs fake petha",
+      "authentic petha shop in agra",
+      "taj petha agra online"
+    ],
+    targetKeywords: [
+      "how to identify real agra petha",
+      "original panchhi petha vs duplicate",
+      "where to buy authentic agra petha online",
+      "genuine agra petha price"
+    ],
+    image: "/images/blogs/authenticity-guide.webp",
+    featured: true,
+    faqs: [
+      {
+        question: "Why do so many shops in Agra have the same name?",
+        answer: "Due to lack of trademark enforcement in older eras, hundreds of unlicensed roadside stalls adopted famous brand names. Always verify registered trademark seals and official direct dispatch addresses."
+      },
+      {
+        question: "How can I tell if Petha has gone bad?",
+        answer: "Spoiled petha develops a sour fermented odor, cloudy white surface slime, or mold spots. Fresh dry petha maintains a clean crystalline sugar shell."
+      }
+    ],
+    productHandles: ["white-petha", "kesar-angoori-petha", "pan-petha"],
+    relatedProducts: [
+      {
+        name: "Taj Famous White Petha",
+        handle: "white-petha",
+        price: "₹289.99",
+        description: "100% verified authentic Mughal recipe",
+        emoji: "🏛️",
+        badge: "Certified Pure"
+      },
+      {
+        name: "Kesar Angoori Petha",
+        handle: "kesar-angoori-petha",
+        price: "₹299.99",
+        description: "Pure Kashmiri saffron infusion",
+        emoji: "🍯",
+        badge: "Royal Special"
+      }
+    ]
+  },
+  {
+    id: "authentic-paan-petha-guide-ingredients-flavors",
+    title: "The Complete Guide to Paan Petha: Gulkand Filling, Betel Spices & Royal Digestive Heritage",
+    excerpt: "Discover why Paan Gilori Petha is India’s favorite after-dinner digestive sweet. Ingredients, authentic gulkand filling, health benefits, and master folding secrets.",
+    quickAnswer: "Paan Petha is an artisanal Indian sweet crafted by rolling paper-thin candied ash gourd sheets into royal triangular giloris (resembling royal betel paan). Stuffed with sun-cured Damask rose gulkand, crushed pistachios, almonds, cardamom, and clove, it serves as a cooling post-meal digestive.",
+    content: `For centuries in North Indian royal courts, offering a freshly folded *Paan Gilori* after a banquet was the ultimate mark of hospitality (*Mehman-Nawazi*).
+
+In modern confectionery, master halwais in Agra took this regal after-dinner digestive tradition and elevated it into a global dessert sensation: **Paan Gilori Petha**.
+
+---
+
+## What Makes Authentic Paan Petha So Unique?
+Unlike common betel paan which contains areca nut (*supari*) and tobacco, **[Taj Paan Petha](/in/products/pan-petha) is a 100% wholesome, family-safe sweet**:
+- **The Outer Shell:** A pliable, paper-thin sheet of tender candied ash gourd infused with natural betel leaf extract and edible silver leaf (*Chandi Vark*).
+- **The Imperial Core Filling:** Slow-cooked sun-cured Damask rose petal preserve (*Shahi Gulkand*), crunchy California pistachios, green cardamom, fennel seeds (*Saunf*), and a single whole aromatic clove (*Laung*) securing the fold.
+
+---
+
+## 4 Digestive Benefits of Eating Paan Petha Post-Meal
+1. **Natural Acidity Relief:** Rose gulkand and fennel seeds provide immediate soothing relief against heavy, spicy meals.
+2. **Breath Freshening:** Essential oils of clove, green cardamom, and menthol naturally eliminate lingering food odors.
+3. **Digestive Enzyme Secretion:** Spices stimulate salivary and gastric enzymes for smooth post-dinner digestion.
+4. **Clean Sugar Release:** Delivers refreshing sweetness without heavy dairy fats or trans-fat oils.
+
+---
+
+## How to Serve Paan Petha at Dinners & Parties
+- **The Welcome Platter:** Serve chilled Paan Petha giloris garnished with crushed pistachios on silver trays as guests finish their main course.
+- **Pairing with High Tea:** Complements warm masala chai with an invigorating mint-rose contrast.`,
+    author: "Siddharth Rawal",
+    publishDate: "2025-01-25",
+    readTime: "9 min read",
+    category: "Buying Guides",
+    tags: [
+      "paan petha agra",
+      "paan petha ingredients",
+      "gulkand petha",
+      "paan gilori sweet",
+      "digestive sweets india",
+      "buy paan petha online"
+    ],
+    targetKeywords: [
+      "what is paan petha",
+      "paan petha ingredients and recipe",
+      "buy authentic paan petha agra online",
+      "paan gilori petha price"
+    ],
+    image: "/images/blogs/paan-petha-guide.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "Does Paan Petha contain supari, tobacco, or nicotine?",
+        answer: "No. Taj Paan Petha is 100% vegetarian and free from supari, tobacco, or artificial chemicals. It is made purely from sweet ash gourd, gulkand, and dry fruits."
+      },
+      {
+        question: "How long does Paan Petha stay fresh?",
+        answer: "Paan Petha stays fresh for 15 to 25 days. For maximum flavor, store in an airtight container and refrigerate after opening."
+      }
+    ],
+    productHandles: ["pan-petha", "kesar-angoori-petha"],
+    relatedProducts: [
+      {
+        name: "Paan Petha",
+        handle: "pan-petha",
+        price: "₹349.00",
+        description: "Stuffed with royal gulkand and digestive spices",
+        emoji: "🍃",
+        badge: "Chef's Special"
+      },
+      {
+        name: "Kesar Angoori Petha",
+        handle: "kesar-angoori-petha",
+        price: "₹299.99",
+        description: "Juicy saffron spheres soaked in royal syrup",
+        emoji: "🍯",
+        badge: "Royal Duo"
+      }
+    ]
+  },
+  {
+    id: "chocolate-petha-fusion-sweet-trend-review",
+    title: "Chocolate Petha: How Agra’s Modern Confectionery Fusion Won Over Sweet Lovers Across India",
+    excerpt: "The story behind Chocolate Petha—Agra’s most famous modern fusion sweet. Discover its taste profile, cocoa glazing process, and why kids and dessert lovers adore it.",
+    quickAnswer: "Chocolate Petha is an innovative modern Indian confection that combines a tender, juicy Agra ash gourd petha core with an outer shell of rich, velvety dark chocolate. It balances traditional fruit sweetness with deep cocoa bitterness for a modern gourmet experience.",
+    content: `For decades, purists believed that traditional Indian mithai and European chocolate confectionery belonged in two separate worlds. 
+
+Then came **Chocolate Petha**—an audacious culinary fusion pioneered in Agra that took the confectionery world by storm. Today, [Chocolate Petha](/in/products/chocolate-petha) is one of the top-selling modern gift hampers across metropolitan India.
+
+---
+
+## Anatomy of the Perfect Chocolate Petha
+Crafting authentic chocolate petha is a delicate two-stage process:
+1. **The Ash Gourd Core:** Firm, lightly sweetened white petha cubes are prepared using traditional lime soaking to preserve their juicy interior chew.
+2. **The Artisanal Chocolate Enrobing:** The petha cubes are gently enrobed in a tempered bath of premium dark cocoa glaze with notes of roasted cacao and vanilla.
+3. **The Texture Contrast:** When bitten, the crisp snap of rich chocolate gives way to an explosion of refreshing, sweet winter melon nectar.
+
+---
+
+## Why Chocolate Petha is a Hit for Modern Gifting
+- **Loved by All Generations:** Bridges the gap between elders who love traditional mithai and children who prefer modern chocolate candies.
+- **Longer Travel Resilience:** The chocolate glaze creates an additional moisture barrier, giving it exceptional 30–45 day shelf life during courier transit.
+- **Birthday & Celebration Favorite:** An impressive, unique centerpiece for corporate hampers, children's birthday parties, and festive Diwali assortments.`,
+    author: "Editorial Team – Taj Petha",
+    publishDate: "2025-01-28",
+    readTime: "8 min read",
+    category: "Buying Guides",
+    tags: [
+      "chocolate petha",
+      "chocolate petha agra",
+      "fusion indian sweets",
+      "modern mithai",
+      "chocolate petha price",
+      "buy chocolate petha online"
+    ],
+    targetKeywords: [
+      "chocolate petha agra online buy",
+      "how chocolate petha is made",
+      "chocolate petha taste and price",
+      "best fusion sweets in india"
+    ],
+    image: "/images/blogs/chocolate-petha-guide.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "What does Chocolate Petha taste like?",
+        answer: "It offers a rich bittersweet dark chocolate outer crunch followed immediately by a refreshing, juicy and sweet translucent petha center."
+      },
+      {
+        question: "Does Chocolate Petha melt during summer shipping?",
+        answer: "Taj Petha utilizes insulated thermal bubble packaging with ice gel liners during peak summer months to ensure chocolate arrives in pristine firm condition."
+      }
+    ],
+    productHandles: ["chocolate-petha", "pan-petha"],
+    relatedProducts: [
+      {
+        name: "Chocolate Petha",
+        handle: "chocolate-petha",
+        price: "₹399.99",
+        description: "Velvety dark chocolate over fresh petha core",
+        emoji: "🍫",
+        badge: "Bestseller"
+      },
+      {
+        name: "Paan Petha",
+        handle: "pan-petha",
+        price: "₹349.00",
+        description: "Refreshing gulkand filled paan rolls",
+        emoji: "🍃",
+        badge: "Party Duo"
+      }
+    ]
+  },
+  {
+    id: "kesar-angoori-petha-kashmiri-saffron-royal-treat",
+    title: "Why Kesar Angoori Petha is the Crown Jewel of Indian Sweets: Kashmiri Saffron Infusion Guide",
+    excerpt: "An insider look into Kesar Angoori Petha. The craftsmanship behind hand-rolling grape-sized petha pearls, infusing pure Kashmiri saffron, and royal serving traditions.",
+    quickAnswer: "Kesar Angoori Petha is crafted from bite-sized, spherical ash gourd pearls (resembling angoor/grapes) that are slow-simmered in pure single-thread sugar nectar steeped with grade-A Kashmiri saffron (Mongra Kesar) and green cardamom. It is the most prized sweet for royal feasts and wedding hampers.",
+    content: `Among all the exquisite confectionery creations originating from Agra, **Kesar Angoori Petha** is widely regarded as the ultimate luxury treat.
+
+Its name stems from its delicate, bite-sized spherical shape (*Angoori* meaning grape-like pearls) and its radiant golden hue infused with pure **Kashmiri Saffron (*Kesar*)**.
+
+---
+
+## The Art of Crafting Kesar Angoori Petha
+Unlike ordinary rectangular petha cubes, creating authentic Angoori petha requires master-level manual skill:
+1. **Artisanal Sphere Carving:** Fresh winter melon pulp is precision-shaped into uniform marble spheres using specialized hand tools.
+2. **Kashmiri Mongra Saffron Steeping:** Authentic *Mongra* saffron threads from Pampore, Kashmir are gently ground in warm kewra water to release their intense aromatic carotenoids and golden color.
+3. **Micro-Pore Syrup Penetration:** The spheres are slow-simmered in light single-thread nectar until every microscopic cell of the ash gourd is saturated with saffron aroma.
+
+---
+
+## 3 Reasons Kesar Angoori Petha Dominates Festive Gifting
+- **The Ultimate Burst of Nectar:** Biting into an Angoori pearl releases an immediate, refreshing burst of floral saffron sweetness.
+- **Royal Presentation:** Garnished with slivered pistachios and pure silver leaf (*Chandi Vark*), it elevates any dessert table.
+- **Chilled Dessert Experience:** Served cold straight from the refrigerator, it creates an unmatched summer cooling dessert bowl.`,
+    author: "Siddharth Rawal",
+    publishDate: "2025-02-02",
+    readTime: "8 min read",
+    category: "Buying Guides",
+    tags: [
+      "kesar angoori petha",
+      "kesar petha agra",
+      "saffron petha online",
+      "angoori petha price",
+      "royal indian sweets",
+      "kashmiri saffron sweet"
+    ],
+    targetKeywords: [
+      "kesar angoori petha price 1kg",
+      "buy kesar angoori petha online",
+      "best saffron petha in agra",
+      "juicy angoori petha delivery"
+    ],
+    image: "/images/blogs/kesar-angoori-guide.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "What is the difference between Kesar Petha and Kesar Angoori Petha?",
+        answer: "Standard Kesar Petha is cut into rectangular cubes with a drier texture, while Kesar Angoori Petha is shaped into juicy, bite-sized spherical balls soaked in aromatic saffron nectar."
+      },
+      {
+        question: "Should Kesar Angoori Petha be refrigerated?",
+        answer: "Yes. Because Angoori Petha contains aromatic syrup, refrigerating it after opening preserves its saffron fragrance and gives it a delightful chilled dessert bite."
+      }
+    ],
+    productHandles: ["kesar-angoori-petha", "kesar-dry-petha"],
+    relatedProducts: [
+      {
+        name: "Kesar Angoori Petha",
+        handle: "kesar-angoori-petha",
+        price: "₹299.99",
+        description: "Juicy saffron spheres soaked in royal nectar",
+        emoji: "🍯",
+        badge: "Royal Special"
+      },
+      {
+        name: "Kesar Dry Petha",
+        handle: "kesar-dry-petha",
+        price: "₹299.99",
+        description: "Crystalline saffron glazed petha cubes",
+        emoji: "✨",
+        badge: "Festive Favorite"
+      }
+    ]
+  },
+  {
+    id: "wedding-sweet-box-ideas-agra-petha-hampers",
+    title: "Luxury Wedding Sweet Box Ideas (2025): Traditional Agra Petha & Namkeen Hampers",
+    excerpt: "Curated wedding invitation mithai box ideas using authentic Agra sweets. Discover sweet and savory pairings, custom wooden packaging, and PAN India guest dispatch.",
+    quickAnswer: "Agra Petha & Dalmoth hampers have become the #1 modern luxury wedding invitation choice because they represent 350+ years of royal Indian heritage, offer 45–60 day transit shelf life (zero spoilage risk), and provide balanced sweet-and-savory varieties that delight all guests.",
+    content: `When planning wedding invitation hampers, engagement gift boxes, or return gifts (*Mehman Saughat*), couples face a common dilemma: **traditional dairy sweets (*Khoya/Mawa*) spoil within 48 hours and cannot survive long courier shipping**.
+
+**Taj Petha luxury wedding hampers solve this completely** with royal Mughal heritage sweets that stay pristine for 45 to 60 days.
+
+---
+
+## 3 Best-Selling Wedding Hamper Combinations
+
+### 1. The Royal Shahi Trousseau Box
+- **Contents:** 500g [Kesar Angoori Petha](/in/products/kesar-angoori-petha) + 400g [Special Agra Dalmoth](/in/products/dalmoth) in an embossed velvet gold satin box.
+- **Why Guests Love It:** The perfect harmony of saffron sweetness and spicy, crispy lentil crunch.
+
+### 2. The Modern Connoisseur Assortment
+- **Contents:** Tri-compartment wooden gift box featuring [Paan Petha](/in/products/pan-petha), [Chocolate Petha](/in/products/chocolate-petha), and [Taj Famous White Petha](/in/products/white-petha).
+- **Why Guests Love It:** Delivers three distinct colors, textures, and flavor profiles (herbal rose, rich cocoa, and crisp crystalline melon).
+
+### 3. The Grand Destination Wedding Pack
+- **Contents:** Individual vacuum-sealed 250g souvenir boxes designed for guest room welcome baskets.
+
+---
+
+## Why Wedding Planners Choose Taj Petha
+- **Zero Spoilage Guarantee:** Sealed in nitrogen-flushed vacuum packs that withstand hot summer weather and multi-day travel.
+- **Direct-to-Guest PAN India Courier:** Send your guest list spreadsheet and our logistics team handles doorstep delivery across 19,000+ PIN codes with live tracking.`,
+    author: "Editorial Team – Taj Petha",
+    publishDate: "2025-02-05",
+    readTime: "9 min read",
+    category: "Gifting & Festive",
+    tags: [
+      "wedding sweet box agra petha",
+      "mithai box for wedding invitation",
+      "luxury wedding sweet hampers",
+      "destination wedding sweets",
+      "custom wedding sweet boxes"
+    ],
+    targetKeywords: [
+      "luxury wedding sweet hampers agra petha",
+      "wedding invitation sweet box online",
+      "long shelf life sweets for wedding gift",
+      "bulk wedding sweets online delivery"
+    ],
+    image: "/images/blogs/wedding-sweet-box.webp",
+    featured: false,
+    faqs: [
+      {
+        question: "Can we get custom branded sleeves with bride and groom names?",
+        answer: "Yes, Taj Petha provides customized embossed sleeves, gold-foil monogram tags, and personalized greeting cards for wedding orders."
+      },
+      {
+        question: "How far in advance should we place bulk wedding sweet orders?",
+        answer: "We recommend placing wedding orders 7 to 10 days before your intended dispatch date to allow for custom packaging and batch preparation."
+      }
+    ],
+    productHandles: ["kesar-angoori-petha", "pan-petha", "dalmoth"],
+    relatedProducts: [
+      {
+        name: "Kesar Angoori Petha",
+        handle: "kesar-angoori-petha",
+        price: "₹299.99",
+        description: "Royal saffron sweet box for VIP wedding trays",
+        emoji: "🎁",
+        badge: "Wedding Pick"
+      },
+      {
+        name: "Paan Petha",
+        handle: "pan-petha",
+        price: "₹349.00",
+        description: "Aromatic digestive sweet for wedding banquets",
+        emoji: "🍃",
+        badge: "Royal Special"
+      },
+      {
+        name: "Special Agra Dalmoth",
+        handle: "dalmoth",
+        price: "₹479.00",
+        description: "Crunchy brown lentils, roasted cashews & sev",
+        emoji: "🥨",
+        badge: "Savory Partner"
       }
     ]
   }
