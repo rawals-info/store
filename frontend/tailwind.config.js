@@ -47,7 +47,7 @@ module.exports = {
           gold:       "#B45309",   // Harmonised gold accent
           border:     "#E8DDD0",   // Warm border color
           text:       "#2D2013",   // Primary text - warm dark
-          subtle:     "#7C6B5A",   // Muted text
+          subtle:     "#554536",   // Muted text (WCAG AAA compliant on light & warm backgrounds)
         },
         luxury: {
           gold: "#F4C110",           // Vibrant golden accent used in the new design
