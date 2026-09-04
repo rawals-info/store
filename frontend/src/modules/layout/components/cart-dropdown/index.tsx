@@ -35,6 +35,7 @@ const CartDropdown = ({
   cart?: HttpTypes.StoreCart | null
 }) => {
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
+  const [mobileCartOpen, setMobileCartOpen] = useState(false)
   const [badgeBounced, setBadgeBounced] = useState(false)
 
   // Use SWR to fetch and auto-revalidate cart
@@ -49,9 +50,20 @@ const CartDropdown = ({
     }
   )
 
-  const toggle = () => setCartDropdownOpen((prev) => !prev)
-  const open = () => setCartDropdownOpen(true)
-  const close = () => setCartDropdownOpen(false)
+  const openDesktop = () => setCartDropdownOpen(true)
+  const closeDesktop = () => setCartDropdownOpen(false)
+  
+  const toggle = () => {
+    if (typeof window !== "undefined" && window.innerWidth >= 640) {
+      setCartDropdownOpen((prev) => !prev)
+    } else {
+      setMobileCartOpen((prev) => !prev)
+    }
+  }
+  const close = () => {
+    setCartDropdownOpen(false)
+    setMobileCartOpen(false)
+  }
 
   const cart = (cartState || initialCart) as HttpTypes.StoreCart | null
 
@@ -74,7 +86,7 @@ const CartDropdown = ({
     // Only auto-open on desktop screens
     if (typeof window !== "undefined" && window.innerWidth >= 640) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      setCartDropdownOpen(true)
+      openDesktop()
     }
   }
 
@@ -82,7 +94,7 @@ const CartDropdown = ({
     if (typeof window !== "undefined" && window.innerWidth >= 640) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
       timeoutRef.current = setTimeout(() => {
-        setCartDropdownOpen(false)
+        closeDesktop()
       }, 220)
     }
   }
@@ -341,13 +353,15 @@ const CartDropdown = ({
           leaveFrom="opacity-100 translate-y-0"
           leaveTo="opacity-0 translate-y-1"
         >
-          <div className="hidden sm:block absolute right-0 top-full mt-2 w-[380px] bg-white shadow-2xl rounded-3xl border border-amber-200/80 overflow-hidden z-[90]">
-            {renderCartContent(false)}
+          <div className="hidden sm:block absolute right-0 top-[100%] pt-2 w-[380px] z-[90]">
+            <div className="bg-white shadow-2xl rounded-3xl border border-amber-200/80 overflow-hidden">
+              {renderCartContent(false)}
+            </div>
           </div>
         </Transition>
 
-        {/* Mobile Slide-Up Drawer Portal (Dialog mounted at root level, completely immune to stacking context overlaps) */}
-        <Transition appear show={cartDropdownOpen} as={Fragment}>
+        {/* Mobile Slide-Up Drawer Portal */}
+        <Transition appear show={mobileCartOpen} as={Fragment}>
           <Dialog as="div" className="relative z-[100] sm:hidden" onClose={close}>
             <Transition.Child
               as={Fragment}
