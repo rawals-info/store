@@ -9,9 +9,36 @@ import { PostStoreReviewSchema } from "./store/reviews/route"
 import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
 import { GetAdminReviewsSchema } from "./admin/reviews/route"
 import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
+import { GetAdminAbandonedCartsSchema } from "./admin/abandoned-carts/route"
+import { PostAdminAbandonedCartNotifySchema } from "./admin/abandoned-carts/notify/route"
 
 export default defineMiddlewares({
   routes: [
+    {
+      method: ["GET"],
+      matcher: "/admin/abandoned-carts",
+      middlewares: [
+        authenticate("user", ["session", "bearer"]),
+        validateAndTransformQuery(GetAdminAbandonedCartsSchema, {
+          isList: true,
+        }),
+      ],
+    },
+    {
+      method: ["GET"],
+      matcher: "/admin/abandoned-carts/:id",
+      middlewares: [
+        authenticate("user", ["session", "bearer"]),
+      ],
+    },
+    {
+      method: ["POST"],
+      matcher: "/admin/abandoned-carts/notify",
+      middlewares: [
+        authenticate("user", ["session", "bearer"]),
+        validateAndTransformBody(PostAdminAbandonedCartNotifySchema),
+      ],
+    },
     {
       method: ["POST"],
       matcher: "/store/reviews",

@@ -203,6 +203,16 @@ export async function middleware(request: NextRequest) {
       }
     }
 
+    // If URL has a cart_id parameter (from abandoned cart recovery email/link), set the cookie
+    const recoveryCartId = request.nextUrl.searchParams.get("cart_id")
+    if (recoveryCartId) {
+      response.cookies.set("_medusa_cart_id", recoveryCartId, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: "lax",
+      })
+    }
+
     // If URL already has a valid country code, just proceed with cache headers
     if (validCountries.includes(urlCountryCode)) {
       // Set cache ID cookie if not already set
@@ -233,6 +243,14 @@ export async function middleware(request: NextRequest) {
 
     // Use permanent 308 to consolidate SEO signals on country-scoped URLs
     response = NextResponse.redirect(redirectUrl, 308)
+
+    if (recoveryCartId) {
+      response.cookies.set("_medusa_cart_id", recoveryCartId, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: "lax",
+      })
+    }
 
     // Set cache ID cookie
     response.cookies.set("_medusa_cache_id", crypto.randomUUID(), {
