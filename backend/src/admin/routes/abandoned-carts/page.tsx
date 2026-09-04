@@ -860,7 +860,7 @@ const AbandonedCartsContent: React.FC = () => {
                             </label>
                             <Input
                               size="small"
-                              placeholder="Default: Did you leave something sweet behind? 🍯"
+                              placeholder="Default: Your saved items at Taj Petha"
                               value={customSubject}
                               onChange={(e) => setCustomSubject(e.target.value)}
                             />

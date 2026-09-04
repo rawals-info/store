@@ -143,17 +143,17 @@ export async function sendAbandonedCartRecoveryEmail(options: SendAbandonedCartE
 
     <div style="margin: 24px 0; padding: 14px 18px; background-color: #F8FAFC; border-radius: 8px; border-left: 3px solid #8C7355;">
       <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.5;">
-        <strong>Our Freshness Guarantee:</strong> Every box of Taj Petha is dispatched fresh directly from Agra, safely packaged to ensure crisp delicacy and exquisite flavor upon arrival.
+        <strong>Need any assistance?</strong> If you experienced any issues during checkout or have questions about fresh delivery, simply reply directly to this email and our team in Agra will be delighted to assist you.
       </p>
     </div>
 
-    ${buildSignOff("The Taj Petha Family")}
+    ${buildSignOff("Taj Petha")}
   `
 
-  const title = "Complete Your Order"
-  const subject = customSubject || `Did you leave something sweet behind? 🍯 - Taj Petha`
+  const title = "Your Saved Cart"
+  const subject = customSubject || `Your saved items at Taj Petha`
 
-  const fullHtml = buildLuxuryTemplate(title, emailBody, "Your selected delicacies are waiting")
+  const fullHtml = buildLuxuryTemplate(title, emailBody, "Order assistance & details")
 
   return await sendLuxuryEmail({
     to,
