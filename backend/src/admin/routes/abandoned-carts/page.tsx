@@ -54,6 +54,7 @@ export type AbandonedCart = {
   currency_code: string
   created_at: string
   updated_at: string
+  customer_last_active_at?: string | null
   completed_at?: string | null
   total: number
   item_count: number
@@ -359,26 +360,37 @@ const AbandonedCartsContent: React.FC = () => {
       }),
       columnHelper.accessor("updated_at", {
         header: "Abandoned",
-        cell: ({ row }) => (
-          <Tooltip content={`Last activity: ${new Date(row.original.updated_at).toLocaleString()}`}>
-            <span className="text-xs text-ui-fg-subtle flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-ui-fg-muted" />
-              {formatRelativeTime(row.original.updated_at)}
-            </span>
-          </Tooltip>
-        ),
+        cell: ({ row }) => {
+          const activityDate = row.original.customer_last_active_at || row.original.updated_at
+          return (
+            <Tooltip content={`Customer activity: ${new Date(activityDate).toLocaleString()}`}>
+              <span className="text-xs text-ui-fg-subtle flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-ui-fg-muted" />
+                {formatRelativeTime(activityDate)}
+              </span>
+            </Tooltip>
+          )
+        },
       }),
       columnHelper.accessor("notification_status", {
         header: "Status",
         cell: ({ row }) => {
           const isNotified = row.original.is_notified
-          const count = row.original.notification_count
+          const count = Number(row.original.notification_count || 0)
 
           if (isNotified) {
+            const ordinalLabel =
+              count === 1 ? "1st Sent" : count === 2 ? "2nd Sent" : count === 3 ? "3rd Sent" : `${count}th Sent`
+            const lastTime = row.original.last_notified_at
+              ? formatRelativeTime(row.original.last_notified_at)
+              : "Recently"
+
             return (
-              <StatusBadge color="green">
-                Notified {count > 1 ? `(${count}x)` : ""}
-              </StatusBadge>
+              <Tooltip content={`Sent ${count} reminder${count > 1 ? "s" : ""} • Last sent: ${lastTime}`}>
+                <StatusBadge color="green">
+                  {ordinalLabel}
+                </StatusBadge>
+              </Tooltip>
             )
           }
 
@@ -394,6 +406,7 @@ const AbandonedCartsContent: React.FC = () => {
         cell: ({ row }) => {
           const cart = row.original
           const hasEmail = Boolean(cart.email)
+          const count = Number(cart.notification_count || 0)
 
           return (
             <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
@@ -425,7 +438,7 @@ const AbandonedCartsContent: React.FC = () => {
                       }}
                     >
                       <Envelope className="h-3.5 w-3.5" />
-                      Send recovery email
+                      Send recovery email {count > 0 ? `(#${count + 1})` : ""}
                     </DropdownMenu.Item>
                   )}
                   <DropdownMenu.Item
@@ -694,7 +707,13 @@ const AbandonedCartsContent: React.FC = () => {
                         </div>
                         {c.is_notified ? (
                           <StatusBadge color="green">
-                            Notified ({c.notification_count}x)
+                            {c.notification_count === 1
+                              ? "1st Sent"
+                              : c.notification_count === 2
+                              ? "2nd Sent"
+                              : c.notification_count === 3
+                              ? "3rd Sent"
+                              : `${c.notification_count}th Sent`}
                           </StatusBadge>
                         ) : hasEmail ? (
                           <StatusBadge color="blue">Ready to Notify</StatusBadge>
@@ -841,8 +860,20 @@ const AbandonedCartsContent: React.FC = () => {
                       {hasEmail && (
                         <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle p-4 space-y-3">
                           <Text className="text-xs font-medium text-ui-fg-muted uppercase tracking-wider">
-                            Send Custom Recovery Email
+                            Send Recovery Email
                           </Text>
+                          <div className="flex items-center justify-between text-xs text-ui-fg-muted mb-1">
+                            <span>
+                              {c.notification_count > 0
+                                ? `Already notified ${c.notification_count} time${c.notification_count > 1 ? "s" : ""}`
+                                : "No recovery emails sent yet"}
+                            </span>
+                            {c.notification_count > 0 && (
+                              <span className="font-semibold text-ui-fg-subtle">
+                                Next: Reminder #{c.notification_count + 1}
+                              </span>
+                            )}
+                          </div>
                           <div>
                             <label className="text-xs text-ui-fg-subtle block mb-1">
                               Promotional Discount Code (Optional)
@@ -890,7 +921,11 @@ const AbandonedCartsContent: React.FC = () => {
                             }}
                           >
                             <Envelope className="h-4 w-4 mr-1.5" />
-                            {isSendingIndividual ? "Sending Email..." : "Send Recovery Email Now"}
+                            {isSendingIndividual
+                              ? "Sending Email..."
+                              : c.notification_count > 0
+                              ? `Send Reminder #${c.notification_count + 1}`
+                              : "Send Recovery Email Now"}
                           </Button>
                         </div>
                       )}
@@ -899,27 +934,32 @@ const AbandonedCartsContent: React.FC = () => {
                       {c.notification_history && c.notification_history.length > 0 && (
                         <div className="space-y-2">
                           <Text className="text-xs font-medium text-ui-fg-muted uppercase tracking-wider">
-                            Notification History
+                            Notification History ({c.notification_history.length})
                           </Text>
                           <div className="space-y-2">
-                            {c.notification_history.map((h: any, idx: number) => (
-                              <div
-                                key={idx}
-                                className="flex items-start gap-2.5 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3 text-xs"
-                              >
-                                <CheckCircle className="h-4 w-4 text-ui-tag-green-icon mt-0.5 flex-shrink-0" />
-                                <div>
-                                  <p className="font-medium text-ui-fg-base">
-                                    Sent to {h.recipient || c.email}
-                                  </p>
-                                  <p className="text-ui-fg-muted mt-0.5">
-                                    {new Date(h.sent_at).toLocaleString()}
-                                    {h.discount_code ? ` • Code: ${h.discount_code}` : ""}
-                                    {h.automated ? " • (Automated Cron)" : " • (Admin Manual)"}
-                                  </p>
+                            {c.notification_history.map((h: any, idx: number) => {
+                              const attempt = h.attempt_number || (idx + 1)
+                              const ordinal =
+                                attempt === 1 ? "1st" : attempt === 2 ? "2nd" : attempt === 3 ? "3rd" : `${attempt}th`
+                              return (
+                                <div
+                                  key={idx}
+                                  className="flex items-start gap-2.5 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3 text-xs"
+                                >
+                                  <CheckCircle className="h-4 w-4 text-ui-tag-green-icon mt-0.5 flex-shrink-0" />
+                                  <div>
+                                    <p className="font-medium text-ui-fg-base">
+                                      {ordinal} Reminder &bull; Sent to {h.recipient || c.email}
+                                    </p>
+                                    <p className="text-ui-fg-muted mt-0.5">
+                                      {new Date(h.sent_at).toLocaleString()}
+                                      {h.discount_code ? ` • Code: ${h.discount_code}` : ""}
+                                      {h.automated ? " • (Automated Cron)" : " • (Admin Manual)"}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              )
+                            })}
                           </div>
                         </div>
                       )}

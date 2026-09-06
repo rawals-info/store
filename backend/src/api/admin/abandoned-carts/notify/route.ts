@@ -134,13 +134,21 @@ export const POST = async (
         ? cart.metadata.abandoned_notifications
         : []
 
+      // Preserve the real customer activity timestamp before updating the cart
+      const customerLastActive =
+        cart.metadata?.customer_last_active_at ||
+        cart.updated_at ||
+        cart.created_at
+
       const updatedHistory = [
         ...existingHistory,
         {
+          attempt_number: currentCount + 1,
           sent_at: nowIso,
           recipient: cart.email,
-          subject: custom_subject || "Did you leave something sweet behind? 🍯 - Taj Petha",
+          subject: custom_subject || "Your saved items at Taj Petha",
           discount_code: discount_code || null,
+          automated: false,
           success: true,
         },
       ]
@@ -148,6 +156,7 @@ export const POST = async (
       await cartModuleService.updateCarts(cart.id, {
         metadata: {
           ...(cart.metadata || {}),
+          customer_last_active_at: customerLastActive,
           abandoned_notified_at: nowIso,
           abandoned_notification_count: currentCount + 1,
           abandoned_notifications: updatedHistory,

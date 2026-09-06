@@ -44,11 +44,9 @@ export const GET = async (
   cutoffDate.setHours(cutoffDate.getHours() - (hours_ago || 1))
 
   // Base filters for query.graph
+  // Fetch uncompleted carts; inactivity filtering is handled with customer activity awareness
   const filters: Record<string, any> = {
     completed_at: null,
-    updated_at: {
-      $lt: cutoffDate,
-    },
   }
 
   // Handle has_email filter
@@ -99,10 +97,32 @@ export const GET = async (
     },
   })
 
-  // Filter only carts that have at least 1 line item
-  let validAbandonedCarts = (rawCarts || []).filter(
-    (cart: any) => Array.isArray(cart.items) && cart.items.length > 0
-  )
+  // Filter only carts that have at least 1 line item and meet abandonment threshold
+  let validAbandonedCarts = (rawCarts || []).filter((cart: any) => {
+    if (!Array.isArray(cart.items) || cart.items.length === 0) {
+      return false
+    }
+
+    const notifiedAt = cart.metadata?.abandoned_notified_at
+    const notificationCount = Number(cart.metadata?.abandoned_notification_count || 0)
+    const isNotified = Boolean(notifiedAt || notificationCount > 0)
+
+    // Preserve the customer's actual shopping activity timestamp
+    // (Admin notification updates cart.updated_at, which should not reset abandonment status)
+    const customerLastActiveAt =
+      cart.metadata?.customer_last_active_at ||
+      (isNotified ? cart.created_at : cart.updated_at)
+
+    const customerActivityDate = new Date(customerLastActiveAt)
+
+    // If the cart has already been notified, it is a confirmed abandoned cart and remains visible
+    if (isNotified) {
+      return true
+    }
+
+    // For un-notified carts, must exceed the inactivity threshold
+    return customerActivityDate < cutoffDate
+  })
 
   // Apply search query filter if provided
   if (q && q.trim().length > 0) {
@@ -142,6 +162,10 @@ export const GET = async (
     const notificationCount = Number(cart.metadata?.abandoned_notification_count || 0)
     const isNotified = Boolean(notifiedAt || notificationCount > 0)
 
+    const customerLastActiveAt =
+      cart.metadata?.customer_last_active_at ||
+      (isNotified ? cart.created_at : cart.updated_at)
+
     const customerName =
       cart.customer?.first_name || cart.shipping_address?.first_name
         ? `${cart.customer?.first_name || cart.shipping_address?.first_name || ""} ${cart.customer?.last_name || cart.shipping_address?.last_name || ""}`.trim()
@@ -149,6 +173,7 @@ export const GET = async (
 
     return {
       ...cart,
+      customer_last_active_at: customerLastActiveAt,
       total,
       item_count: itemCount,
       customer_name: customerName,
@@ -157,6 +182,11 @@ export const GET = async (
       last_notified_at: notifiedAt || null,
       notification_count: notificationCount,
     }
+  })
+
+  // Sort by customer activity date descending
+  enrichedCarts.sort((a: any, b: any) => {
+    return new Date(b.customer_last_active_at).getTime() - new Date(a.customer_last_active_at).getTime()
   })
 
   // Apply notification status filter if requested
