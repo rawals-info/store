@@ -125,18 +125,15 @@ export default async function CityPage({ params }: CityPageProps) {
         const rawAmount = Number(prod.variants?.[0]?.calculated_price?.calculated_amount || (prod.variants?.[0] as any)?.prices?.[0]?.amount || 0)
         const hasPromo = Boolean(activePromo && activePromo.discountPercent > 0 && rawAmount > 0)
         const discounted = hasPromo ? Math.round(rawAmount * (1 - activePromo!.discountPercent / 100) * 100) / 100 : rawAmount
+        const productUrl = `https://tajpetha.in/${countryCode}/products/${prod.handle}`
+        const productImg = prod.thumbnail || "https://tajpetha.in/hero_image.webp"
 
-        return {
+        const offerDetails = {
           "@type": "Offer",
-          "itemOffered": {
-            "@type": "Product",
-            "name": prod.title,
-            "description": prod.description || `Fresh Agra ${prod.title} delivered to ${city.name}`,
-            "url": `https://tajpetha.in/${countryCode}/products/${prod.handle}`
-          },
           "price": discounted > 0 ? discounted.toFixed(2) : "0.00",
           "priceCurrency": "INR",
           "availability": "https://schema.org/InStock",
+          "url": productUrl,
           ...(hasPromo ? { "description": `Save ${activePromo!.discountPercent}% with code ${activePromo!.code}` } : {}),
           "priceSpecification": hasPromo
             ? [
@@ -159,6 +156,18 @@ export default async function CityPage({ params }: CityPageProps) {
               "price": rawAmount.toFixed(2),
               "priceCurrency": "INR"
             }
+        }
+
+        return {
+          ...offerDetails,
+          "itemOffered": {
+            "@type": "Product",
+            "name": prod.title,
+            "description": prod.description || `Fresh Agra ${prod.title} delivered to ${city.name}`,
+            "image": productImg,
+            "url": productUrl,
+            "offers": offerDetails
+          }
         }
       })
     }

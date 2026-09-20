@@ -99,7 +99,7 @@ const productListSchema = {
     "@type": "ItemList",
     "name": "Buy Petha Online - Taj Petha Collection",
     "description": "Authentic Agra petha varieties available to buy online with same-day dispatch",
-    "numberOfItems": 6,
+    "numberOfItems": 5,
     "itemListElement": [
         {
             "@type": "ListItem",
@@ -108,7 +108,15 @@ const productListSchema = {
                 "@type": "Product",
                 "name": "Dry Petha",
                 "description": "Classic Agra dry petha - firm, sweet, 45-60 days shelf life",
-                "url": "https://tajpetha.in/in/products/dry-petha"
+                "image": "https://tajpetha.in/hero_image.webp",
+                "url": "https://tajpetha.in/in/products/dry-petha",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "180.00",
+                    "priceCurrency": "INR",
+                    "availability": "https://schema.org/InStock",
+                    "url": "https://tajpetha.in/in/products/dry-petha"
+                }
             }
         },
         {
@@ -118,7 +126,15 @@ const productListSchema = {
                 "@type": "Product",
                 "name": "Kesar Petha",
                 "description": "Premium saffron-infused petha for gifting and festivals",
-                "url": "https://tajpetha.in/in/products/kesar-petha"
+                "image": "https://tajpetha.in/hero_image.webp",
+                "url": "https://tajpetha.in/in/products/kesar-petha",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "280.00",
+                    "priceCurrency": "INR",
+                    "availability": "https://schema.org/InStock",
+                    "url": "https://tajpetha.in/in/products/kesar-petha"
+                }
             }
         },
         {
@@ -126,9 +142,53 @@ const productListSchema = {
             "position": 3,
             "item": {
                 "@type": "Product",
+                "name": "Paan Petha",
+                "description": "Refreshing betel leaf flavor, unique taste",
+                "image": "https://tajpetha.in/hero_image.webp",
+                "url": "https://tajpetha.in/in/products/paan-petha",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "220.00",
+                    "priceCurrency": "INR",
+                    "availability": "https://schema.org/InStock",
+                    "url": "https://tajpetha.in/in/products/paan-petha"
+                }
+            }
+        },
+        {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+                "@type": "Product",
                 "name": "Chocolate Petha",
                 "description": "Modern fusion petha with chocolate coating - kid favorite",
-                "url": "https://tajpetha.in/in/products/chocolate-petha"
+                "image": "https://tajpetha.in/hero_image.webp",
+                "url": "https://tajpetha.in/in/products/chocolate-petha",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "250.00",
+                    "priceCurrency": "INR",
+                    "availability": "https://schema.org/InStock",
+                    "url": "https://tajpetha.in/in/products/chocolate-petha"
+                }
+            }
+        },
+        {
+            "@type": "ListItem",
+            "position": 5,
+            "item": {
+                "@type": "Product",
+                "name": "Angoori Petha",
+                "description": "Bite-sized, juicy, extra sweet Agra petha",
+                "image": "https://tajpetha.in/hero_image.webp",
+                "url": "https://tajpetha.in/in/products/angoori-petha",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "200.00",
+                    "priceCurrency": "INR",
+                    "availability": "https://schema.org/InStock",
+                    "url": "https://tajpetha.in/in/products/angoori-petha"
+                }
             }
         }
     ]
