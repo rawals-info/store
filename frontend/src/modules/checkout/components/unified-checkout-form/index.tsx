@@ -330,9 +330,16 @@ export default function UnifiedCheckoutForm({
           }
         }
 
+        const origin = typeof window !== "undefined" ? window.location.origin : ""
+        const countryCode = cartUpdated?.shipping_address?.country_code?.toLowerCase() || "in"
+        const callbackUrl = origin
+          ? `${origin}/api/payment/razorpay-callback?cart_id=${cartUpdated.id}&country_code=${countryCode}`
+          : undefined
+
         const options: RazorpayOrderOptions = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID || "",
-          callback_url: `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/razorpay/hooks`,
+          callback_url: callbackUrl,
+          redirect: true,
           amount: paymentSession?.amount || Math.round((currentNetItemsTotal + (isFreeShippingUnlocked ? 0 : 89)) * 100),
           order_id: razorpayOrderId,
           currency: "INR",
