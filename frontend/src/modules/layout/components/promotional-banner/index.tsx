@@ -18,7 +18,7 @@ export default function PromotionalBanner() {
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const [copied, setCopied] = useState(false)
   const [activeMobileIndex, setActiveMobileIndex] = useState(0)
-  const { activePromo } = usePromotion()
+  const { activePromo, threshold } = usePromotion()
 
   // Dynamic promotion from Medusa backend (NO hardcoding)
   const promoCode = activePromo?.code || null
@@ -61,7 +61,7 @@ export default function PromotionalBanner() {
       {
         id: "shipping",
         icon: <Truck className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />,
-        text: "Free Express Shipping on Orders Above ₹500",
+        text: `Free Express Shipping on Orders Above ₹${threshold}`,
       },
     ]
 
@@ -69,7 +69,7 @@ export default function PromotionalBanner() {
       items.push({
         id: "promo",
         icon: <Sparkles className="w-3.5 h-3.5 text-amber-300 flex-shrink-0 animate-pulse" />,
-        text: `Use code ${promoCode} for ${promoDiscount}% OFF your order`,
+        text: `Use code ${promoCode} for ${promoDiscount}% OFF orders ₹${threshold}+`,
         code: promoCode,
         discount: promoDiscount,
       })
@@ -94,7 +94,7 @@ export default function PromotionalBanner() {
     )
 
     return items
-  }, [promoCode, promoDiscount])
+  }, [promoCode, promoDiscount, threshold])
 
   // Mobile cycling highlights
   const mobileHighlights = useMemo(() => {
@@ -119,7 +119,7 @@ export default function PromotionalBanner() {
         icon: <Truck className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />,
         content: (
           <span className="font-jakarta text-[11px] font-medium text-white">
-            <strong className="text-amber-200 font-bold">Free Express Shipping</strong> on ₹500+
+            <strong className="text-amber-200 font-bold">Free Express Shipping</strong> on ₹{threshold}+
           </span>
         ),
       },
@@ -131,7 +131,7 @@ export default function PromotionalBanner() {
         icon: <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse flex-shrink-0" />,
         content: (
           <div className="flex items-center gap-1 font-jakarta text-[11px] font-medium text-white">
-            <span>{promoDiscount}% OFF</span>
+            <span>{promoDiscount}% OFF on ₹{threshold}+</span>
             <button
               onClick={handleCopyCode}
               className="inline-flex items-center gap-1 bg-amber-400/25 hover:bg-amber-400/40 active:scale-95 border border-amber-300/40 text-amber-100 font-mono font-bold px-1.5 py-0.5 rounded text-[10.5px] transition-all cursor-pointer shadow-sm ml-1"

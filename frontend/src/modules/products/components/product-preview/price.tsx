@@ -10,30 +10,31 @@ export default function PreviewPrice({
 }: {
   price: CalculatedVariant
 }) {
-  const { calculatePrice } = usePromotion()
+  const { threshold, calculatePotentialDiscount } = usePromotion()
 
   if (!price || !price.calculated_price || price.calculated_price_number === 0) {
     return null
   }
 
   const rawNum = price.calculated_price_number || 0
-  const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawNum)
+  const { discountPercent } = calculatePotentialDiscount(rawNum)
 
   return (
     <div className="flex flex-col items-start">
-      <span className="font-mono font-bold text-sm sm:text-base text-slate-900 leading-tight">
-        ₹{formatIndianPrice(discountedPrice)}
-      </span>
-      {isDiscounted && (
-        <div className="flex items-center gap-1 mt-0.5">
-          <span className="font-mono text-[10px] sm:text-xs text-slate-400 line-through">
-            ₹{formatIndianPrice(rawNum)}
+      <div className="flex items-baseline gap-1.5 flex-wrap">
+        <span className="font-mono font-bold text-sm sm:text-base text-slate-900 leading-tight">
+          ₹{formatIndianPrice(rawNum)}
+        </span>
+        {discountPercent > 0 ? (
+          <span className="text-[9px] font-bold text-amber-800 bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded font-jakarta tracking-tight">
+            {discountPercent}% OFF on ₹{threshold}+
           </span>
-          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-jakarta">
-            {discountPercent}% OFF
+        ) : (
+          <span className="text-[9px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded font-jakarta tracking-tight">
+            FREE Delivery on ₹{threshold}+
           </span>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

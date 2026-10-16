@@ -27,16 +27,19 @@ const CartClientWrapper = ({
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [addingUpsell, setAddingUpsell] = useState<Record<string, boolean>>({})
   const [upsellProducts, setUpsellProducts] = useState<any[]>([])
-  const { activePromo, calculatePrice } = usePromotion()
+  const { activePromo, threshold, isThresholdMet, getRemainingAmount, calculatePrice } = usePromotion()
   const autoAppliedRef = useRef(false)
   const router = useRouter()
 
-  // Auto-apply active coupon (e.g. TAJ10) if cart has items and no promo applied
+  // Auto-apply active coupon ONLY if cart subtotal meets dynamic threshold and an active code exists
   useEffect(() => {
     if (autoAppliedRef.current) return
-    const promoCodeToApply = activePromo?.code || "TAJ10"
+    const promoCodeToApply = activePromo?.code
+    if (!promoCodeToApply) return
 
-    if (cart && cart.items && cart.items.length > 0 && (!cart.promotions || cart.promotions.length === 0)) {
+    const subtotal = (cart?.item_subtotal ?? ((cart?.subtotal ?? 0) - (cart?.shipping_subtotal ?? 0)))
+
+    if (isThresholdMet(subtotal) && cart && cart.items && cart.items.length > 0 && (!cart.promotions || cart.promotions.length === 0)) {
       autoAppliedRef.current = true
       fetch("/api/cart/coupon", {
         method: "POST",
@@ -54,7 +57,7 @@ const CartClientWrapper = ({
         })
         .catch((err) => console.log("[Auto-Coupon] Handled:", err))
     }
-  }, [cart?.items?.length, activePromo?.code, cart?.promotions?.length])
+  }, [cart?.items?.length, activePromo?.code, cart?.promotions?.length, isThresholdMet, cart?.item_subtotal, cart?.subtotal, cart?.shipping_subtotal])
 
   // Fetch dynamic pairing products pool from backend
   useEffect(() => {
@@ -112,9 +115,10 @@ const CartClientWrapper = ({
   const itemsSubtotal = (cart?.item_subtotal ?? ((cart?.subtotal ?? 0) - (cart?.shipping_subtotal ?? 0)))
   const discountTotal = cart?.discount_total ?? 0
   const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
-  const freeShippingThreshold = 500
-  const isFreeShipping = netItemsTotal >= freeShippingThreshold
-  const neededForFreeShipping = Math.max(0, freeShippingThreshold - Math.round(netItemsTotal))
+  const isUnlocked = isThresholdMet(itemsSubtotal)
+  const needed = getRemainingAmount(itemsSubtotal)
+  const hasPromo = Boolean(activePromo && activePromo.discountPercent > 0)
+  const promoDiscountPercent = activePromo?.discountPercent || 0
 
   const handleAddUpsell = async (item: any) => {
     if (!item?.variantId) return
@@ -216,21 +220,21 @@ const CartClientWrapper = ({
               {/* Right: Summary & Free Shipping Progress */}
               <div className="space-y-6">
                 <div className="bg-white rounded-3xl border border-amber-200/60 shadow-xs p-5 sm:p-6 space-y-6">
-                  {/* Free Shipping Meter */}
+                  {/* Dual Incentive Meter (Discount + Free Delivery) */}
                   <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/60 text-xs font-jakarta">
-                    {isFreeShipping ? (
+                    {isUnlocked ? (
                       <div className="flex items-center gap-2 text-emerald-700 font-bold">
-                        <span className="text-base">🎉</span> You have unlocked FREE Shipping!
+                        <span className="text-base">🎉</span> You unlocked {hasPromo ? `${promoDiscountPercent}% OFF + ` : ""}FREE Delivery!
                       </div>
                     ) : (
                       <div>
                         <p className="text-slate-700 font-semibold mb-1.5">
-                          Add <span className="font-bold text-petha-amber">₹{neededForFreeShipping}</span> more for <span className="font-bold text-emerald-700">FREE Shipping</span>
+                          Add <span className="font-bold text-petha-amber">₹{needed}</span> more to unlock <span className="font-bold text-emerald-700">{hasPromo ? `${promoDiscountPercent}% OFF + ` : ""}FREE Delivery</span>
                         </p>
                         <div className="w-full h-2 rounded-full bg-amber-200/60 overflow-hidden">
                           <div 
                             className="h-full bg-petha-amber rounded-full transition-all duration-500" 
-                            style={{ width: `${Math.min(100, (netItemsTotal / 500) * 100)}%` }} 
+                            style={{ width: `${Math.min(100, (itemsSubtotal / threshold) * 100)}%` }} 
                           />
                         </div>
                       </div>
@@ -288,7 +292,7 @@ const CartClientWrapper = ({
                             {prod.title}
                           </h4>
                           {(() => {
-                            const prodPromo = calculatePrice(prod.price)
+                            const prodPromo = calculatePrice(prod.price, isUnlocked)
                             return (
                               <div className="flex items-center gap-1.5 mt-0.5">
                                 <span className="font-mono text-sm font-bold text-slate-900">

@@ -10,6 +10,7 @@ import DeleteButton from "@modules/common/components/delete-button"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
+import { usePromotion } from "@lib/context/promotion-context"
 import useSWR from "swr"
 
 // Simple fetcher for SWR
@@ -37,6 +38,7 @@ const CartDropdown = ({
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
   const [mobileCartOpen, setMobileCartOpen] = useState(false)
   const [badgeBounced, setBadgeBounced] = useState(false)
+  const { activePromo, threshold, isThresholdMet, getRemainingAmount } = usePromotion()
 
   // Use SWR to fetch and auto-revalidate cart
   const { data: cartState, mutate } = (useSWR as any)(
@@ -75,9 +77,10 @@ const CartDropdown = ({
   const itemsSubtotal = (cart?.item_subtotal ?? (cart?.subtotal ?? 0))
   const discountTotal = cart?.discount_total ?? 0
   const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
-  const freeShippingThreshold = 500
-  const isFreeShipping = netItemsTotal >= freeShippingThreshold
-  const neededForFreeShipping = Math.max(0, freeShippingThreshold - Math.round(netItemsTotal))
+  const isUnlocked = isThresholdMet(itemsSubtotal)
+  const needed = getRemainingAmount(itemsSubtotal)
+  const hasPromo = Boolean(activePromo && activePromo.discountPercent > 0)
+  const promoDiscountPercent = activePromo?.discountPercent || 0
 
   const pathname = usePathname() ?? ""
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -156,21 +159,21 @@ const CartDropdown = ({
         </div>
       </div>
 
-      {/* Free Delivery Progress Bar */}
+      {/* Free Delivery & Discount Progress Bar */}
       <div className="px-4 sm:px-5 py-2.5 bg-[#FFFDF9] border-b border-amber-100/60 text-xs font-jakarta flex-shrink-0">
-        {isFreeShipping ? (
+        {isUnlocked ? (
           <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
-            <span>🎉</span> You unlocked FREE Air Express Delivery!
+            <span>🎉</span> You unlocked {hasPromo ? `${promoDiscountPercent}% OFF + ` : ""}FREE Air Express Delivery!
           </div>
         ) : (
           <div>
             <p className="text-slate-600 mb-1">
-              Add <strong className="text-petha-amber">₹{neededForFreeShipping}</strong> more for <strong className="text-emerald-700">FREE Delivery</strong>
+              Add <strong className="text-petha-amber">₹{needed}</strong> more to unlock <strong className="text-emerald-700">{hasPromo ? `${promoDiscountPercent}% OFF + ` : ""}FREE Delivery</strong>
             </p>
             <div className="w-full h-1.5 rounded-full bg-amber-100 overflow-hidden">
               <div
                 className="h-full bg-petha-amber rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(100, (netItemsTotal / 500) * 100)}%` }}
+                style={{ width: `${Math.min(100, (itemsSubtotal / threshold) * 100)}%` }}
               />
             </div>
           </div>

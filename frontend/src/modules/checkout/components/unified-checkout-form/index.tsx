@@ -16,6 +16,7 @@ import Image from "next/image"
 import { MapPin, CreditCard, Check, ArrowRight, ShieldCheck, Lock, Sparkles, Truck, Phone, Mail, User, Building, QrCode, Zap, AlertCircle } from "lucide-react"
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay"
 import AddressAutocomplete from "@modules/common/components/address-autocomplete"
+import { usePromotion } from "@lib/context/promotion-context"
 
 interface UnifiedCheckoutFormProps {
   cart: HttpTypes.StoreCart
@@ -36,6 +37,7 @@ export default function UnifiedCheckoutForm({
   const [isPinLoading, setIsPinLoading] = useState(false)
   const [searchAddress, setSearchAddress] = useState(cart?.shipping_address?.address_1 || "")
   const [error, setError] = useState<string | null>(null)
+  const { threshold, isThresholdMet } = usePromotion()
 
   // Customer Name State (Unified Full Name)
   const initialFullName = [
@@ -97,13 +99,13 @@ export default function UnifiedCheckoutForm({
   const currentItemsSubtotal = (cartUpdated?.item_subtotal ?? (cartUpdated?.subtotal ?? 0))
   const currentDiscount = cartUpdated?.discount_total || 0
   const currentNetItemsTotal = Math.max(0, currentItemsSubtotal - currentDiscount)
-  const isFreeShippingUnlocked = currentNetItemsTotal >= 500
+  const isFreeShippingUnlocked = isThresholdMet(currentItemsSubtotal)
 
   // Live shipping calculation
   const handleShippingMethodChange = (methodId: string) => {
     setSelectedShippingMethod(methodId)
     const activeShippingOption = shippingMethods?.find((m: any) => m.id === methodId)
-    const defaultRate = Number(activeShippingOption?.amount ?? 89)
+    const defaultRate = Number(activeShippingOption?.amount ?? 59)
     const shippingAmount = isFreeShippingUnlocked ? 0 : defaultRate
     const netTotal = currentNetItemsTotal + shippingAmount
 

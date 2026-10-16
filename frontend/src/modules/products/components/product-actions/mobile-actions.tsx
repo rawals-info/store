@@ -38,7 +38,6 @@ const MobileActions: React.FC<MobileActionsProps> = ({
 }) => {
   const { state, open, close } = useToggleState()
   const [quantity, setQuantity] = useState(1)
-  const { calculatePrice } = usePromotion()
 
   const incrementQuantity = () => {
     if (quantity < 10) {
@@ -67,7 +66,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   }, [price])
 
   const rawNum = selectedPrice?.calculated_price_number || 0
-  const { discountedPrice, isDiscounted } = calculatePrice(rawNum)
+  const { activePromo, threshold } = usePromotion()
 
   const isSimple = isSimpleProduct(product)
 
@@ -98,10 +97,14 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 {product.title}
               </span>
               <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-slate-900">
-                <span>₹{formatIndianPrice(discountedPrice)}</span>
-                {isDiscounted && (
-                  <span className="line-through text-xs text-slate-400 font-normal">
-                    ₹{formatIndianPrice(rawNum)}
+                <span>₹{formatIndianPrice(rawNum)}</span>
+                {activePromo && activePromo.discountPercent > 0 ? (
+                  <span className="font-jakarta text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200/80 px-1 py-0.2 rounded">
+                    {activePromo.discountPercent}% OFF on ₹{threshold}+
+                  </span>
+                ) : (
+                  <span className="font-jakarta text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1 py-0.2 rounded">
+                    FREE Delivery on ₹{threshold}+
                   </span>
                 )}
               </div>

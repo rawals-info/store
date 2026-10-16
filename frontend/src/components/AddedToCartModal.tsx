@@ -41,7 +41,7 @@ export default function AddedToCartModal({
   const [addingUpsell, setAddingUpsell] = useState<Record<string, boolean>>({})
   const [addedUpsell, setAddedUpsell] = useState<Record<string, boolean>>({})
   const [extraSubtotal, setExtraSubtotal] = useState(0)
-  const { calculatePrice } = usePromotion()
+  const { activePromo, threshold, isThresholdMet, getRemainingAmount, calculatePrice } = usePromotion()
 
   useEffect(() => {
     setMounted(true)
@@ -114,8 +114,10 @@ export default function AddedToCartModal({
   if (!mounted) return null
 
   const currentSubtotal = extraSubtotal || item?.subtotal || (item ? item.price * item.quantity : 0)
-  const freeShippingThreshold = 500
-  const neededForFreeShipping = Math.max(0, freeShippingThreshold - currentSubtotal)
+  const isUnlocked = isThresholdMet(currentSubtotal)
+  const needed = getRemainingAmount(currentSubtotal)
+  const hasPromo = Boolean(activePromo && activePromo.discountPercent > 0)
+  const promoDiscountPercent = activePromo?.discountPercent || 0
 
   return createPortal(
     <AnimatePresence>
@@ -197,7 +199,7 @@ export default function AddedToCartModal({
                       </p>
                       {(() => {
                         const itemRaw = item.price * item.quantity
-                        const itemPromo = calculatePrice(itemRaw)
+                        const itemPromo = calculatePrice(itemRaw, isUnlocked)
                         return (
                           <div className="flex items-center gap-2 mt-0.5">
                             <span className="font-mono text-sm sm:text-base font-bold text-slate-900">
@@ -219,15 +221,15 @@ export default function AddedToCartModal({
                     </div>
                   </div>
 
-                  {/* Free Delivery Bar */}
+                  {/* Dual Incentive Progress Bar */}
                   <div className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-100 text-xs font-jakarta">
-                    {neededForFreeShipping === 0 ? (
+                    {isUnlocked ? (
                       <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
-                        <span>🎉</span> You qualify for FREE Nationwide Delivery!
+                        <span>🎉</span> You unlocked {hasPromo ? `${promoDiscountPercent}% OFF + ` : ""}FREE Air Express Delivery!
                       </div>
                     ) : (
                       <div className="text-slate-700">
-                        Add <span className="font-bold text-petha-amber">₹{Math.round(neededForFreeShipping)}</span> more for <span className="font-bold text-emerald-700">FREE Delivery</span>
+                        Add <span className="font-bold text-petha-amber">₹{Math.round(needed)}</span> more to unlock <span className="font-bold text-emerald-700">{hasPromo ? `${promoDiscountPercent}% OFF + ` : ""}FREE Delivery</span>
                       </div>
                     )}
                   </div>
@@ -246,7 +248,7 @@ export default function AddedToCartModal({
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {pairings.filter((u: any) => u.title !== item.title).slice(0, 3).map((pair: any) => {
-                          const pairPromo = calculatePrice(pair.price)
+                          const pairPromo = calculatePrice(pair.price, isUnlocked)
                           return (
                             <div
                               key={pair.id}

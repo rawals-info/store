@@ -27,6 +27,82 @@ import { randomUUID } from "crypto"
 import { getActivePromotion } from "@lib/data/promotions"
 
 /**
+ * Synchronizes cart promotion state with the dynamic minimum order threshold.
+ * - If items subtotal >= threshold: attaches active promo code unless dismissed.
+ * - If items subtotal < threshold: strictly detaches promo codes so discounts are never applied to small orders.
+ */
+export async function syncCartPromotionWithThreshold(
+  cart: HttpTypes.StoreCart,
+  headers?: Record<string, string>
+): Promise<HttpTypes.StoreCart> {
+  if (!cart || !cart.id) return cart
+  try {
+    const activePromo = await getActivePromotion().catch(() => null)
+    const hasPromotions = Boolean(cart.promotions && cart.promotions.length > 0)
+    const authHeaders = headers || (await getAuthHeaders())
+
+    if (!activePromo || !activePromo.code) {
+      if (hasPromotions) {
+        const updateRes = await retryWithBackoff(() =>
+          sdk.store.cart.update(
+            cart.id,
+            { promo_codes: [] },
+            {},
+            { ...authHeaders, "Idempotency-Key": randomUUID() }
+          )
+        ).catch(() => null)
+        return updateRes?.cart || cart
+      }
+      return cart
+    }
+
+    const threshold = activePromo.minOrderThreshold ?? 500
+    const itemsSubtotal = Number(
+      cart.item_subtotal ??
+      (cart.items?.reduce((sum: number, i: any) => sum + (Number(i.unit_price || 0) * (Number(i.quantity) || 1)), 0) ?? 0)
+    )
+    const dismissedCode = await getDismissedPromo().catch(() => undefined)
+
+    // 1. Ineligible (< threshold) but promotions are present -> REMOVE PROMOTIONS
+    if (itemsSubtotal < threshold && hasPromotions) {
+      console.log(`[syncCartPromotionWithThreshold] itemsSubtotal ₹${itemsSubtotal} < threshold ₹${threshold}. Removing promo_codes: []`)
+      const updateRes = await retryWithBackoff(() =>
+        sdk.store.cart.update(
+          cart.id,
+          { promo_codes: [] },
+          {},
+          { ...authHeaders, "Idempotency-Key": randomUUID() }
+        )
+      ).catch(() => null)
+      return updateRes?.cart || cart
+    }
+
+    // 2. Eligible (>= threshold) and no promotions present -> ATTACH PROMOTION
+    if (
+      itemsSubtotal >= threshold &&
+      !hasPromotions &&
+      activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
+    ) {
+      console.log(`[syncCartPromotionWithThreshold] itemsSubtotal ₹${itemsSubtotal} >= threshold ₹${threshold}. Attaching promo_code: ${activePromo.code}`)
+      const promoRes = await retryWithBackoff(() =>
+        sdk.store.cart.update(
+          cart.id,
+          { promo_codes: [activePromo.code] },
+          {},
+          { ...authHeaders, "Idempotency-Key": randomUUID() }
+        )
+      ).catch(() => null)
+      return promoRes?.cart || cart
+    }
+
+    return cart
+  } catch (err) {
+    console.warn("[syncCartPromotionWithThreshold] Error:", err)
+    return cart
+  }
+}
+
+/**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
  * @param cartId - optional - The ID of the cart to retrieve.
  * @param fields - optional - Specific fields to retrieve (defaults to FULL)
@@ -75,30 +151,8 @@ export async function retrieveCart(
           return item;
         });
 
-        // Auto-apply active database promotion if cart has items and no promo applied yet
-        if (cart.items.length > 0 && (!cart.promotions || cart.promotions.length === 0)) {
-          try {
-            const dismissedCode = await getDismissedPromo().catch(() => undefined)
-            const activePromo = await getActivePromotion().catch(() => null)
-            if (
-              activePromo?.code &&
-              activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
-            ) {
-              const promoRes = await sdk.store.cart.update(
-                id,
-                { promo_codes: [activePromo.code] },
-                {},
-                headers
-              ).catch(() => null)
-
-              if (promoRes?.cart) {
-                cart = promoRes.cart
-              }
-            }
-          } catch (promoErr) {
-            // Continue if promo update fails
-          }
-        }
+        // Synchronize cart promotion state with dynamic minimum order threshold
+        cart = await syncCartPromotionWithThreshold(cart, headers)
       }
       return cart;
     })
@@ -206,6 +260,8 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
     .catch(medusaError)
 }
 
+
+
 export async function addToCart({
   variantId,
   quantity,
@@ -238,27 +294,7 @@ export async function addToCart({
       )
 
       let finalCart = result.cart
-      const dismissedCode = await getDismissedPromo().catch(() => undefined)
-      const activePromo = await getActivePromotion().catch(() => null)
-      if (
-        activePromo?.code &&
-        (!finalCart.promotions || finalCart.promotions.length === 0) &&
-        activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
-      ) {
-        try {
-          const promoRes = await sdk.store.cart.update(
-            cartId,
-            { promo_codes: [activePromo.code] },
-            {},
-            headers
-          )
-          if (promoRes?.cart) {
-            finalCart = promoRes.cart
-          }
-        } catch (promoErr) {
-          // Continue if promo is not active on backend
-        }
-      }
+      finalCart = await syncCartPromotionWithThreshold(finalCart, headers)
 
       const cartCacheTag = await getCacheTag("carts")
       scheduleRevalidates([
@@ -300,26 +336,7 @@ export async function addToCart({
     )
 
     let finalCart = lineItemRes.cart
-    const dismissedCode = await getDismissedPromo().catch(() => undefined)
-    const activePromo = await getActivePromotion().catch(() => null)
-    if (
-      activePromo?.code &&
-      activePromo.code.toUpperCase() !== dismissedCode?.toUpperCase()
-    ) {
-      try {
-        const promoRes = await sdk.store.cart.update(
-          newCart.id,
-          { promo_codes: [activePromo.code] },
-          {},
-          headers
-        )
-        if (promoRes?.cart) {
-          finalCart = promoRes.cart
-        }
-      } catch (promoErr) {
-        // Continue if promo is not active on backend
-      }
-    }
+    finalCart = await syncCartPromotionWithThreshold(finalCart, headers)
 
     const cartCacheTag = await getCacheTag("carts")
     scheduleRevalidates([
@@ -449,7 +466,10 @@ export async function updateLineItem({
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    const updatedCart = result?.cart || (await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true }))
+    let updatedCart = result?.cart || (await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true }))
+    if (updatedCart) {
+      updatedCart = await syncCartPromotionWithThreshold(updatedCart, headers)
+    }
     return { success: true, cart: updatedCart }
   } catch (error) {
     console.error(`[Cart] Failed to update line item ${lineId}:`, error)
@@ -492,7 +512,10 @@ export async function deleteLineItem(lineId: string) {
     ])
     scheduleRevalidates([cartCacheTag, fulfillmentCacheTag])
     
-    const updatedCart = (result as any)?.parent || (result as any)?.cart || (await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true }))
+    let updatedCart = (result as any)?.parent || (result as any)?.cart || (await retrieveCart(cartId, CART_FIELDS.FULL, { fresh: true }))
+    if (updatedCart) {
+      updatedCart = await syncCartPromotionWithThreshold(updatedCart, headers)
+    }
     return { success: true, cart: updatedCart }
   } catch (error) {
     console.error(`[Cart] Failed to delete line item ${lineId}:`, error)
@@ -561,6 +584,20 @@ export async function applyPromotions(codes: string[]) {
 
   const headers = {
     ...(await getAuthHeaders()),
+  }
+
+  // If applying codes, verify cart items subtotal meets threshold
+  if (codes && codes.length > 0) {
+    const currentCart = await retrieveCart(cartId, CART_FIELDS.FULL)
+    if (currentCart) {
+      const itemsSubtotal = Number(currentCart.item_subtotal ?? (currentCart.subtotal ?? 0))
+      const activePromo = await getActivePromotion().catch(() => null)
+      const threshold = activePromo?.minOrderThreshold ?? 500
+      if (itemsSubtotal < threshold) {
+        const remaining = Math.max(0, threshold - Math.round(itemsSubtotal))
+        throw new Error(`Minimum items total of ₹${threshold} required. Add ₹${remaining} more to unlock!`)
+      }
+    }
   }
 
   return retryWithBackoff(() =>
@@ -640,11 +677,25 @@ export async function submitPromotionForm(
     return "Please enter a promotion code."
   }
   try {
+    const cart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
+    if (!cart) {
+      return "No active cart found."
+    }
+
+    const itemsSubtotal = Number(cart.item_subtotal ?? (cart.subtotal ?? 0))
+    const activePromo = await getActivePromotion().catch(() => null)
+    const threshold = activePromo?.minOrderThreshold ?? 500
+
+    if (itemsSubtotal < threshold) {
+      const remaining = Math.max(0, threshold - Math.round(itemsSubtotal))
+      return `Code ${code} requires a minimum order value of ₹${threshold}. Add ₹${remaining} more to your box to unlock!`
+    }
+
     await clearDismissedPromo()
     await applyPromotions([code])
     // Fetch updated cart fresh to confirm promotion actually applied
-    const cart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
-    const applied = cart?.promotions?.some((p) => p.code?.toUpperCase() === code)
+    const updatedCart = await retrieveCart(undefined, CART_FIELDS.FULL, { fresh: true })
+    const applied = updatedCart?.promotions?.some((p) => p.code?.toUpperCase() === code)
     if (!applied) {
       return "Invalid or ineligible promotion code."
     }

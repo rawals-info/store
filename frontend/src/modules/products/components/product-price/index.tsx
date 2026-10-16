@@ -12,7 +12,7 @@ export default function ProductPrice({
   product: HttpTypes.StoreProduct
   variantId?: string
 }) {
-  const { calculatePrice } = usePromotion()
+  const { threshold, calculatePotentialDiscount } = usePromotion()
 
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
@@ -26,27 +26,34 @@ export default function ProductPrice({
   }
 
   const rawNum = selectedPrice.calculated_price_number || 0
-  const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawNum)
+  const { discountedPrice: potentialPrice, discountPercent } = calculatePotentialDiscount(rawNum)
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-baseline gap-3 flex-wrap">
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-3 flex-wrap">
         <span className="font-mono text-3xl sm:text-4xl font-bold text-slate-900">
-          ₹{formatIndianPrice(discountedPrice)}
+          ₹{formatIndianPrice(rawNum)}
         </span>
-        {isDiscounted && (
-          <>
-            <span className="font-mono text-lg sm:text-xl text-slate-400 line-through">
-              ₹{formatIndianPrice(rawNum)}
-            </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-jakarta text-xs font-bold shadow-xs">
-              {discountPercent}% OFF Applied
-            </span>
-          </>
+        {discountPercent > 0 ? (
+          <span className="px-2.5 py-1 rounded-full bg-amber-100/80 text-amber-900 font-jakarta text-xs font-bold border border-amber-200/80 shadow-2xs">
+            {discountPercent}% OFF on orders ₹{threshold}+
+          </span>
+        ) : (
+          <span className="px-2.5 py-1 rounded-full bg-emerald-100/80 text-emerald-900 font-jakarta text-xs font-bold border border-emerald-200/80 shadow-2xs">
+            FREE Delivery on orders ₹{threshold}+
+          </span>
         )}
       </div>
-      <p className="text-[11px] font-jakarta font-semibold text-emerald-700">
-        ✨ Inclusive of all taxes · Free Delivery on ₹500+
+      {discountPercent > 0 && (
+        <p className="text-xs font-jakarta text-slate-600 flex items-center gap-1.5">
+          <span>💡</span>
+          <span>
+            Get this for <strong className="text-emerald-700 font-mono font-bold">₹{formatIndianPrice(potentialPrice)}</strong> (+ FREE Delivery) when your box reaches ₹{threshold}!
+          </span>
+        </p>
+      )}
+      <p className="text-[11px] font-jakarta font-semibold text-slate-500">
+        ✨ Inclusive of all taxes · Vacuum Sealed Agra Dispatch
       </p>
     </div>
   )

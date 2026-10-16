@@ -12,6 +12,8 @@ import Trash from "@modules/common/icons/trash"
 import ErrorMessage from "../error-message"
 import { SubmitButton } from "../submit-button"
 
+import { usePromotion } from "@lib/context/promotion-context"
+
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
     promotions: HttpTypes.StorePromotion[]
@@ -24,8 +26,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const router = useRouter()
   const [submitted, setSubmitted] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
-
   const [localError, setLocalError] = React.useState<string | null>(null)
+  const { threshold, isThresholdMet, getRemainingAmount } = usePromotion()
 
   const { items = [], promotions = [] } = cart
   const removePromotionCode = async (code: string) => {
@@ -91,6 +93,15 @@ React.useEffect(() => {
               setLocalError("Please enter a promotion code.")
               return
             }
+
+            const itemsSubtotal = (cart.item_subtotal ?? (cart.subtotal ?? 0))
+            if (!isThresholdMet(itemsSubtotal)) {
+              e.preventDefault()
+              const needed = getRemainingAmount(itemsSubtotal)
+              setLocalError(`Coupons require a minimum order value of ₹${threshold}. Add ₹${needed} more to your box to unlock!`)
+              return
+            }
+
             // Upper-case the value for consistency
             if (inputRef.current) {
               inputRef.current.value = val.toUpperCase()

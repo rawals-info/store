@@ -6,12 +6,13 @@ export type ActiveStorePromotion = {
   discountPercent: number
   type: "percentage" | "fixed"
   status: "active" | "inactive"
+  minOrderThreshold: number
 }
 
 /**
- * Dynamically fetches the primary active promotion from Medusa Admin API.
+ * Dynamically fetches the primary active promotion and minimum order threshold from Medusa Admin API.
  * Uses the Secret API Key (MEDUSA_ADMIN_API_TOKEN).
- * No hardcoded strings. If no promotions are active, returns null.
+ * Resolves the threshold directly from the standard shipping rule (defaults to 500).
  */
 export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion | null> => {
   const backendUrl =
@@ -35,6 +36,46 @@ export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion |
       ? `Basic ${Buffer.from(`${secretToken}:`).toString("base64")}`
       : `Bearer ${secretToken}`
 
+    // 1. Fetch active shipping rule to resolve dynamic Free Delivery / Discount Threshold
+    let minOrderThreshold = 500
+    try {
+      const shippingRes = await fetch(
+        `${backendUrl}/admin/shipping-options?fields=*prices,*prices.price_rules`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: authHeader,
+            "Content-Type": "application/json",
+          },
+          next: { revalidate: 43200, tags: ["shipping-options", "promotions"] },
+        }
+      )
+
+      if (shippingRes.ok) {
+        const shippingData = await shippingRes.json()
+        const options = shippingData?.shipping_options || []
+        const standardOption =
+          options.find((o: any) => o.name && o.name.toLowerCase().includes("standard")) ||
+          options[0]
+
+        const freePrice = standardOption?.prices?.find(
+          (p: any) => Number(p.amount) === 0
+        )
+
+        const itemTotalRule = freePrice?.price_rules?.find(
+          (r: any) =>
+            r.attribute === "item_total" && (r.operator === "gte" || r.operator === "gt")
+        )
+
+        if (itemTotalRule?.value && !isNaN(Number(itemTotalRule.value))) {
+          minOrderThreshold = Number(itemTotalRule.value)
+        }
+      }
+    } catch (shippingErr) {
+      // Graceful fallback to 500 if shipping options cannot be queried
+    }
+
+    // 2. Fetch active promotions
     const res = await fetch(
       `${backendUrl}/admin/promotions?fields=*application_method&order=-created_at&limit=10`,
       {
@@ -43,7 +84,7 @@ export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion |
           Authorization: authHeader,
           "Content-Type": "application/json",
         },
-        next: { revalidate: 86400, tags: ["promotions"] },
+        next: { revalidate: 43200, tags: ["promotions"] },
       }
     )
 
@@ -79,6 +120,7 @@ export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion |
       discountPercent: appMethod?.type === "percentage" ? discountVal : 0,
       type: appMethod?.type || "percentage",
       status: bestPromo.status,
+      minOrderThreshold,
     }
   } catch (error) {
     console.error("[getActivePromotion] Failed to fetch active promotion from Admin API:", error)
@@ -86,3 +128,7 @@ export const getActivePromotion = cache(async (): Promise<ActiveStorePromotion |
   }
 })
 
+export const getMinOrderThreshold = cache(async (): Promise<number> => {
+  const promo = await getActivePromotion()
+  return promo?.minOrderThreshold ?? 500
+})

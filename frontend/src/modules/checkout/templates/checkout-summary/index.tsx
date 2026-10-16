@@ -17,7 +17,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
   const [upsellSnacks, setUpsellSnacks] = useState<any[]>([])
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<string[]>([])
-  const { calculatePrice } = usePromotion()
+  const { threshold, isThresholdMet, calculatePrice } = usePromotion()
 
   useEffect(() => {
     setCurrentCart(cart)
@@ -36,7 +36,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
   const itemsSubtotal = (currentCart?.item_subtotal ?? (currentCart?.subtotal ?? 0))
   const discountTotal = currentCart?.discount_total ?? 0
   const netItemsTotal = Math.max(0, itemsSubtotal - discountTotal)
-  const isFreeShipping = netItemsTotal >= 500
+  const isFreeShipping = isThresholdMet(itemsSubtotal)
 
   const hasShippingMethod = Boolean(
     (currentCart?.shipping_methods && currentCart.shipping_methods.length > 0) ||
@@ -141,7 +141,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
           <div className="space-y-2.5">
             {upsellSnacks.map((snack: any) => {
               const isAdded = addedIds.includes(snack.id)
-              const snackPrice = calculatePrice(snack.price)
+              const snackPrice = calculatePrice(snack.price, isFreeShipping)
               return (
                 <div
                   key={snack.id}
