@@ -100,7 +100,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {[
               { icon: "🌱", heading: "100% Vegetarian", sub: "No animal-derived ingredients, ever" },
-              { icon: "🛡️", heading: "FSSAI Certified", sub: "Safe, hygienic, government approved" },
+              { icon: "🛡️", heading: "FSSAI Registered", sub: "Reg. No. 22725113001738" },
               { icon: "📦", heading: "Vacuum Sealed", sub: "Freshness locked in for 30+ days" },
               { icon: "🚚", heading: "Pan-India Delivery", sub: "All 28 states in 24–48 hours" },
             ].map(item => (
@@ -195,6 +195,10 @@ export default function Footer() {
           <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3">
             <span className="font-jakarta text-xs text-petha-subtle">
               © {new Date().getFullYear()} Taj Petha. All rights reserved.
+            </span>
+            <span className="hidden sm:block text-petha-border">·</span>
+            <span className="font-jakarta text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded">
+              FSSAI Reg. No. 22725113001738
             </span>
             <span className="hidden sm:block text-petha-border">·</span>
             <span className="font-jakarta text-xs text-petha-subtle flex items-center gap-1.5">

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 
 const WHATSAPP_URL = `https://wa.me/919259418994?text=${encodeURIComponent(
-  "Hi Taj Petha! I need help with my order / want to know more about your products. 🙏"
+  "Hello Taj Petha! I have an inquiry regarding your sweets / my order."
 )}`
 
 export default function WhatsAppFloat() {

@@ -46,6 +46,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 
   const promoCodeName = promotions?.[0]?.code
 
+  // Check shipping amount across both cart and order formats
+  const rawShipping =
+    shipping_subtotal ??
+    totals.shipping_total ??
+    (totals as any).shipping_methods?.[0]?.total
+  const hasShipping = typeof rawShipping === "number"
+
   return (
     <div>
       <div className="flex flex-col gap-y-2.5 text-xs font-jakarta text-slate-600">
@@ -71,10 +78,16 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 
         <div className="flex items-center justify-between gap-2">
           <span>Shipping &amp; Handling</span>
-          {shipping_subtotal && shipping_subtotal > 0 ? (
-            <span className="font-mono text-xs font-semibold text-slate-800" data-testid="cart-shipping" data-value={shipping_subtotal}>
-              {convertToLocale({ amount: shipping_subtotal, currency_code })}
-            </span>
+          {hasShipping ? (
+            rawShipping > 0 ? (
+              <span className="font-mono text-xs font-semibold text-slate-800" data-testid="cart-shipping" data-value={rawShipping}>
+                {convertToLocale({ amount: rawShipping, currency_code })}
+              </span>
+            ) : (
+              <span className="font-jakarta text-xs font-bold text-emerald-700" data-testid="cart-shipping" data-value={0}>
+                FREE
+              </span>
+            )
           ) : (
             <span className="font-jakarta text-xs font-medium text-slate-500" data-testid="cart-shipping" data-value={0}>
               {finalShippingPlaceholder}
@@ -89,9 +102,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({
             data-testid="cart-taxes"
             data-value={tax_total || 0}
           >
-            {tax_total && tax_total > 0
+            {typeof tax_total === "number" && tax_total > 0
               ? convertToLocale({ amount: tax_total, currency_code })
-              : finalTaxPlaceholder}
+              : (taxPlaceholder || "Included in Price")}
           </span>
         </div>
 

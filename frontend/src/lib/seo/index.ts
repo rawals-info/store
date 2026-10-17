@@ -353,11 +353,7 @@ export const generateProductSchema = (
         "applicableCountry": "IN",
         "merchantReturnLink": `${baseUrl}/${countryCode}/returns`,
         "url": `${baseUrl}/${countryCode}/returns`,
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 7,
-        "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/FreeReturn",
-        "refundType": "https://schema.org/StoreCreditRefund",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
         "inStoreReturnsOffered": false
       },
 

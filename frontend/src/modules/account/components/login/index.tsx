@@ -30,7 +30,7 @@ const Login = ({ setCurrentView }: Props) => {
       if (result.error) {
         setError(result.error)
       } else if (result.success) {
-        router.push("/account")
+        window.location.href = "/account"
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")

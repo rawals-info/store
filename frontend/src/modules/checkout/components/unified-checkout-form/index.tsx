@@ -13,6 +13,7 @@ import PayPalContainer from "@modules/checkout/components/paypal-container"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { MapPin, CreditCard, Check, ArrowRight, ShieldCheck, Lock, Sparkles, Truck, Phone, Mail, User, Building, QrCode, Zap, AlertCircle } from "lucide-react"
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay"
 import AddressAutocomplete from "@modules/common/components/address-autocomplete"
@@ -38,6 +39,14 @@ export default function UnifiedCheckoutForm({
   const [searchAddress, setSearchAddress] = useState(cart?.shipping_address?.address_1 || "")
   const [error, setError] = useState<string | null>(null)
   const { threshold, isThresholdMet } = usePromotion()
+
+  // Whitelisted Admin / Tester Account for Zero-Payment Order Testing (Strictly single email)
+  const TESTER_EMAILS = [
+    "sidrawal1200@gmail.com",
+  ]
+  const isAuthorizedTester = Boolean(
+    customer?.email && TESTER_EMAILS.includes(customer.email.toLowerCase().trim())
+  )
 
   // Customer Name State (Unified Full Name)
   const initialFullName = [
@@ -762,12 +771,22 @@ export default function UnifiedCheckoutForm({
               {/* Razorpay UPI / Online Payment Card */}
               <div
                 onClick={() => handlePaymentMethodChange(initialProvider)}
-                className="p-5 rounded-2xl border-2 border-petha-amber bg-amber-50/50 shadow-xs cursor-pointer transition-all space-y-4"
+                className={`p-5 rounded-2xl border-2 transition-all cursor-pointer space-y-4 ${
+                  selectedPaymentMethod !== "pp_system_default"
+                    ? "border-petha-amber bg-amber-50/50 shadow-xs"
+                    : "border-slate-200 bg-white hover:border-slate-300"
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3.5">
-                    <div className="mt-1 w-4 h-4 rounded-full border-2 border-petha-amber bg-petha-amber ring-2 ring-amber-200/60 flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    <div className={`mt-1 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      selectedPaymentMethod !== "pp_system_default"
+                        ? "border-petha-amber bg-petha-amber ring-2 ring-amber-200/60"
+                        : "border-slate-300 bg-white"
+                    }`}>
+                      {selectedPaymentMethod !== "pp_system_default" && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                      )}
                     </div>
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -806,8 +825,46 @@ export default function UnifiedCheckoutForm({
                     <Image src="/payment-icons/razorpay.svg" alt="Razorpay" width={56} height={16} className="h-3.5 w-auto object-contain" />
                   </div>
                 </div>
-
               </div>
+
+              {/* Admin Whitelisted Test Order / COD Card (Strictly visible ONLY to logged-in whitelisted admins) */}
+              {isAuthorizedTester && (
+                <div
+                  onClick={() => handlePaymentMethodChange("pp_system_default")}
+                  className={`p-5 rounded-2xl border-2 transition-all cursor-pointer space-y-2 ${
+                    selectedPaymentMethod === "pp_system_default"
+                      ? "border-amber-600 bg-amber-50/90 shadow-sm"
+                      : "border-amber-200/80 bg-white hover:border-amber-400"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3.5">
+                      <div className={`mt-1 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        selectedPaymentMethod === "pp_system_default"
+                          ? "border-amber-600 bg-amber-600 ring-2 ring-amber-200/60"
+                          : "border-slate-300 bg-white"
+                      }`}>
+                        {selectedPaymentMethod === "pp_system_default" && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-jakarta font-bold text-slate-900 text-sm sm:text-base">
+                            🧪 Admin Test Order / Cash on Delivery
+                          </span>
+                          <span className="text-[10px] font-bold text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            Tester Whitelisted ({customer?.email})
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600 font-jakarta mt-0.5">
+                          Places a real test order with instant confirmation and real Brevo email dispatch without gateway fees or card popups.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -818,13 +875,22 @@ export default function UnifiedCheckoutForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-14 sm:h-15 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-jakarta font-bold text-base sm:text-lg shadow-md hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2.5 disabled:opacity-75"
+              className={`w-full h-14 sm:h-15 rounded-2xl text-white font-jakarta font-bold text-base sm:text-lg shadow-md hover:shadow-lg active:scale-[0.99] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2.5 disabled:opacity-75 ${
+                selectedPaymentMethod === "pp_system_default"
+                  ? "bg-amber-600 hover:bg-amber-700 active:bg-amber-800"
+                  : "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
+              }`}
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2.5">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Pay ₹{formatIndianPrice(finalPayAmount)} via UPI / Cards</span>
+                  <span>{selectedPaymentMethod === "pp_system_default" ? "Placing Test Order..." : `Pay ₹${formatIndianPrice(finalPayAmount)} via UPI / Cards`}</span>
                 </div>
+              ) : selectedPaymentMethod === "pp_system_default" ? (
+                <>
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200" />
+                  <span>Confirm Admin Test Order (Zero Payment) →</span>
+                </>
               ) : (
                 <>
                   <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -834,11 +900,24 @@ export default function UnifiedCheckoutForm({
               )}
             </button>
 
+            {/* Legal Consent Disclaimer */}
+            <p className="text-center text-[11px] text-slate-500 leading-normal pt-1.5 px-2 font-jakarta">
+              By clicking Pay, you agree to our{" "}
+              <Link href="/terms" target="_blank" className="text-amber-800 underline hover:text-amber-900 font-medium">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/returns" target="_blank" className="text-amber-800 underline hover:text-amber-900 font-medium">
+                Perishable Goods &amp; Transit Policy
+              </Link>
+              .
+            </p>
+
             {/* Trust and Safety Footer Strip */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-500 pt-1">
-              <span className="flex items-center gap-1 text-emerald-700">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-slate-500 pt-1">
+              <span className="flex items-center gap-1 text-emerald-700" title="Packages insured against transit damage or loss">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                100% Refund Guarantee
+                Transit Insured Delivery*
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -846,7 +925,7 @@ export default function UnifiedCheckoutForm({
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                🛡️ FSSAI Certified
+                🛡️ FSSAI Reg. 22725113001738
               </span>
             </div>
           </div>

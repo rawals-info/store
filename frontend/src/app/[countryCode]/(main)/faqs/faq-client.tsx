@@ -273,7 +273,7 @@ export default function FaqClient({ countryCode }: { countryCode: string }) {
         {/* Still Have Questions? Banner */}
         <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950 text-white rounded-3xl p-8 sm:p-12 shadow-xl border border-amber-500/20 text-center space-y-6">
           <span className="font-bold text-xs uppercase tracking-wider text-amber-300">
-            💬 Dedicated Sweet Concierge
+            Dedicated Sweet Concierge
           </span>
           
           <h3 className="font-cormorant text-3xl sm:text-4xl font-bold text-white leading-tight">

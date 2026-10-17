@@ -42,7 +42,7 @@ export default function CheckoutLayout({
           <div className="flex items-center gap-4 text-slate-600">
             <span>🌱 100% Pure Vegetarian</span>
             <span>•</span>
-            <span>🛡️ FSSAI Certified</span>
+            <span>🛡️ FSSAI Reg. 22725113001738</span>
             <span>•</span>
             <span>📦 30-Day Freshness Guarantee</span>
           </div>

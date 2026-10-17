@@ -16,16 +16,16 @@ export default function Testimonials() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <ScrollReveal className="p-8 border border-gray-200 rounded-lg">
             <Text className="italic mb-4">
-              "The petha centerpiece I purchased is absolutely stunning. The craftsmanship is impeccable and it has become the focal point of my dining table."
+              "Gifting ke liye bhi perfect hai. Presentation outstanding and sweets arrived completely fresh in Delhi. Everyone at home loved the authentic taste."
             </Text>
-            <Text className="font-medium">— Sarah J., Interior Designer</Text>
+            <Text className="font-medium">— Sushma Sharma, Verified Buyer</Text>
           </ScrollReveal>
           
           <ScrollReveal delay={0.2} className="p-8 border border-gray-200 rounded-lg">
             <Text className="italic mb-4">
-              "I've been enjoying pethas for years, and the quality of these sweets is truly exceptional. Each piece tells a story of artistry and tradition."
+              "Kesar Angoori Petha is top tier standard. Authentic saffron aroma, melts in mouth like original Agra quality."
             </Text>
-            <Text className="font-medium">— Michael T., Art Collector</Text>
+            <Text className="font-medium">— Manish Singh, Verified Buyer</Text>
           </ScrollReveal>
         </div>
       </div>

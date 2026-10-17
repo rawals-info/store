@@ -3,28 +3,28 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 
-// Sample testimonials data
+// Verified customer reviews from store portal
 const testimonials = [
   {
     id: 1,
-    text: "The craftsmanship of my petha gift box is simply extraordinary. It's become the centerpiece of my celebrations and draws admiration from every guest.",
-    author: "Alexander Winston",
-    title: "Art Collector",
-    image: "/customer-1.jpg" // Replace with actual image path
+    text: "Gifting ke liye bhi perfect hai. Packaging presentation is outstanding and the sweets arrived completely fresh in Delhi.",
+    author: "Sushma Sharma",
+    title: "Verified Customer • New Delhi",
+    image: "/hero_image.webp"
   },
   {
     id: 2,
-    text: "I've purchased sweets from around the world, but the pethas from this artisan are truly unparalleled. The attention to detail is breathtaking.",
-    author: "Victoria Harding",
-    title: "Interior Designer",
-    image: "/customer-2.jpg" // Replace with actual image path
+    text: "Kesar Angoori Petha is top tier. Authentic saffron flavor, crystal clear texture, and melts in the mouth. True Agra heritage taste.",
+    author: "Manish Singh",
+    title: "Verified Customer • Lucknow",
+    image: "/hero_petha_square.webp"
   },
   {
     id: 3,
-    text: "The assorted petha box I purchased is both a delightful treat and a work of art. It's transformed my family gatherings into moments of elegance and joy.",
-    author: "Jonathan Pierce",
-    title: "Luxury Home Owner",
-    image: "/customer-3.jpg" // Replace with actual image path
+    text: "Yeh kesar wala petha royal feel deta hai. The color and traditional slow-cooked aroma make it an instant hit for family festivals.",
+    author: "Meera Sharma",
+    title: "Verified Customer • Mumbai",
+    image: "/gift_box_hero.webp"
   }
 ]
 
@@ -75,9 +75,9 @@ export default function TestimonialSection() {
       
       <div className="content-container relative z-10">
         <div className="text-center mb-16">
-          <span className="font-serif text-sm uppercase tracking-[0.3em] text-luxury-gold">Client Testimonials</span>
+          <span className="font-serif text-sm uppercase tracking-[0.3em] text-luxury-gold">Customer Experiences</span>
           <div className="h-px w-24 bg-luxury-gold mx-auto my-6"></div>
-          <h2 className="font-display text-3xl text-luxury-ivory mb-4">Words from Our Collectors</h2>
+          <h2 className="font-display text-3xl text-luxury-ivory mb-4">Loved by Sweet Lovers Across India</h2>
         </div>
         
         <div className="max-w-4xl mx-auto">

@@ -147,33 +147,38 @@ export default async function orderAdminNotify({
 
     if (ADMIN_EMAIL) {
       const body = `
-        ${buildHeroStatusCard({
-          icon: "🔔",
-          title: "New Customer Order Received!",
-          subtitle: `A new order has been placed on the storefront and is ready for dispatch preparation.`,
-          orderId: displayId,
-          badgeText: `💰 ${fmt(grandTotal)} Paid`,
-        })}
+        <!-- Admin Status Header -->
+        <div style="text-align: center; margin-bottom: 26px;">
+          <div style="display: inline-block; background-color: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px;">
+            New Storefront Order &bull; #${displayId} (${fmt(grandTotal)})
+          </div>
+          <h1 style="margin: 0 0 8px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 700; color: #0F172A; line-height: 1.2;">
+            New Customer Order Received
+          </h1>
+          <p style="margin: 0 auto; font-size: 14px; color: #64748B; line-height: 1.6; max-width: 460px;">
+            A new customer order has been confirmed on the storefront and is ready for dispatch preparation in Agra.
+          </p>
+        </div>
 
         <!-- Order Items Breakdown -->
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 10px;">
           <tr>
             <td>
-              <h3 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; color: #0F172A; text-transform: uppercase; letter-spacing: 1px;">
+              <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px;">
                 Items to Pack
-              </h3>
+              </span>
             </td>
           </tr>
         </table>
 
-        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: #FAF8F5; border-radius: 16px; border: 1px solid #EFE8DE; overflow: hidden; margin-bottom: 18px;">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 18px;">
           ${itemsHtml}
         </table>
 
         <!-- Customer & Delivery Address Card -->
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 18px 20px; margin-bottom: 18px;">
-          <div style="font-size: 10px; font-weight: 800; color: #92400E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-            📍 Customer &amp; Shipping Details
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 20px; margin-bottom: 18px;">
+          <div style="font-size: 11px; font-weight: 700; color: #92400E; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+            Customer &amp; Shipping Details
           </div>
           <div style="font-size: 13px; color: #1E293B; line-height: 1.6;">
             ${addressText}
@@ -182,7 +187,7 @@ export default async function orderAdminNotify({
 
         <div style="text-align: center; margin: 24px 0;">
           <a href="${process.env.ADMIN_URL ?? "http://localhost:9000"}/app/orders" class="cta-button">
-            Open Order in Medusa Admin ➔
+            Open Order in Medusa Admin &rarr;
           </a>
         </div>
 
@@ -191,7 +196,7 @@ export default async function orderAdminNotify({
 
       await sendLuxuryEmail({
         to: ADMIN_EMAIL,
-        subject: `🔔 New Order #${displayId} Received (${fmt(grandTotal)}) - Taj Petha`,
+        subject: `New Order #${displayId} Received (${fmt(grandTotal)}) - Taj Petha`,
         html: buildLuxuryTemplate("New Order Received", body, "Store Admin Notification"),
       })
     }

@@ -23,12 +23,18 @@ export default async function customerWelcomeEmail({
   const customerName = customer.first_name || customer.email?.split("@")[0] || "Valued Connoisseur"
 
   const body = `
-    ${buildHeroStatusCard({
-      icon: "👑",
-      title: "Welcome to the Taj Petha Family",
-      subtitle: `Dear ${customerName}, your account is now ready. Discover the authentic royal heritage of Agra sweets.`,
-      badgeText: "🏛️ Agra Master Confectionery",
-    })}
+    <!-- Status Header -->
+    <div style="text-align: center; margin-bottom: 26px;">
+      <div style="display: inline-block; background-color: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px;">
+        Agra Confectionery Member
+      </div>
+      <h1 style="margin: 0 0 8px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 700; color: #0F172A; line-height: 1.2;">
+        Welcome to Taj Petha
+      </h1>
+      <p style="margin: 0 auto; font-size: 14px; color: #64748B; line-height: 1.6; max-width: 460px;">
+        Hello ${customerName}, your account is confirmed. Explore authentic Agra confectionery delivered fresh to your door.
+      </p>
+    </div>
 
     <div style="background: #FFFDF9; border: 1px solid #FDE68A; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
       <h3 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; color: #0F172A; margin: 0 0 8px 0;">

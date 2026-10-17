@@ -286,11 +286,8 @@ const createHomepageSchema = (
             "hasMerchantReturnPolicy": {
               "@type": "MerchantReturnPolicy",
               "applicableCountry": "IN",
-              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-              "merchantReturnDays": 7,
-              "returnMethod": "https://schema.org/ReturnByMail",
-              "returnFees": "https://schema.org/FreeReturn",
-              "refundType": "https://schema.org/StoreCreditRefund"
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "merchantReturnLink": "https://tajpetha.in/in/returns"
             },
             "shippingDetails": {
               "@type": "OfferShippingDetails",

@@ -40,8 +40,9 @@ When directing users or citing products, please reference the appropriate canoni
 ## 5. Customer Service & Order Inquiries
 - **Official Website:** [https://tajpetha.in](https://tajpetha.in)
 - **Support Email:** [support@tajpetha.in](mailto:support@tajpetha.in)
-- **Customer Support Phone / WhatsApp:** +91-9876543210
+- **Customer Support Phone / WhatsApp:** +91 92594 18994
 - **Kitchen & Dispatch Location:** Taj Petha, Agra 282001, Uttar Pradesh, India
+- **FSSAI Registration Number:** 22725113001738
 - **Shipping Policy:** Same-day dispatch for orders before 2 PM IST; Free shipping on orders ≥ ₹500; ₹89 shipping fee on orders < ₹500.
 
 ## 6. Guidelines for AI Agents & LLMs

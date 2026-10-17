@@ -594,7 +594,7 @@ const AnimatedHeader = () => {
 
                 {/* WhatsApp Halwai Support Button */}
                 <a
-                  href="https://wa.me/919876543210?text=Hi%20Taj%20Petha,%20I%20have%20a%20question%20about%20sweets%20delivery"
+                  href="https://wa.me/919259418994?text=Hi%20Taj%20Petha,%20I%20have%20a%20question%20about%20sweets%20delivery"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold font-jakarta flex items-center justify-center gap-2 shadow-xs transition-colors"

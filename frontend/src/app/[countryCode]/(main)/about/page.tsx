@@ -127,7 +127,7 @@ export default async function AboutPage(props: AboutPageProps) {
         name: "Is Taj Petha 100% vegetarian?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes, all Taj Petha sweets and namkeens are 100% pure vegetarian, FSSAI certified, and made with natural ingredients.",
+          text: "Yes, all Taj Petha sweets and namkeens are 100% pure vegetarian, FSSAI registered (Reg. No. 22725113001738), and made with natural ingredients.",
         },
       },
     ],
@@ -292,7 +292,7 @@ export default async function AboutPage(props: AboutPageProps) {
                 </div>
                 <h3 className="font-jakarta font-bold text-base text-slate-900">FSSAI Certified Safety</h3>
                 <p className="font-jakarta text-xs text-slate-600 leading-relaxed">
-                  State-of-the-art hygienic cleanrooms ensure touch-free packaging and 100% vegetarian purity.
+                  FSSAI Reg. No. 22725113001738. State-of-the-art hygienic cleanrooms ensure touch-free packaging and 100% vegetarian purity.
                 </p>
               </div>
 

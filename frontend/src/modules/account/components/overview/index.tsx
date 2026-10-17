@@ -1,5 +1,6 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
+import { getOrderStatusBadge } from "@lib/util/order-status"
 import { HttpTypes } from "@medusajs/types"
 import { Package, MapPin, User, ArrowRight, Clock, CheckCircle2 } from "lucide-react"
 
@@ -101,9 +102,14 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                       <span className="font-mono font-bold text-xs text-slate-900">
                         #{order.display_id || order.id.slice(0, 8)}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        {order.status || "Confirmed"}
-                      </span>
+                      {(() => {
+                        const badge = getOrderStatusBadge(order)
+                        return (
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.className}`}>
+                            {badge.label}
+                          </span>
+                        )
+                      })()}
                     </div>
                     <p className="text-xs text-slate-500">
                       Placed on {new Date(order.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}

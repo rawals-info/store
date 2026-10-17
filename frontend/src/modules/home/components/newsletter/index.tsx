@@ -23,7 +23,7 @@ export default function Newsletter() {
   }
 
   const WHATSAPP_URL = `https://wa.me/919259418994?text=${encodeURIComponent(
-    "Hi Taj Petha! I'd like to know more about your products. 🙏"
+    "Hello Taj Petha! I would like to know more about your products."
   )}`
 
   return (

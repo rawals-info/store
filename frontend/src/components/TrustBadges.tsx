@@ -33,9 +33,9 @@ const trustBadges: TrustBadge[] = [
     description: "1-4 days delivery across India"
   },
   {
-    icon: <RefreshCw className="w-6 h-6" />,
-    title: "Easy Returns",
-    description: "7-day return policy for peace of mind"
+    icon: <Shield className="w-6 h-6" />,
+    title: "Transit Insured*",
+    description: "Every box protected against transit loss or damage"
   }
 ]
 

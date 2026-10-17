@@ -2,8 +2,9 @@ import { useMemo } from "react"
 import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
+import { getOrderStatusBadge } from "@lib/util/order-status"
 import { HttpTypes } from "@medusajs/types"
-import { Package, ArrowRight, Clock, CheckCircle2 } from "lucide-react"
+import { Package, ArrowRight, Clock, CheckCircle2, Truck } from "lucide-react"
 
 type OrderCardProps = {
   order: HttpTypes.StoreOrder
@@ -22,6 +23,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
     return order.items?.length ?? 0
   }, [order])
 
+  const badge = getOrderStatusBadge(order)
+
   return (
     <div
       className="bg-white rounded-3xl border border-slate-200 hover:border-petha-amber p-6 shadow-xs hover:shadow-md transition-all font-jakarta space-y-6"
@@ -34,8 +37,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
             <span className="font-mono font-bold text-sm text-slate-900">
               Order #{order.display_id || order.id.slice(0, 8)}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-              {order.status || "Confirmed"}
+            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${badge.className}`}>
+              {badge.label}
             </span>
           </div>
           <p className="text-xs text-slate-500" data-testid="order-created-at">

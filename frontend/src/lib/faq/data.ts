@@ -7,27 +7,27 @@ export const CATEGORY_FAQS: Record<string, QA[]> = {
     {
       question: "How fresh will the Agra Petha be when it arrives?",
       answer:
-        "Every batch is prepared fresh daily in our Agra kitchen. We use airtight, food-grade vacuum sealing with moisture absorbers to guarantee your petha arrives soft, juicy, and with 30-day fresh taste.",
+        "Every batch is prepared fresh daily in our Agra kitchen. We use airtight, food-grade vacuum sealing to lock in peak flavor, guaranteeing your petha arrives juicy and fresh with 30-day room-temperature shelf life.",
     },
     {
       question: "Is this original authentic Agra Petha?",
       answer:
-        "Yes! Our master halwais handcraft authentic Agra Petha using pure winter melon (ash gourd), sulfur-free cane sugar, and real Kashmiri saffron. No artificial syrups or preservatives.",
+        "Yes! Our master halwais handcraft authentic Agra Petha using pure winter melon (ash gourd), sulfur-free cane sugar, and real Kashmiri saffron. Prepared with zero artificial dyes, chemical bleaching, or synthetic preservatives.",
     },
     {
-      question: "Is your Petha 100% pure vegetarian?",
+      question: "Is your Petha 100% pure vegetarian and FSSAI certified?",
       answer:
-        "Yes, 100% pure vegetarian and FSSAI food-safety certified. Prepared in a dedicated hygienic sweet kitchen with pure natural ingredients.",
+        "Yes, 100% pure vegetarian and certified by the Food Safety and Standards Authority of India (FSSAI Reg. No. 22725113001738). Prepared in dedicated hygienic sweet kitchens with pure natural ingredients.",
     },
     {
-      question: "How long does delivery take and is shipping free?",
+      question: "Do you have allergen warnings for nuts or dairy?",
       answer:
-        "We dispatch orders daily via express air cargo. Deliveries to Delhi NCR take 24 hours; other cities take 24–48 hours. All orders above ₹500 get Free Express Shipping across India.",
+        "Our kitchens handle tree nuts (cashews, pistachios, almonds), dairy (khoya/ghee in select items), and seeds. While we follow strict hygiene, products may contain trace allergens. Customers with severe nut or dairy allergies should check descriptions before consuming.",
     },
     {
       question: "What if my sweet box gets damaged in transit?",
       answer:
-        "We provide a 100% Damage-Proof Replacement Guarantee. If your box is damaged by the courier, we will immediately send you a free fresh replacement or a full refund — zero hassle.",
+        "Every consignment is transit-insured by our courier partners. If your parcel arrives damaged, please share a continuous pure unboxing video and photos within 24 hours of delivery. We will lodge an insurance claim with the courier partner and arrange resolution based on the verified survey report.",
     },
   ],
 
@@ -58,7 +58,7 @@ export const CATEGORY_FAQS: Record<string, QA[]> = {
     {
       question: "What makes authentic Agra Dalmoth special?",
       answer:
-        "Authentic Agra Dalmoth is made with crispy fried whole brown lentils (moth beans), spicy gram flour sev, and premium fried cashews, seasoned with authentic royal spice blend.",
+        "Authentic Agra Dalmoth is made with crispy fried whole brown lentils (moth beans), spicy gram flour sev, premium fried cashews, and melon seeds, seasoned with authentic royal spice blend.",
     },
     {
       question: "How long does Dalmoth stay fresh?",
@@ -71,9 +71,9 @@ export const CATEGORY_FAQS: Record<string, QA[]> = {
         "Orders are dispatched within 24 hours using express air delivery, reaching most cities across India in 24 to 48 hours.",
     },
     {
-      question: "What is your damage replacement guarantee?",
+      question: "What if my Dalmoth box gets damaged during transit?",
       answer:
-        "If your package arrives damaged or unsealed, contact our support team and we will send a free replacement box immediately.",
+        "All shipments are transit-insured. If your package arrives damaged, share an unboxing video and photos within 24 hours so our team can lodge a claim with the courier partner for investigation and resolution.",
     },
   ],
 
@@ -86,17 +86,17 @@ export const CATEGORY_FAQS: Record<string, QA[]> = {
     {
       question: "Are your products 100% pure vegetarian?",
       answer:
-        "Yes, 100% pure vegetarian, FSSAI certified, made with pure natural ingredients and zero artificial chemicals.",
+        "Yes, 100% pure vegetarian, FSSAI certified (Reg. No. 22725113001738), made with pure natural ingredients and zero artificial chemicals.",
     },
     {
-      question: "Do you offer free delivery?",
+      question: "What is your order cancellation window?",
       answer:
-        "Yes! Free express shipping is automatically applied to all orders above ₹500 at checkout.",
+        "Orders can only be cancelled within 30 minutes of placement by contacting our WhatsApp desk. After 30 minutes, orders are routed to fresh batch preparation and packing, after which no cancellations or refunds are possible.",
     },
     {
-      question: "What is your return and replacement policy?",
+      question: "What is your return and transit damage policy?",
       answer:
-        "We have a 100% fresh guarantee. If your order arrives damaged or unsatisfactory, we offer immediate free replacements or full refunds.",
+        "Because our sweets are freshly prepared and perishable, we do not accept returns or replacements once delivered. All packages are insured against transit damage; if your box arrives damaged, share a continuous unboxing video within 24 hours so our team can lodge an insurance claim with the courier.",
     },
   ],
 }

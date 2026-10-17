@@ -124,7 +124,7 @@ export function buildLuxuryTemplate(title: string, body: string, subtitle?: stri
                   TAJ PETHA
                 </div>
                 <div style="font-size: 10px; font-weight: 700; color: #B45309; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px;">
-                  ${subtitle || "Original Agra Sweet Kitchen • Direct Fresh Dispatch"}
+                  ${subtitle || "Original Agra Confectionery • Direct Dispatch"}
                 </div>
               </td>
             </tr>
@@ -134,20 +134,20 @@ export function buildLuxuryTemplate(title: string, body: string, subtitle?: stri
 
       <!-- Content Body -->
       <tr>
-        <td style="padding: 36px 32px;" class="content-padding">
+        <td style="padding: 32px 32px;" class="content-padding">
           ${body}
         </td>
       </tr>
 
       <!-- Luxury Brand Footer -->
       <tr>
-        <td style="background-color: #FAF8F5; padding: 28px 32px; text-align: center; border-top: 1px solid #EFE8DE;">
-          <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">
-            Taj Petha
+        <td style="background-color: #FAF8F5; padding: 24px 32px; text-align: center; border-top: 1px solid #EFE8DE;">
+          <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 16px; font-weight: 700; color: #0F172A; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+            Taj Petha Confectioners
           </div>
           <div style="font-size: 11px; color: #64748B; line-height: 1.6;">
-            Handcrafted with pride in Agra 282001, Uttar Pradesh, India<br>
-            Official Store: <a href="https://tajpetha.in" style="color: #D97706; font-weight: 600; text-decoration: none;">https://tajpetha.in</a> &bull; Email: <a href="mailto:support@tajpetha.in" style="color: #D97706; font-weight: 600; text-decoration: none;">support@tajpetha.in</a>
+            Noori Gate, Near Taj Mahal, Agra, Uttar Pradesh 282001, India<br>
+            Official Store: <a href="https://tajpetha.in" style="color: #B45309; font-weight: 600; text-decoration: none;">tajpetha.in</a> &bull; Support: <a href="mailto:support@tajpetha.in" style="color: #B45309; font-weight: 600; text-decoration: none;">support@tajpetha.in</a>
           </div>
           <div style="font-size: 10px; color: #94A3B8; margin-top: 12px;">
             &copy; ${new Date().getFullYear()} Taj Petha. All rights reserved. 100% Vegetarian Authentic Sweets.
@@ -166,11 +166,10 @@ export function buildLuxuryTemplate(title: string, body: string, subtitle?: stri
  * Helper: Hero status announcement card
  */
 export function buildHeroStatusCard({
-  icon = "✨",
   title,
   subtitle,
   orderId,
-  badgeText = "⚡ 24–48h Air Express",
+  badgeText = "Order Update",
 }: {
   icon?: string
   title: string
@@ -264,12 +263,12 @@ export function buildLink(href: string, text: string) {
 export function buildButton(href: string, text: string, variant: "primary" | "whatsapp" = "primary") {
   if (variant === "whatsapp") {
     return `
-      <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px 20px; text-align: center; margin: 24px 0;">
+      <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 20px; text-align: center; margin: 20px 0;">
         <div style="font-size: 12.5px; color: #475569; font-weight: 600; margin-bottom: 10px;">
           Have questions or need assistance with your order?
         </div>
         <a href="${href}" class="whatsapp-button">
-          💬 ${text}
+          ${text}
         </a>
       </div>
     `

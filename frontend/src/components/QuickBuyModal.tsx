@@ -585,7 +585,7 @@ export default function QuickBuyModal({ product, region, isOpen, onClose }: Quic
                   {/* Trust Footer */}
                   <div className="flex flex-wrap items-center justify-center gap-6 pt-3 border-t border-slate-100 text-[11px] font-jakarta font-semibold text-slate-500">
                     <span className="flex items-center gap-1">🌱 100% Pure Vegetarian</span>
-                    <span className="flex items-center gap-1">🛡️ FSSAI Certified</span>
+                    <span className="flex items-center gap-1">🛡️ FSSAI Reg. 22725113001738</span>
                     <span className="flex items-center gap-1">✈️ Express Shipping</span>
                   </div>
                 </div>

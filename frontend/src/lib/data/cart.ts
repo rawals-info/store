@@ -779,7 +779,10 @@ export async function placeOrder(cartId?: string) {
     }
 
     return cartRes.cart
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.digest?.startsWith("NEXT_REDIRECT") || error?.message === "NEXT_REDIRECT") {
+      throw error
+    }
     console.error("Error placing order:", error)
     // Revalidate cart to ensure UI is consistent
     const customCartCacheTag = await customCartCacheTagPromise
