@@ -73,7 +73,7 @@ If you are visiting Agra, authentic confectionery workshops line the historic la
 At [Taj Petha](/in), every batch is crafted fresh daily in Agra using these exact 6 steps, sealed in food-grade airtight nitrogen packs, and express-delivered within 24 to 72 hours across [Delhi NCR](/in/city/delhi), [Bangalore](/in/city/bangalore), [Mumbai](/in/city/mumbai), [Hyderabad](/in/city/hyderabad), and all major Indian cities.
 `,
     author: "Master Halwai Ramratan",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "7 min read",
     category: "traditional-recipes",
     tags: ["Agra Petha Making", "Halwai Recipe", "Ash Gourd Sweet", "Food Science", "Traditional Sweets"],
@@ -173,7 +173,7 @@ Bangalore tea lovers adore this crispy, protein-rich savory mix made from micro-
 Experience genuine GI-origin sweets without leaving your home in Karnataka. Check our dedicated [Bangalore City Delivery Portal](/in/city/bangalore) for free shipping on eligible orders, live package tracking, and 100% authentic freshness guarantee.
 `,
     author: "Taj Petha Culinary Guild",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "6 min read",
     category: "delivery-shipping",
     tags: ["Bangalore Sweets", "Petha Home Delivery Bangalore", "Agra Petha Online BLR", "Whitefield Sweets Delivery"],
@@ -267,7 +267,7 @@ The historic Mughal classic with only 2 natural ingredients: winter melon and ca
 Order directly via our [Mumbai City Delivery Page](/in/city/mumbai) or [Pune City Delivery Page](/in/city/pune) for verified dispatch straight from the heart of Agra!
 `,
     author: "Taj Petha Logistics Team",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "6 min read",
     category: "delivery-shipping",
     tags: ["Mumbai Petha Delivery", "Pune Agra Sweets", "Buy Petha Online Mumbai", "Paan Petha Pune"],
@@ -351,7 +351,7 @@ A royal homage to Meetha Paan! Folded petha cones stuffed with natural Gulkand, 
 Avoid stale warehouse stock. Order directly from our specialized [Hyderabad City Hub](/in/city/hyderabad) to experience pure Agra craftsmanship delivered straight to your door with full tracking and satisfaction guarantees!
 `,
     author: "Taj Petha Culinary Guild",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "5 min read",
     category: "delivery-shipping",
     tags: ["Hyderabad Petha Delivery", "Kesar Petha Hyderabad", "Buy Agra Sweets Hyderabad", "Agra Dalmoth Telangana"],
@@ -442,7 +442,7 @@ Because authentic Agra petha is prepared in small batches over 36-hour copper ka
 - **Corporate Bulk Inquiries:** Take advantage of personalized branded sleeves and multi-address shipping via [Taj Petha Corporate Services](/in/products/white-petha).
 `,
     author: "Agra Confectionery Archives",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "6 min read",
     category: "gifting",
     tags: ["Diwali Sweets", "Festive Hampers", "Diwali Gift Ideas", "Corporate Gifting Sweets", "Agra Petha Hamper"],
@@ -535,7 +535,7 @@ If you are trying to balance sweet indulgence with mindful health or looking for
 - **For Post-Workout Protein Snacking:** Fresh artisanal Rasgulla takes the prize.
 `,
     author: "Taj Petha Culinary Guild",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "7 min read",
     category: "health-nutrition",
     tags: ["Petha vs Rasgulla", "Soan Papdi Comparison", "Sweets Calories", "Healthy Indian Sweets", "Low Fat Mithai"],
@@ -632,7 +632,7 @@ While fresh raw ash gourd juice is consumed in the morning for intense therapeut
 At [Taj Petha](/in), we honor this 3,000-year heritage by using 100% pure mature field-ripened winter melon with zero chemical additives or artificial binders. Order fresh, wholesome sweets directly from our Agra kitchen today!
 `,
     author: "Agra Confectionery Archives",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "7 min read",
     category: "health-nutrition",
     tags: ["Ayurveda Petha", "Kushmanda Benefits", "Ash Gourd Health", "Pitta Cooling Sweets", "Safed Petha Acidity"],
@@ -736,7 +736,7 @@ In Agra households, afternoon chai is unthinkable without a bowl of crisp Dalmot
 Pair your next order of [Classic Dry Petha](/in/products/white-petha) with fresh [Agra Shahi Dalmoth](/in/products/dalmoth) to experience the true royal contrast of sweet and savory!
 `,
     author: "Master Halwai Ramratan",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "6 min read",
     category: "snack-guides",
     tags: ["Agra Dalmoth Recipe", "Dalmoth Namkeen", "Moth Dal Snack", "High Protein Namkeen", "Indian Tea Snacks"],
@@ -829,7 +829,7 @@ If you are courier-shipping sweets across Indian states during August:
 Send your love and sacred thread with guaranteed peace of mind. Explore our complete [Festive Gift Collection](/in/products/white-petha) today!
 `,
     author: "Taj Petha Culinary Guild",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "6 min read",
     category: "gifting",
     tags: ["Raksha Bandhan Sweets", "Rakhi Gift Combos", "Send Sweets to Brother", "Long Distance Rakhi Sweets", "Petha Rakhi Hamper"],
@@ -932,7 +932,7 @@ Do not compromise your family's health for roadside imitations. At [Taj Petha](/
 Shop our verified [Original Agra Petha Collection](/in/products/white-petha) with complete confidence, doorstep freshness, and 100% authenticity guaranteed!
 `,
     author: "Agra Confectionery Archives",
-    publishDate: "October 18, 2026",
+    publishDate: "2026-10-18",
     readTime: "6 min read",
     category: "buying-guides",
     tags: ["Fake Petha Identification", "Authentic Agra Petha", "Petha Food Safety", "Ash Gourd Quality", "Buy Genuine Petha"],
