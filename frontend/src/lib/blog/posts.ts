@@ -3,12 +3,14 @@ import { healthBlogPosts } from "./data/health-posts"
 import { buyingBlogPosts } from "./data/buying-guides"
 import { recipesHeritageBlogPosts } from "./data/recipes-heritage"
 import { snacksDeliveryBlogPosts } from "./data/snacks-delivery"
+import { newSeoBlogPosts } from "./data/new-seo-posts"
 
 export * from "./types"
 export * from "./categories"
 
 // Combined list of all modular blog posts
 export const blogPosts: BlogPost[] = [
+  ...newSeoBlogPosts,
   ...healthBlogPosts,
   ...buyingBlogPosts,
   ...recipesHeritageBlogPosts,
