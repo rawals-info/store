@@ -65,9 +65,6 @@ export const RazorpayPaymentButton = ({
       currency: (cart.currency_code || "usd").toUpperCase() as CurrencyCode,
       name: process.env.NEXT_PUBLIC_SHOP_NAME ?? "Checkout",
       description: `Order ${orderId}`,
-      notes: {
-        cart_id: cart.id,
-      } as any,
       remember_customer: true,
       image: "/favicon.ico",
       modal: {
