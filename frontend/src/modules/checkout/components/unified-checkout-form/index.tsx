@@ -357,6 +357,9 @@ export default function UnifiedCheckoutForm({
           name: "Taj Petha Agra",
           description: "Fresh Agra Sweets Order",
           image: "https://tajpetha.in/logo.webp",
+          notes: {
+            cart_id: cartUpdated.id,
+          } as any,
           modal: {
             backdropclose: true,
             escape: true,

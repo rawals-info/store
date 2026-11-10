@@ -15,6 +15,11 @@ import { PostAdminAbandonedCartNotifySchema } from "./admin/abandoned-carts/noti
 export default defineMiddlewares({
   routes: [
     {
+      method: ["POST"],
+      matcher: "/razorpay/*",
+      bodyParser: { preserveRawBody: true },
+    },
+    {
       method: ["GET"],
       matcher: "/admin/abandoned-carts",
       middlewares: [
