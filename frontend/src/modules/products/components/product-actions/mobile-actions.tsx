@@ -66,7 +66,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   }, [price])
 
   const rawNum = selectedPrice?.calculated_price_number || 0
-  const { activePromo, threshold } = usePromotion()
+  const { threshold, calculatePrice } = usePromotion()
+  const { discountedPrice, isDiscounted, discountPercent } = calculatePrice(rawNum)
 
   const isSimple = isSimpleProduct(product)
 
@@ -96,14 +97,19 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               <span className="font-jakarta text-xs sm:text-sm font-bold text-slate-900 truncate block">
                 {product.title}
               </span>
-              <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-slate-900">
-                <span>₹{formatIndianPrice(rawNum)}</span>
-                {activePromo && activePromo.discountPercent > 0 ? (
-                  <span className="font-jakarta text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200/80 px-1 py-0.2 rounded">
-                    {activePromo.discountPercent}% OFF on ₹{threshold}+
-                  </span>
+              <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-slate-900 flex-wrap">
+                <span>₹{formatIndianPrice(isDiscounted ? discountedPrice : rawNum)}</span>
+                {isDiscounted ? (
+                  <>
+                    <span className="text-xs text-slate-400 line-through">
+                      ₹{formatIndianPrice(rawNum)}
+                    </span>
+                    <span className="font-jakarta text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded whitespace-nowrap">
+                      {discountPercent}% OFF
+                    </span>
+                  </>
                 ) : (
-                  <span className="font-jakarta text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1 py-0.2 rounded">
+                  <span className="font-jakarta text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1 py-0.2 rounded whitespace-nowrap">
                     FREE Delivery on ₹{threshold}+
                   </span>
                 )}

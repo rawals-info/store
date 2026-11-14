@@ -3,7 +3,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
 import { formatIndianPrice } from "@lib/util/money"
-import { calculateDiscountedPrice } from "@lib/config/promotions"
+import { usePromotion } from "@lib/context/promotion-context"
 import React from "react"
 
 type OptionSelectProps = {
@@ -26,6 +26,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   product,
 }) => {
   const filteredOptions = (option.values ?? []).map((v) => v.value)
+  const { calculatePrice } = usePromotion()
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -51,7 +52,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
           ) as any
 
           const rawAmt = Number(matchingVariant?.calculated_price?.calculated_amount || matchingVariant?.prices?.[0]?.amount || 0)
-          const { discountedPrice: discAmt } = calculateDiscountedPrice(rawAmt)
+          const { discountedPrice: discAmt, isDiscounted } = calculatePrice(rawAmt)
 
           return (
             <button

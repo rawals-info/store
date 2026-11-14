@@ -119,7 +119,12 @@ const ProductPreview = ({
         {/* Product Details */}
         <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between">
           <div>
-            <ProductPreviewRating productId={product.id} />
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <ProductPreviewRating productId={product.id} />
+              <span className="text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded font-jakarta flex items-center gap-1">
+                ⚡ 24h Air Ship
+              </span>
+            </div>
             
             <LocalizedClientLink href={`/products/${product.handle}`}>
               <h3 className="font-cormorant text-base sm:text-lg font-bold text-slate-900 line-clamp-2 h-[2.5rem] sm:h-auto group-hover:text-petha-amber transition-colors mt-1 leading-tight sm:leading-snug">
@@ -134,11 +139,9 @@ const ProductPreview = ({
 
           {/* Price & Quick Add Button */}
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               {cheapestPrice ? (
-                <div className="font-mono text-sm sm:text-base font-bold text-slate-900">
-                  <PreviewPrice price={cheapestPrice} />
-                </div>
+                <PreviewPrice price={cheapestPrice} />
               ) : (
                 <span className="text-xs font-bold text-slate-700 font-jakarta">₹249</span>
               )}
