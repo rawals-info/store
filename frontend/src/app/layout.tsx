@@ -5,28 +5,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
 import Script from "next/script";
 import "styles/globals.css"
-import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google"
 import PackingSweetBoxOverlay from "@components/PackingSweetBoxOverlay"
 import { PromotionProvider } from "@lib/context/promotion-context"
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-cormorant",
-  preload: true,
-  fallback: ['Georgia', 'serif'],
-})
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-jakarta",
-  preload: true,
-  fallback: ['system-ui', 'arial'],
-})
 
 
 export const metadata: Metadata = {
@@ -247,9 +227,17 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   const enableServiceWorker = process.env.NEXT_PUBLIC_ENABLE_SW === 'true'
   const isProd = process.env.NODE_ENV === 'production'
   return (
-    <html lang="en-IN" data-mode="light" className={`${cormorant.variable} ${jakarta.variable}`}>
+    <html lang="en-IN" data-mode="light">
       <head>
         <meta property="og:site_name" content="Taj Petha" />
+
+        {/* Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
 
         {/* Critical DNS prefetch for external analytics */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
